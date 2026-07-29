@@ -1,0 +1,565 @@
+/* =============================================
+   reservas_adm.css — SiGA ITJ Admin
+   ============================================= */
+
+/* ========== PAGE HEADER ========== */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0b4b9b;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 i {
+    color: #e67e22;
+}
+
+.page-subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.btn-primary {
+    background: #0b4b9b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background: #0a3d7a;
+    transform: translateY(-2px);
+}
+
+.btn-primary i {
+    font-size: 14px;
+}
+
+/* ========== FILTROS ========== */
+.filtros-container {
+    background: white;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filtros-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filtro-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #555;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: #f5f7fa;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.filtro-tab:hover {
+    background: #e8edf5;
+    color: #0b4b9b;
+}
+
+.filtro-tab.active {
+    background: #0b4b9b;
+    color: white;
+    border-color: #0b4b9b;
+}
+
+.filtro-tab.active .tab-badge {
+    background: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.tab-badge {
+    background: #e8edf5;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+}
+
+.tab-badge.pendente {
+    background: #fff4ec;
+    color: #e67e22;
+}
+.tab-badge.aprovada {
+    background: #eafaf1;
+    color: #27ae60;
+}
+.tab-badge.cancelada {
+    background: #fef0ef;
+    color: #e74c3c;
+}
+
+.filtro-busca-ativa {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f0f7ff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #0b4b9b;
+    border: 1px solid #dbeafe;
+}
+
+.limpar-busca {
+    color: #e74c3c;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.limpar-busca:hover {
+    background: #fef0ef;
+}
+
+/* ========== TABELA ========== */
+.reservas-table-wrapper {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.reservas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.reservas-table thead {
+    background: #f8faff;
+}
+
+.reservas-table thead th {
+    text-align: left; /* Mantém alinhamento à esquerda por padrão */
+    padding: 14px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #edf2f7;
+}
+
+/* Centraliza apenas as colunas de Status e Ações no cabeçalho */
+.reservas-table thead th:nth-child(6), /* Status */
+.reservas-table thead th:nth-child(7) { /* Ações */
+    text-align: center;
+}
+
+.reservas-table tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f4fd;
+    vertical-align: middle;
+    text-align: left; /* Mantém alinhamento à esquerda por padrão */
+}
+
+/* Centraliza apenas as colunas de Status e Ações no corpo da tabela */
+.reservas-table tbody td:nth-child(6), /* Status */
+.reservas-table tbody td:nth-child(7) { /* Ações */
+    text-align: center;
+}
+
+.reservas-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.reservas-table tbody tr:hover td {
+    background: #fafcff;
+}
+
+.reserva-row {
+    transition: background 0.2s;
+}
+
+/* ========== ALUNO INFO ========== */
+.aluno-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.aluno-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #0b4b9b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.aluno-nome {
+    font-weight: 500;
+    color: #1f1f1f;
+}
+
+.material-nome {
+    color: #1f1f1f;
+}
+
+/* ========== TIPO BADGE ========== */
+.tipo-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #eaf4ff;
+    color: #0b4b9b;
+    border: 1px solid #dbeafe;
+    display: inline-block;
+}
+
+/* ========== STATUS BADGE ========== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+}
+
+.status-pendente {
+    background: #fff4ec;
+    color: #e67e22;
+    border-color: #fde8d8;
+}
+.status-pendente i {
+    color: #e67e22;
+}
+
+.status-aprovada {
+    background: #eafaf1;
+    color: #27ae60;
+    border-color: #d4f0e0;
+}
+.status-aprovada i {
+    color: #27ae60;
+}
+
+.status-cancelada {
+    background: #fef0ef;
+    color: #e74c3c;
+    border-color: #fde2df;
+}
+.status-cancelada i {
+    color: #e74c3c;
+}
+
+/* ========== AÇÕES ========== */
+.acoes-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.btn-acao {
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin: 0 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-aprovar {
+    background: #eafaf1;
+    color: #27ae60;
+    border: 1px solid #d4f0e0;
+}
+.btn-aprovar:hover {
+    background: #27ae60;
+    color: white;
+    border-color: #27ae60;
+    transform: scale(1.05);
+}
+
+.btn-rejeitar {
+    background: #fef0ef;
+    color: #e74c3c;
+    border: 1px solid #fde2df;
+}
+.btn-rejeitar:hover {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+.sem-acao {
+    color: #ccc;
+    font-size: 14px;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: #d1d9e6;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    color: #1f1f1f;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* ========== ANIMAÇÕES DOS FILTROS ========== */
+.filtro-tab {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.filtro-tab.active {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(11, 75, 155, 0.15);
+}
+
+.filtro-tab:active {
+    transform: scale(0.95);
+}
+
+/* ========== ANIMAÇÃO DAS LINHAS DA TABELA ========== */
+.reserva-row {
+    transition: all 0.3s ease;
+    animation: fadeInRow 0.3s ease forwards;
+}
+
+@keyframes fadeInRow {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reserva-row:nth-child(2) {
+    animation-delay: 0.05s;
+}
+.reserva-row:nth-child(3) {
+    animation-delay: 0.1s;
+}
+.reserva-row:nth-child(4) {
+    animation-delay: 0.15s;
+}
+.reserva-row:nth-child(5) {
+    animation-delay: 0.2s;
+}
+.reserva-row:nth-child(6) {
+    animation-delay: 0.25s;
+}
+.reserva-row:nth-child(7) {
+    animation-delay: 0.3s;
+}
+.reserva-row:nth-child(8) {
+    animation-delay: 0.35s;
+}
+.reserva-row:nth-child(9) {
+    animation-delay: 0.4s;
+}
+.reserva-row:nth-child(10) {
+    animation-delay: 0.45s;
+}
+
+/* ========== TRANSITION DA BUSCA ========== */
+.filtro-busca-ativa {
+    transition: all 0.3s ease;
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.limpar-busca {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.limpar-busca:hover {
+    transform: rotate(90deg);
+}
+
+/* ========== TOAST ========== */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 14px 20px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    animation: toastIn 0.4s ease forwards;
+    border: 1px solid #f0f4fd;
+}
+
+.toast-success {
+    border-left: 3px solid #27ae60;
+}
+.toast-success i {
+    color: #27ae60;
+}
+
+.toast-error {
+    border-left: 3px solid #e74c3c;
+}
+.toast-error i {
+    color: #e74c3c;
+}
+
+.toast-info {
+    border-left: 3px solid #0b4b9b;
+}
+.toast-info i {
+    color: #0b4b9b;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filtros-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtros-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+    }
+
+    .filtro-tab {
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .reservas-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .reservas-table {
+        font-size: 13px;
+        min-width: 700px;
+    }
+
+    .reservas-table thead th,
+    .reservas-table tbody td {
+        padding: 10px 12px;
+    }
+
+    .btn-acao {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
