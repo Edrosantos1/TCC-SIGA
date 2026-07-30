@@ -68,7 +68,7 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
     <header class="top-header">
       <div class="search-container">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search-input" placeholder="Pesquisar alunos, acervos, empréstimos..." autocomplete="off">
+        <input type="text" id="search-input" placeholder="Pesquisar por aluno..." autocomplete="off">
         <div class="search-results-dropdown" id="search-results" style="display:none;"></div>
       </div>
 
@@ -93,7 +93,7 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
           <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
         </div>
 
-        <!-- NOTIFICAÇÃO -->
+        <!-- NOTIFICAÇÃO (sininho) -->
         <div class="notification-container">
           <button class="notification-btn" id="notification-btn" title="Notificações">
             <i class="fas fa-bell"></i>
@@ -104,7 +104,7 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
               <button class="mark-read-btn" id="mark-read-btn">Marcar todas como lidas</button>
             </div>
             <div class="notification-list" id="notification-list">
-              <!-- Preenchido via JS -->
+              <!-- Preenchido via JS (caso queira, mas pode ficar vazio) -->
             </div>
           </div>
         </div>
@@ -118,11 +118,13 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
       <section class="welcome-section">
         <div class="welcome-text">
           <h1>Bem-vinda, <span id="welcome-name"><?= htmlspecialchars($nome_bibliotecaria) ?></span>!</h1>
-          <p>Aqui está um resumo do que está acontecendo hoje na biblioteca.</p>
+          <p>Aqui você pode pesquisar alunos cadastrados no sistema.</p>
         </div>
         <div class="welcome-date" id="welcome-date">
           <!-- Data preenchida via JS -->
         </div>
       </section>
+    </main>
+  </div>
 </body>
 </html>

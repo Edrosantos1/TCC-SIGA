@@ -1,7 +1,3 @@
-// =============================================
-// reservas_adm.js — SiGA ITJ Admin
-// =============================================
-
 // ========== VARIÁVEIS GLOBAIS ==========
 let reservas = [];
 let filtroAtual = 'todos';
@@ -21,12 +17,11 @@ function renderizarReservas() {
         reservasFiltradas = reservasFiltradas.filter(r => r.status === filtroAtual);
     }
     
-    // Filtrar por busca
+    // Filtrar por busca (APENAS POR ALUNO, COM PREFIXO)
     if (buscaAtual.trim() !== '') {
         const termo = buscaAtual.toLowerCase().trim();
         reservasFiltradas = reservasFiltradas.filter(r => 
-            r.aluno.toLowerCase().includes(termo) || 
-            r.material.toLowerCase().includes(termo)
+            r.aluno.toLowerCase().startsWith(termo)
         );
     }
     
@@ -56,11 +51,13 @@ function renderizarReservas() {
         const statusIcon = {
             'pendente': 'fa-hourglass-half',
             'aprovada': 'fa-check-circle',
-            'cancelada': 'fa-times-circle'
+            'cancelada': 'fa-times-circle',
+            'rejeitada': 'fa-times-circle'
         }[reserva.status] || 'fa-circle';
         
-        const dataReserva = new Date(reserva.data_reserva);
-        const dataLimite = new Date(reserva.data_limite);
+        // Trata a string da data do MySQL corretamente
+        const dataReserva = new Date(reserva.data_reserva.replace(/-/g, '/'));
+        const dataLimite = new Date(reserva.data_limite.replace(/-/g, '/'));
         
         return `
             <tr class="reserva-row" data-id="${reserva.id}">
@@ -102,12 +99,14 @@ function renderizarReservas() {
 
 // ========== FUNÇÕES AUXILIARES ==========
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
 function formatarData(date) {
+    if (isNaN(date.getTime())) return '-';
     const dia = String(date.getDate()).padStart(2, '0');
     const mes = String(date.getMonth() + 1).padStart(2, '0');
     const ano = date.getFullYear();
@@ -117,6 +116,7 @@ function formatarData(date) {
 }
 
 function formatarDataSimples(date) {
+    if (isNaN(date.getTime())) return '-';
     const dia = String(date.getDate()).padStart(2, '0');
     const mes = String(date.getMonth() + 1).padStart(2, '0');
     const ano = date.getFullYear();
@@ -127,18 +127,17 @@ function atualizarBadges() {
     const total = reservas.length;
     const pendentes = reservas.filter(r => r.status === 'pendente').length;
     const aprovadas = reservas.filter(r => r.status === 'aprovada').length;
-    const canceladas = reservas.filter(r => r.status === 'cancelada').length;
-    
+    const rejeitadas = reservas.filter(r => r.status === 'rejeitada').length;
+
     document.getElementById('badge-todos').textContent = total;
     document.getElementById('badge-pendente').textContent = pendentes;
     document.getElementById('badge-aprovada').textContent = aprovadas;
-    document.getElementById('badge-cancelada').textContent = canceladas;
+    document.getElementById('badge-rejeitada').textContent = rejeitadas;
     document.getElementById('reservas-badge').textContent = pendentes;
 }
 
 function atualizarStats(filtradas) {
-    // Atualizar apenas o total de reservas filtradas
-    // Os outros stats permanecem com os valores totais
+    // Reservado para futuras atualizações de contadores visuais na tela
 }
 
 // ========== FILTROS ==========
@@ -167,30 +166,34 @@ function initFiltros() {
     
     // Busca
     let timeoutId;
-    buscaInput.addEventListener('input', function() {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            const termo = this.value.trim();
-            buscaAtual = termo;
-            
-            if (termo) {
-                buscaTermo.textContent = termo;
-                buscaAtiva.style.display = 'flex';
-            } else {
-                buscaAtiva.style.display = 'none';
-            }
-            
-            renderizarReservas();
-        }, 300);
-    });
+    if (buscaInput) {
+        buscaInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                const termo = this.value.trim();
+                buscaAtual = termo;
+                
+                if (termo) {
+                    buscaTermo.textContent = termo;
+                    buscaAtiva.style.display = 'flex';
+                } else {
+                    buscaAtiva.style.display = 'none';
+                }
+                
+                renderizarReservas();
+            }, 300);
+        });
+    }
     
     // Limpar busca
-    limparBusca.addEventListener('click', function() {
-        buscaInput.value = '';
-        buscaAtual = '';
-        buscaAtiva.style.display = 'none';
-        renderizarReservas();
-    });
+    if (limparBusca) {
+        limparBusca.addEventListener('click', function() {
+            buscaInput.value = '';
+            buscaAtual = '';
+            buscaAtiva.style.display = 'none';
+            renderizarReservas();
+        });
+    }
 }
 
 // ========== SIDEBAR COLLAPSE ==========
@@ -248,29 +251,51 @@ function initNotifications() {
 }
 
 // ========== AÇÕES DAS RESERVAS ==========
-function aprovarReserva(id) {
+async function alterarStatusReserva(id, novoStatus) {
+    console.log('📤 Enviando:', { id, novoStatus });
+    try {
+        const response = await fetch('atualizar_status_reserva.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, status: novoStatus })
+        });
+
+        const result = await response.json();
+        console.log('📥 Resposta:', result);
+
+        if (result.success) {
+            const reserva = reservas.find(r => Number(r.id) === Number(id));
+            if (reserva) {
+                reserva.status = novoStatus;
+                renderizarReservas();
+            } else {
+                location.reload();
+            }
+
+            if (novoStatus === 'aprovada') {
+                showToast('Reserva aprovada com sucesso!', 'success');
+            } else if (novoStatus === 'rejeitada') {
+                showToast('Reserva rejeitada com sucesso.', 'error');
+            }
+        } else {
+            showToast(result.message || 'Erro ao atualizar status.', 'error');
+        }
+    } catch (error) {
+        console.error('❌ Erro:', error);
+        showToast('Erro de comunicação com o servidor.', 'error');
+    }
+}
+
+// ANEXANDO AO WINDOW PARA GARANTIR QUE O ONCLICK DO HTML ENCONTRE AS FUNÇÕES
+window.aprovarReserva = function(id) {
     if (!confirm('Deseja aprovar esta reserva?')) return;
+    alterarStatusReserva(id, 'aprovada');
+};
 
-    // Em produção: enviar requisição AJAX para o backend
-    const reserva = reservas.find(r => r.id === id);
-    if (reserva) {
-        reserva.status = 'aprovada';
-        renderizarReservas();
-        showToast('Reserva aprovada com sucesso!', 'success');
-    }
-}
-
-function rejeitarReserva(id) {
+window.rejeitarReserva = function(id) {
     if (!confirm('Deseja rejeitar esta reserva?')) return;
-
-    // Em produção: enviar requisição AJAX para o backend
-    const reserva = reservas.find(r => r.id === id);
-    if (reserva) {
-        reserva.status = 'cancelada';
-        renderizarReservas();
-        showToast('Reserva rejeitada.', 'error');
-    }
-}
+    alterarStatusReserva(id, 'rejeitada');
+};
 
 // ========== TOAST ==========
 function criarContainerToast() {
@@ -315,7 +340,7 @@ function showToast(message, type = 'info') {
 
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // Carregar dados
+    // Carregar dados vindos do PHP
     if (typeof reservasData !== 'undefined') {
         reservas = reservasData;
     }
@@ -328,5 +353,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Renderizar inicial
     renderizarReservas();
 
-    console.log('%cPágina de Reservas - SiGA ITJ Admin carregada!', 'color: #e67e22; font-weight: bold;');
+    console.log('%cPágina de Reservas - SiGA ITJ Admin conectada ao MySQL!', 'color: #27ae60; font-weight: bold;');
 });

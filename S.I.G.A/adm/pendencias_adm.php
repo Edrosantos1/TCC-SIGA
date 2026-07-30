@@ -7,9 +7,9 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$nome_bibliotecaria = isset($_SESSION['admin_nome']) ? $_SESSION['admin_nome'] : 'Bibliotecária';
+$nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 
-// ========== IDENTIFICAR A CONEXÃO MYSQLI ==========
+// ========== IDENTIFICAR CONEXÃO (MYSQLI OU PDO) ==========
 $db = null;
 if (isset($conn)) {
     $db = $conn;
@@ -19,68 +19,71 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ========== BUSCAR RESERVAS DO BANCO (MYSQLI) ==========
-$reservas = array();
+// ========== BUSCAR EMPRÉSTIMOS/PENDÊNCIAS DO BANCO ==========
+$pendencias = array();
 
 if ($db) {
     $query = "
         SELECT 
-            r.id_reserva AS id,
+            e.id_emprestimo AS id,
             l.nome_aluno AS aluno,
-            r.id_aluno,
-            r.titulo_item AS material,
+            e.titulo_item AS material,
             'Livro' AS tipo,
-            r.data_reserva,
-            r.data_limite,
-            r.status
-        FROM reservas r
-        INNER JOIN login_aluno l ON r.id_aluno = l.id_aluno
-        ORDER BY r.data_reserva DESC
+            e.data_emprestimo,
+            e.data_devolucao_prevista AS data_limite,
+            e.status
+        FROM emprestimos e
+        INNER JOIN login_aluno l ON e.id_aluno = l.id_aluno
+        WHERE e.status IN ('emprestado', 'atrasado')
+        ORDER BY e.data_devolucao_prevista ASC
     ";
     
-    $result = $db->query($query);
-
-    if ($result) {
-        // Busca todas as linhas usando o método correto do MySQLi
-        $reservas = $result->fetch_all(MYSQLI_ASSOC);
+    if ($db instanceof mysqli) {
+        $result = $db->query($query);
+        if ($result) {
+            $pendencias = $result->fetch_all(MYSQLI_ASSOC);
+        }
+    } elseif ($db instanceof PDO) {
+        $stmt = $db->query($query);
+        if ($stmt) {
+            $pendencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 }
 
-// ========== CONTAGENS ==========
-$total_pendentes = 0;
-$total_aprovadas = 0;
-$total_rejeitadas = 0;
+// ========== CONTAGENS E ATUALIZAÇÃO DINÂMICA DE STATUS ==========
+$total_no_prazo = 0;
+$total_atrasados = 0;
+$data_hoje = date('Y-m-d');
 
-foreach ($reservas as $r) {
-    if ($r['status'] === 'pendente') {
-        $total_pendentes++;
-    } elseif ($r['status'] === 'aprovada') {
-        $total_aprovadas++;
-    } elseif ($r['status'] === 'rejeitada') {
-        $total_rejeitadas++;
+foreach ($pendencias as &$p) {
+    if ($p['status'] !== 'devolvido' && $p['data_limite'] < $data_hoje) {
+        $p['status'] = 'atrasado';
+    }
+    
+    if ($p['status'] === 'atrasado') {
+        $total_atrasados++;
+    } else {
+        $total_no_prazo++;
     }
 }
+unset($p);
 
-$total_geral = count($reservas);
-
-
-$total_geral = count($reservas);
-
-// Passar dados para o JavaScript
-$reservas_json = json_encode($reservas);
+$total_geral = count($pendencias);
+$pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas — SiGA ITJ Admin</title>
+    <title>Pendências — SiGA ITJ Admin</title>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
     <link rel="stylesheet" href="../assets/css/reservas_adm.css">
-    <script src="../assets/js/reservas_adm.js" defer></script>
+    <script src="../assets/js/pendencias_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
 
@@ -102,14 +105,16 @@ $reservas_json = json_encode($reservas);
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="reservas_adm.php" class="nav-item active">
+            <a href="reservas_adm.php" class="nav-item">
                 <i class="fas fa-bookmark"></i>
                 <span>Reservas</span>
-                <span class="nav-badge" id="reservas-badge"><?= $total_pendentes ?></span>
             </a>
-            <a href="pendencias_adm.php" class="nav-item">
+            <a href="pendencias_adm.php" class="nav-item active">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
+                <?php if ($total_atrasados > 0): ?>
+                    <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
+                <?php endif; ?>
             </a>
             <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
@@ -130,7 +135,7 @@ $reservas_json = json_encode($reservas);
         <header class="top-header">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" placeholder="Pesquisar por aluno" autocomplete="off">
+                <input type="text" id="search-input" placeholder="Pesquisar pendências por aluno..." autocomplete="off">
             </div>
 
             <div class="header-right">
@@ -178,13 +183,8 @@ $reservas_json = json_encode($reservas);
             <!-- ========== CABEÇALHO DA PÁGINA ========== -->
             <div class="page-header">
                 <div>
-                    <h1><i class="fas fa-bookmark"></i> Gerenciar Reservas</h1>
-                    <p class="page-subtitle">Gerencie todas as solicitações de reserva dos alunos</p>
-                </div>
-                <div class="page-actions">
-                    <button class="btn-primary" id="btn-nova-reserva">
-                        <i class="fas fa-plus"></i> Nova Reserva Manual
-                    </button>
+                    <h1><i class="fas fa-exclamation-circle"></i> Empréstimos & Pendências</h1>
+                    <p class="page-subtitle">Acompanhe os materiais emprestados e registre as devoluções</p>
                 </div>
             </div>
 
@@ -195,17 +195,13 @@ $reservas_json = json_encode($reservas);
                         <i class="fas fa-list"></i> Todos
                         <span class="tab-badge" id="badge-todos"><?= $total_geral ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="pendente">
-                        <i class="fas fa-hourglass-half"></i> Pendentes
-                        <span class="tab-badge pendente" id="badge-pendente"><?= $total_pendentes ?></span>
+                    <button class="filtro-tab" data-status="atrasado">
+                        <i class="fas fa-exclamation-triangle"></i> Atrasados
+                        <span class="tab-badge cancelada" id="badge-atrasado"><?= $total_atrasados ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="aprovada">
-                        <i class="fas fa-check-circle"></i> Aprovadas
-                        <span class="tab-badge aprovada" id="badge-aprovada"><?= $total_aprovadas ?></span>
-                    </button>
-                    <button class="filtro-tab" data-status="rejeitada">
-                        <i class="fas fa-times-circle"></i> Rejeitadas
-                        <span class="tab-badge rejeitada" id="badge-rejeitada"><?= $total_rejeitadas ?></span>
+                    <button class="filtro-tab" data-status="emprestado">
+                        <i class="fas fa-clock"></i> No Prazo
+                        <span class="tab-badge aprovada" id="badge-emprestado"><?= $total_no_prazo ?></span>
                     </button>
                 </div>
 
@@ -215,7 +211,7 @@ $reservas_json = json_encode($reservas);
                 </div>
             </div>
 
-            <!-- ========== LISTA DE RESERVAS ========== -->
+            <!-- ========== LISTA DE PENDÊNCIAS ========== -->
             <div class="reservas-list-container">
                 <div class="reservas-table-wrapper">
                     <table class="reservas-table">
@@ -224,31 +220,29 @@ $reservas_json = json_encode($reservas);
                                 <th>Aluno</th>
                                 <th>Material</th>
                                 <th>Tipo</th>
-                                <th>Data da Reserva</th>
-                                <th>Data Limite</th>
+                                <th>Data Empréstimo</th>
+                                <th>Devolução Prevista</th>
                                 <th>Status</th>
                                 <th class="text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="reservas-tbody">
-                            <!-- As reservas serão renderizadas pelo JavaScript -->
+                        <tbody id="pendencias-tbody">
+                            <!-- Preenchido via JS -->
                         </tbody>
                     </table>
                 </div>
                 <div class="empty-state" id="empty-state" style="display: none;">
                     <i class="fas fa-inbox"></i>
-                    <h3>Nenhuma reserva encontrada</h3>
-                    <p id="empty-message">Não há reservas para os filtros selecionados</p>
+                    <h3>Nenhum empréstimo ativo no momento</h3>
+                    <p id="empty-message">Não há pendências cadastradas</p>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <!-- ========== DADOS PARA O JAVASCRIPT ========== -->
     <script>
-        // Passar dados reais do banco de dados para o JavaScript
-        const reservasData = <?= $reservas_json ?>;
+        const pendenciasData = <?= $pendencias_json ?>;
     </script>
 
 </body>

@@ -562,4 +562,15 @@
         font-size: 11px;
         padding: 4px 8px;
     }
+}.status-rejeitada {
+    background: #fef0ef;
+    color: #e74c3c;
+    border-color: #fde2df;
+}
+.status-rejeitada i {
+    color: #e74c3c;
+}
+.tab-badge.rejeitada {
+    background: #fef0ef;
+    color: #e74c3c;
 }
