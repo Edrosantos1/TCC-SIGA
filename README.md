@@ -48,8 +48,9 @@ O sistema é dividido em duas grandes áreas:
 
 ## 👥 Autores & Desenvolvedores
 
-* **Pedro Santos Schweitzer** — *Desenvolvimento & Estruturação* — [GitHub](https://github.com/Edrosantos1)
-
+* **Pedro Santos Schweitzer** — *Desenvolvimento do sistema, organização dos arquivos & Estruturação completa do Banco de Dados* — [GitHub](https://github.com/Edrosantos1)
+* **Ricado Menezes Lourenço de Araujo** — *Desenvolvimentoc do sistema & Estruturação de mecânicas do sistema via JS*
+* **João Guilherme** 
 ---
 
 ## 📌 Status do Projeto
