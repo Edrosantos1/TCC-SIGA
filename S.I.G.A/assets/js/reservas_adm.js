@@ -8,7 +8,10 @@ function renderizarReservas() {
     const tbody = document.getElementById('reservas-tbody');
     const emptyState = document.getElementById('empty-state');
     const emptyMessage = document.getElementById('empty-message');
-    
+    const tableWrapper = document.querySelector('.reservas-table-wrapper');
+
+    if (!tbody) return;
+
     // Filtrar reservas
     let reservasFiltradas = reservas;
     
@@ -17,11 +20,11 @@ function renderizarReservas() {
         reservasFiltradas = reservasFiltradas.filter(r => r.status === filtroAtual);
     }
     
-    // Filtrar por busca (APENAS POR ALUNO, COM PREFIXO)
+    // Filtrar por busca (APENAS POR ALUNO)
     if (buscaAtual.trim() !== '') {
         const termo = buscaAtual.toLowerCase().trim();
         reservasFiltradas = reservasFiltradas.filter(r => 
-            r.aluno.toLowerCase().startsWith(termo)
+            r.aluno && r.aluno.toLowerCase().startsWith(termo)
         );
     }
     
@@ -31,46 +34,51 @@ function renderizarReservas() {
     // Mostrar/ocultar empty state
     if (reservasFiltradas.length === 0) {
         tbody.innerHTML = '';
-        emptyState.style.display = 'block';
-        let mensagem = 'Não há reservas ';
-        if (filtroAtual !== 'todos') {
-            mensagem += `com status "${filtroAtual}" `;
+        if (tableWrapper) tableWrapper.style.display = 'none';
+        if (emptyState) {
+            emptyState.style.display = 'block';
+            let mensagem = 'Não há reservas ';
+            if (filtroAtual !== 'todos') {
+                mensagem += `com status "${filtroAtual}" `;
+            }
+            if (buscaAtual.trim() !== '') {
+                mensagem += `para a busca "${buscaAtual}"`;
+            }
+            if (emptyMessage) emptyMessage.textContent = mensagem || 'Não há reservas para os filtros selecionados';
         }
-        if (buscaAtual.trim() !== '') {
-            mensagem += `para a busca "${buscaAtual}"`;
-        }
-        emptyMessage.textContent = mensagem || 'Não há reservas para os filtros selecionados';
         return;
     }
     
-    emptyState.style.display = 'none';
+    if (tableWrapper) tableWrapper.style.display = 'block';
+    if (emptyState) emptyState.style.display = 'none';
     
-    // Renderizar linhas
+    // Renderizar linhas HTML
     tbody.innerHTML = reservasFiltradas.map(reserva => {
         const statusClass = reserva.status;
         const statusIcon = {
             'pendente': 'fa-hourglass-half',
             'aprovada': 'fa-check-circle',
             'cancelada': 'fa-times-circle',
-            'rejeitada': 'fa-times-circle'
+            'rejeitada': 'fa-times-circle',
+            'expirada': 'fa-clock'
         }[reserva.status] || 'fa-circle';
         
-        // Trata a string da data do MySQL corretamente
-        const dataReserva = new Date(reserva.data_reserva.replace(/-/g, '/'));
-        const dataLimite = new Date(reserva.data_limite.replace(/-/g, '/'));
-        
+        const dataReservaFormatada = formatarData(reserva.data_reserva);
+        const dataLimiteFormatada = formatarData(reserva.data_limite);
+        const inicialAluno = reserva.aluno ? reserva.aluno.trim().charAt(0).toUpperCase() : '?';
+
         return `
             <tr class="reserva-row" data-id="${reserva.id}">
                 <td>
                     <div class="aluno-info">
-                        <span class="aluno-avatar">${reserva.aluno.charAt(0)}</span>
+                        <span class="aluno-avatar">${escapeHtml(inicialAluno)}</span>
                         <span class="aluno-nome">${escapeHtml(reserva.aluno)}</span>
                     </div>
                 </td>
                 <td class="material-nome">${escapeHtml(reserva.material)}</td>
-                <td><span class="tipo-badge">${escapeHtml(reserva.tipo)}</span></td>
-                <td>${formatarData(dataReserva)}</td>
-                <td>${formatarDataSimples(dataLimite)}</td>
+                <td><span class="tipo-badge">${escapeHtml(reserva.tipo || 'Livro')}</span></td>
+                <td>${dataReservaFormatada}</td>
+                <td>${dataLimiteFormatada}</td>
                 <td>
                     <span class="status-badge status-${statusClass}">
                         <i class="fas ${statusIcon}"></i>
@@ -92,12 +100,20 @@ function renderizarReservas() {
             </tr>
         `;
     }).join('');
-    
-    // Atualizar contagens nos stats
-    atualizarStats(reservasFiltradas.length);
 }
 
-// ========== FUNÇÕES AUXILIARES ==========
+// ========== FUNÇÕES AUXILIARES DE DATA (FORMATO DD/MM/AAAA) ==========
+function formatarData(dataStr) {
+    if (!dataStr) return '-';
+    // Remove qualquer horário que venha junto do MySQL (ex: "2026-07-31 00:10:00" -> "2026-07-31")
+    const dataApenas = dataStr.split(' ')[0];
+    const partes = dataApenas.split('-');
+    if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return dataStr;
+}
+
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -105,42 +121,29 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function formatarData(date) {
-    if (isNaN(date.getTime())) return '-';
-    const dia = String(date.getDate()).padStart(2, '0');
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const ano = date.getFullYear();
-    const horas = String(date.getHours()).padStart(2, '0');
-    const minutos = String(date.getMinutes()).padStart(2, '0');
-    return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
-}
-
-function formatarDataSimples(date) {
-    if (isNaN(date.getTime())) return '-';
-    const dia = String(date.getDate()).padStart(2, '0');
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const ano = date.getFullYear();
-    return `${dia}/${mes}/${ano}`;
-}
-
 function atualizarBadges() {
     const total = reservas.length;
     const pendentes = reservas.filter(r => r.status === 'pendente').length;
     const aprovadas = reservas.filter(r => r.status === 'aprovada').length;
     const rejeitadas = reservas.filter(r => r.status === 'rejeitada').length;
+    const expiradas = reservas.filter(r => r.status === 'expirada').length;
 
-    document.getElementById('badge-todos').textContent = total;
-    document.getElementById('badge-pendente').textContent = pendentes;
-    document.getElementById('badge-aprovada').textContent = aprovadas;
-    document.getElementById('badge-rejeitada').textContent = rejeitadas;
-    document.getElementById('reservas-badge').textContent = pendentes;
+    const bTodos = document.getElementById('badge-todos');
+    const bPendente = document.getElementById('badge-pendente');
+    const bAprovada = document.getElementById('badge-aprovada');
+    const bRejeitada = document.getElementById('badge-rejeitada');
+    const bExpirada = document.getElementById('badge-expirada');
+    const bBadgeNav = document.getElementById('reservas-badge');
+
+    if (bTodos) bTodos.textContent = total;
+    if (bPendente) bPendente.textContent = pendentes;
+    if (bAprovada) bAprovada.textContent = aprovadas;
+    if (bRejeitada) bRejeitada.textContent = rejeitadas;
+    if (bExpirada) bExpirada.textContent = expiradas;  
+    if (bBadgeNav) bBadgeNav.textContent = pendentes;
 }
 
-function atualizarStats(filtradas) {
-    // Reservado para futuras atualizações de contadores visuais na tela
-}
-
-// ========== FILTROS ==========
+// ========== FILTROS E BUSCA ==========
 function initFiltros() {
     const tabs = document.querySelectorAll('.filtro-tab');
     const buscaInput = document.getElementById('search-input');
@@ -148,23 +151,15 @@ function initFiltros() {
     const buscaAtiva = document.getElementById('filtro-busca-ativa');
     const buscaTermo = document.getElementById('busca-termo');
     
-    // Filtros de status
     tabs.forEach(tab => {
         tab.addEventListener('click', function() {
-            // Remover active de todos
             tabs.forEach(t => t.classList.remove('active'));
-            // Adicionar active no clicado
             this.classList.add('active');
-            
-            // Atualizar filtro
             filtroAtual = this.dataset.status;
-            
-            // Renderizar novamente
             renderizarReservas();
         });
     });
     
-    // Busca
     let timeoutId;
     if (buscaInput) {
         buscaInput.addEventListener('input', function() {
@@ -174,10 +169,10 @@ function initFiltros() {
                 buscaAtual = termo;
                 
                 if (termo) {
-                    buscaTermo.textContent = termo;
-                    buscaAtiva.style.display = 'flex';
+                    if (buscaTermo) buscaTermo.textContent = termo;
+                    if (buscaAtiva) buscaAtiva.style.display = 'flex';
                 } else {
-                    buscaAtiva.style.display = 'none';
+                    if (buscaAtiva) buscaAtiva.style.display = 'none';
                 }
                 
                 renderizarReservas();
@@ -185,18 +180,17 @@ function initFiltros() {
         });
     }
     
-    // Limpar busca
     if (limparBusca) {
         limparBusca.addEventListener('click', function() {
-            buscaInput.value = '';
+            if (buscaInput) buscaInput.value = '';
             buscaAtual = '';
-            buscaAtiva.style.display = 'none';
+            if (buscaAtiva) buscaAtiva.style.display = 'none';
             renderizarReservas();
         });
     }
 }
 
-// ========== SIDEBAR COLLAPSE ==========
+// ========== SIDEBAR ==========
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const collapseBtn = document.getElementById('collapseBtn');
@@ -250,9 +244,8 @@ function initNotifications() {
     });
 }
 
-// ========== AÇÕES DAS RESERVAS ==========
+// ========== AÇÕES DE STATUS ==========
 async function alterarStatusReserva(id, novoStatus) {
-    console.log('📤 Enviando:', { id, novoStatus });
     try {
         const response = await fetch('atualizar_status_reserva.php', {
             method: 'POST',
@@ -261,7 +254,6 @@ async function alterarStatusReserva(id, novoStatus) {
         });
 
         const result = await response.json();
-        console.log('📥 Resposta:', result);
 
         if (result.success) {
             const reserva = reservas.find(r => Number(r.id) === Number(id));
@@ -281,12 +273,10 @@ async function alterarStatusReserva(id, novoStatus) {
             showToast(result.message || 'Erro ao atualizar status.', 'error');
         }
     } catch (error) {
-        console.error('❌ Erro:', error);
         showToast('Erro de comunicação com o servidor.', 'error');
     }
 }
 
-// ANEXANDO AO WINDOW PARA GARANTIR QUE O ONCLICK DO HTML ENCONTRE AS FUNÇÕES
 window.aprovarReserva = function(id) {
     if (!confirm('Deseja aprovar esta reserva?')) return;
     alterarStatusReserva(id, 'aprovada');
@@ -299,18 +289,17 @@ window.rejeitarReserva = function(id) {
 
 // ========== TOAST ==========
 function criarContainerToast() {
-    const container = document.createElement('div');
-    container.className = 'toast-container';
-    document.body.appendChild(container);
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
     return container;
 }
 
 function showToast(message, type = 'info') {
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = criarContainerToast();
-    }
-
+    const container = criarContainerToast();
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
 
@@ -327,20 +316,16 @@ function showToast(message, type = 'info') {
 
     container.appendChild(toast);
 
-    // Remover após 3 segundos
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(40px)';
         toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => {
-            toast.remove();
-        }, 400);
+        setTimeout(() => toast.remove(), 400);
     }, 3000);
 }
 
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // Carregar dados vindos do PHP
     if (typeof reservasData !== 'undefined') {
         reservas = reservasData;
     }
@@ -350,8 +335,5 @@ document.addEventListener('DOMContentLoaded', function() {
     initNotifications();
     initFiltros();
     
-    // Renderizar inicial
     renderizarReservas();
-
-    console.log('%cPágina de Reservas - SiGA ITJ Admin conectada ao MySQL!', 'color: #27ae60; font-weight: bold;');
 });

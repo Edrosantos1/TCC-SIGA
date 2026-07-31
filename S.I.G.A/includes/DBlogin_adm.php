@@ -5,8 +5,12 @@ require_once __DIR__ . '/conexao.php';
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';
 
+// ATENÇÃO: Como este arquivo está na pasta 'includes', 
+// usamos '../adm/' para ele voltar para a pasta onde estão as telas visuais.
+
 if ($email === '' || $senha === '') {
-    header('Location: login_adm.php?erro=Preencha e-mail e senha');
+    // Retorna para a tela de login na pasta adm
+    header('Location: ../adm/login_adm.php?erro=Preencha e-mail e senha');
     exit;
 }
 
@@ -20,16 +24,21 @@ $stmt->close();
 
 // VERIFICAR SENHA
 if ($admin && password_verify($senha, $admin['senha_adm'])) {
-    // CORREÇÃO: Define AMBAS as variáveis de sessão
+    
     $_SESSION['id_adm'] = $admin['id_adm'];
-    $_SESSION['admin_id'] = $admin['id_adm'];  // ESSA LINHA É CRUCIAL
+    $_SESSION['admin_id'] = $admin['id_adm']; // Variável extra para evitar bugs
     $_SESSION['email_adm'] = $admin['email_adm'];
     $_SESSION['admin_nome'] = $admin['nome_adm'] ?? 'Administrador';
     
-    header('Location: dashboard_adm.php');
+    // LOGIN COM SUCESSO: Redireciona para o dashboard na pasta adm
+    header('Location: ../adm/dashboard_adm.php');
     exit;
+    
 } else {
-    header('Location: login_adm.php?erro=E-mail ou senha inválidos');
+    
+    // SENHA ERRADA: Retorna para a tela de login na pasta adm
+    header('Location: ../adm/login_adm.php?erro=E-mail ou senha inválidos');
     exit;
+    
 }
 ?>

@@ -12,11 +12,12 @@ function isValidEmail($email) {
 
 /**
  * Função auxiliar para redirecionar com erro personalizado
+ * CORREÇÃO: Adicionado ../aluno/ para sair da pasta includes
  */
 function redirectWithError($message, $type = 'login') {
     $errorParam = urlencode($message);
     $typeParam = ($type === 'register') ? 'register' : 'login';
-    header("Location: login_user.php?error={$errorParam}&type={$typeParam}");
+    header("Location: ../aluno/login_user.php?error={$errorParam}&type={$typeParam}");
     exit;
 }
 
@@ -97,7 +98,6 @@ if ($senha !== $confirmarSenha) {
 // VERIFICAR SE EMAIL JÁ EXISTE
 // ============================================
 
-// ✅ PREPARED STATEMENT para verificar email
 $stmt = $conexao->prepare("SELECT id_aluno FROM login_aluno WHERE email_aluno = ?");
 
 if (!$stmt) {
@@ -124,7 +124,6 @@ $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 // INSERIR NOVO USUÁRIO NO BANCO
 // ============================================
 
-// ✅ PREPARED STATEMENT para inserir
 $stmt = $conexao->prepare("INSERT INTO login_aluno (nome_aluno, serie_aluno, email_aluno, senha_aluno) VALUES (?, ?, ?, ?)");
 
 if (!$stmt) {
@@ -141,18 +140,16 @@ if ($stmt->execute()) {
     // REGISTRO BEM-SUCEDIDO - CRIAR SESSÃO
     // ============================================
     
-    // ✅ Criar apenas sessão (SEM cookies persistentes no registro)
     $_SESSION['usuario_id']    = $novoId;
     $_SESSION['usuario_nome']  = $nome;
     $_SESSION['usuario_serie'] = $serie;
     
-    // Redireciona para o dashboard
-    header('Location: dashboard_aluno.php');
+    // CORREÇÃO: Adicionado ../aluno/ no redirecionamento de sucesso
+    header('Location: ../aluno/dashboard_aluno.php');
     exit;
     
 } else {
     $stmt->close();
     redirectWithError('Erro ao registrar. Tente novamente mais tarde.', 'register');
 }
-
 ?>

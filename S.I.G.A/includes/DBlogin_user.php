@@ -12,11 +12,12 @@ function isValidEmail($email) {
 
 /**
  * Função auxiliar para redirecionar com erro personalizado
+ * CORREÇÃO: Adicionado ../aluno/ para sair da pasta includes
  */
 function redirectWithError($message, $type = 'login') {
     $errorParam = urlencode($message);
     $typeParam = ($type === 'register') ? 'register' : 'login';
-    header("Location: login_user.php?error={$errorParam}&type={$typeParam}");
+    header("Location: ../aluno/login_user.php?error={$errorParam}&type={$typeParam}");
     exit;
 }
 
@@ -51,7 +52,6 @@ if ($senha === '') {
 // BUSCAR USUÁRIO NO BANCO DE DADOS
 // ============================================
 
-// ✅ PREPARED STATEMENT para buscar aluno
 $stmt = $conexao->prepare("SELECT id_aluno, nome_aluno, serie_aluno, senha_aluno FROM login_aluno WHERE email_aluno = ?");
 
 if (!$stmt) {
@@ -68,23 +68,19 @@ $stmt->close();
 // VERIFICAR EMAIL E SENHA
 // ============================================
 
-// 🔐 VERIFICAR SENHA COM HASH
 if ($usuario && password_verify($senha, $usuario['senha_aluno'])) {
     
     // ============================================
     // LOGIN BEM-SUCEDIDO
     // ============================================
     
-    // ✅ Criar apenas sessão
     $_SESSION['usuario_id']    = $usuario['id_aluno'];
     $_SESSION['usuario_nome']  = $usuario['nome_aluno'];
     $_SESSION['usuario_serie'] = $usuario['serie_aluno'];
 
-    // Remover marcadores de sessão temporária
     unset($_SESSION['login_temporario']);
     unset($_SESSION['tempo_expiracao_temporario']);
 
-    // TOKEN (30 DIAS)
     $token = bin2hex(random_bytes(32));
     $expiracao = date('Y-m-d H:i:s', strtotime('+30 days'));
     
@@ -95,11 +91,11 @@ if ($usuario && password_verify($senha, $usuario['senha_aluno'])) {
         $stmt->close();
     }
     
-    // Criar cookies
     setcookie('relembrar_token', $token, time() + 30*24*60*60, '/');
     setcookie('user_id', $usuario['id_aluno'], time() + 30*24*60*60, '/');
     
-    header('Location: dashboard_aluno.php');
+    // CORREÇÃO: Adicionado ../aluno/ no redirecionamento de sucesso
+    header('Location: ../aluno/dashboard_aluno.php');
     exit;
     
 } else {
@@ -108,5 +104,4 @@ if ($usuario && password_verify($senha, $usuario['senha_aluno'])) {
     // ============================================
     redirectWithError('Email ou senha incorretos. Tente novamente.', 'login');
 }
-
 ?>

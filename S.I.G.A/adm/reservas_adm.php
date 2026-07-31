@@ -19,6 +19,11 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
+// ========== CANCELAR RESERVAS EXPIRADAS AUTOMATICAMENTE ==========
+if (file_exists(__DIR__ . '/../includes/cancelar_reservas_expiradas.php')) {
+    include_once __DIR__ . '/../includes/cancelar_reservas_expiradas.php';
+}
+
 // ========== BUSCAR RESERVAS DO BANCO (MYSQLI) ==========
 $reservas = array();
 
@@ -41,7 +46,6 @@ if ($db) {
     $result = $db->query($query);
 
     if ($result) {
-        // Busca todas as linhas usando o método correto do MySQLi
         $reservas = $result->fetch_all(MYSQLI_ASSOC);
     }
 }
@@ -50,6 +54,7 @@ if ($db) {
 $total_pendentes = 0;
 $total_aprovadas = 0;
 $total_rejeitadas = 0;
+$total_expiradas = 0;
 
 foreach ($reservas as $r) {
     if ($r['status'] === 'pendente') {
@@ -58,17 +63,17 @@ foreach ($reservas as $r) {
         $total_aprovadas++;
     } elseif ($r['status'] === 'rejeitada') {
         $total_rejeitadas++;
+    } elseif ($r['status'] === 'expirada') {
+        $total_expiradas++;
     }
 }
 
 $total_geral = count($reservas);
 
-
-$total_geral = count($reservas);
-
 // Passar dados para o JavaScript
-$reservas_json = json_encode($reservas);
+$reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -79,8 +84,8 @@ $reservas_json = json_encode($reservas);
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
-    <link rel="stylesheet" href="../assets/css/reservas_adm.css">
-    <script src="../assets/js/reservas_adm.js" defer></script>
+    <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
+    <script src="../assets/js/reservas_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
 
@@ -207,6 +212,10 @@ $reservas_json = json_encode($reservas);
                         <i class="fas fa-times-circle"></i> Rejeitadas
                         <span class="tab-badge rejeitada" id="badge-rejeitada"><?= $total_rejeitadas ?></span>
                     </button>
+                    <button class="filtro-tab" data-status="expirada">
+                        <i class="fas fa-clock"></i> Expiradas
+                        <span class="tab-badge expirada" id="badge-expirada"><?= $total_expiradas ?></span>
+                    </button>
                 </div>
 
                 <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
@@ -231,7 +240,7 @@ $reservas_json = json_encode($reservas);
                             </tr>
                         </thead>
                         <tbody id="reservas-tbody">
-                            <!-- As reservas serão renderizadas pelo JavaScript -->
+                            <!-- Renderizado via JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -247,7 +256,6 @@ $reservas_json = json_encode($reservas);
 
     <!-- ========== DADOS PARA O JAVASCRIPT ========== -->
     <script>
-        // Passar dados reais do banco de dados para o JavaScript
         const reservasData = <?= $reservas_json ?>;
     </script>
 

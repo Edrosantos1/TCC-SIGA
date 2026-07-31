@@ -125,9 +125,13 @@
     background: #eafaf1;
     color: #27ae60;
 }
-.tab-badge.cancelada {
+.tab-badge.rejeitada, .tab-badge.cancelada {
     background: #fef0ef;
     color: #e74c3c;
+}
+.tab-badge.expirada {
+    background: #f1f5f9;
+    color: #64748b;
 }
 
 .filtro-busca-ativa {
@@ -158,11 +162,11 @@
     background: #fef0ef;
 }
 
-/* ========== TABELA ========== */
+/* ========== TABELA (PADRÃO PENDÊNCIAS) ========== */
 .reservas-table-wrapper {
     background: white;
     border-radius: 14px;
-    overflow: hidden;
+    overflow-x: auto;
     border: 1px solid #f0f4fd;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
@@ -170,7 +174,7 @@
 .reservas-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .reservas-table thead {
@@ -178,32 +182,43 @@
 }
 
 .reservas-table thead th {
-    text-align: left; /* Mantém alinhamento à esquerda por padrão */
-    padding: 14px 18px;
+    text-align: left;
+    padding: 14px 16px;
     font-size: 11px;
     font-weight: 700;
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     border-bottom: 1px solid #edf2f7;
+    white-space: nowrap;
 }
 
-/* Centraliza apenas as colunas de Status e Ações no cabeçalho */
+/* Alinhamento centralizado nas colunas específicas */
+.reservas-table thead th:nth-child(3), /* Tipo */
 .reservas-table thead th:nth-child(6), /* Status */
 .reservas-table thead th:nth-child(7) { /* Ações */
     text-align: center;
 }
 
 .reservas-table tbody td {
-    padding: 14px 18px;
+    padding: 12px 16px;
     border-bottom: 1px solid #f0f4fd;
     vertical-align: middle;
-    text-align: left; /* Mantém alinhamento à esquerda por padrão */
+    text-align: left;
+    white-space: nowrap;
 }
 
-/* Centraliza apenas as colunas de Status e Ações no corpo da tabela */
-.reservas-table tbody td:nth-child(6), /* Status */
-.reservas-table tbody td:nth-child(7) { /* Ações */
+/* Célula de material flexível */
+.reservas-table tbody td.material-nome {
+    white-space: normal;
+    min-width: 160px;
+    color: #1f1f1f;
+}
+
+/* Centralização do corpo */
+.reservas-table tbody td:nth-child(3),
+.reservas-table tbody td:nth-child(6),
+.reservas-table tbody td:nth-child(7) {
     text-align: center;
 }
 
@@ -245,10 +260,6 @@
     color: #1f1f1f;
 }
 
-.material-nome {
-    color: #1f1f1f;
-}
-
 /* ========== TIPO BADGE ========== */
 .tipo-badge {
     font-size: 11px;
@@ -279,32 +290,29 @@
     color: #e67e22;
     border-color: #fde8d8;
 }
-.status-pendente i {
-    color: #e67e22;
-}
 
 .status-aprovada {
     background: #eafaf1;
     color: #27ae60;
     border-color: #d4f0e0;
 }
-.status-aprovada i {
-    color: #27ae60;
-}
 
-.status-cancelada {
+.status-rejeitada, .status-cancelada {
     background: #fef0ef;
     color: #e74c3c;
     border-color: #fde2df;
 }
-.status-cancelada i {
-    color: #e74c3c;
+
+.status-expirada {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
 }
 
 /* ========== AÇÕES ========== */
 .acoes-cell {
     text-align: center;
-    white-space: nowrap;
+    white-space: nowrap !important;
 }
 
 .btn-acao {
@@ -377,11 +385,10 @@
     font-size: 14px;
 }
 
-/* ========== ANIMAÇÕES DOS FILTROS ========== */
+/* ========== ANIMAÇÕES ========== */
 .filtro-tab {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
 }
 
 .filtro-tab.active {
@@ -389,13 +396,7 @@
     box-shadow: 0 2px 8px rgba(11, 75, 155, 0.15);
 }
 
-.filtro-tab:active {
-    transform: scale(0.95);
-}
-
-/* ========== ANIMAÇÃO DAS LINHAS DA TABELA ========== */
 .reserva-row {
-    transition: all 0.3s ease;
     animation: fadeInRow 0.3s ease forwards;
 }
 
@@ -408,60 +409,6 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.reserva-row:nth-child(2) {
-    animation-delay: 0.05s;
-}
-.reserva-row:nth-child(3) {
-    animation-delay: 0.1s;
-}
-.reserva-row:nth-child(4) {
-    animation-delay: 0.15s;
-}
-.reserva-row:nth-child(5) {
-    animation-delay: 0.2s;
-}
-.reserva-row:nth-child(6) {
-    animation-delay: 0.25s;
-}
-.reserva-row:nth-child(7) {
-    animation-delay: 0.3s;
-}
-.reserva-row:nth-child(8) {
-    animation-delay: 0.35s;
-}
-.reserva-row:nth-child(9) {
-    animation-delay: 0.4s;
-}
-.reserva-row:nth-child(10) {
-    animation-delay: 0.45s;
-}
-
-/* ========== TRANSITION DA BUSCA ========== */
-.filtro-busca-ativa {
-    transition: all 0.3s ease;
-    animation: slideIn 0.3s ease forwards;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.limpar-busca {
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.limpar-busca:hover {
-    transform: rotate(90deg);
 }
 
 /* ========== TOAST ========== */
@@ -488,26 +435,14 @@
     border: 1px solid #f0f4fd;
 }
 
-.toast-success {
-    border-left: 3px solid #27ae60;
-}
-.toast-success i {
-    color: #27ae60;
-}
+.toast-success { border-left: 3px solid #27ae60; }
+.toast-success i { color: #27ae60; }
 
-.toast-error {
-    border-left: 3px solid #e74c3c;
-}
-.toast-error i {
-    color: #e74c3c;
-}
+.toast-error { border-left: 3px solid #e74c3c; }
+.toast-error i { color: #e74c3c; }
 
-.toast-info {
-    border-left: 3px solid #0b4b9b;
-}
-.toast-info i {
-    color: #0b4b9b;
-}
+.toast-info { border-left: 3px solid #0b4b9b; }
+.toast-info i { color: #0b4b9b; }
 
 @keyframes toastIn {
     from {
@@ -520,7 +455,7 @@
     }
 }
 
-/* ========== RESPONSIVE ========== */
+/* ========== RESPONSIVO ========== */
 @media (max-width: 768px) {
     .page-header {
         flex-direction: column;
@@ -562,15 +497,4 @@
         font-size: 11px;
         padding: 4px 8px;
     }
-}.status-rejeitada {
-    background: #fef0ef;
-    color: #e74c3c;
-    border-color: #fde2df;
-}
-.status-rejeitada i {
-    color: #e74c3c;
-}
-.tab-badge.rejeitada {
-    background: #fef0ef;
-    color: #e74c3c;
 }

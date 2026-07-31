@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 30/07/2026 às 16:09
+-- Tempo de geração: 31/07/2026 às 05:39
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -119,7 +119,9 @@ INSERT INTO `login_aluno` (`id_aluno`, `nome_aluno`, `serie_aluno`, `email_aluno
 (10, 'Gabriela Ferreira Alves', '3º EM', 'gabriela.ferreira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
 (11, 'Henrique Gomes Pereira', '6º ano', 'henrique.gomes@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
 (12, 'Isabela Rocha Mendes', '7º ano', 'isabela.rocha@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(13, 'João Pedro Almeida', '8º ano', 'joao.pedro@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL);
+(13, 'João Pedro Almeida', '8º ano', 'joao.pedro@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
+(14, 'Caio', '1º ano', 'caio@gmail.com', '$2y$10$PosgZd2RHafYXwCm7lxkKOUHa9tAXHk4u4PsovafapfCaJ/1ngMrG', NULL, NULL),
+(15, 'Luan', '7º ano', 'luan@gmail.com', '$2y$10$6GOJB7O6MSiM68MRwEkki.TEbdRaJMlMMxdS1y7uMOFrmnCHBTd6C', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -208,7 +210,7 @@ CREATE TABLE `reservas` (
   `titulo_item` varchar(255) NOT NULL,
   `data_reserva` datetime DEFAULT current_timestamp(),
   `data_limite` date DEFAULT NULL,
-  `status` enum('pendente','aprovada','rejeitada','concluida') DEFAULT 'pendente'
+  `status` enum('pendente','aprovada','rejeitada','concluida','expirada') DEFAULT 'pendente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -237,7 +239,20 @@ INSERT INTO `reservas` (`id_reserva`, `id_aluno`, `titulo_item`, `data_reserva`,
 (19, 10, 'Português - Redação', '2026-07-30 09:56:55', '2026-08-14', 'aprovada'),
 (20, 11, 'Ciências - Química', '2026-07-30 09:56:55', '2026-08-08', 'aprovada'),
 (21, 11, 'História Antiga', '2026-07-30 09:56:55', '2026-08-13', 'aprovada'),
-(22, 12, 'Geografia - Clima', '2026-07-30 09:56:55', '2026-08-10', 'aprovada');
+(22, 12, 'Geografia - Clima', '2026-07-30 09:56:55', '2026-08-10', 'aprovada'),
+(23, 1, 'Livro Teste', '2026-07-31 00:10:39', '2026-08-07', 'aprovada');
+
+--
+-- Acionadores `reservas`
+--
+DELIMITER $$
+CREATE TRIGGER `calcular_data_limite_reserva` BEFORE INSERT ON `reservas` FOR EACH ROW BEGIN
+    IF NEW.data_limite IS NULL THEN
+        SET NEW.data_limite = DATE_ADD(NEW.data_reserva, INTERVAL 7 DAY);
+    END IF;
+END
+$$
+DELIMITER ;
 
 --
 -- Índices para tabelas despejadas
@@ -297,7 +312,7 @@ ALTER TABLE `login_admin`
 -- AUTO_INCREMENT de tabela `login_aluno`
 --
 ALTER TABLE `login_aluno`
-  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de tabela `notificacoes`
@@ -309,7 +324,7 @@ ALTER TABLE `notificacoes`
 -- AUTO_INCREMENT de tabela `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Restrições para tabelas despejadas
