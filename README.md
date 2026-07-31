@@ -1,6 +1,6 @@
 # 📚 SIGA — Sistema Integrado de Gestão Acervos & Alunos
 
-![Banner do Projeto](https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=TCC%20-%20SIGA&fontSize=50&animation=fadeIn)
+![Header](https://capsule-render.vercel.app/api?type=rect&color=0:181717,100:24292e&height=120&text=TCC%20-%20SIGA&fontSize=38&fontColor=ffffff&fontAlignY=50)
 
 > **Trabalho de Conclusão de Curso (TCC)**  
 > Sistema completo de gestão de biblioteca escolar e acervo digital, focado em otimizar a experiência de leitura dos alunos e simplificar a administração bibliotecária.
