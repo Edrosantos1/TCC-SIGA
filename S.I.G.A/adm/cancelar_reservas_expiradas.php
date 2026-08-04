@@ -1,5 +1,7 @@
 <?php
 // Não inclui o config.php aqui para evitar duplicação/erro 500
+// No topo, antes de qualquer coisa
+echo "<!-- ARQUIVO INCLUÍDO -->";
 
 $db_cancelar = null;
 if (isset($conn)) $db_cancelar = $conn;

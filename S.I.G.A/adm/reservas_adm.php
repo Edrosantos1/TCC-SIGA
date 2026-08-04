@@ -20,8 +20,8 @@ if (isset($conn)) {
 }
 
 // ========== CANCELAR RESERVAS EXPIRADAS AUTOMATICAMENTE ==========
-if (file_exists(__DIR__ . '/../includes/cancelar_reservas_expiradas.php')) {
-    include_once __DIR__ . '/../includes/cancelar_reservas_expiradas.php';
+if (file_exists(__DIR__ . '/cancelar_reservas_expiradas.php')) {
+    include_once __DIR__ . '/cancelar_reservas_expiradas.php';
 }
 
 // ========== BUSCAR RESERVAS DO BANCO (MYSQLI) ==========
@@ -135,7 +135,7 @@ $reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
         <header class="top-header">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" placeholder="Pesquisar por aluno" autocomplete="off">
+                <input type="text" id="search-input" placeholder="Pesquisar reservas por aluno..." autocomplete="off">
             </div>
 
             <div class="header-right">
