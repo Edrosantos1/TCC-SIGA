@@ -1,0 +1,293 @@
+/* meus_emprestimos.css */
+.loans-main {
+  padding: 40px 40px 60px;
+}
+
+.loans-header {
+  margin-bottom: 32px;
+}
+
+.loans-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0b4b9b;
+  margin-bottom: 6px;
+}
+
+.loans-header p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* Abas */
+.loans-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 28px;
+  background: white;
+  padding: 6px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.tab-btn:hover {
+  background: #f1f5f9;
+}
+
+.tab-btn.active {
+  background: #0b4b9b;
+  color: white;
+  box-shadow: 0 2px 8px rgba(11, 75, 155, 0.2);
+}
+
+/* Lista de empréstimos */
+.loans-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loan-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.2s;
+}
+
+.loan-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.loan-info {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+}
+
+.loan-cover {
+  width: 60px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #e9edf3;
+  flex-shrink: 0;
+}
+
+.loan-cover-placeholder {
+  width: 60px;
+  height: 85px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.loan-details {
+  flex: 1;
+}
+
+.loan-details .loan-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #0b1e33;
+  margin-bottom: 4px;
+}
+
+.loan-details .loan-author {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.loan-details .loan-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.loan-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.loan-status {
+  padding: 4px 14px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.loan-status.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.loan-status.overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.loan-status.returned {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.loan-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.loan-actions button {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-renew {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.btn-renew:hover {
+  background: #bae6fd;
+}
+
+.btn-renew:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-return {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-return:hover {
+  background: #fecaca;
+}
+
+.btn-return:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loan-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+}
+
+.loan-empty i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.loan-empty p {
+  font-size: 16px;
+}
+
+/* Modal */
+#loan-modal .modal-content {
+  flex-direction: column;
+  gap: 16px;
+}
+
+#loan-modal .modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+#loan-modal .btn-primary {
+  background: #0b4b9b;
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#loan-modal .btn-primary:hover {
+  background: #0a3d82;
+}
+
+#loan-modal .btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 30px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#loan-modal .btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .loans-main {
+    padding: 24px 16px 40px;
+  }
+
+  .loan-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .loan-info {
+    flex-wrap: wrap;
+  }
+
+  .loan-actions {
+    justify-content: flex-end;
+  }
+
+  .loans-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+  }
+}

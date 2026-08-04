@@ -1,7 +1,7 @@
 // ===================== TRADUÇÕES COMPLETAS =====================
 const translations = {
   pt: {
-    title: "Sua biblioteca digital completa",
+    title: "Seja muito bem-vindo ao SiGA",
     subtitle: "Acesse livros, materiais e recursos educacionais em um só lugar.",
     stat_materials: "+500 materiais",
     stat_access: "Acesso ilimitado",
@@ -9,42 +9,42 @@ const translations = {
     btn_admin: "Sou Administrador",
     nav_about: "Sobre o SiGA",
     nav_contact: "Fale com a Secretaria",
-    footer_copyright: "© 2026 SiGA ITJ. Todos os direitos reservados.",
+    footer_copyright: "© 2026 SiGA. Todos os direitos reservados.",
     footer_support: "Suporte",
     footer_terms: "Termos de Uso",
     footer_privacy: "Política de Privacidade",
-    sobre_title: "O que é a <span>SiGA</span>?",
+    sobre_title: "O que é o <span>SiGA</span>?",
     sobre_subtitle: "Conheça um pouco do nosso trabalho e propósito",
-    sobre_p1: "O <strong>SiGA</strong> (Sistema Integrado de Gestão de Acervo) é a plataforma digital de gerenciamento de bibliotecas escolares. Nossa missão é democratizar o acesso ao conhecimento, oferecendo um ambiente virtual completo para consulta e empréstimos de materiais acadêmicos.",
-    sobre_p2: "Com um acervo em constante crescimento, o SiGA atende alunos, professores e funcionários, centralizando livros didáticos, artigos científicos, periódicos e outros recursos educacionais. Tudo isso com acesso ilimitado, 24 horas por dia, de qualquer dispositivo.",
-    sobre_p3: "Além da praticidade, nossa plataforma prioriza a organização e a inclusão: é possível pesquisar por categorias, autores e títulos, renovar empréstimos online, tudo isso na palma da sua mão. O SiGA é mais do que uma biblioteca digital – é um portal para o conhecimento, projetado para inspirar e apoiar a jornada acadêmica de cada usuário. <strong>O conhecimento não pode esperar e com o SiGA, está sempre ao seu alcance.</strong>",
-    passos_title: "Comece em <span>3 passos</span>",
+     sobre_p1: "O <strong>SiGA</strong> (Sistema Gerenciador de Alunos e Acervos) é uma plataforma digital de gerenciamento de bibliotecas escolares, criado com a missão de tornar o gerenciamento e uso da biblioteca mais prático e organizado para administradores e alunos por meio da tecnologia.",
+    sobre_p2: "Com uma grande variedade de acervos, o SiGA atende alunos, professores e funcionários, centralizando livros didáticos, artigos científicos, cadernos de TCCs, periódicos e outros recursos educacionais. Tudo isso com acesso de 24 horas por dia, de qualquer dispositivo.",
+    sobre_p3: "Além da praticidade, nossa plataforma prioriza a organização e a facilidade de uso: é possível pesquisar por categorias, autores e títulos, renovar empréstimos online, e utilizar diversas funcionalidades que facilitam o gerenciamento da biblioteca. Tudo isso de forma simples, rápida e acessível. O SiGA é mais do que um sistema digital – é um portal para o conhecimento, projetado para inspirar e apoiar a jornada acadêmica de cada usuário. <strong>O conhecimento não pode esperar, e com o SiGA está sempre ao seu alcance.</strong>",
+    passos_title: "Comece em 3 passos",
     passos_subtitle: "Simples, rápido e gratuito para alunos",
     passo1_title: "1. Cadastre-se",
     passo1_desc: "Crie sua conta gratuita usando seu email institucional.",
     passo2_title: "2. Encontre",
     passo2_desc: "Pesquise entre centenas de livros e materiais didáticos.",
     passo3_title: "3. Acesse",
-    passo3_desc: "Leia online ou faça download para estudar onde quiser."
+    passo3_desc: "Faça reservas, realize empréstimos e aproveite!"
   },
   en: {
-    title: "Your complete digital library",
+    title: "Welcome to SiGA",
     subtitle: "Access books, materials and educational resources in one place.",
     stat_materials: "+500 materials",
     stat_access: "Unlimited access",
     btn_student: "I'm a Student",
     btn_admin: "I'm an Administrator",
     nav_about: "About SiGA",
-    nav_contact: "Contact Support",
-    footer_copyright: "© 2026 SiGA ITJ. All rights reserved.",
+    nav_contact: "Contact the Office",
+    footer_copyright: "© 2026 SiGA. All rights reserved.",
     footer_support: "Support",
     footer_terms: "Terms of Use",
     footer_privacy: "Privacy Policy",
     sobre_title: "What is <span>SiGA</span>?",
     sobre_subtitle: "Learn a little about our work and purpose",
-    sobre_p1: "<strong>SiGA</strong> (Integrated Collection Management System) is the digital management platform for school libraries. Our mission is to democratize access to knowledge, offering a complete virtual environment for consultation and borrowing of academic materials.",
-    sobre_p2: "With a constantly growing collection, SiGA serves students, teachers and staff, centralizing textbooks, scientific articles, journals and other educational resources. All with unlimited access, 24 hours a day, from any device.",
-    sobre_p3: "In addition to practicality, our platform prioritizes organization and inclusion: you can search by categories, authors and titles, renew loans online, all in the palm of your hand. SiGA is more than a digital library – it is a gateway to knowledge, designed to inspire and support each user's academic journey. <strong>Knowledge cannot wait and with SiGA, it is always within your reach.</strong>",
+    sobre_p1: "<strong>SiGA</strong> (Student and Collection Management System) is a digital platform for school library management, created with the mission of making library management and use more practical and organized for administrators and students through technology.",
+    sobre_p2: "With a wide variety of collections, SiGA serves students, teachers and staff by centralizing textbooks, scientific articles, undergraduate thesis papers, journals and other educational resources. All of this is available 24 hours a day from any device.",
+    sobre_p3: "In addition to practicality, our platform prioritizes organization and ease of use: users can search by categories, authors and titles, renew loans online, and access several features that simplify library management. Everything is designed to be simple, fast and accessible. SiGA is more than just a digital system—it is a gateway to knowledge, designed to inspire and support every user's academic journey. <strong>Knowledge cannot wait, and with SiGA it is always within your reach.</strong>",
     passos_title: "Start in <span>3 steps</span>",
     passos_subtitle: "Simple, fast and free for students",
     passo1_title: "1. Sign up",
@@ -52,26 +52,26 @@ const translations = {
     passo2_title: "2. Find",
     passo2_desc: "Search among hundreds of books and teaching materials.",
     passo3_title: "3. Access",
-    passo3_desc: "Read online or download to study anywhere."
+    passo3_desc: "Reserve books, borrow materials, and enjoy!"
   },
   es: {
-    title: "Tu biblioteca digital completa",
+    title: "Bienvenido a SiGA",
     subtitle: "Accede a libros, materiales y recursos educativos en un solo lugar.",
     stat_materials: "+500 materiales",
     stat_access: "Acceso ilimitado",
     btn_student: "Soy Alumno",
     btn_admin: "Soy Administrador",
     nav_about: "Sobre el SiGA",
-    nav_contact: "Contactar Secretaría",
-    footer_copyright: "© 2026 SiGA ITJ. Todos los derechos reservados.",
+    nav_contact: "Contactar con la Secretaría",
+    footer_copyright: "© 2026 SiGA. Todos los derechos reservados.",
     footer_support: "Soporte",
     footer_terms: "Términos de Uso",
     footer_privacy: "Política de Privacidad",
     sobre_title: "¿Qué es <span>SiGA</span>?",
     sobre_subtitle: "Conoce un poco de nuestro trabajo y propósito",
-    sobre_p1: "<strong>SiGA</strong> (Sistema Integrado de Gestión de Acervo) es la plataforma digital de gestión de bibliotecas escolares. Nuestra misión es democratizar el acceso al conocimiento, ofreciendo un entorno virtual completo para consulta y préstamo de materiales académicos.",
-    sobre_p2: "Con un acervo en constante crecimiento, SiGA atiende a estudiantes, profesores y funcionarios, centralizando libros de texto, artículos científicos, revistas y otros recursos educativos. Todo con acceso ilimitado, las 24 horas del día, desde cualquier dispositivo.",
-    sobre_p3: "Además de la practicidad, nuestra plataforma prioriza la organización y la inclusión: es posible buscar por categorías, autores y títulos, renovar préstamos en línea, todo en la palma de tu mano. SiGA es más que una biblioteca digital: es un portal al conocimiento, diseñado para inspirar y apoyar la trayectoria académica de cada usuario. <strong>El conocimiento no puede esperar y con SiGA, siempre está a tu alcance.</strong>",
+    sobre_p1: "<strong>SiGA</strong> (Sistema de Gestión de Alumnos y Acervos) es una plataforma digital de gestión de bibliotecas escolares, creada con la misión de hacer que la administración y el uso de la biblioteca sean más prácticos y organizados para administradores y estudiantes mediante la tecnología.",
+    sobre_p2: "Con una amplia variedad de colecciones, SiGA atiende a estudiantes, profesores y personal, centralizando libros de texto, artículos científicos, trabajos de fin de curso (TCC), revistas y otros recursos educativos. Todo ello con acceso las 24 horas del día desde cualquier dispositivo.",
+    sobre_p3: "Además de la practicidad, nuestra plataforma prioriza la organización y la facilidad de uso: es posible buscar por categorías, autores y títulos, renovar préstamos en línea y utilizar diversas funciones que facilitan la gestión de la biblioteca. Todo ello de forma sencilla, rápida y accesible. SiGA es más que un sistema digital: es un portal al conocimiento, diseñado para inspirar y apoyar la trayectoria académica de cada usuario. <strong>El conocimiento no puede esperar, y con SiGA siempre está a tu alcance.</strong>",
     passos_title: "Comienza en <span>3 pasos</span>",
     passos_subtitle: "Sencillo, rápido y gratuito para alumnos",
     passo1_title: "1. Regístrate",
@@ -79,7 +79,7 @@ const translations = {
     passo2_title: "2. Encuentra",
     passo2_desc: "Busca entre cientos de libros y materiales didácticos.",
     passo3_title: "3. Accede",
-    passo3_desc: "Lee en línea o descarga para estudiar donde quieras."
+    passo3_desc: "¡Reserva libros, realiza préstamos y disfrútalo!"
   }
 };
 
@@ -219,69 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Idioma inicial: português
   applyLanguage("pt");
-
-  // ====== Menu mobile ======
-  const menuButton = document.querySelector('.menu-button');
-  const navLinks = document.querySelector('.nav-links');
-
-  function toggleMenu(open) {
-    const isOpen = typeof open === 'boolean' ? open : !navLinks.classList.contains('open');
-    if (isOpen) {
-      navLinks.classList.add('open');
-      menuButton.setAttribute('aria-expanded', 'true');
-    } else {
-      navLinks.classList.remove('open');
-      menuButton.setAttribute('aria-expanded', 'false');
-    }
-  }
-
-  if (menuButton) {
-    menuButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleMenu();
-    });
-  }
-
-  // Fecha o menu ao clicar fora
-  document.addEventListener('click', (e) => {
-    if (navLinks && !navLinks.contains(e.target) && menuButton && !menuButton.contains(e.target)) {
-      toggleMenu(false);
-    }
-  });
-
-  // Fecha o menu ao redimensionar para desktop
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 900) toggleMenu(false);
-  });
-
-  // Fecha o menu quando um link de navegação é clicado (mobile)
-  const navAnchors = navLinks ? navLinks.querySelectorAll('a') : null;
-  if (navAnchors) {
-    navAnchors.forEach(a => a.addEventListener('click', () => toggleMenu(false)));
-  }
-
-  // Keyboard: close menu with Escape, trap Tab within the menu when open
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      // Close both menus
-      toggleMenu(false);
-      closeMenu(true);
-    }
-
-    if (e.key === 'Tab' && navLinks && navLinks.classList.contains('open')) {
-      const focusable = Array.from(navLinks.querySelectorAll('a, button'));
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    }
-  });
 
   // ===================== EVENTOS DOS LINKS DO FOOTER =====================
   document.getElementById("footer_support").addEventListener("click", (e) => {

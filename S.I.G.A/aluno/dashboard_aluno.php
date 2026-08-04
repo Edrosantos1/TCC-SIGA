@@ -10,21 +10,24 @@ if (!isset($_SESSION['usuario_id'])) {
 
 // Buscar o nome do aluno no banco
 $usuario_id = $_SESSION['usuario_id'];
-$sql = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $usuario_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
 $primeiroNome = 'Aluno';
 
-if ($row = $result->fetch_assoc()) {
-    $nomeCompleto = trim($row['nome_aluno']);
-    $partes = explode(' ', $nomeCompleto);
-    $primeiroNome = $partes[0] ?: 'Aluno';
-}
+$sql = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
+$stmt = $conn->prepare($sql);
 
-$stmt->close();
+if ($stmt) {
+    $stmt->bind_param("i", $usuario_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        $nomeCompleto = trim($row['nome_aluno']);
+        $partes = explode(' ', $nomeCompleto);
+        $primeiroNome = $partes[0] ?: 'Aluno';
+    }
+
+    $stmt->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -147,6 +150,127 @@ $stmt->close();
 </header>
     <!-- MAIN -->
     <main class="dashboard-main">
+
+      <!-- CONTINUAR LENDO -->
+      <section class="last-viewed">
+        <h2><i class="fas fa-clock"></i> Em Andamento</h2>
+        <div class="last-viewed-wrapper">
+
+          <a href="#" id="last-viewed-main-link" class="continue-card">
+            <img id="last-viewed-cover" class="book-cover" src="../assets/Imagens/capa-exemplo.jpg" alt="Capa do livro em andamento">
+            <div class="continue-info">
+              <span class="item-type-badge"><i class="fas fa-book"></i> Livro</span>
+              <h3 id="last-viewed-title">Introdução à Programação com Python</h3>
+              <p class="author" id="last-viewed-author">Eric Matthes</p>
+
+              <div class="progress-bar">
+                <div class="progress" id="last-viewed-progress" style="width: 68%"></div>
+              </div>
+              <p class="progress-text" id="last-viewed-progress-text">68% concluído • Página 214 de 412</p>
+
+              <div class="rating">
+                <span>Avalie este material:</span>
+                <div class="stars">
+                  <i class="far fa-star" data-value="1"></i>
+                  <i class="far fa-star" data-value="2"></i>
+                  <i class="far fa-star" data-value="3"></i>
+                  <i class="far fa-star" data-value="4"></i>
+                  <i class="far fa-star" data-value="5"></i>
+                </div>
+              </div>
+
+              <span class="btn-continue">Continuar Leitura →</span>
+            </div>
+          </a>
+
+          <aside class="recent-items-panel">
+            <div class="recent-items-label"><i class="fas fa-history"></i> Vistos Recentemente</div>
+            <div class="recent-items-list" id="recent-items-list"></div>
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- AÇÕES RÁPIDAS -->
+      <section>
+        <h2 class="section-title">Ações Rápidas</h2>
+        <div class="actions-grid">
+          <a href="catalogo.php" class="action-btn">
+            <i class="fas fa-search"></i>
+            <span>Explorar Catálogo</span>
+          </a>
+          <a href="meus_emprestimos.php" class="action-btn">
+            <i class="fas fa-book"></i>
+            <span>Meus Empréstimos</span>
+          </a>
+          <a href="reservas.php" class="action-btn">
+            <i class="fas fa-clock"></i>
+            <span>Minhas Reservas</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- CARROSSEL DE TCCs -->
+      <section class="tcc-section">
+        <h2 class="section-title" id="tcc-section-title">Trabalhos de Conclusão de Curso</h2>
+        <p class="tcc-subtitle" id="tcc-section-subtitle">Explore os TCCs da nossa escola e inspire-se para o seu projeto</p>
+
+        <div class="tcc-carousel">
+          <button class="tcc-nav-btn" id="tcc-prev" aria-label="TCC anterior">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="tcc-track-container">
+            <div class="tcc-track" id="tcc-track"></div>
+          </div>
+          <button class="tcc-nav-btn" id="tcc-next" aria-label="Próximo TCC">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </section>
+
     </main>
+  </div>
+
+    <!-- MODAL DE DETALHES DO TCC -->
+    <div class="tcc-modal-overlay" id="tcc-modal-overlay">
+      <div class="tcc-modal" role="dialog" aria-modal="true">
+        <button class="tcc-modal-close" id="tcc-modal-close" aria-label="Fechar">
+          <i class="fas fa-times"></i>
+        </button>
+        <div class="tcc-modal-body">
+          <div class="tcc-modal-cover-wrap">
+            <img id="tcc-modal-cover" src="" alt="">
+          </div>
+          <div class="tcc-modal-info">
+            <span class="tcc-modal-badge">
+              <i class="fas fa-graduation-cap"></i>
+              <span id="tcc-modal-badge-text">TCC</span>
+            </span>
+            <h3 id="tcc-modal-title"></h3>
+            <div class="tcc-modal-meta">
+              <span id="tcc-modal-year"></span> · <span id="tcc-modal-area"></span>
+            </div>
+
+            <h4 id="tcc-theme-label">Tema</h4>
+            <p id="tcc-modal-theme"></p>
+
+            <h4 id="tcc-members-label">Integrantes</h4>
+            <ul id="tcc-modal-members"></ul>
+
+            <div class="tcc-modal-actions">
+              <button id="tcc-favorite-btn">
+                <i class="far fa-heart" id="tcc-favorite-icon"></i>
+                <span id="tcc-favorite-text">Favoritar</span>
+              </button>
+              <button id="tcc-reserve-btn">
+                <i class="fas fa-bookmark"></i>
+                <span id="tcc-reserve-text">Reservar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </body>
 </html>

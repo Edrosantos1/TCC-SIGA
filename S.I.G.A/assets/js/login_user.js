@@ -780,10 +780,36 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
+  // ── Botões de série do modal (6º, 7º, 8º... 1º-3º EM) ──
+  // Clicar num botão preenche o input escondido #modal-serie-select
+  // (que é o valor lido por confirmarSerieGoogle) e marca visualmente
+  // o botão selecionado.
+  const gradeButtons = modalSerieGoogle
+    ? modalSerieGoogle.querySelectorAll('.grade')
+    : [];
+
+  function selecionarGrade(botao) {
+    gradeButtons.forEach(b => b.classList.remove('selected'));
+    botao.classList.add('selected');
+    if (modalSerieSelect) modalSerieSelect.value = botao.dataset.value;
+    if (modalSerieError) modalSerieError.style.display = 'none';
+    // Ativa o estado visual "pronto" do botão Confirmar (CSS: .btn-primary.ready)
+    if (btnConfirmarSerieGoogle) btnConfirmarSerieGoogle.classList.add('ready');
+  }
+
+  gradeButtons.forEach(botao => {
+    botao.addEventListener('click', () => selecionarGrade(botao));
+  });
+
   // ── Modal "completar cadastro": abre quando falta escolher a série ──
   function abrirModalSerie() {
     if (modalSerieError) modalSerieError.style.display = 'none';
     if (modalSerieSelect) modalSerieSelect.value = '';
+    gradeButtons.forEach(b => b.classList.remove('selected'));
+    if (btnConfirmarSerieGoogle) {
+      btnConfirmarSerieGoogle.disabled = false;
+      btnConfirmarSerieGoogle.classList.remove('ready', 'loading');
+    }
     if (modalSerieGoogle) modalSerieGoogle.style.display = 'flex';
   }
 
@@ -802,7 +828,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (modalSerieError) modalSerieError.style.display = 'none';
-    if (btnConfirmarSerieGoogle) btnConfirmarSerieGoogle.disabled = true;
+    if (btnConfirmarSerieGoogle) {
+      btnConfirmarSerieGoogle.disabled = true;
+      btnConfirmarSerieGoogle.classList.remove('ready');
+      btnConfirmarSerieGoogle.classList.add('loading');
+    }
 
     const form = new FormData();
     form.append('serie', serie);
@@ -820,7 +850,11 @@ document.addEventListener("DOMContentLoaded", () => {
             modalSerieError.textContent = data.mensagem || 'Erro ao salvar a série.';
             modalSerieError.style.display = 'block';
           }
-          if (btnConfirmarSerieGoogle) btnConfirmarSerieGoogle.disabled = false;
+          if (btnConfirmarSerieGoogle) {
+            btnConfirmarSerieGoogle.disabled = false;
+            btnConfirmarSerieGoogle.classList.remove('loading');
+            btnConfirmarSerieGoogle.classList.add('ready');
+          }
         }
       })
       .catch(erro => {
@@ -829,7 +863,11 @@ document.addEventListener("DOMContentLoaded", () => {
           modalSerieError.textContent = 'Erro ao conectar com o servidor. Tente novamente.';
           modalSerieError.style.display = 'block';
         }
-        if (btnConfirmarSerieGoogle) btnConfirmarSerieGoogle.disabled = false;
+        if (btnConfirmarSerieGoogle) {
+          btnConfirmarSerieGoogle.disabled = false;
+          btnConfirmarSerieGoogle.classList.remove('loading');
+          btnConfirmarSerieGoogle.classList.add('ready');
+        }
       });
   }
 

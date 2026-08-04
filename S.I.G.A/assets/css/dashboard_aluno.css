@@ -104,7 +104,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   display: block;
   width: 20px;
   height: 2px;
-  background: #6b4a4a;
+  background: #0b4b9b;
   border-radius: 2px;
   position: absolute;
   left: 50%;
@@ -785,5 +785,370 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   .notification-dropdown {
     width: 300px;
     right: -20px;
+  }
+}
+
+/* ========== CONTINUE CARD - CONTEÚDO ========== */
+.continue-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #667085;
+}
+
+.rating .stars {
+  display: flex;
+  gap: 4px;
+  color: #f5b301;
+  font-size: 16px;
+}
+
+.rating .stars i {
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.rating .stars i:hover {
+  transform: scale(1.15);
+}
+
+.btn-continue {
+  align-self: flex-start;
+  background: #0b4b9b;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.continue-card:hover .btn-continue {
+  background: #0a3f83;
+  transform: translateX(4px);
+}
+
+/* ========== CARROSSEL DE TCCs ========== */
+.tcc-section {
+  margin-top: 8px;
+}
+
+.tcc-subtitle {
+  text-align: center;
+  color: #667085;
+  font-size: 15px;
+  margin-top: -20px;
+  margin-bottom: 32px;
+}
+
+.tcc-carousel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tcc-nav-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  color: #0b4b9b;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.tcc-nav-btn:hover:not(:disabled) {
+  background: #0b4b9b;
+  color: #fff;
+  transform: scale(1.06);
+}
+
+.tcc-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.tcc-track-container {
+  overflow: hidden;
+  flex: 1;
+}
+
+.tcc-track {
+  display: flex;
+  gap: 16px;
+  transition: transform 0.35s ease;
+}
+
+.tcc-cover-card {
+  flex-shrink: 0;
+  width: 140px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.tcc-cover-card:hover,
+.tcc-cover-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 28px rgba(11, 75, 155, 0.2);
+}
+
+.tcc-cover-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tcc-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  text-align: center;
+}
+
+.tcc-cover-placeholder i {
+  font-size: 30px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.tcc-cover-placeholder span {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tcc-cover-year {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ========== MODAL DE DETALHES DO TCC ========== */
+.tcc-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.tcc-modal-overlay.open {
+  display: flex;
+  animation: fadeInDown 0.2s ease;
+}
+
+.tcc-modal {
+  background: #fff;
+  border-radius: 20px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+}
+
+.tcc-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f0f7ff;
+  color: #0b4b9b;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 2;
+  transition: background 0.2s;
+}
+
+.tcc-modal-close:hover {
+  background: #dceafe;
+}
+
+.tcc-modal-body {
+  display: flex;
+  gap: 28px;
+  padding: 36px;
+}
+
+.tcc-modal-cover-wrap {
+  flex-shrink: 0;
+  width: 150px;
+  height: 210px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tcc-modal-cover-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.tcc-modal-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tcc-modal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f7ff;
+  color: #0b4b9b;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.tcc-modal-info h3 {
+  font-size: 20px;
+  color: #0b4b9b;
+  margin-bottom: 6px;
+}
+
+.tcc-modal-meta {
+  color: #667085;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.tcc-modal-info h4 {
+  font-size: 13px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+.tcc-modal-info p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+#tcc-modal-members {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#tcc-modal-members li {
+  font-size: 14px;
+  color: #333;
+  position: relative;
+  padding-left: 30px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+#tcc-modal-members li::before {
+  content: attr(data-initial);
+  position: absolute;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0b4b9b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tcc-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.tcc-modal-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  font-family: inherit;
+  transition: 0.2s;
+}
+
+#tcc-favorite-btn:hover,
+#tcc-reserve-btn:hover {
+  background: #f8faff;
+}
+
+#tcc-favorite-btn.favorited {
+  background: #ffe0e0;
+  border-color: #ffc9c9;
+  color: #e74c3c;
+}
+
+#tcc-reserve-btn.reserved {
+  background: #f0f7ff;
+  border-color: #c5d8f7;
+  color: #0b4b9b;
+}
+
+@media (max-width: 640px) {
+  .tcc-modal-body {
+    flex-direction: column;
+    padding: 24px;
+  }
+  .tcc-modal-cover-wrap {
+    width: 100%;
+    height: 180px;
   }
 }
