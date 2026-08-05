@@ -25,11 +25,11 @@ if (strlen($termo) < 1) {
     exit;
 }
 
-// BUSCA POR PREFIXO (starts with)
+// Busca por prefixo
 $termo_like = $termo . '%';
 
 try {
-    $sql = "SELECT id_aluno AS id, nome_aluno AS nome, 'aluno' AS tipo
+    $sql = "SELECT id_aluno AS id, nome_aluno AS nome, serie_aluno
             FROM login_aluno
             WHERE nome_aluno LIKE ?
             ORDER BY nome_aluno ASC
@@ -40,17 +40,56 @@ try {
         $stmt->bind_param('s', $termo_like);
         $stmt->execute();
         $result = $stmt->get_result();
-        $dados = $result->fetch_all(MYSQLI_ASSOC);
+        $alunos = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
+
+        // Para cada aluno, verificar se tem reservas e empréstimos
+        foreach ($alunos as &$aluno) {
+            $id = $aluno['id'];
+            
+            // Verificar reservas
+            $reservas_sql = "SELECT COUNT(*) as total FROM reservas WHERE id_aluno = ? AND status IN ('pendente', 'aprovada')";
+            $reservas_stmt = $db->prepare($reservas_sql);
+            $reservas_stmt->bind_param('i', $id);
+            $reservas_stmt->execute();
+            $reservas_result = $reservas_stmt->get_result();
+            $reservas_count = $reservas_result->fetch_assoc()['total'];
+            $reservas_stmt->close();
+            $aluno['tem_reservas'] = $reservas_count > 0;
+            
+            // Verificar empréstimos
+            $emprestimos_sql = "SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')";
+            $emprestimos_stmt = $db->prepare($emprestimos_sql);
+            $emprestimos_stmt->bind_param('i', $id);
+            $emprestimos_stmt->execute();
+            $emprestimos_result = $emprestimos_stmt->get_result();
+            $emprestimos_count = $emprestimos_result->fetch_assoc()['total'];
+            $emprestimos_stmt->close();
+            $aluno['tem_emprestimos'] = $emprestimos_count > 0;
+        }
+        
     } elseif ($db instanceof PDO) {
         $stmt = $db->prepare($sql);
         $stmt->execute([$termo_like]);
-        $dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach ($alunos as &$aluno) {
+            $id = $aluno['id'];
+            
+            $reservas_stmt = $db->prepare("SELECT COUNT(*) as total FROM reservas WHERE id_aluno = ? AND status IN ('pendente', 'aprovada')");
+            $reservas_stmt->execute([$id]);
+            $aluno['tem_reservas'] = $reservas_stmt->fetchColumn() > 0;
+            
+            $emprestimos_stmt = $db->prepare("SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')");
+            $emprestimos_stmt->execute([$id]);
+            $aluno['tem_emprestimos'] = $emprestimos_stmt->fetchColumn() > 0;
+        }
     } else {
-        $dados = [];
+        $alunos = [];
     }
 
-    echo json_encode($dados);
+    echo json_encode($alunos);
 } catch (Exception $e) {
     echo json_encode(['error' => $e->getMessage()]);
 }
+?>

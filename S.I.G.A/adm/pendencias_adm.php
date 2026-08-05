@@ -9,6 +9,10 @@ if (!isset($_SESSION['admin_id'])) {
 
 $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 
+// ========== FILTRO POR ALUNO ==========
+$filtro_aluno_id = isset($_GET['aluno_id']) ? intval($_GET['aluno_id']) : 0;
+$filtro_aluno_nome = isset($_GET['aluno_nome']) ? urldecode($_GET['aluno_nome']) : '';
+
 // ========== IDENTIFICAR CONEXÃO (MYSQLI OU PDO) ==========
 $db = null;
 if (isset($conn)) {
@@ -20,6 +24,7 @@ if (isset($conn)) {
 }
 
 // ========== BUSCAR EMPRÉSTIMOS/PENDÊNCIAS DO BANCO ==========
+
 $pendencias = array();
 
 if ($db) {
@@ -35,8 +40,13 @@ if ($db) {
         FROM emprestimos e
         INNER JOIN login_aluno l ON e.id_aluno = l.id_aluno
         WHERE e.status IN ('emprestado', 'atrasado')
-        ORDER BY e.data_devolucao_prevista ASC
     ";
+    
+    if ($filtro_aluno_id > 0) {
+        $query .= " AND e.id_aluno = " . intval($filtro_aluno_id);
+    }
+    
+    $query .= " ORDER BY e.data_devolucao_prevista ASC";
     
     if ($db instanceof mysqli) {
         $result = $db->query($query);
@@ -181,11 +191,24 @@ $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
         <main class="dashboard-main">
 
             <!-- ========== CABEÇALHO DA PÁGINA ========== -->
+            
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-exclamation-circle"></i> Empréstimos & Pendências</h1>
-                    <p class="page-subtitle">Acompanhe os materiais emprestados e registre as devoluções</p>
+                    <p class="page-subtitle">
+                        Acompanhe os materiais emprestados e registre as devoluções
+                        <?php if ($filtro_aluno_id > 0): ?>
+                            <br><strong style="color: #0b4b9b;">📌 Aluno: <?= htmlspecialchars($filtro_aluno_nome) ?></strong>
+                        <?php endif; ?>
+                    </p>
                 </div>
+                <?php if ($filtro_aluno_id > 0): ?>
+                    <div>
+                        <a href="pendencias_adm.php" style="background: #f0f4fd; border: none; padding: 10px 20px; border-radius: 10px; text-decoration: none; color: #0b4b9b; font-weight: 600; display: inline-block;">
+                            <i class="fas fa-times"></i> Limpar Filtro
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- ========== FILTROS ========== -->

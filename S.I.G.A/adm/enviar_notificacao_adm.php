@@ -2,118 +2,118 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
 if (!isset($_SESSION['admin_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Sessão expirada. Faça login novamente.']);
+    header('Location: login_adm.php');
     exit;
 }
 
-// ========== IDENTIFICAR CONEXÃO ==========
-$db = null;
-if (isset($conn)) {
-    $db = $conn;
-} elseif (isset($conexao)) {
-    $db = $conexao;
-} elseif (isset($pdo)) {
-    $db = $pdo;
+// ========== PREVENIR ENVIO DUPLICADO POR TEMPO ==========
+if (isset($_SESSION['ultimo_envio']) && time() - $_SESSION['ultimo_envio'] < 5) {
+    $_SESSION['msg_erro'] = 'Aguarde alguns segundos antes de enviar novamente.';
+    header('Location: notificacoes_adm.php');
+    exit;
 }
+$_SESSION['ultimo_envio'] = time();
+
+$db = null;
+if (isset($conn)) $db = $conn;
+elseif (isset($conexao)) $db = $conexao;
+elseif (isset($pdo)) $db = $pdo;
 
 if (!$db) {
-    echo json_encode(['success' => false, 'message' => 'Sem conexão com o banco de dados.']);
+    $_SESSION['msg_erro'] = 'Erro de conexão com o banco de dados.';
+    header('Location: notificacoes_adm.php');
     exit;
 }
 
-// ========== LER PAYLOAD ==========
-$input = json_decode(file_get_contents('php://input'), true);
+// ========== RECEBER DADOS DO POST ==========
+$destinatarioTipo = isset($_POST['destinatario_tipo']) ? $_POST['destinatario_tipo'] : 'todos';
+$idAlunoEspecifico = isset($_POST['id_aluno']) ? intval($_POST['id_aluno']) : 0;
+$categoria = isset($_POST['categoria']) ? $_POST['categoria'] : 'aviso';
+$mensagem = isset($_POST['mensagem']) ? trim($_POST['mensagem']) : '';
+$enviarEmail = isset($_POST['enviar_email']) ? true : false;
 
-$destinatarioTipo = isset($input['destinatario_tipo']) ? $input['destinatario_tipo'] : 'todos'; // 'todos' | 'especifico'
-$idAlunoEspecifico = isset($input['id_aluno']) ? $input['id_aluno'] : null;
-$categoria = isset($input['categoria']) ? $input['categoria'] : 'aviso'; // 'pendencia' | 'aviso' -> vai para a coluna `tipo`
-$mensagem = isset($input['mensagem']) ? trim($input['mensagem']) : '';
-$enviarEmail = isset($input['enviar_email']) ? (bool) $input['enviar_email'] : false;
-
+// ========== VALIDAÇÕES ==========
 if ($mensagem === '') {
-    echo json_encode(['success' => false, 'message' => 'A mensagem não pode estar vazia.']);
+    $_SESSION['msg_erro'] = 'A mensagem não pode estar vazia.';
+    header('Location: notificacoes_adm.php');
     exit;
 }
 
-if ($destinatarioTipo === 'especifico' && empty($idAlunoEspecifico)) {
-    echo json_encode(['success' => false, 'message' => 'Nenhum aluno específico foi selecionado.']);
+if ($destinatarioTipo === 'especifico' && $idAlunoEspecifico <= 0) {
+    $_SESSION['msg_erro'] = 'Nenhum aluno específico foi selecionado.';
+    header('Location: notificacoes_adm.php');
     exit;
 }
 
 $titulo = $categoria === 'pendencia' ? 'Pendência' : 'Aviso';
-$tipo = $categoria; // grava 'pendencia' ou 'aviso' na coluna `tipo`
+$tipo = $categoria;
 
-// ========== DESCOBRIR OS DESTINATÁRIOS ==========
-$alunosDestino = array(); // cada item: ['id_aluno' => ..., 'email_aluno' => ...]
+// ========== GERAR ID ÚNICO PARA ESTE ENVIO ==========
+$id_envio = uniqid() . '_' . time();
+
+// ========== BUSCAR DESTINATÁRIOS ==========
+$alunosDestino = array();
 
 try {
     if ($destinatarioTipo === 'todos') {
         $result = $db->query("SELECT id_aluno, email_aluno FROM login_aluno");
         if ($result) {
-            $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
+            if (method_exists($result, 'fetch_all')) {
+                $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
+            } else {
+                while ($row = $result->fetch_assoc()) {
+                    $alunosDestino[] = $row;
+                }
+            }
         }
     } else {
         $stmt = $db->prepare("SELECT id_aluno, email_aluno FROM login_aluno WHERE id_aluno = ?");
         $stmt->bind_param('i', $idAlunoEspecifico);
         $stmt->execute();
         $result = $stmt->get_result();
-        $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
+        if (method_exists($result, 'fetch_all')) {
+            $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
+        } else {
+            while ($row = $result->fetch_assoc()) {
+                $alunosDestino[] = $row;
+            }
+        }
         $stmt->close();
     }
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Erro ao buscar destinatários: ' . $e->getMessage()]);
+    $_SESSION['msg_erro'] = 'Erro ao buscar destinatários: ' . $e->getMessage();
+    header('Location: notificacoes_adm.php');
     exit;
 }
 
 if (empty($alunosDestino)) {
-    echo json_encode(['success' => false, 'message' => 'Nenhum destinatário encontrado.']);
+    $_SESSION['msg_erro'] = 'Nenhum destinatário encontrado.';
+    header('Location: notificacoes_adm.php');
     exit;
 }
 
-// ========== GRAVAR NOTIFICAÇÃO(ÕES) NO BANCO ==========
-// Tabela `notificacoes`: id, id_aluno, titulo, mensagem, tipo, lida, criado_em
-// (criado_em e lida já têm valor padrão no banco, não precisa informar)
+// ========== GRAVAR NOTIFICAÇÕES ==========
 try {
-    $stmt = $db->prepare("
-        INSERT INTO notificacoes (id_aluno, titulo, mensagem, tipo)
-        VALUES (?, ?, ?, ?)
-    ");
-
+    // 🔥 AGORA INCLUI O id_envio
+    $stmt = $db->prepare("INSERT INTO notificacoes (id_aluno, titulo, mensagem, tipo, id_envio) VALUES (?, ?, ?, ?, ?)");
     $sucessos = 0;
-    $emailsEnviados = 0;
 
     foreach ($alunosDestino as $aluno) {
-        $stmt->bind_param('isss', $aluno['id_aluno'], $titulo, $mensagem, $tipo);
+        $stmt->bind_param('issss', $aluno['id_aluno'], $titulo, $mensagem, $tipo, $id_envio);
         if ($stmt->execute()) {
             $sucessos++;
-
-            // ---------- ENVIO DE E-MAIL (placeholder) ----------
-            // Substitua este bloco pela sua integração real (PHPMailer, SMTP, etc).
-            if ($enviarEmail && !empty($aluno['email_aluno'])) {
-                $enviado = @mail(
-                    $aluno['email_aluno'],
-                    'SiGA ITJ — ' . $titulo,
-                    $mensagem,
-                    'From: no-reply@sigaitj.com.br'
-                );
-                if ($enviado) {
-                    $emailsEnviados++;
-                }
-            }
         }
     }
-
     $stmt->close();
 
-    echo json_encode([
-        'success' => true,
-        'message' => "Notificação enviada para {$sucessos} aluno(s)." . ($enviarEmail ? " ({$emailsEnviados} e-mail(s) enviado(s))" : ''),
-        'total_destinatarios' => $sucessos,
-        'total_emails' => $emailsEnviados
-    ]);
+    $_SESSION['msg_sucesso'] = "Notificação enviada para {$sucessos} aluno(s).";
+    header('Location: notificacoes_adm.php');
+    exit;
+
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Erro ao salvar notificação: ' . $e->getMessage()]);
+    $_SESSION['msg_erro'] = 'Erro ao salvar notificação: ' . $e->getMessage();
+    header('Location: notificacoes_adm.php');
+    exit;
 }
+?>

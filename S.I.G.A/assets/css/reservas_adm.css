@@ -498,3 +498,5 @@
         padding: 4px 8px;
     }
 }
+/* ========== INCLUIR ESTILOS DA MODAL ========== */
+@import url('modal_reserva.css');

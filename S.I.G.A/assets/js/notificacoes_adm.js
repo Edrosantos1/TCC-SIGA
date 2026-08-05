@@ -1,9 +1,11 @@
 // ========== VARIÁVEIS GLOBAIS ==========
-let notificacoesHeader = [];
 let alunos = [];
-let alunoSelecionado = null; // { id_aluno, nome_aluno, turma }
-let destinatarioAtual = 'todos'; // 'todos' | 'especifico'
-let categoriaAtual = 'pendencia'; // 'pendencia' | 'aviso'
+let alunoSelecionado = null;
+let destinatarioAtual = 'todos';
+let categoriaAtual = 'aviso';
+let filtroPeriodo = 'semana';
+let filtroOrdenacao = 'mais_recente';
+let enviando = false;
 
 // ========== FUNÇÕES AUXILIARES ==========
 function escapeHtml(text) {
@@ -13,46 +15,19 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ========== DROPDOWN DE NOTIFICAÇÕES DO HEADER (sininho) ==========
-function renderizarDropdownNotificacoes() {
-    const lista = document.getElementById('notification-list-dropdown');
-    if (!lista) return;
-
-    if (notificacoesHeader.length === 0) {
-        lista.innerHTML = `
-            <div class="empty-notifications">
-                <i class="far fa-bell-slash"></i>
-                <p>Nenhuma notificação</p>
-            </div>
-        `;
-        return;
-    }
-
-    lista.innerHTML = notificacoesHeader.slice(0, 5).map(notificacao => `
-        <div class="notificacao-item">
-            <div class="notificacao-icon">
-                <i class="fas fa-bell"></i>
-            </div>
-            <div class="notificacao-content">
-                <h4>${escapeHtml(notificacao.titulo || 'Nova Notificação')}</h4>
-                <p>${escapeHtml(notificacao.mensagem || 'Você tem um novo aviso no sistema.')}</p>
-            </div>
-        </div>
-    `).join('');
+function formatarData(data) {
+    const d = new Date(data + ' UTC');
+    const agora = new Date();
+    const diff = Math.floor((agora - d) / 1000);
+    
+    if (diff < 60) return 'Agora pouco';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+    if (diff < 172800) return 'Ontem';
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
 }
 
-function initMarcarComoLidas() {
-    const botao = document.querySelector('.mark-read-btn');
-    if (!botao) return;
-
-    botao.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notificacoesHeader = [];
-        renderizarDropdownNotificacoes();
-    });
-}
-
-// ========== SIDEBAR (RECOLHER / EXPANDIR) ==========
+// ========== SIDEBAR ==========
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const collapseBtn = document.getElementById('collapseBtn');
@@ -88,29 +63,7 @@ function initProfileDropdown() {
     });
 }
 
-// ========== NOTIFICAÇÕES (sino do header) ==========
-function initNotifications() {
-    const btn = document.getElementById('notification-btn');
-    const dropdown = document.getElementById('notification-dropdown');
-    if (!btn || !dropdown) return;
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('show');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('show');
-        }
-    });
-}
-
-// =============================================
-// BLOCO DE COMPOSIÇÃO
-// =============================================
-
-// ========== GERENCIAR CATEGORIA CONFORME DESTINATÁRIO ==========
+// ========== ATUALIZAR CATEGORIA POR DESTINATÁRIO ==========
 function atualizarCategoriaPorDestinatario() {
     const tabPendencia = document.querySelector('.categoria-tab[data-categoria="pendencia"]');
     const tabAviso = document.querySelector('.categoria-tab[data-categoria="aviso"]');
@@ -118,21 +71,22 @@ function atualizarCategoriaPorDestinatario() {
 
     if (destinatarioAtual === 'todos') {
         tabPendencia.classList.add('disabled');
-
         if (tabPendencia.classList.contains('active')) {
             tabPendencia.classList.remove('active');
             tabAviso.classList.add('active');
             categoriaAtual = 'aviso';
+            document.getElementById('categoria-input').value = 'aviso';
         }
     } else {
         tabPendencia.classList.remove('disabled');
     }
 }
 
-// ---------- Destinatário (todos x aluno específico) ----------
+// ========== DESTINATÁRIO TABS ==========
 function initDestinatarioTabs() {
     const tabs = document.querySelectorAll('.dest-tab');
     const buscaWrapper = document.getElementById('aluno-busca-wrapper');
+    const inputHidden = document.getElementById('destinatario-tipo-input');
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function () {
@@ -140,6 +94,7 @@ function initDestinatarioTabs() {
             this.classList.add('active');
 
             destinatarioAtual = this.dataset.tipo;
+            if (inputHidden) inputHidden.value = destinatarioAtual;
 
             if (destinatarioAtual === 'especifico') {
                 buscaWrapper.style.display = 'block';
@@ -153,22 +108,22 @@ function initDestinatarioTabs() {
     });
 }
 
-// ---------- Categoria ----------
+// ========== CATEGORIA TABS ==========
 function initCategoriaTabs() {
     const tabs = document.querySelectorAll('.categoria-tab');
 
     tabs.forEach(tab => {
         tab.addEventListener('click', function () {
             if (this.classList.contains('disabled')) return;
-
             tabs.forEach(t => t.classList.remove('active'));
             this.classList.add('active');
             categoriaAtual = this.dataset.categoria;
+            document.getElementById('categoria-input').value = categoriaAtual;
         });
     });
 }
 
-// ---------- Busca inteligente de alunos (COM SUPORTE A ENTER) ----------
+// ========== BUSCA ALUNO ==========
 function initBuscaAluno() {
     const input = document.getElementById('busca-aluno-input');
     const sugestoesBox = document.getElementById('aluno-sugestoes');
@@ -182,6 +137,7 @@ function initBuscaAluno() {
 
         if (termo.length === 0) {
             sugestoesBox.innerHTML = '';
+            sugestoesBox.style.display = 'none';
             return;
         }
 
@@ -190,26 +146,12 @@ function initBuscaAluno() {
         }, 200);
     });
 
-    // ========== SUPORTE À TECLA ENTER ==========
     input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-
             const primeiraSugestao = sugestoesBox.querySelector('.aluno-sugestao-item');
-            
             if (primeiraSugestao) {
                 primeiraSugestao.click();
-            } else if (this.value.trim().length > 0) {
-                const termo = this.value.trim().toLowerCase();
-                const alunoEncontrado = alunos.find(a => 
-                    (a.nome_aluno || '').toLowerCase().includes(termo)
-                );
-                
-                if (alunoEncontrado) {
-                    selecionarAluno(alunoEncontrado);
-                } else {
-                    showToast('Nenhum aluno encontrado com este nome.', 'error');
-                }
             }
         }
     });
@@ -217,6 +159,7 @@ function initBuscaAluno() {
     document.addEventListener('click', (e) => {
         if (!input.contains(e.target) && !sugestoesBox.contains(e.target)) {
             sugestoesBox.innerHTML = '';
+            sugestoesBox.style.display = 'none';
         }
     });
 }
@@ -225,16 +168,13 @@ function renderizarSugestoesAluno(termo) {
     const sugestoesBox = document.getElementById('aluno-sugestoes');
     const termoLower = termo.toLowerCase().trim();
     
-    // FILTRO POR PREFIXO (começa com o termo digitado)
     const resultados = alunos
-        .filter(a => {
-            const nome = (a.nome_aluno || '').toLowerCase();
-            return nome.startsWith(termoLower); // <-- MUDANÇA AQUI
-        })
+        .filter(a => (a.nome_aluno || '').toLowerCase().startsWith(termoLower))
         .slice(0, 6);
 
     if (resultados.length === 0) {
         sugestoesBox.innerHTML = `<div class="aluno-sugestao-vazia">Nenhum aluno encontrado para "${escapeHtml(termo)}"</div>`;
+        sugestoesBox.style.display = 'block';
         return;
     }
 
@@ -245,6 +185,8 @@ function renderizarSugestoesAluno(termo) {
             ${aluno.turma ? `<span class="aluno-turma">${escapeHtml(aluno.turma)}</span>` : ''}
         </div>
     `).join('');
+
+    sugestoesBox.style.display = 'block';
 
     sugestoesBox.querySelectorAll('.aluno-sugestao-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -262,16 +204,14 @@ function selecionarAluno(aluno) {
     const sugestoesBox = document.getElementById('aluno-sugestoes');
     const selecionadoBox = document.getElementById('aluno-selecionado');
     const selecionadoNome = document.getElementById('aluno-selecionado-nome');
-    const buscaContainer = document.querySelector('.busca-aluno-container');
+    const idHidden = document.getElementById('id-aluno-selecionado');
 
     input.value = '';
     sugestoesBox.innerHTML = '';
+    sugestoesBox.style.display = 'none';
     selecionadoNome.textContent = aluno.turma ? `${aluno.nome_aluno} — ${aluno.turma}` : aluno.nome_aluno;
     selecionadoBox.style.display = 'inline-flex';
-    
-    if (buscaContainer) {
-        buscaContainer.style.display = 'none';
-    }
+    if (idHidden) idHidden.value = aluno.id_aluno;
 }
 
 function limparAlunoSelecionado() {
@@ -279,18 +219,11 @@ function limparAlunoSelecionado() {
 
     const input = document.getElementById('busca-aluno-input');
     const selecionadoBox = document.getElementById('aluno-selecionado');
-    const buscaContainer = document.querySelector('.busca-aluno-container');
+    const idHidden = document.getElementById('id-aluno-selecionado');
 
-    if (input) {
-        input.value = '';
-        input.style.display = '';
-    }
-    if (selecionadoBox) {
-        selecionadoBox.style.display = 'none';
-    }
-    if (buscaContainer) {
-        buscaContainer.style.display = 'block';
-    }
+    if (input) input.value = '';
+    if (selecionadoBox) selecionadoBox.style.display = 'none';
+    if (idHidden) idHidden.value = '';
 }
 
 function initRemoverAlunoSelecionado() {
@@ -299,137 +232,147 @@ function initRemoverAlunoSelecionado() {
     btn.addEventListener('click', limparAlunoSelecionado);
 }
 
-// ---------- Envio do formulário ----------
-function initFormEnvio() {
+// ========== PREVENIR ENVIO DUPLICADO ==========
+function initPrevenirEnvioDuplicado() {
     const form = document.getElementById('form-notificacao');
-    if (!form) return;
-
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const mensagem = document.getElementById('mensagem-textarea').value.trim();
-        const enviarEmail = document.getElementById('enviar-email-checkbox').checked;
-        const btnEnviar = document.getElementById('btn-enviar-notificacao');
-
-        if (mensagem === '') {
-            showToast('Escreva uma mensagem antes de enviar.', 'error');
-            return;
-        }
-
-        if (destinatarioAtual === 'especifico' && !alunoSelecionado) {
-            showToast('Selecione um aluno específico ou mude para "Todos os alunos".', 'error');
-            return;
-        }
-
-        const payload = {
-            destinatario_tipo: destinatarioAtual,
-            id_aluno: destinatarioAtual === 'especifico' ? alunoSelecionado.id_aluno : null,
-            categoria: categoriaAtual,
-            mensagem: mensagem,
-            enviar_email: enviarEmail
-        };
-
-        btnEnviar.disabled = true;
-        btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-        try {
-            const response = await fetch('enviar_notificacao_adm.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                showToast('Notificação enviada com sucesso!', 'success');
-                resetarFormulario();
-            } else {
-                showToast(result.message || 'Erro ao enviar notificação.', 'error');
+    const btnEnviar = document.getElementById('btn-enviar-notificacao');
+    
+    if (form && btnEnviar) {
+        form.addEventListener('submit', function(e) {
+            if (enviando) {
+                e.preventDefault();
+                return;
             }
-        } catch (error) {
-            console.error(error);
-            showToast('Erro de comunicação com o servidor.', 'error');
-        } finally {
-            btnEnviar.disabled = false;
-            btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar notificação';
-        }
+            
+            enviando = true;
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        });
+    }
+}
+
+// ========== FILTROS DO HISTÓRICO ==========
+function initFiltrosHistorico() {
+    document.querySelectorAll('.filtro-periodo .filtro-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filtro-periodo .filtro-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            filtroPeriodo = this.dataset.periodo;
+            carregarHistoricoFiltrado();
+        });
+    });
+
+    document.querySelectorAll('.filtros-ordenacao .filtro-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filtros-ordenacao .filtro-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            filtroOrdenacao = this.dataset.ordenacao;
+            carregarHistoricoFiltrado();
+        });
     });
 }
 
-function resetarFormulario() {
-    document.getElementById('mensagem-textarea').value = '';
+async function carregarHistoricoFiltrado() {
+    const container = document.querySelector('.historico-lista');
+    const emptyContainer = document.querySelector('.empty-historico');
+    const loading = document.getElementById('historico-loading');
+    
+    if (!container) return;
 
-    document.querySelectorAll('.dest-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('.dest-tab[data-tipo="todos"]').classList.add('active');
-    destinatarioAtual = 'todos';
-    document.getElementById('aluno-busca-wrapper').style.display = 'none';
-    limparAlunoSelecionado();
+    if (loading) loading.style.display = 'block';
+    container.style.opacity = '0.3';
 
-    document.querySelectorAll('.categoria-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('.categoria-tab[data-categoria="pendencia"]').classList.add('active');
-    categoriaAtual = 'pendencia';
-}
+    try {
+        const response = await fetch(`buscar_notificacoes.php?periodo=${filtroPeriodo}&ordenacao=${filtroOrdenacao}`);
+        const data = await response.json();
 
-// ========== TOAST ==========
-function criarContainerToast() {
-    const container = document.createElement('div');
-    container.className = 'toast-container';
-    document.body.appendChild(container);
-    return container;
-}
+        if (data.error) {
+            console.error('Erro ao carregar histórico:', data.error);
+            return;
+        }
 
-function showToast(message, type = 'info') {
-    let container = document.querySelector('.toast-container');
-    if (!container) {
-        container = criarContainerToast();
+        if (data.length === 0) {
+            if (emptyContainer) emptyContainer.style.display = 'block';
+            container.innerHTML = '';
+            if (loading) loading.style.display = 'none';
+            container.style.opacity = '1';
+            return;
+        }
+
+        if (emptyContainer) emptyContainer.style.display = 'none';
+
+        container.innerHTML = data.map(notif => {
+            const isPendencia = notif.tipo === 'pendencia';
+            const corLabel = isPendencia ? 'pendencia' : 'aviso';
+            const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
+            
+            // 🔥 VERIFICAR SE É "TODOS OS ALUNOS"
+            // Pode vir como 'Todos os alunos' ou 'todos os alunos'
+            const isTodosAlunos = notif.alunos_nomes && notif.alunos_nomes.toLowerCase().includes('todos os alunos');
+            
+            console.log('🔍 Notificação:', notif.id, '| Alunos:', notif.alunos_nomes, '| Total:', notif.total_alunos, '| isTodos:', isTodosAlunos);
+            
+            return `
+                <div class="historico-item">
+                    <div class="historico-header">
+                        <div class="historico-info">
+                            <span class="historico-categoria ${corLabel}">
+                                <i class="fas ${icone}"></i>
+                                ${isPendencia ? 'Pendência' : 'Aviso'}
+                            </span>
+                            <span class="historico-data">
+                                <i class="far fa-calendar-alt"></i>
+                                ${formatarData(notif.criado_em)}
+                            </span>
+                        </div>
+                        <span class="historico-destinatarios">
+                            <i class="fas fa-users"></i>
+                            ${notif.total_alunos} aluno(s)
+                        </span>
+                    </div>
+                    
+                    <div class="historico-mensagem">
+                        ${escapeHtml(notif.mensagem)}
+                    </div>
+                    
+                    <div class="historico-alunos">
+                        ${isTodosAlunos ? `
+                            <span style="display: inline-flex; align-items: center; gap: 6px; background: #eaf4ff; padding: 4px 14px; border-radius: 12px; color: #0b4b9b; font-weight: 600; font-size: 12px;">
+                                <i class="fas fa-globe"></i> Enviado para todos os alunos
+                            </span>
+                        ` : `
+                            ${notif.alunos_nomes ? escapeHtml(notif.alunos_nomes) : 'Nenhum aluno'}
+                        `}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.style.opacity = '1';
+
+    } catch (error) {
+        console.error('Erro ao carregar histórico:', error);
+    } finally {
+        if (loading) loading.style.display = 'none';
+        container.style.opacity = '1';
     }
-
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-
-    const icons = {
-        success: 'fas fa-check-circle',
-        error: 'fas fa-exclamation-circle',
-        info: 'fas fa-info-circle'
-    };
-
-    toast.innerHTML = `
-        <i class="${icons[type] || icons.info}"></i>
-        <span>${escapeHtml(message)}</span>
-    `;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(40px)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 400);
-    }, 3000);
 }
 
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function () {
-    if (typeof notificacoesData !== 'undefined') {
-        notificacoesHeader = notificacoesData;
-    }
     if (typeof alunosData !== 'undefined') {
         alunos = alunosData;
     }
 
     initSidebar();
     initProfileDropdown();
-    initNotifications();
-    initMarcarComoLidas();
-    renderizarDropdownNotificacoes();
-
     initDestinatarioTabs();
     initCategoriaTabs();
     initBuscaAluno();
     initRemoverAlunoSelecionado();
-    initFormEnvio();
+    initFiltrosHistorico();
+    initPrevenirEnvioDuplicado();
 
-    // Aplica estado inicial (desabilita Pendência quando "Todos" estiver ativo)
     atualizarCategoriaPorDestinatario();
+    carregarHistoricoFiltrado();
 });

@@ -1,5 +1,5 @@
 // ========== VARIÁVEIS GLOBAIS ==========
-let reservas = [];
+let reservas = []; // será preenchida com reservasData no DOMContentLoaded
 let filtroAtual = 'todos';
 let buscaAtual = '';
 
@@ -15,12 +15,10 @@ function renderizarReservas() {
     // Filtrar reservas
     let reservasFiltradas = reservas;
     
-    // Filtrar por status
     if (filtroAtual !== 'todos') {
         reservasFiltradas = reservasFiltradas.filter(r => r.status === filtroAtual);
     }
     
-    // Filtrar por busca (APENAS POR ALUNO)
     if (buscaAtual.trim() !== '') {
         const termo = buscaAtual.toLowerCase().trim();
         reservasFiltradas = reservasFiltradas.filter(r => 
@@ -28,10 +26,8 @@ function renderizarReservas() {
         );
     }
     
-    // Atualizar badges
     atualizarBadges();
     
-    // Mostrar/ocultar empty state
     if (reservasFiltradas.length === 0) {
         tbody.innerHTML = '';
         if (tableWrapper) tableWrapper.style.display = 'none';
@@ -52,7 +48,6 @@ function renderizarReservas() {
     if (tableWrapper) tableWrapper.style.display = 'block';
     if (emptyState) emptyState.style.display = 'none';
     
-    // Renderizar linhas HTML
     tbody.innerHTML = reservasFiltradas.map(reserva => {
         const statusClass = reserva.status;
         const statusIcon = {
@@ -105,7 +100,6 @@ function renderizarReservas() {
 // ========== FUNÇÕES AUXILIARES DE DATA (FORMATO DD/MM/AAAA) ==========
 function formatarData(dataStr) {
     if (!dataStr) return '-';
-    // Remove qualquer horário que venha junto do MySQL (ex: "2026-07-31 00:10:00" -> "2026-07-31")
     const dataApenas = dataStr.split(' ')[0];
     const partes = dataApenas.split('-');
     if (partes.length === 3) {
@@ -336,4 +330,19 @@ document.addEventListener('DOMContentLoaded', function() {
     initFiltros();
     
     renderizarReservas();
+});
+
+// ========== MENSAGENS FLASH (via SESSION) ==========
+document.addEventListener('DOMContentLoaded', function() {
+    const flashMsg = document.getElementById('flash-msg');
+    if (flashMsg) {
+        const type = flashMsg.dataset.type;
+        const message = flashMsg.dataset.message;
+        if (type === 'success') {
+            showToast(message, 'success');
+        } else if (type === 'error') {
+            showToast(message, 'error');
+        }
+        flashMsg.remove();
+    }
 });

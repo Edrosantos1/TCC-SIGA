@@ -7,9 +7,13 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$nome_bibliotecaria = isset($_SESSION['admin_nome']) ? $_SESSION['admin_nome'] : 'Bibliotecária';
+$nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 
-// ========== IDENTIFICAR A CONEXÃO MYSQLI ==========
+// ========== FILTRO POR ALUNO ==========
+$filtro_aluno_id = isset($_GET['aluno_id']) ? intval($_GET['aluno_id']) : 0;
+$filtro_aluno_nome = isset($_GET['aluno_nome']) ? urldecode($_GET['aluno_nome']) : '';
+
+// ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
 if (isset($conn)) {
     $db = $conn;
@@ -19,12 +23,12 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ========== CANCELAR RESERVAS EXPIRADAS AUTOMATICAMENTE ==========
+// ========== CANCELAR RESERVAS EXPIRADAS ==========
 if (file_exists(__DIR__ . '/cancelar_reservas_expiradas.php')) {
     include_once __DIR__ . '/cancelar_reservas_expiradas.php';
 }
 
-// ========== BUSCAR RESERVAS DO BANCO (MYSQLI) ==========
+// ========== BUSCAR RESERVAS ==========
 $reservas = array();
 
 if ($db) {
@@ -40,13 +44,24 @@ if ($db) {
             r.status
         FROM reservas r
         INNER JOIN login_aluno l ON r.id_aluno = l.id_aluno
-        ORDER BY r.data_reserva DESC
     ";
     
-    $result = $db->query($query);
-
-    if ($result) {
-        $reservas = $result->fetch_all(MYSQLI_ASSOC);
+    if ($filtro_aluno_id > 0) {
+        $query .= " WHERE r.id_aluno = " . intval($filtro_aluno_id);
+    }
+    
+    $query .= " ORDER BY r.data_reserva DESC";
+    
+    if ($db instanceof mysqli) {
+        $result = $db->query($query);
+        if ($result) {
+            $reservas = $result->fetch_all(MYSQLI_ASSOC);
+        }
+    } elseif ($db instanceof PDO) {
+        $stmt = $db->query($query);
+        if ($stmt) {
+            $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 }
 
@@ -69,11 +84,33 @@ foreach ($reservas as $r) {
 }
 
 $total_geral = count($reservas);
-
-// Passar dados para o JavaScript
 $reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
-?>
 
+// ========== CARREGAR TODOS OS ALUNOS PARA O JS ==========
+$alunos = array();
+if ($db) {
+    $sql_alunos = "SELECT id_aluno, nome_aluno, serie_aluno FROM login_aluno ORDER BY nome_aluno";
+    if ($db instanceof mysqli) {
+        $result_alunos = $db->query($sql_alunos);
+        if ($result_alunos) {
+            while ($row = $result_alunos->fetch_assoc()) {
+                $alunos[] = $row;
+            }
+        }
+    } elseif ($db instanceof PDO) {
+        $stmt = $db->query($sql_alunos);
+        if ($stmt) {
+            $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+}
+$alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+// ========== MENSAGENS FLASH ==========
+$msg_sucesso = $_SESSION['msg_sucesso'] ?? null;
+$msg_erro = $_SESSION['msg_erro'] ?? null;
+unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -85,7 +122,7 @@ $reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
     <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
-    <script src="../assets/js/reservas_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/modal_reserva.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -181,12 +218,23 @@ $reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
         <main class="dashboard-main">
 
             <!-- ========== CABEÇALHO DA PÁGINA ========== -->
+<!-- ========== CABEÇALHO DA PÁGINA ========== -->
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-bookmark"></i> Gerenciar Reservas</h1>
-                    <p class="page-subtitle">Gerencie todas as solicitações de reserva dos alunos</p>
+                    <p class="page-subtitle">
+                        Gerencie todas as solicitações de reserva dos alunos
+                        <?php if ($filtro_aluno_id > 0): ?>
+                            <br><strong style="color: #0b4b9b;">📌 Aluno: <?= htmlspecialchars($filtro_aluno_nome) ?></strong>
+                        <?php endif; ?>
+                    </p>
                 </div>
                 <div class="page-actions">
+                    <?php if ($filtro_aluno_id > 0): ?>
+                        <a href="reservas_adm.php" style="background: #f0f4fd; border: none; padding: 10px 20px; border-radius: 10px; text-decoration: none; color: #0b4b9b; font-weight: 600; display: inline-block; margin-right: 10px;">
+                            <i class="fas fa-times"></i> Limpar Filtro
+                        </a>
+                    <?php endif; ?>
                     <button class="btn-primary" id="btn-nova-reserva">
                         <i class="fas fa-plus"></i> Nova Reserva Manual
                     </button>
@@ -254,10 +302,89 @@ $reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_A
         </main>
     </div>
 
+    <!-- ========== MODAL NOVA RESERVA (COM BUSCA LOCAL) ========== -->
+    <div class="modal-overlay" id="modalReserva">
+        <div class="modal-reserva">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Nova Reserva Manual</h2>
+                <button class="modal-close" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="formNovaReserva" method="POST" action="salvar_reserva_manual.php">
+                <div class="modal-body">
+                    <!-- Busca de Aluno -->
+                    <div class="form-group">
+                        <label>Buscar Aluno <span class="required">*</span></label>
+                        <div class="busca-aluno-container">
+                            <input type="text" id="buscaAluno" placeholder="Digite o nome do aluno..." autocomplete="off">
+                            <div class="aluno-suggestions" id="alunoSuggestions"></div>
+                        </div>
+                        <div class="aluno-selecionado" id="alunoSelecionado">
+                            <div class="info-aluno">
+                                <div class="avatar" id="alunoAvatar">?</div>
+                                <div class="detalhes">
+                                    <span class="nome" id="alunoNomeSelecionado">Nome do Aluno</span>
+                                    <span class="matricula" id="alunoMatriculaSelecionada">Série: ---</span>
+                                </div>
+                            </div>
+                            <button class="btn-remover" id="removerAluno"><i class="fas fa-times"></i></button>
+                        </div>
+                        <input type="hidden" id="idAlunoSelecionado" name="id_aluno" value="">
+                    </div>
+                    <!-- Material -->
+                    <div class="form-group">
+                        <label>Material <span class="required">*</span></label>
+                        <input type="text" name="material" id="materialReserva" placeholder="Ex: O Pequeno Príncipe, Física Vol. 1" required />
+                    </div>
+                    <!-- Tipo -->
+                    <div class="form-group">
+                        <label>Tipo de Material</label>
+                        <select name="tipo" id="tipoMaterial">
+                            <option value="Livro">📚 Livro</option>
+                            <option value="E-book">📱 E-book</option>
+                            <option value="Apostila">📄 Apostila</option>
+                            <option value="Periódico">📰 Periódico</option>
+                            <option value="CD/DVD">💿 CD/DVD</option>
+                            <option value="Outro">📦 Outro</option>
+                        </select>
+                    </div>
+                    <!-- Data Limite -->
+                    <div class="form-group">
+                        <label>Data Limite <span class="required">*</span></label>
+                        <input type="date" name="data_limite" id="dataLimite" required />
+                        <div class="helper-text">A data deve ser hoje ou no futuro</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-modal-cancel" id="modalCancelBtn">Cancelar</button>
+                    <button type="submit" class="btn-modal btn-modal-save" id="modalSaveBtn">
+                        <i class="fas fa-save"></i> Salvar Reserva
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== TOAST CONTAINER ========== -->
+    <div class="toast-container"></div>
+
+    <!-- ========== MENSAGENS FLASH ========== -->
+    <?php if ($msg_sucesso): ?>
+        <div id="flash-msg" data-type="success" data-message="<?= htmlspecialchars($msg_sucesso) ?>" style="display:none;"></div>
+    <?php elseif ($msg_erro): ?>
+        <div id="flash-msg" data-type="error" data-message="<?= htmlspecialchars($msg_erro) ?>" style="display:none;"></div>
+    <?php endif; ?>
+
     <!-- ========== DADOS PARA O JAVASCRIPT ========== -->
     <script>
         const reservasData = <?= $reservas_json ?>;
+        const alunosData = <?= $alunos_json ?>;
     </script>
+
+    <!-- ========== SCRIPTS ========== -->
+    <script src="../assets/js/reservas_adm.js?v=<?= time() ?>"></script>
+    <script src="../assets/js/modal_reserva.js?v=<?= time() ?>"></script>
 
 </body>
 </html>
