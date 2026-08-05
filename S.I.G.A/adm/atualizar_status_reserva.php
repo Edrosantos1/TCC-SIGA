@@ -2,23 +2,8 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
-header('Content-Type: application/json');
-
 if (!isset($_SESSION['admin_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Sessão expirada ou não autorizado.']);
-    exit;
-}
-
-$input = json_decode(file_get_contents('php://input'), true);
-error_log("📥 Recebido: " . print_r($input, true)); // LOG NO SERVIDOR
-
-$id_reserva = isset($input['id']) ? intval($input['id']) : 0;
-$novo_status = isset($input['status']) ? $input['status'] : '';
-
-// ACEITA APENAS 'aprovada' ou 'rejeitada'
-if ($id_reserva <= 0 || !in_array($novo_status, ['aprovada', 'rejeitada'])) {
-    error_log("❌ Status inválido: " . $novo_status);
-    echo json_encode(['success' => false, 'message' => 'Parâmetros inválidos. Status: ' . $novo_status]);
+    header('Location: login_adm.php');
     exit;
 }
 
@@ -32,20 +17,47 @@ if (isset($conn)) {
 }
 
 if (!$db) {
-    echo json_encode(['success' => false, 'message' => 'Erro de conexão com o banco.']);
+    $_SESSION['msg_erro'] = 'Erro de conexão com o banco de dados.';
+    header('Location: reservas_adm.php');
+    exit;
+}
+
+// ========== RECEBER DADOS DO POST ==========
+$id_reserva = isset($_POST['id']) ? intval($_POST['id']) : 0;
+$novo_status = isset($_POST['status']) ? trim($_POST['status']) : '';
+
+if ($id_reserva <= 0) {
+    $_SESSION['msg_erro'] = 'ID da reserva inválido.';
+    header('Location: reservas_adm.php');
+    exit;
+}
+
+if (!in_array($novo_status, ['aprovada', 'rejeitada'])) {
+    $_SESSION['msg_erro'] = 'Status inválido.';
+    header('Location: reservas_adm.php');
     exit;
 }
 
 $stmt = $db->prepare("UPDATE reservas SET status = ? WHERE id_reserva = ?");
-if ($stmt) {
-    $stmt->bind_param("si", $novo_status, $id_reserva);
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Erro ao atualizar no banco.']);
-    }
-    $stmt->close();
-} else {
-    echo json_encode(['success' => false, 'message' => 'Erro na preparação da consulta.']);
+if (!$stmt) {
+    $_SESSION['msg_erro'] = 'Erro na preparação da consulta.';
+    header('Location: reservas_adm.php');
+    exit;
 }
+
+$stmt->bind_param("si", $novo_status, $id_reserva);
+
+if ($stmt->execute()) {
+    if ($novo_status === 'aprovada') {
+        $_SESSION['msg_sucesso'] = 'Reserva aprovada com sucesso!';
+    } else {
+        $_SESSION['msg_sucesso'] = 'Reserva rejeitada com sucesso.';
+    }
+} else {
+    $_SESSION['msg_erro'] = 'Erro ao atualizar: ' . $stmt->error;
+}
+
+$stmt->close();
+header('Location: reservas_adm.php');
+exit;
 ?>

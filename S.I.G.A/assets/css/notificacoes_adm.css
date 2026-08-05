@@ -759,3 +759,197 @@
         padding: 5px 10px;
     }
 }
+/* ========== CORREÇÕES TEMA ESCURO - NOTIFICAÇÕES ========== */
+body.tema-escuro .dest-tab {
+    color: #8a9aaa !important;
+    background: #0f1a3a !important;
+    border: 1px solid #2a3a5e !important;
+}
+body.tema-escuro .dest-tab:hover {
+    background: #1a2a4a !important;
+    color: #c0d0e0 !important;
+}
+body.tema-escuro .dest-tab.active {
+    background: #0b4b9b !important;
+    color: #ffffff !important;
+    border-color: #0b4b9b !important;
+}
+body.tema-escuro .dest-tab.active i {
+    color: #ffffff !important;
+}
+
+body.tema-escuro .categoria-tab {
+    color: #8a9aaa !important;
+    background: #0f1a3a !important;
+    border: 1px solid #2a3a5e !important;
+}
+body.tema-escuro .categoria-tab:hover {
+    background: #1a2a4a !important;
+    color: #c0d0e0 !important;
+}
+body.tema-escuro .categoria-tab.active {
+    background: #0b4b9b !important;
+    color: #ffffff !important;
+    border-color: #0b4b9b !important;
+}
+body.tema-escuro .categoria-tab.active i {
+    color: #ffffff !important;
+}
+body.tema-escuro .categoria-tab[data-categoria="pendencia"].active {
+    background: #6a3a1a !important;
+    color: #eeaa6a !important;
+    border-color: #aa6a3a !important;
+}
+body.tema-escuro .categoria-tab.disabled {
+    opacity: 0.4 !important;
+    color: #4a5a6a !important;
+}
+
+body.tema-escuro .aluno-busca-wrapper input {
+    background: #0f1a3a !important;
+    border-color: #2a3a5e !important;
+    color: #f0f0f0 !important;
+}
+body.tema-escuro .aluno-busca-wrapper input::placeholder {
+    color: #6a7a8a !important;
+}
+body.tema-escuro .aluno-busca-wrapper .search-icon {
+    color: #6a7a8a !important;
+}
+
+body.tema-escuro .aluno-sugestoes {
+    background: #1a2a4a !important;
+    border-color: #2a3a5e !important;
+}
+body.tema-escuro .aluno-sugestao-item {
+    color: #f0f0f0 !important;
+    border-bottom: 1px solid #2a3a5e !important;
+}
+body.tema-escuro .aluno-sugestao-item:hover {
+    background: #1a3a5a !important;
+}
+
+body.tema-escuro .checkbox-envio {
+    color: #b0c0d0 !important;
+}
+body.tema-escuro .checkbox-envio input[type="checkbox"] {
+    accent-color: #0b4b9b !important;
+}
+
+body.tema-escuro .btn-enviar {
+    background: #0b4b9b !important;
+    color: #ffffff !important;
+}
+body.tema-escuro .btn-enviar:hover {
+    background: #1a5aab !important;
+}
+
+/* ========== CORREÇÕES TEMA ALTO CONTRASTE - NOTIFICAÇÕES ========== */
+body.tema-alto_contraste .dest-tab {
+    color: #ffffff !important;
+    background: #222222 !important;
+    border: 1px solid #ffffff !important;
+}
+body.tema-alto_contraste .dest-tab:hover {
+    background: #333333 !important;
+}
+body.tema-alto_contraste .dest-tab.active {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+body.tema-alto_contraste .dest-tab.active i {
+    color: #000000 !important;
+}
+
+body.tema-alto_contraste .categoria-tab {
+    color: #ffffff !important;
+    background: #222222 !important;
+    border: 1px solid #ffffff !important;
+}
+body.tema-alto_contraste .categoria-tab:hover {
+    background: #333333 !important;
+}
+body.tema-alto_contraste .categoria-tab.active {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+body.tema-alto_contraste .categoria-tab.active i {
+    color: #000000 !important;
+}
+body.tema-alto_contraste .categoria-tab[data-categoria="pendencia"].active {
+    background: #ffaa44 !important;
+    color: #000000 !important;
+    border-color: #ffaa44 !important;
+}
+body.tema-alto_contraste .categoria-tab.disabled {
+    opacity: 0.4 !important;
+}
+
+body.tema-alto_contraste .aluno-busca-wrapper input {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .aluno-busca-wrapper input::placeholder {
+    color: #888888 !important;
+}
+body.tema-alto_contraste .aluno-busca-wrapper .search-icon {
+    color: #888888 !important;
+}
+
+body.tema-alto_contraste .aluno-sugestoes {
+    background: #1a1a1a !important;
+    border: 1px solid #ffffff !important;
+}
+body.tema-alto_contraste .aluno-sugestao-item {
+    color: #ffffff !important;
+    border-bottom: 1px solid #444444 !important;
+}
+body.tema-alto_contraste .aluno-sugestao-item:hover {
+    background: #333333 !important;
+}
+
+body.tema-alto_contraste .checkbox-envio {
+    color: #cccccc !important;
+}
+body.tema-alto_contraste .checkbox-envio input[type="checkbox"] {
+    accent-color: #ffffff !important;
+}
+
+body.tema-alto_contraste .btn-enviar {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+body.tema-alto_contraste .btn-enviar:hover {
+    background: #cccccc !important;
+}
+body.tema-alto_contraste .btn-enviar i {
+    color: #000000 !important;
+}
+/* ========== CORREÇÕES TEMA ESCURO - BUSCA ALUNO ========== */
+body.tema-escuro .busca-aluno-container input {
+    background: #0f1a3a !important;
+    border-color: #2a3a5e !important;
+    color: #f0f0f0 !important;
+}
+body.tema-escuro .busca-aluno-container input::placeholder {
+    color: #6a7a8a !important;
+}
+body.tema-escuro .busca-aluno-container .search-icon {
+    color: #6a7a8a !important;
+}
+
+/* ========== CORREÇÕES TEMA ALTO CONTRASTE - BUSCA ALUNO ========== */
+body.tema-alto_contraste .busca-aluno-container input {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .busca-aluno-container input::placeholder {
+    color: #888888 !important;
+}
+body.tema-alto_contraste .busca-aluno-container .search-icon {
+    color: #888888 !important;
+}

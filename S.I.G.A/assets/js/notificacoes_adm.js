@@ -3,9 +3,7 @@ let alunos = [];
 let alunoSelecionado = null;
 let destinatarioAtual = 'todos';
 let categoriaAtual = 'aviso';
-let filtroPeriodo = 'semana';
-let filtroOrdenacao = 'mais_recente';
-let enviando = false;
+let notificacoesHeader = [];
 
 // ========== FUNÇÕES AUXILIARES ==========
 function escapeHtml(text) {
@@ -16,7 +14,7 @@ function escapeHtml(text) {
 }
 
 function formatarData(data) {
-    const d = new Date(data + ' UTC');
+    const d = new Date(data);  // <-- REMOVI O '+ "UTC"'
     const agora = new Date();
     const diff = Math.floor((agora - d) / 1000);
     
@@ -25,6 +23,66 @@ function formatarData(data) {
     if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
     if (diff < 172800) return 'Ontem';
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+}
+
+function atualizarBadge(total) {
+    const badge = document.querySelector('.notification-btn .badge');
+    if (badge) {
+        if (total > 0) {
+            badge.textContent = total;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+// ========== DROPDOWN DE NOTIFICAÇÕES ==========
+function renderizarDropdownNotificacoes() {
+    const lista = document.getElementById('notification-list-dropdown');
+    if (!lista) return;
+
+    if (notificacoesHeader.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-notifications">
+                <i class="far fa-bell-slash"></i>
+                <p>Nenhuma notificação enviada</p>
+            </div>
+        `;
+        return;
+    }
+
+    lista.innerHTML = notificacoesHeader.slice(0, 10).map(notificacao => {
+        const isPendencia = notificacao.tipo === 'pendencia';
+        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
+        const label = isPendencia ? 'Pendência' : 'Aviso';
+        
+        const totalAlunos = parseInt(notificacao.total_alunos, 10) || 0;
+        const textoAlunos = totalAlunos === 1 ? '1 aluno' : totalAlunos + ' alunos';
+        
+        return `
+            <div class="notification-item">
+                <div class="notification-icon" style="color: ${corIcon};">
+                    <i class="fas ${icone}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">
+                        <strong style="color: ${corIcon};">${label}</strong><br>
+                        ${escapeHtml(notificacao.mensagem)}
+                    </div>
+                    <div class="notification-footer">
+                        <span class="notification-date">${formatarData(notificacao.criado_em)}</span>
+                        <span class="notification-destinatarios">
+                            <i class="fas fa-users"></i> ${textoAlunos}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    atualizarBadge(notificacoesHeader.length);
 }
 
 // ========== SIDEBAR ==========
@@ -60,6 +118,55 @@ function initProfileDropdown() {
             btn.classList.remove('open');
             dropdown.classList.remove('show');
         }
+    });
+}
+
+// ========== NOTIFICAÇÕES (SININHO) - SEM AJAX ==========
+function initNotifications() {
+    const btn = document.getElementById('notification-btn');
+    const dropdown = document.getElementById('notification-dropdown');
+    if (!btn || !dropdown) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            renderizarDropdownNotificacoes();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+}
+
+// ========== TRAVA DE DUPLO ENVIO NO FORMULÁRIO ==========
+function initFormNotificacao() {
+    const form = document.getElementById('form-notificacao');
+    const btnEnviar = document.getElementById('btn-enviar-notificacao');
+    if (!form || !btnEnviar) return;
+
+    form.addEventListener('submit', function (e) {
+        if (destinatarioAtual === 'especifico' && !alunoSelecionado) {
+            e.preventDefault();
+            alert('Por favor, selecione um aluno para enviar a notificação.');
+            return;
+        }
+
+        const msgInput = document.getElementById('mensagem-textarea');
+        if (!msgInput || !msgInput.value.trim()) {
+            e.preventDefault();
+            alert('Por favor, digite a mensagem da notificação.');
+            return;
+        }
+
+        // Desabilita o botão para evitar duplo clique e envios duplicados
+        setTimeout(() => {
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        }, 10);
     });
 }
 
@@ -232,147 +339,24 @@ function initRemoverAlunoSelecionado() {
     btn.addEventListener('click', limparAlunoSelecionado);
 }
 
-// ========== PREVENIR ENVIO DUPLICADO ==========
-function initPrevenirEnvioDuplicado() {
-    const form = document.getElementById('form-notificacao');
-    const btnEnviar = document.getElementById('btn-enviar-notificacao');
-    
-    if (form && btnEnviar) {
-        form.addEventListener('submit', function(e) {
-            if (enviando) {
-                e.preventDefault();
-                return;
-            }
-            
-            enviando = true;
-            btnEnviar.disabled = true;
-            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-        });
-    }
-}
-
-// ========== FILTROS DO HISTÓRICO ==========
-function initFiltrosHistorico() {
-    document.querySelectorAll('.filtro-periodo .filtro-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filtro-periodo .filtro-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            filtroPeriodo = this.dataset.periodo;
-            carregarHistoricoFiltrado();
-        });
-    });
-
-    document.querySelectorAll('.filtros-ordenacao .filtro-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.filtros-ordenacao .filtro-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            filtroOrdenacao = this.dataset.ordenacao;
-            carregarHistoricoFiltrado();
-        });
-    });
-}
-
-async function carregarHistoricoFiltrado() {
-    const container = document.querySelector('.historico-lista');
-    const emptyContainer = document.querySelector('.empty-historico');
-    const loading = document.getElementById('historico-loading');
-    
-    if (!container) return;
-
-    if (loading) loading.style.display = 'block';
-    container.style.opacity = '0.3';
-
-    try {
-        const response = await fetch(`buscar_notificacoes.php?periodo=${filtroPeriodo}&ordenacao=${filtroOrdenacao}`);
-        const data = await response.json();
-
-        if (data.error) {
-            console.error('Erro ao carregar histórico:', data.error);
-            return;
-        }
-
-        if (data.length === 0) {
-            if (emptyContainer) emptyContainer.style.display = 'block';
-            container.innerHTML = '';
-            if (loading) loading.style.display = 'none';
-            container.style.opacity = '1';
-            return;
-        }
-
-        if (emptyContainer) emptyContainer.style.display = 'none';
-
-        container.innerHTML = data.map(notif => {
-            const isPendencia = notif.tipo === 'pendencia';
-            const corLabel = isPendencia ? 'pendencia' : 'aviso';
-            const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
-            
-            // 🔥 VERIFICAR SE É "TODOS OS ALUNOS"
-            // Pode vir como 'Todos os alunos' ou 'todos os alunos'
-            const isTodosAlunos = notif.alunos_nomes && notif.alunos_nomes.toLowerCase().includes('todos os alunos');
-            
-            console.log('🔍 Notificação:', notif.id, '| Alunos:', notif.alunos_nomes, '| Total:', notif.total_alunos, '| isTodos:', isTodosAlunos);
-            
-            return `
-                <div class="historico-item">
-                    <div class="historico-header">
-                        <div class="historico-info">
-                            <span class="historico-categoria ${corLabel}">
-                                <i class="fas ${icone}"></i>
-                                ${isPendencia ? 'Pendência' : 'Aviso'}
-                            </span>
-                            <span class="historico-data">
-                                <i class="far fa-calendar-alt"></i>
-                                ${formatarData(notif.criado_em)}
-                            </span>
-                        </div>
-                        <span class="historico-destinatarios">
-                            <i class="fas fa-users"></i>
-                            ${notif.total_alunos} aluno(s)
-                        </span>
-                    </div>
-                    
-                    <div class="historico-mensagem">
-                        ${escapeHtml(notif.mensagem)}
-                    </div>
-                    
-                    <div class="historico-alunos">
-                        ${isTodosAlunos ? `
-                            <span style="display: inline-flex; align-items: center; gap: 6px; background: #eaf4ff; padding: 4px 14px; border-radius: 12px; color: #0b4b9b; font-weight: 600; font-size: 12px;">
-                                <i class="fas fa-globe"></i> Enviado para todos os alunos
-                            </span>
-                        ` : `
-                            ${notif.alunos_nomes ? escapeHtml(notif.alunos_nomes) : 'Nenhum aluno'}
-                        `}
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        container.style.opacity = '1';
-
-    } catch (error) {
-        console.error('Erro ao carregar histórico:', error);
-    } finally {
-        if (loading) loading.style.display = 'none';
-        container.style.opacity = '1';
-    }
-}
-
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function () {
     if (typeof alunosData !== 'undefined') {
         alunos = alunosData;
     }
+    if (typeof notificacoesData !== 'undefined') {
+        notificacoesHeader = notificacoesData;
+    }
 
     initSidebar();
     initProfileDropdown();
+    initNotifications();
+    initFormNotificacao();
     initDestinatarioTabs();
     initCategoriaTabs();
     initBuscaAluno();
     initRemoverAlunoSelecionado();
-    initFiltrosHistorico();
-    initPrevenirEnvioDuplicado();
 
     atualizarCategoriaPorDestinatario();
-    carregarHistoricoFiltrado();
+    renderizarDropdownNotificacoes();
 });

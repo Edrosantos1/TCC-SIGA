@@ -1,199 +1,11 @@
-// Global array carregado pelo PHP
-let pendencias = typeof pendenciasData !== 'undefined' ? pendenciasData : [];
-let filtroStatusAtual = 'todos';
-let termoBuscaAtual = '';
+// ========== VARIÁVEIS GLOBAIS ==========
+let pendencias = [];
+let filtroAtual = 'todos';
+let buscaAtual = '';
+let ordemAtual = 'recente';
+let notificacoes = [];
 
-document.addEventListener('DOMContentLoaded', () => {
-    initSidebar();
-    initProfileDropdown();
-    initNotificationDropdown();
-    initFiltrosTabs();
-    initBusca();
-    renderizarPendencias();
-});
-
-// ========== RENDERIZAÇÃO DA TABELA ==========
-function renderizarPendencias() {
-    const tbody = document.getElementById('pendencias-tbody');
-    const emptyState = document.getElementById('empty-state');
-    const tableWrapper = document.querySelector('.reservas-table-wrapper');
-
-    if (!tbody) return;
-
-    // Filtra por status e termo de busca (APENAS POR ALUNO, COM PREFIXO)
-    let filtradas = pendencias.filter(p => {
-        const matchStatus = filtroStatusAtual === 'todos' || p.status === filtroStatusAtual;
-        
-        const termo = termoBuscaAtual.toLowerCase().trim();
-        const matchBusca = !termo || 
-            (p.aluno && p.aluno.toLowerCase().startsWith(termo)); // <-- CORRIGIDO
-
-        return matchStatus && matchBusca;
-    });
-
-    // Se estiver vazio
-    if (filtradas.length === 0) {
-        tbody.innerHTML = '';
-        if (tableWrapper) tableWrapper.style.display = 'none';
-        if (emptyState) {
-            emptyState.style.display = 'block';
-            const emptyMsg = document.getElementById('empty-message');
-            if (emptyMsg) {
-                emptyMsg.textContent = termoBuscaAtual 
-                    ? `Nenhum aluno encontrado para "${termoBuscaAtual}".`
-                    : 'Nenhum empréstimo ativo nesta categoria.';
-            }
-        }
-        atualizarContadores();
-        return;
-    }
-
-    if (tableWrapper) tableWrapper.style.display = 'block';
-    if (emptyState) emptyState.style.display = 'none';
-
-    // Monta as linhas HTML
-    tbody.innerHTML = filtradas.map(p => {
-        const dataEmpFormatted = formatarData(p.data_emprestimo);
-        const dataLimFormatted = formatarData(p.data_limite);
-        const inicial = p.aluno ? p.aluno.trim().charAt(0).toUpperCase() : '?';
-
-        let badgeClass = 'status-aprovada';
-        let statusTexto = 'No Prazo';
-        let iconeStatus = 'fa-clock';
-
-        if (p.status === 'atrasado') {
-            badgeClass = 'status-cancelada';
-            statusTexto = 'Atrasado';
-            iconeStatus = 'fa-exclamation-triangle';
-        }
-
-        return `
-            <tr class="reserva-row" data-id="${p.id}">
-                <td>
-                    <div class="aluno-info">
-                        <span class="aluno-avatar">${escapeHtml(inicial)}</span>
-                        <span class="aluno-nome">${escapeHtml(p.aluno)}</span>
-                    </div>
-                </td>
-                <td class="material-nome">${escapeHtml(p.material)}</td>
-                <td><span class="tipo-badge">${escapeHtml(p.tipo || 'Livro')}</span></td>
-                <td>${dataEmpFormatted}</td>
-                <td>${dataLimFormatted}</td>
-                <td>
-                    <span class="status-badge ${badgeClass}">
-                        <i class="fas ${iconeStatus}"></i> ${statusTexto}
-                    </span>
-                </td>
-                <td class="acoes-cell">
-                    <button class="btn-acao btn-aprovar" onclick="devolverMaterial(${p.id})" title="Dar Baixa / Registrar Devolução">
-                        <i class="fas fa-check-double"></i> Dar Baixa
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-
-    atualizarContadores();
-}
-
-// ========== FILTROS E BUSCA ==========
-function initFiltrosTabs() {
-    const tabs = document.querySelectorAll('.filtro-tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            filtroStatusAtual = tab.dataset.status;
-            renderizarPendencias();
-        });
-    });
-}
-
-function initBusca() {
-    const searchInput = document.getElementById('search-input');
-    const buscaAtivaBox = document.getElementById('filtro-busca-ativa');
-    const buscaTermoText = document.getElementById('busca-termo');
-    const limparBtn = document.getElementById('limpar-busca');
-
-    if (!searchInput) return;
-
-    let timeoutId;
-    searchInput.addEventListener('input', (e) => {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            termoBuscaAtual = e.target.value.trim();
-            if (termoBuscaAtual) {
-                if (buscaAtivaBox) buscaAtivaBox.style.display = 'flex';
-                if (buscaTermoText) buscaTermoText.textContent = termoBuscaAtual;
-            } else {
-                if (buscaAtivaBox) buscaAtivaBox.style.display = 'none';
-            }
-            renderizarPendencias();
-        }, 300);
-    });
-
-    if (limparBtn) {
-        limparBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            termoBuscaAtual = '';
-            if (buscaAtivaBox) buscaAtivaBox.style.display = 'none';
-            renderizarPendencias();
-        });
-    }
-}
-
-// ========== ATUALIZAR CONTADORES DOS BADGES ==========
-function atualizarContadores() {
-    const totalGeral = pendencias.length;
-    const totalAtrasados = pendencias.filter(p => p.status === 'atrasado').length;
-    const totalNoPrazo = pendencias.filter(p => p.status === 'emprestado').length;
-
-    const bTodos = document.getElementById('badge-todos');
-    const bAtrasado = document.getElementById('badge-atrasado');
-    const bEmprestado = document.getElementById('badge-emprestado');
-    const navBadge = document.getElementById('pendencias-badge');
-
-    if (bTodos) bTodos.textContent = totalGeral;
-    if (bAtrasado) bAtrasado.textContent = totalAtrasados;
-    if (bEmprestado) bEmprestado.textContent = totalNoPrazo;
-    if (navBadge) navBadge.textContent = totalAtrasados;
-}
-
-// ========== AÇÃO DE DAR BAIXA (DEVOLUÇÃO) ==========
-window.devolverMaterial = async function(id) {
-    if (!confirm('Confirmar a devolução deste livro/material?')) return;
-
-    try {
-        const response = await fetch('atualizar_status_emprestimo.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id, status: 'devolvido' })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            pendencias = pendencias.filter(p => Number(p.id) !== Number(id));
-            renderizarPendencias();
-            showToast('Devolução registrada com sucesso!', 'success');
-        } else {
-            showToast(result.message || 'Erro ao registrar devolução.', 'error');
-        }
-    } catch (error) {
-        showToast('Erro de comunicação com o servidor.', 'error');
-    }
-};
-
-// ========== AUXILIARES ==========
-function formatarData(dataStr) {
-    if (!dataStr) return '-';
-    const partes = dataStr.split(' ')[0].split('-');
-    if (partes.length === 3) {
-        return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-    return dataStr;
-}
-
+// ========== FUNÇÕES AUXILIARES PARA NOTIFICAÇÕES ==========
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -201,6 +13,305 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function formatarData(data) {
+    const d = new Date(data);
+    const agora = new Date();
+    const diff = Math.floor((agora - d) / 1000);
+    
+    if (diff < 60) return 'Agora pouco';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+    if (diff < 172800) return 'Ontem';
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+}
+
+function renderizarDropdownNotificacoes() {
+    const lista = document.getElementById('notification-list-dropdown');
+    if (!lista) return;
+
+    if (!notificacoes || notificacoes.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-notifications">
+                <i class="far fa-bell-slash"></i>
+                <p>Nenhuma notificação enviada</p>
+            </div>
+        `;
+        return;
+    }
+
+    lista.innerHTML = notificacoes.slice(0, 10).map(notificacao => {
+        const isPendencia = notificacao.tipo === 'pendencia';
+        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
+        const label = isPendencia ? 'Pendência' : 'Aviso';
+        
+        const totalAlunos = parseInt(notificacao.total_alunos, 10) || 0;
+        const textoAlunos = totalAlunos === 1 ? '1 aluno' : totalAlunos + ' alunos';
+        
+        return `
+            <div class="notification-item">
+                <div class="notification-icon" style="color: ${corIcon};">
+                    <i class="fas ${icone}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">
+                        <strong style="color: ${corIcon};">${label}</strong><br>
+                        ${escapeHtml(notificacao.mensagem)}
+                    </div>
+                    <div class="notification-footer">
+                        <span class="notification-date">${formatarData(notificacao.criado_em)}</span>
+                        <span class="notification-destinatarios">
+                            <i class="fas fa-users"></i> ${textoAlunos}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ========== RENDERIZAR PENDÊNCIAS ==========
+function renderizarPendencias() {
+    const tbody = document.getElementById('pendencias-tbody');
+    const emptyState = document.getElementById('empty-state');
+    const emptyMessage = document.getElementById('empty-message');
+    const tableWrapper = document.querySelector('.reservas-table-wrapper');
+
+    if (!tbody) return;
+
+    let pendenciasFiltradas = pendencias;
+
+    if (filtroAtual !== 'todos') {
+        pendenciasFiltradas = pendenciasFiltradas.filter(p => p.status === filtroAtual);
+    }
+
+    if (buscaAtual.trim() !== '') {
+        const termo = buscaAtual.toLowerCase().trim();
+        pendenciasFiltradas = pendenciasFiltradas.filter(p => 
+            p.aluno && p.aluno.toLowerCase().startsWith(termo)
+        );
+    }
+
+    // ========== ORDENAR ==========
+    if (ordemAtual === 'recente') {
+        pendenciasFiltradas.sort((a, b) => {
+            const dataA = new Date(a.data_emprestimo);
+            const dataB = new Date(b.data_emprestimo);
+            return dataB - dataA;
+        });
+    } else {
+        pendenciasFiltradas.sort((a, b) => {
+            const dataA = new Date(a.data_emprestimo);
+            const dataB = new Date(b.data_emprestimo);
+            return dataA - dataB;
+        });
+    }
+
+    atualizarBadges();
+
+    if (pendenciasFiltradas.length === 0) {
+        tbody.innerHTML = '';
+        if (tableWrapper) tableWrapper.style.display = 'none';
+        if (emptyState) {
+            emptyState.style.display = 'block';
+            let mensagem = 'Nenhum empréstimo ';
+            if (filtroAtual !== 'todos') {
+                mensagem += `com status "${filtroAtual}" `;
+            }
+            if (buscaAtual.trim() !== '') {
+                mensagem += `para a busca "${buscaAtual}"`;
+            }
+            if (emptyMessage) emptyMessage.textContent = mensagem || 'Não há empréstimos para os filtros selecionados';
+        }
+        return;
+    }
+
+    if (tableWrapper) tableWrapper.style.display = 'block';
+    if (emptyState) emptyState.style.display = 'none';
+
+    tbody.innerHTML = pendenciasFiltradas.map(pendencia => {
+        const statusClass = pendencia.status;
+        const statusIcon = {
+            'emprestado': 'fa-check-circle',
+            'atrasado': 'fa-exclamation-triangle',
+            'devolvido': 'fa-undo-alt'
+        }[pendencia.status] || 'fa-circle';
+        const statusLabel = pendencia.status.charAt(0).toUpperCase() + pendencia.status.slice(1);
+
+        const dataEmprestimoFormatada = formatarDataBR(pendencia.data_emprestimo);
+        const dataLimiteFormatada = formatarDataBR(pendencia.data_limite);
+        const inicialAluno = pendencia.aluno ? pendencia.aluno.trim().charAt(0).toUpperCase() : '?';
+
+        return `
+            <tr class="pendencia-row" data-id="${pendencia.id}">
+                <td>
+                    <div class="aluno-info">
+                        <span class="aluno-avatar">${escapeHtml(inicialAluno)}</span>
+                        <span class="aluno-nome">${escapeHtml(pendencia.aluno)}</span>
+                    </div>
+                </td>
+                <td class="material-nome">${escapeHtml(pendencia.material)}</td>
+                <td><span class="tipo-badge">${escapeHtml(pendencia.tipo || 'Livro')}</span></td>
+                <td>${dataEmprestimoFormatada}</td>
+                <td>${dataLimiteFormatada}</td>
+                <td>
+                    <span class="status-badge status-${statusClass}">
+                        <i class="fas ${statusIcon}"></i>
+                        ${statusLabel}
+                    </span>
+                </td>
+                <td class="acoes-cell">
+                    ${pendencia.status === 'emprestado' || pendencia.status === 'atrasado' ? `
+                        <button class="btn-acao btn-aprovar" onclick="confirmarDevolucao(${pendencia.id}, '${escapeHtml(pendencia.material)}', '${escapeHtml(pendencia.aluno)}')">
+                            <i class="fas fa-undo-alt"></i> Devolver
+                        </button>
+                    ` : `
+                        <span class="sem-acao">—</span>
+                    `}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ========== FUNÇÃO DE CONFIRMAÇÃO DE DEVOLUÇÃO ==========
+window.confirmarDevolucao = function(id, material, aluno) {
+    if (confirm(`📚 Deseja registrar a devolução do livro "${material}" do aluno ${aluno}?\n\nEsta ação não pode ser desfeita.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'atualizar_status_emprestimo.php';
+        
+        const inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.name = 'id';
+        inputId.value = id;
+        
+        const inputStatus = document.createElement('input');
+        inputStatus.type = 'hidden';
+        inputStatus.name = 'status';
+        inputStatus.value = 'devolvido';
+        
+        form.appendChild(inputId);
+        form.appendChild(inputStatus);
+        document.body.appendChild(form);
+        form.submit();
+    }
+};
+
+// ========== FUNÇÕES AUXILIARES ==========
+function formatarDataBR(dataStr) {
+    if (!dataStr) return '-';
+    const dataApenas = dataStr.split(' ')[0];
+    const partes = dataApenas.split('-');
+    if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return dataStr;
+}
+
+function atualizarBadges() {
+    const total = pendencias.length;
+    const atrasados = pendencias.filter(p => p.status === 'atrasado').length;
+    const emprestados = pendencias.filter(p => p.status === 'emprestado').length;
+
+    const bTodos = document.getElementById('badge-todos');
+    const bAtrasado = document.getElementById('badge-atrasado');
+    const bEmprestado = document.getElementById('badge-emprestado');
+    const bBadgeNav = document.getElementById('pendencias-badge');
+
+    if (bTodos) bTodos.textContent = total;
+    if (bAtrasado) bAtrasado.textContent = atrasados;
+    if (bEmprestado) bEmprestado.textContent = emprestados;
+    if (bBadgeNav) bBadgeNav.textContent = atrasados;
+}
+
+// ========== FILTROS E BUSCA ==========
+function initFiltros() {
+    const tabs = document.querySelectorAll('.filtro-tab');
+    const buscaInput = document.getElementById('search-input');
+    const limparBusca = document.getElementById('limpar-busca');
+    const buscaAtiva = document.getElementById('filtro-busca-ativa');
+    const buscaTermo = document.getElementById('busca-termo');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            filtroAtual = this.dataset.status;
+            renderizarPendencias();
+        });
+    });
+
+    let timeoutId;
+    if (buscaInput) {
+        buscaInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                const termo = this.value.trim();
+                buscaAtual = termo;
+
+                if (termo) {
+                    if (buscaTermo) buscaTermo.textContent = termo;
+                    if (buscaAtiva) buscaAtiva.style.display = 'flex';
+                } else {
+                    if (buscaAtiva) buscaAtiva.style.display = 'none';
+                }
+
+                renderizarPendencias();
+            }, 300);
+        });
+    }
+
+    if (limparBusca) {
+        limparBusca.addEventListener('click', function() {
+            if (buscaInput) buscaInput.value = '';
+            buscaAtual = '';
+            if (buscaAtiva) buscaAtiva.style.display = 'none';
+            renderizarPendencias();
+        });
+    }
+}
+
+// ========== ORDENAÇÃO ==========
+function initOrdenacao() {
+    const btnOrdenacao = document.getElementById('btn-ordenacao');
+    const dropdown = document.getElementById('ordenacao-dropdown');
+    const items = document.querySelectorAll('.ordenacao-item');
+    const label = document.getElementById('ordenacao-label');
+    
+    if (!btnOrdenacao || !dropdown) return;
+    
+    btnOrdenacao.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!btnOrdenacao.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    
+    items.forEach(item => {
+        item.addEventListener('click', function() {
+            items.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            ordemAtual = this.dataset.ordem;
+            
+            if (ordemAtual === 'recente') {
+                label.textContent = 'Mais recente';
+            } else {
+                label.textContent = 'Mais antigo';
+            }
+            
+            dropdown.classList.remove('show');
+            renderizarPendencias();
+        });
+    });
+}
+
+// ========== SIDEBAR ==========
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const collapseBtn = document.getElementById('collapseBtn');
@@ -216,6 +327,7 @@ function initSidebar() {
     }
 }
 
+// ========== PERFIL DROPDOWN ==========
 function initProfileDropdown() {
     const btn = document.getElementById('admin-profile-btn');
     const dropdown = document.getElementById('profile-dropdown');
@@ -235,7 +347,8 @@ function initProfileDropdown() {
     });
 }
 
-function initNotificationDropdown() {
+// ========== NOTIFICAÇÕES (SININHO) - SEM AJAX ==========
+function initNotifications() {
     const btn = document.getElementById('notification-btn');
     const dropdown = document.getElementById('notification-dropdown');
     if (!btn || !dropdown) return;
@@ -243,6 +356,9 @@ function initNotificationDropdown() {
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            renderizarDropdownNotificacoes();
+        }
     });
 
     document.addEventListener('click', (e) => {
@@ -252,6 +368,7 @@ function initNotificationDropdown() {
     });
 }
 
+// ========== TOAST ==========
 function criarContainerToast() {
     let container = document.querySelector('.toast-container');
     if (!container) {
@@ -287,3 +404,23 @@ function showToast(message, type = 'info') {
         setTimeout(() => toast.remove(), 400);
     }, 3000);
 }
+
+// ========== INICIALIZAÇÃO ==========
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof pendenciasData !== 'undefined') {
+        pendencias = pendenciasData;
+    }
+    
+    if (typeof notificacoesData !== 'undefined') {
+        notificacoes = notificacoesData;
+    }
+
+    initSidebar();
+    initProfileDropdown();
+    initNotifications();
+    initFiltros();
+    initOrdenacao();
+
+    renderizarPendencias();
+    renderizarDropdownNotificacoes();
+});

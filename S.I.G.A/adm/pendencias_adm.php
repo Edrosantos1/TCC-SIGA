@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
+$config_classes = $GLOBALS['config_classes'] ?? '';
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
@@ -13,7 +14,7 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 $filtro_aluno_id = isset($_GET['aluno_id']) ? intval($_GET['aluno_id']) : 0;
 $filtro_aluno_nome = isset($_GET['aluno_nome']) ? urldecode($_GET['aluno_nome']) : '';
 
-// ========== IDENTIFICAR CONEXÃO (MYSQLI OU PDO) ==========
+// ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
 if (isset($conn)) {
     $db = $conn;
@@ -23,8 +24,40 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ========== BUSCAR EMPRÉSTIMOS/PENDÊNCIAS DO BANCO ==========
+// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+$notificacoes = array();
+if ($db) {
+    try {
+        $sql = "
+            SELECT 
+                n.id_envio,
+                n.titulo,
+                n.mensagem,
+                n.tipo,
+                MAX(n.criado_em) AS criado_em,
+                COUNT(DISTINCT n.id_aluno) AS total_alunos
+            FROM notificacoes n
+            WHERE n.id_envio IS NOT NULL AND n.id_envio != ''
+            GROUP BY n.id_envio, n.titulo, n.mensagem, n.tipo
+            ORDER BY criado_em DESC
+            LIMIT 5
+        ";
 
+        if ($db instanceof mysqli) {
+            $result = $db->query($sql);
+            $notificacoes = $result->fetch_all(MYSQLI_ASSOC);
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->query($sql);
+            $notificacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $notificacoes = [];
+        }
+    } catch (Exception $e) {
+        $notificacoes = [];
+    }
+}
+
+// ========== BUSCAR EMPRÉSTIMOS/PENDÊNCIAS ==========
 $pendencias = array();
 
 if ($db) {
@@ -81,6 +114,31 @@ unset($p);
 
 $total_geral = count($pendencias);
 $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+// ========== CARREGAR ALUNOS PARA O JS ==========
+$alunos = array();
+if ($db) {
+    $sql_alunos = "SELECT id_aluno, nome_aluno, serie_aluno FROM login_aluno ORDER BY nome_aluno";
+    if ($db instanceof mysqli) {
+        $result_alunos = $db->query($sql_alunos);
+        if ($result_alunos) {
+            while ($row = $result_alunos->fetch_assoc()) {
+                $alunos[] = $row;
+            }
+        }
+    } elseif ($db instanceof PDO) {
+        $stmt = $db->query($sql_alunos);
+        if ($stmt) {
+            $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    }
+}
+$alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+// ========== MENSAGENS FLASH ==========
+$msg_sucesso = $_SESSION['msg_sucesso'] ?? null;
+$msg_erro = $_SESSION['msg_erro'] ?? null;
+unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -92,11 +150,12 @@ $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
-    <link rel="stylesheet" href="../assets/css/reservas_adm.css">
+    <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/meus_emprestimos.css?v=<?= time() ?>">
     <script src="../assets/js/pendencias_adm.js?v=<?= time() ?>" defer></script>
 </head>
-<body>
-
+<body class="<?= $config_classes ?>">
+    
     <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -167,20 +226,35 @@ $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
 
+                <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
+                        <?php if (count($notificacoes) > 0): ?>
+                            <span class="badge" style="
+                                position: absolute;
+                                top: -4px;
+                                right: -4px;
+                                background: #e74c3c;
+                                color: white;
+                                font-size: 10px;
+                                font-weight: 700;
+                                min-width: 18px;
+                                height: 18px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0 5px;
+                            "><?= count($notificacoes) ?></span>
+                        <?php endif; ?>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
                         <div class="notification-header">
-                            <h4><i class="fas fa-bell"></i> Notificações</h4>
-                            <button class="mark-read-btn">Marcar todas como lidas</button>
+                            <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
-                        <div class="notification-list" id="notification-list">
-                            <div class="empty-notifications">
-                                <i class="far fa-bell-slash"></i>
-                                <p>Nenhuma notificação</p>
-                            </div>
+                        <div class="notification-list" id="notification-list-dropdown">
+                            <!-- Preenchido via JS -->
                         </div>
                     </div>
                 </div>
@@ -190,8 +264,20 @@ $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
         <!-- ========== MAIN ========== -->
         <main class="dashboard-main">
 
+            <!-- ========== MENSAGENS FLASH ========== -->
+            <?php if ($msg_sucesso): ?>
+                <div class="flash-message flash-success">
+                    <i class="fas fa-check-circle"></i>
+                    <?= htmlspecialchars($msg_sucesso) ?>
+                </div>
+            <?php elseif ($msg_erro): ?>
+                <div class="flash-message flash-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <?= htmlspecialchars($msg_erro) ?>
+                </div>
+            <?php endif; ?>
+
             <!-- ========== CABEÇALHO DA PÁGINA ========== -->
-            
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-exclamation-circle"></i> Empréstimos & Pendências</h1>
@@ -228,9 +314,28 @@ $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
                     </button>
                 </div>
 
-                <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
-                    <span><i class="fas fa-search"></i> Buscando por: "<strong id="busca-termo"></strong>"</span>
-                    <button class="limpar-busca" id="limpar-busca"><i class="fas fa-times"></i></button>
+                <div class="filtros-acoes">
+                    <!-- ========== BOTÃO DE ORDENAÇÃO ========== -->
+                    <div class="ordenacao-wrapper">
+                        <button class="btn-ordenacao" id="btn-ordenacao" title="Ordenar empréstimos">
+                            <i class="fas fa-sort"></i>
+                            <span id="ordenacao-label">Mais recente</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="ordenacao-dropdown" id="ordenacao-dropdown">
+                            <button class="ordenacao-item active" data-ordem="recente">
+                                <i class="fas fa-arrow-down"></i> Mais recente
+                            </button>
+                            <button class="ordenacao-item" data-ordem="antigo">
+                                <i class="fas fa-arrow-up"></i> Mais antigo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
+                        <span><i class="fas fa-search"></i> Buscando por: "<strong id="busca-termo"></strong>"</span>
+                        <button class="limpar-busca" id="limpar-busca"><i class="fas fa-times"></i></button>
+                    </div>
                 </div>
             </div>
 
@@ -264,9 +369,12 @@ $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_H
         </main>
     </div>
 
-    <script>
-        const pendenciasData = <?= $pendencias_json ?>;
-    </script>
+<script>
+    const pendenciasData = <?= $pendencias_json ?>;
+    const alunosData = <?= $alunos_json ?>;
+    const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
+
 
 </body>
 </html>

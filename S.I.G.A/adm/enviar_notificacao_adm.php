@@ -7,13 +7,18 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+// Aceitar apenas requisições POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: notificacoes_adm.php');
+    exit;
+}
+
 // ========== PREVENIR ENVIO DUPLICADO POR TEMPO ==========
-if (isset($_SESSION['ultimo_envio']) && time() - $_SESSION['ultimo_envio'] < 5) {
+if (isset($_SESSION['ultimo_envio']) && (time() - $_SESSION['ultimo_envio']) < 3) {
     $_SESSION['msg_erro'] = 'Aguarde alguns segundos antes de enviar novamente.';
     header('Location: notificacoes_adm.php');
     exit;
 }
-$_SESSION['ultimo_envio'] = time();
 
 $db = null;
 if (isset($conn)) $db = $conn;
@@ -46,19 +51,43 @@ if ($destinatarioTipo === 'especifico' && $idAlunoEspecifico <= 0) {
     exit;
 }
 
-$titulo = $categoria === 'pendencia' ? 'Pendência' : 'Aviso';
+// Atualiza a trava de envio após validação
+$_SESSION['ultimo_envio'] = time();
+
+$titulo = ($categoria === 'pendencia') ? 'Pendência' : 'Aviso';
 $tipo = $categoria;
 
 // ========== GERAR ID ÚNICO PARA ESTE ENVIO ==========
-$id_envio = uniqid() . '_' . time();
+$id_envio = uniqid('env_') . '_' . time();
 
-// ========== BUSCAR DESTINATÁRIOS ==========
+// ========== BUSCAR DESTINATÁRIOS (SUPORTE MYSQLI E PDO) ==========
 $alunosDestino = array();
 
 try {
     if ($destinatarioTipo === 'todos') {
-        $result = $db->query("SELECT id_aluno, email_aluno FROM login_aluno");
-        if ($result) {
+        $sql = "SELECT id_aluno, email_aluno FROM login_aluno";
+        if ($db instanceof mysqli) {
+            $result = $db->query($sql);
+            if ($result) {
+                if (method_exists($result, 'fetch_all')) {
+                    $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
+                } else {
+                    while ($row = $result->fetch_assoc()) {
+                        $alunosDestino[] = $row;
+                    }
+                }
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->query($sql);
+            $alunosDestino = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } else {
+        $sql = "SELECT id_aluno, email_aluno FROM login_aluno WHERE id_aluno = ?";
+        if ($db instanceof mysqli) {
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param('i', $idAlunoEspecifico);
+            $stmt->execute();
+            $result = $stmt->get_result();
             if (method_exists($result, 'fetch_all')) {
                 $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
             } else {
@@ -66,20 +95,12 @@ try {
                     $alunosDestino[] = $row;
                 }
             }
+            $stmt->close();
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$idAlunoEspecifico]);
+            $alunosDestino = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-    } else {
-        $stmt = $db->prepare("SELECT id_aluno, email_aluno FROM login_aluno WHERE id_aluno = ?");
-        $stmt->bind_param('i', $idAlunoEspecifico);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if (method_exists($result, 'fetch_all')) {
-            $alunosDestino = $result->fetch_all(MYSQLI_ASSOC);
-        } else {
-            while ($row = $result->fetch_assoc()) {
-                $alunosDestino[] = $row;
-            }
-        }
-        $stmt->close();
     }
 } catch (Exception $e) {
     $_SESSION['msg_erro'] = 'Erro ao buscar destinatários: ' . $e->getMessage();
@@ -93,21 +114,37 @@ if (empty($alunosDestino)) {
     exit;
 }
 
-// ========== GRAVAR NOTIFICAÇÕES ==========
+// ========== GRAVAR NOTIFICAÇÕES (SUPORTE MYSQLI E PDO) ==========
 try {
-    // 🔥 AGORA INCLUI O id_envio
-    $stmt = $db->prepare("INSERT INTO notificacoes (id_aluno, titulo, mensagem, tipo, id_envio) VALUES (?, ?, ?, ?, ?)");
     $sucessos = 0;
+    $sqlInsert = "INSERT INTO notificacoes (id_aluno, titulo, mensagem, tipo, id_envio) VALUES (?, ?, ?, ?, ?)";
 
-    foreach ($alunosDestino as $aluno) {
-        $stmt->bind_param('issss', $aluno['id_aluno'], $titulo, $mensagem, $tipo, $id_envio);
-        if ($stmt->execute()) {
-            $sucessos++;
+    if ($db instanceof mysqli) {
+        $stmt = $db->prepare($sqlInsert);
+        foreach ($alunosDestino as $aluno) {
+            $idAluno = intval($aluno['id_aluno']);
+            $stmt->bind_param('issss', $idAluno, $titulo, $mensagem, $tipo, $id_envio);
+            if ($stmt->execute()) {
+                $sucessos++;
+            }
+        }
+        $stmt->close();
+    } elseif ($db instanceof PDO) {
+        $stmt = $db->prepare($sqlInsert);
+        foreach ($alunosDestino as $aluno) {
+            $idAluno = intval($aluno['id_aluno']);
+            if ($stmt->execute([$idAluno, $titulo, $mensagem, $tipo, $id_envio])) {
+                $sucessos++;
+            }
         }
     }
-    $stmt->close();
 
-    $_SESSION['msg_sucesso'] = "Notificação enviada para {$sucessos} aluno(s).";
+    if ($sucessos === 1) {
+        $_SESSION['msg_sucesso'] = "Notificação enviada para 1 aluno.";
+    } else {
+        $_SESSION['msg_sucesso'] = "Notificação enviada para {$sucessos} alunos.";
+    }
+
     header('Location: notificacoes_adm.php');
     exit;
 

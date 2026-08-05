@@ -936,3 +936,1414 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     max-height: 380px;
     overflow-y: auto;
 }
+/* =============================================
+   CONFIGURAÇÕES DE ACESSIBILIDADE
+   ============================================= */
+
+/* ========== TAMANHO DA FONTE ========== */
+body.fonte-pequeno {
+    font-size: 13px;
+}
+body.fonte-pequeno .top-header,
+body.fonte-pequeno .sidebar-nav,
+body.fonte-pequeno .dashboard-main {
+    font-size: 13px;
+}
+
+body.fonte-medio {
+    font-size: 16px;
+}
+body.fonte-medio .top-header,
+body.fonte-medio .sidebar-nav,
+body.fonte-medio .dashboard-main {
+    font-size: 16px;
+}
+
+body.fonte-grande {
+    font-size: 19px;
+}
+body.fonte-grande .top-header,
+body.fonte-grande .sidebar-nav,
+body.fonte-grande .dashboard-main {
+    font-size: 19px;
+}
+body.fonte-grande .reservas-table,
+body.fonte-grande .admin-table {
+    font-size: 16px;
+}
+body.fonte-grande .status-badge {
+    font-size: 14px;
+    padding: 6px 16px;
+}
+
+/* ========== TEMA ESCURO ========== */
+
+body.tema-escuro {
+    background: #1a1a2e;
+    color: #f0f0f0;
+}
+
+/* Garantir que textos em elementos principais fiquem claros */
+body.tema-escuro * {
+    color: #f0f0f0;
+}
+body.tema-escuro .tipo-badge {
+    background: #0a2a4a !important;
+    color: #6aaae0 !important;
+    border: 1px solid #2a5a7a !important;
+}
+
+body.tema-escuro .btn-acao {
+    color: #ffffff !important;
+}
+body.tema-escuro .btn-aprovar {
+    background: #0a2a1a !important;
+    color: #6aeeaa !important;
+    border: 1px solid #2a6a4a !important;
+}
+body.tema-escuro .btn-aprovar:hover {
+    background: #1a4a2a !important;
+    color: #aaffcc !important;
+}
+body.tema-escuro .btn-rejeitar {
+    background: #2a0a1a !important;
+    color: #ee6a6a !important;
+    border: 1px solid #6a2a2a !important;
+}
+body.tema-escuro .btn-rejeitar:hover {
+    background: #4a1a1a !important;
+    color: #ffaaaa !important;
+}
+body.tema-escuro .sem-acao {
+    color: #6a7a8a !important;
+}
+
+body.tema-escuro .aluno-avatar {
+    background: #0b4b9b !important;
+    color: #ffffff !important;
+}
+body.tema-escuro .aluno-nome {
+    color: #f0f0f0 !important;
+}
+body.tema-escuro .material-nome {
+    color: #f0f0f0 !important;
+}
+
+/* Corrigir elementos que podem ter fundo branco */
+body.tema-escuro .search-results-dropdown,
+body.tema-escuro .search-results-dropdown * {
+    background: #1a2a4a !important;
+    color: #f0f0f0 !important;
+}
+
+body.tema-escuro .search-results-dropdown .search-result-item {
+    border-bottom: 1px solid #2a3a5e !important;
+}
+body.tema-escuro .search-results-dropdown .search-result-item:hover {
+    background: #1a3a5a !important;
+}
+
+body.tema-escuro .aluno-sugestoes,
+body.tema-escuro .aluno-sugestoes * {
+    background: #1a2a4a !important;
+    color: #f0f0f0 !important;
+}
+body.tema-escuro .aluno-sugestao-item {
+    border-bottom: 1px solid #2a3a5e !important;
+}
+body.tema-escuro .aluno-sugestao-item:hover {
+    background: #1a3a5a !important;
+}
+
+body.tema-escuro .aluno-selecionado {
+    background: #0a2a4a !important;
+    color: #6aaae0 !important;
+}
+body.tema-escuro .aluno-selecionado * {
+    color: #6aaae0 !important;
+}
+
+body.tema-escuro .toast,
+body.tema-escuro .toast-custom {
+    background: #1a2a4a !important;
+    color: #f0f0f0 !important;
+    border: 1px solid #2a3a5e !important;
+}
+body.tema-escuro .toast *,
+body.tema-escuro .toast-custom * {
+    color: #f0f0f0 !important;
+}
+
+/* Sidebar */
+body.tema-escuro .sidebar {
+    background: #16213e;
+    border-right: 1px solid #2a3a5e;
+}
+
+body.tema-escuro .sidebar-logo {
+    color: #7ec8e3;
+}
+body.tema-escuro .sidebar-logo i {
+    color: #7ec8e3;
+}
+
+body.tema-escuro .nav-item {
+    color: #d0d0d0;
+}
+body.tema-escuro .nav-item:hover {
+    background: #1a2a4a;
+    color: #ffffff;
+}
+body.tema-escuro .nav-item.active {
+    background: #1a3a6a;
+    color: #7ec8e3;
+}
+body.tema-escuro .nav-item.active i,
+body.tema-escuro .nav-item.active span {
+    color: #7ec8e3;
+}
+
+/* Top Header */
+body.tema-escuro .top-header {
+    background: #16213e;
+    border-bottom: 1px solid #2a3a5e;
+}
+
+body.tema-escuro .search-container input {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+    color: #f0f0f0;
+}
+body.tema-escuro .search-container input:focus {
+    border-color: #4a8bc2;
+}
+body.tema-escuro .search-container input::placeholder {
+    color: #8a9aaa;
+}
+
+body.tema-escuro .admin-name {
+    color: #f0f0f0;
+}
+
+/* Cards */
+body.tema-escuro .compose-card,
+body.tema-escuro .historico-card,
+body.tema-escuro .config-card,
+body.tema-escuro .perfil-card {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .compose-card h3,
+body.tema-escuro .historico-card h3,
+body.tema-escuro .config-card h3,
+body.tema-escuro .perfil-card h3 {
+    color: #7ec8e3;
+}
+body.tema-escuro .compose-card .compose-label,
+body.tema-escuro .compose-card label {
+    color: #b0c0d0;
+}
+
+/* Tabelas */
+body.tema-escuro .reservas-table-wrapper,
+body.tema-escuro .table-wrapper {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .reservas-table thead {
+    background: #0f1a3a;
+}
+body.tema-escuro .reservas-table thead th {
+    color: #c0d0e0;
+}
+body.tema-escuro .reservas-table tbody td {
+    border-color: #2a3a5e;
+    color: #f0f0f0;
+}
+body.tema-escuro .reservas-table tbody tr:hover td {
+    background: #1a3a5a;
+}
+
+/* Aluno info na tabela */
+body.tema-escuro .aluno-avatar {
+    background: #0b4b9b;
+    color: #ffffff;
+}
+body.tema-escuro .aluno-nome {
+    color: #f0f0f0;
+}
+
+/* Profile Dropdown */
+body.tema-escuro .admin-profile:hover {
+    background: #1a2a4a;
+}
+
+body.tema-escuro .profile-dropdown {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .profile-dropdown a {
+    color: #e0e0e0;
+}
+body.tema-escuro .profile-dropdown a:hover {
+    background: #1a3a5a;
+    color: #ffffff;
+}
+
+/* Notificações */
+body.tema-escuro .notification-dropdown {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .notification-item {
+    border-color: #2a3a5e;
+}
+body.tema-escuro .notification-item:hover {
+    background: #1a3a5a;
+}
+body.tema-escuro .notification-message {
+    color: #f0f0f0;
+}
+body.tema-escuro .notification-message strong {
+    color: #7ec8e3;
+}
+body.tema-escuro .notification-date {
+    color: #8a9aaa;
+}
+body.tema-escuro .notification-destinatarios {
+    color: #7ec8e3;
+}
+body.tema-escuro .empty-notifications {
+    color: #8a9aaa;
+}
+
+/* Flash Messages */
+body.tema-escuro .flash-message.flash-success {
+    background: #0a2a1a;
+    color: #6aeeaa;
+}
+body.tema-escuro .flash-message.flash-success * {
+    color: #6aeeaa;
+}
+body.tema-escuro .flash-message.flash-error {
+    background: #2a0a1a;
+    color: #ee6a6a;
+}
+body.tema-escuro .flash-message.flash-error * {
+    color: #ee6a6a;
+}
+
+/* Filtros */
+body.tema-escuro .filtros-container {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .filtro-tab {
+    color: #b0b0b0;
+    background: #0f1a3a;
+}
+body.tema-escuro .filtro-tab:hover {
+    background: #1a3a5a;
+    color: #ffffff;
+}
+body.tema-escuro .filtro-tab.active {
+    background: #0b4b9b;
+    color: #ffffff;
+}
+body.tema-escuro .filtro-tab .tab-badge {
+    color: #b0b0b0;
+}
+body.tema-escuro .filtro-tab.active .tab-badge {
+    color: #ffffff;
+}
+
+/* Ordenação */
+body.tema-escuro .btn-ordenacao {
+    background: #0f1a3a;
+    border-color: #2a3a5e;
+    color: #d0d0d0;
+}
+body.tema-escuro .btn-ordenacao:hover {
+    background: #1a3a5a;
+}
+body.tema-escuro .btn-ordenacao i {
+    color: #8a9aaa;
+}
+
+body.tema-escuro .ordenacao-dropdown {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .ordenacao-item {
+    color: #d0d0d0;
+}
+body.tema-escuro .ordenacao-item:hover {
+    background: #1a3a5a;
+}
+body.tema-escuro .ordenacao-item.active {
+    background: #0b4b9b;
+    color: #ffffff;
+}
+body.tema-escuro .ordenacao-item.active i {
+    color: #ffffff;
+}
+
+/* Status Badges */
+body.tema-escuro .status-badge {
+    color: #ffffff;
+}
+body.tema-escuro .status-badge i {
+    color: #ffffff;
+}
+body.tema-escuro .status-badge.status-pendente {
+    background: #3a2a1a;
+    color: #eeaa6a;
+}
+body.tema-escuro .status-badge.status-aprovada {
+    background: #0a2a1a;
+    color: #6aeeaa;
+}
+body.tema-escuro .status-badge.status-rejeitada {
+    background: #2a0a1a;
+    color: #ee6a6a;
+}
+body.tema-escuro .status-badge.status-expirada {
+    background: #1a1a2a;
+    color: #8a9aaa;
+}
+body.tema-escuro .status-emprestado {
+    background: #0a2a4a;
+    color: #6aaae0;
+}
+body.tema-escuro .status-atrasado {
+    background: #2a0a1a;
+    color: #ee6a6a;
+}
+body.tema-escuro .status-devolvido {
+    background: #0a2a1a;
+    color: #6aeeaa;
+}
+
+/* Botões */
+body.tema-escuro .btn-primary {
+    background: #0b4b9b;
+    color: #ffffff;
+}
+body.tema-escuro .btn-primary:hover {
+    background: #1a5aab;
+    color: #ffffff;
+}
+body.tema-escuro .btn-primary i {
+    color: #ffffff;
+}
+
+/* Inputs */
+body.tema-escuro input,
+body.tema-escuro select,
+body.tema-escuro textarea {
+    background: #0f1a3a;
+    border-color: #2a3a5e;
+    color: #f0f0f0;
+}
+body.tema-escuro input:focus,
+body.tema-escuro select:focus,
+body.tema-escuro textarea:focus {
+    border-color: #4a8bc2;
+}
+body.tema-escuro input::placeholder,
+body.tema-escuro textarea::placeholder {
+    color: #6a7a8a;
+}
+
+/* Histórico */
+body.tema-escuro .historico-item {
+    background: #0f1a3a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .historico-item:hover {
+    background: #1a2a4a;
+}
+body.tema-escuro .historico-categoria.pendencia {
+    background: #3a2a1a;
+    color: #eeaa6a;
+}
+body.tema-escuro .historico-categoria.aviso {
+    background: #0a2a4a;
+    color: #6aaae0;
+}
+body.tema-escuro .historico-data {
+    color: #8a9aaa;
+}
+
+/* Page Header */
+body.tema-escuro .page-header h1 {
+    color: #ffffff;
+}
+body.tema-escuro .page-header h1 i {
+    color: #7ec8e3;
+}
+body.tema-escuro .page-subtitle {
+    color: #b0c0d0;
+}
+
+/* Welcome Section */
+body.tema-escuro .welcome-section {
+    background: #0b3a6a;
+}
+body.tema-escuro .welcome-section * {
+    color: #ffffff;
+}
+
+/* Perfil */
+body.tema-escuro .perfil-header {
+    background: #0b3a6a;
+}
+body.tema-escuro .perfil-header * {
+    color: #ffffff;
+}
+
+/* Empty State */
+body.tema-escuro .empty-state {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .empty-state * {
+    color: #8a9aaa;
+}
+body.tema-escuro .empty-state h3 {
+    color: #f0f0f0;
+}
+
+/* Modal */
+body.tema-escuro .modal-reserva {
+    background: #1a2a4a;
+    border-color: #2a3a5e;
+}
+body.tema-escuro .modal-reserva * {
+    color: #f0f0f0;
+}
+body.tema-escuro .modal-header {
+    border-bottom-color: #2a3a5e;
+}
+body.tema-escuro .modal-footer {
+    border-top-color: #2a3a5e;
+}
+body.tema-escuro .modal-reserva input,
+body.tema-escuro .modal-reserva select,
+body.tema-escuro .modal-reserva textarea {
+    background: #0f1a3a;
+    border-color: #2a3a5e;
+    color: #f0f0f0;
+}
+body.tema-escuro .modal-reserva .helper-text {
+    color: #8a9aaa;
+}
+body.tema-escuro .modal-close {
+    color: #f0f0f0;
+}
+body.tema-escuro .modal-close:hover {
+    background: #2a3a5e;
+}
+
+/* ========== TEMA ALTO CONTRASTE ========== */
+
+body.tema-alto_contraste {
+    background: #000000;
+    color: #ffffff;
+}
+
+body.tema-alto_contraste * {
+    color: #ffffff;
+}
+
+body.tema-alto_contraste .tipo-badge {
+    background: #333333 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+
+body.tema-alto_contraste .btn-acao {
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .btn-aprovar {
+    background: #333333 !important;
+    color: #00ff00 !important;
+    border: 1px solid #00ff00 !important;
+}
+body.tema-alto_contraste .btn-aprovar:hover {
+    background: #444444 !important;
+}
+body.tema-alto_contraste .btn-rejeitar {
+    background: #333333 !important;
+    color: #ff0000 !important;
+    border: 1px solid #ff0000 !important;
+}
+body.tema-alto_contraste .btn-rejeitar:hover {
+    background: #444444 !important;
+}
+body.tema-alto_contraste .sem-acao {
+    color: #888888 !important;
+}
+
+body.tema-alto_contraste .aluno-avatar {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+body.tema-alto_contraste .aluno-nome {
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .material-nome {
+    color: #ffffff !important;
+}
+
+/* Corrigir elementos que podem ter fundo branco */
+body.tema-alto_contraste .search-results-dropdown,
+body.tema-alto_contraste .search-results-dropdown * {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .search-results-dropdown .search-result-item {
+    border-bottom: 1px solid #444444 !important;
+}
+body.tema-alto_contraste .search-results-dropdown .search-result-item:hover {
+    background: #333333 !important;
+}
+
+body.tema-alto_contraste .aluno-sugestoes,
+body.tema-alto_contraste .aluno-sugestoes * {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .aluno-sugestao-item {
+    border-bottom: 1px solid #444444 !important;
+}
+body.tema-alto_contraste .aluno-sugestao-item:hover {
+    background: #333333 !important;
+}
+
+body.tema-alto_contraste .aluno-selecionado {
+    background: #333333 !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .aluno-selecionado * {
+    color: #ffffff !important;
+}
+
+body.tema-alto_contraste .toast,
+body.tema-alto_contraste .toast-custom {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+}
+body.tema-alto_contraste .toast *,
+body.tema-alto_contraste .toast-custom * {
+    color: #ffffff !important;
+}
+
+body.tema-alto_contraste a,
+body.tema-alto_contraste .nav-item,
+body.tema-alto_contraste .nav-item i,
+body.tema-alto_contraste .nav-item span {
+    color: #ffffff;
+}
+
+body.tema-alto_contraste .nav-item.active {
+    background: #ffffff;
+    color: #000000;
+}
+body.tema-alto_contraste .nav-item.active i,
+body.tema-alto_contraste .nav-item.active span {
+    color: #000000;
+}
+
+body.tema-alto_contraste .sidebar,
+body.tema-alto_contraste .top-header,
+body.tema-alto_contraste .compose-card,
+body.tema-alto_contraste .historico-card,
+body.tema-alto_contraste .config-card,
+body.tema-alto_contraste .perfil-card {
+    background: #1a1a1a;
+    border-color: #ffffff;
+}
+
+/* Botões */
+body.tema-alto_contraste .btn-primary {
+    background: #ffffff;
+    color: #000000;
+}
+body.tema-alto_contraste .btn-primary:hover {
+    background: #cccccc;
+}
+body.tema-alto_contraste .btn-primary i {
+    color: #000000;
+}
+
+/* Inputs */
+body.tema-alto_contraste input,
+body.tema-alto_contraste select,
+body.tema-alto_contraste textarea {
+    background: #000000;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+body.tema-alto_contraste input::placeholder,
+body.tema-alto_contraste textarea::placeholder {
+    color: #888888;
+}
+
+/* Flash Messages */
+body.tema-alto_contraste .flash-message.flash-success {
+    background: #000000;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+}
+body.tema-alto_contraste .flash-message.flash-success * {
+    color: #00ff00;
+}
+body.tema-alto_contraste .flash-message.flash-error {
+    background: #000000;
+    color: #ff0000;
+    border: 2px solid #ff0000;
+}
+body.tema-alto_contraste .flash-message.flash-error * {
+    color: #ff0000;
+}
+
+/* Status Badges */
+body.tema-alto_contraste .status-badge {
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .status-badge.status-pendente {
+    background: #333333;
+    color: #ffffff;
+}
+body.tema-alto_contraste .status-badge.status-aprovada {
+    background: #444444;
+    color: #ffffff;
+}
+body.tema-alto_contraste .status-badge.status-rejeitada {
+    background: #222222;
+    color: #ffffff;
+}
+body.tema-alto_contraste .status-badge.status-expirada {
+    background: #111111;
+    color: #ffffff;
+}
+body.tema-alto_contraste .status-emprestado {
+    background: #333333;
+    color: #ffffff;
+}
+body.tema-alto_contraste .status-atrasado {
+    background: #222222;
+    color: #ffffff;
+}
+body.tema-alto_contraste .status-devolvido {
+    background: #444444;
+    color: #ffffff;
+}
+
+/* Tabelas */
+body.tema-alto_contraste .reservas-table-wrapper {
+    background: #1a1a1a;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .reservas-table thead th {
+    color: #ffffff;
+    border-bottom: 2px solid #ffffff;
+}
+body.tema-alto_contraste .reservas-table tbody td {
+    color: #ffffff;
+    border-color: #444444;
+}
+body.tema-alto_contraste .reservas-table tbody tr:hover td {
+    background: #333333;
+}
+
+/* Aluno info na tabela */
+body.tema-alto_contraste .aluno-avatar {
+    background: #ffffff;
+    color: #000000;
+}
+body.tema-alto_contraste .aluno-nome {
+    color: #ffffff;
+}
+
+/* Filtros */
+body.tema-alto_contraste .filtros-container {
+    background: #1a1a1a;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .filtro-tab {
+    background: #222222;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .filtro-tab.active {
+    background: #ffffff;
+    color: #000000;
+}
+body.tema-alto_contraste .filtro-tab.active * {
+    color: #000000;
+}
+
+/* Ordenação */
+body.tema-alto_contraste .btn-ordenacao {
+    background: #222222;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+}
+body.tema-alto_contraste .btn-ordenacao i {
+    color: #ffffff;
+}
+
+body.tema-alto_contraste .ordenacao-dropdown {
+    background: #1a1a1a;
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .ordenacao-item {
+    color: #ffffff;
+}
+body.tema-alto_contraste .ordenacao-item:hover {
+    background: #333333;
+}
+body.tema-alto_contraste .ordenacao-item.active {
+    background: #ffffff;
+    color: #000000;
+}
+body.tema-alto_contraste .ordenacao-item.active i {
+    color: #000000;
+}
+
+/* Page Header */
+body.tema-alto_contraste .page-header h1 {
+    color: #ffffff;
+}
+body.tema-alto_contraste .page-subtitle {
+    color: #cccccc;
+}
+
+/* Welcome Section */
+body.tema-alto_contraste .welcome-section {
+    background: #222222;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .welcome-section * {
+    color: #ffffff;
+}
+
+/* Perfil */
+body.tema-alto_contraste .perfil-header {
+    background: #222222;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .perfil-header * {
+    color: #ffffff;
+}
+
+/* Notificações */
+body.tema-alto_contraste .notification-dropdown {
+    background: #1a1a1a;
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .notification-item {
+    border-color: #444444;
+}
+body.tema-alto_contraste .notification-item:hover {
+    background: #333333;
+}
+body.tema-alto_contraste .notification-message {
+    color: #ffffff;
+}
+body.tema-alto_contraste .notification-date {
+    color: #aaaaaa;
+}
+
+/* Profile Dropdown */
+body.tema-alto_contraste .profile-dropdown {
+    background: #1a1a1a;
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .profile-dropdown a {
+    color: #ffffff;
+}
+body.tema-alto_contraste .profile-dropdown a:hover {
+    background: #333333;
+}
+
+/* Cards */
+body.tema-alto_contraste .compose-card,
+body.tema-alto_contraste .historico-card,
+body.tema-alto_contraste .config-card,
+body.tema-alto_contraste .perfil-card {
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .compose-card h3,
+body.tema-alto_contraste .historico-card h3,
+body.tema-alto_contraste .config-card h3,
+body.tema-alto_contraste .perfil-card h3 {
+    color: #ffffff;
+}
+body.tema-alto_contraste .compose-card label,
+body.tema-alto_contraste .compose-card .compose-label {
+    color: #cccccc;
+}
+
+/* Histórico */
+body.tema-alto_contraste .historico-item {
+    background: #222222;
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .historico-item:hover {
+    background: #333333;
+}
+body.tema-alto_contraste .historico-categoria.pendencia {
+    background: #333333;
+    color: #ffffff;
+}
+body.tema-alto_contraste .historico-categoria.aviso {
+    background: #444444;
+    color: #ffffff;
+}
+body.tema-alto_contraste .historico-data {
+    color: #aaaaaa;
+}
+
+/* Empty State */
+body.tema-alto_contraste .empty-state {
+    background: #1a1a1a;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .empty-state * {
+    color: #cccccc;
+}
+body.tema-alto_contraste .empty-state h3 {
+    color: #ffffff;
+}
+
+/* Modal */
+body.tema-alto_contraste .modal-reserva {
+    background: #1a1a1a;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .modal-reserva * {
+    color: #ffffff;
+}
+body.tema-alto_contraste .modal-header {
+    border-bottom-color: #ffffff;
+}
+body.tema-alto_contraste .modal-footer {
+    border-top-color: #ffffff;
+}
+body.tema-alto_contraste .modal-reserva input,
+body.tema-alto_contraste .modal-reserva select,
+body.tema-alto_contraste .modal-reserva textarea {
+    background: #000000;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+body.tema-alto_contraste .modal-reserva .helper-text {
+    color: #aaaaaa;
+}
+body.tema-alto_contraste .modal-close {
+    color: #ffffff;
+}
+body.tema-alto_contraste .modal-close:hover {
+    background: #333333;
+}
+
+/* ========== DALTONISMO ========== */
+/* Protanopia - dificuldade com vermelho */
+body.daltonismo-protanopia .status-pendente,
+body.daltonismo-protanopia .status-rejeitada,
+body.daltonismo-protanopia .status-atrasado {
+    background: #4a6a8a !important;
+    color: #ffffff !important;
+}
+body.daltonismo-protanopia .status-aprovada,
+body.daltonismo-protanopia .status-emprestado,
+body.daltonismo-protanopia .status-devolvido {
+    background: #4a8a6a !important;
+    color: #ffffff !important;
+}
+
+/* Deuteranopia - dificuldade com verde */
+body.daltonismo-deuteranopia .status-pendente,
+body.daltonismo-deuteranopia .status-rejeitada,
+body.daltonismo-deuteranopia .status-atrasado {
+    background: #8a4a6a !important;
+    color: #ffffff !important;
+}
+body.daltonismo-deuteranopia .status-aprovada,
+body.daltonismo-deuteranopia .status-emprestado,
+body.daltonismo-deuteranopia .status-devolvido {
+    background: #4a6a8a !important;
+    color: #ffffff !important;
+}
+
+/* Tritanopia - dificuldade com azul/amarelo */
+body.daltonismo-tritanopia .status-pendente,
+body.daltonismo-tritanopia .status-aprovada {
+    background: #6a6a8a !important;
+    color: #ffffff !important;
+}
+body.daltonismo-tritanopia .status-rejeitada,
+body.daltonismo-tritanopia .status-atrasado {
+    background: #8a6a6a !important;
+    color: #ffffff !important;
+}
+body.daltonismo-tritanopia .status-emprestado,
+body.daltonismo-tritanopia .status-devolvido {
+    background: #6a8a6a !important;
+    color: #ffffff !important;
+}
+
+/* ========== ESPAÇAMENTO ========== */
+body.espacamento-compacto .top-header {
+    padding: 8px 16px !important;
+}
+body.espacamento-compacto .dashboard-main {
+    padding: 16px 20px !important;
+}
+body.espacamento-compacto .page-header {
+    margin-bottom: 12px !important;
+}
+body.espacamento-compacto .reservas-table tbody td,
+body.espacamento-compacto .admin-table tbody td {
+    padding: 6px 10px !important;
+}
+body.espacamento-compacto .compose-card,
+body.espacamento-compacto .historico-card {
+    padding: 16px 18px !important;
+}
+body.espacamento-compacto .filtros-container {
+    padding: 8px 12px !important;
+}
+body.espacamento-compacto .perfil-card {
+    padding: 16px 18px !important;
+}
+body.espacamento-compacto .config-card {
+    padding: 16px 18px !important;
+}
+body.espacamento-compacto .reservas-table thead th,
+body.espacamento-compacto .reservas-table tbody td {
+    padding: 6px 10px !important;
+}
+body.espacamento-compacto .card-section {
+    padding: 12px 16px !important;
+}
+body.espacamento-compacto .perfil-header {
+    padding: 16px 20px !important;
+}
+body.espacamento-compacto .flash-message {
+    padding: 10px 16px !important;
+}
+body.espacamento-compacto .historico-item {
+    padding: 10px 14px !important;
+}
+body.espacamento-compacto .nav-item {
+    padding: 8px 12px !important;
+    margin: 2px 6px !important;
+}
+body.espacamento-compacto .sidebar {
+    padding: 8px 0 !important;
+}
+body.espacamento-compacto .sidebar-header {
+    padding: 0 12px 16px 12px !important;
+    margin-bottom: 4px !important;
+}
+body.espacamento-compacto .filtros-tabs .filtro-tab {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+}
+body.espacamento-compacto .btn-ordenacao {
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+}
+body.espacamento-compacto .welcome-section {
+    padding: 16px 20px !important;
+}
+
+/* --- CONFORTAVEL --- */
+body.espacamento-confortavel .top-header {
+    padding: 24px 40px !important;
+}
+body.espacamento-confortavel .dashboard-main {
+    padding: 40px 48px !important;
+}
+body.espacamento-confortavel .page-header {
+    margin-bottom: 32px !important;
+}
+body.espacamento-confortavel .reservas-table tbody td,
+body.espacamento-confortavel .admin-table tbody td {
+    padding: 16px 20px !important;
+}
+body.espacamento-confortavel .compose-card,
+body.espacamento-confortavel .historico-card {
+    padding: 32px 36px !important;
+}
+body.espacamento-confortavel .filtros-container {
+    padding: 16px 24px !important;
+}
+body.espacamento-confortavel .perfil-card {
+    padding: 32px 36px !important;
+}
+body.espacamento-confortavel .config-card {
+    padding: 32px 36px !important;
+}
+body.espacamento-confortavel .reservas-table thead th,
+body.espacamento-confortavel .reservas-table tbody td {
+    padding: 14px 18px !important;
+}
+body.espacamento-confortavel .card-section {
+    padding: 24px 28px !important;
+}
+body.espacamento-confortavel .perfil-header {
+    padding: 36px 44px !important;
+}
+body.espacamento-confortavel .flash-message {
+    padding: 18px 24px !important;
+}
+body.espacamento-confortavel .historico-item {
+    padding: 20px 24px !important;
+}
+body.espacamento-confortavel .nav-item {
+    padding: 16px 24px !important;
+    margin: 6px 10px !important;
+}
+body.espacamento-confortavel .sidebar {
+    padding: 16px 0 !important;
+}
+body.espacamento-confortavel .sidebar-header {
+    padding: 0 24px 24px 24px !important;
+    margin-bottom: 12px !important;
+}
+body.espacamento-confortavel .filtros-tabs .filtro-tab {
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+}
+body.espacamento-confortavel .btn-ordenacao {
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+}
+body.espacamento-confortavel .welcome-section {
+    padding: 32px 40px !important;
+}
+/* ========== CORREÇÕES TEMA ESCURO - BUSCA ALUNO ========== */
+body.tema-escuro .busca-aluno-container input {
+    background: #0f1a3a !important;
+    border-color: #2a3a5e !important;
+    color: #f0f0f0 !important;
+}
+body.tema-escuro .busca-aluno-container input::placeholder {
+    color: #6a7a8a !important;
+}
+body.tema-escuro .busca-aluno-container .search-icon {
+    color: #6a7a8a !important;
+}
+
+/* ========== CORREÇÕES TEMA ALTO CONTRASTE - BUSCA ALUNO ========== */
+body.tema-alto_contraste .busca-aluno-container input {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .busca-aluno-container input::placeholder {
+    color: #888888 !important;
+}
+body.tema-alto_contraste .busca-aluno-container .search-icon {
+    color: #888888 !important;
+}
+/* =============================================
+   DASHBOARD - BARRA DE PESQUISA PREMIUM
+   ============================================= */
+
+/* ========== CAMPO DE BUSCA ========== */
+.search-container {
+    position: relative;
+    flex: 1;
+    max-width: 560px;
+    margin: 0 32px;
+}
+
+.search-container input {
+    width: 100%;
+    padding: 14px 20px 14px 52px;
+    border: 2px solid #e5e9f0;
+    border-radius: 16px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    background: #fafcff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    color: #1a2333;
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: #0b4b9b;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(11, 75, 155, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.search-container input::placeholder {
+    color: #a0aec0;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.search-container input:focus + .search-icon {
+    color: #0b4b9b;
+}
+
+/* ========== DROPDOWN DE RESULTADOS ========== */
+.search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+    max-height: 420px;
+    overflow-y: auto;
+    z-index: 1000;
+    padding: 8px;
+    display: none;
+    animation: fadeInDown 0.25s ease forwards;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-results-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.search-results-dropdown::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+/* ========== ITEM DE RESULTADO ========== */
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f5f7fb;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background: #f8faff;
+}
+
+.search-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.search-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #1a2333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.search-detail {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 1px;
+}
+
+/* ========== ÍCONE DE STATUS ========== */
+.search-status-icon {
+    font-size: 16px;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.search-status-icon span {
+    margin-left: 4px;
+}
+
+/* ========== EMPTY STATE ========== */
+.search-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 16px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.search-empty i {
+    font-size: 22px;
+    opacity: 0.5;
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+    .search-container {
+        max-width: 100%;
+        margin: 0 12px;
+    }
+
+    .search-container input {
+        padding: 12px 16px 12px 44px;
+        font-size: 14px;
+        border-radius: 12px;
+    }
+
+    .search-icon {
+        left: 14px;
+        font-size: 17px;
+    }
+
+    .search-results-dropdown {
+        max-height: 320px;
+        padding: 6px;
+        border-radius: 12px;
+    }
+
+    .search-result-item {
+        padding: 8px 12px;
+        gap: 10px;
+    }
+
+    .search-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 15px;
+    }
+
+    .search-name {
+        font-size: 14px;
+    }
+
+    .search-detail {
+        font-size: 12px;
+    }
+}
+/* ========== ÍCONES DE STATUS ========== */
+.search-status-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    background: #f0f4fd;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 32px;
+    justify-content: center;
+}
+
+.search-status-icon i {
+    font-size: 15px;
+}
+
+.search-status-icon i.fa-bookmark {
+    color: #0b4b9b;
+}
+
+.search-status-icon i.fa-exclamation-circle {
+    color: #e67e22;
+}
+/* Container das notificações */
+.notification-container {
+    position: relative;
+}
+
+/* Esconder dropdown por padrão e exibir quando tiver a classe .show */
+.notification-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    width: 300px;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+/* Badge / Bolinha vermelha sobre o sininho */
+.notification-btn {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: #e74c3c;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 50%;
+    padding: 2px 6px;
+    line-height: 1;
+}

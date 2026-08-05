@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 05/08/2026 às 03:29
+-- Tempo de geração: 05/08/2026 às 14:48
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -24,6 +24,31 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `configuracoes`
+--
+
+CREATE TABLE `configuracoes` (
+  `id` int(11) NOT NULL,
+  `chave` varchar(50) NOT NULL,
+  `valor` varchar(255) NOT NULL,
+  `descricao` varchar(255) DEFAULT NULL,
+  `atualizado_em` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `configuracoes`
+--
+
+INSERT INTO `configuracoes` (`id`, `chave`, `valor`, `descricao`, `atualizado_em`) VALUES
+(1, 'tamanho_fonte', 'grande', 'Tamanho da fonte: pequeno, medio, grande', '2026-08-05 12:41:01'),
+(2, 'tema', 'alto_contraste', 'Tema: claro, escuro, alto_contraste', '2026-08-05 12:43:16'),
+(3, 'daltonismo', 'tritanopia', 'Tipo de daltonismo: normal, protanopia, deuteranopia, tritanopia', '2026-08-05 12:43:16'),
+(4, 'espacamento', 'normal', 'Espaçamento: compacto, normal, confortavel', '2026-08-05 12:29:11'),
+(5, 'reduzir_animacoes', '0', 'Reduzir animações: 0=desligado, 1=ligado', '2026-08-05 12:29:11');
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `emprestimos`
 --
 
@@ -32,7 +57,7 @@ CREATE TABLE `emprestimos` (
   `id_aluno` int(11) NOT NULL,
   `titulo_item` varchar(255) NOT NULL,
   `data_emprestimo` datetime NOT NULL,
-  `data_devolucao_prevista` date NOT NULL,
+  `data_devolucao_prevista` date DEFAULT NULL,
   `status` enum('emprestado','atrasado','devolvido') DEFAULT 'emprestado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -41,31 +66,42 @@ CREATE TABLE `emprestimos` (
 --
 
 INSERT INTO `emprestimos` (`id_emprestimo`, `id_aluno`, `titulo_item`, `data_emprestimo`, `data_devolucao_prevista`, `status`) VALUES
-(1, 1, 'Matemática - Vol. 1', '2026-08-04 19:48:46', '2026-08-11', 'emprestado'),
-(2, 2, 'Português - Gramática', '2026-08-04 19:48:46', '2026-08-14', 'emprestado'),
-(3, 3, 'Física - Mecânica', '2026-08-04 19:48:46', '2026-08-09', 'atrasado'),
-(4, 4, 'Química - Vol. 1', '2026-08-04 19:48:46', '2026-08-12', 'emprestado'),
-(5, 5, 'História do Mundo', '2026-08-04 19:48:46', '2026-08-07', 'devolvido'),
-(6, 6, 'Geografia - Vol. 1', '2026-08-04 19:48:46', '2026-08-10', 'emprestado'),
-(7, 7, 'Inglês - Básico', '2026-08-04 19:48:46', '2026-08-13', 'emprestado'),
-(8, 8, 'Literatura - Contos', '2026-08-04 19:48:46', '2026-08-08', 'atrasado'),
-(9, 9, 'Filosofia - Antiga', '2026-08-04 19:48:46', '2026-08-11', 'emprestado'),
-(10, 10, 'Sociologia - Teoria', '2026-08-04 19:48:46', '2026-08-09', 'emprestado'),
-(11, 11, 'Arte - Renascimento', '2026-08-04 19:48:46', '2026-08-14', 'atrasado'),
-(12, 12, 'Educação Física - Teoria', '2026-08-04 19:48:46', '2026-08-07', 'devolvido'),
-(13, 13, 'Matemática - Vol. 4', '2026-08-04 19:48:46', '2026-08-12', 'emprestado'),
-(14, 14, 'Português - Literatura', '2026-08-04 19:48:46', '2026-08-10', 'atrasado'),
-(15, 15, 'Física - Eletricidade', '2026-08-04 19:48:46', '2026-08-08', 'emprestado'),
-(16, 16, 'Química - Vol. 4', '2026-08-04 19:48:46', '2026-08-11', 'emprestado'),
-(17, 17, 'História Moderna', '2026-08-04 19:48:46', '2026-08-13', 'atrasado'),
-(18, 18, 'Geografia - Vol. 2', '2026-08-04 19:48:46', '2026-08-09', 'devolvido'),
-(19, 19, 'Inglês - Gramática', '2026-08-04 19:48:46', '2026-08-07', 'emprestado'),
-(20, 20, 'Literatura - Romance', '2026-08-04 19:48:46', '2026-08-12', 'atrasado'),
-(21, 21, 'Filosofia - Moderna', '2026-08-04 19:48:46', '2026-08-10', 'emprestado'),
-(22, 22, 'Sociologia - Crítica', '2026-08-04 19:48:46', '2026-08-14', 'emprestado'),
-(23, 23, 'Arte - Contemporânea', '2026-08-04 19:48:46', '2026-08-08', 'atrasado'),
-(24, 24, 'Educação Física - Prática', '2026-08-04 19:48:46', '2026-08-11', 'emprestado'),
-(25, 25, 'Matemática - Trigonometria', '2026-08-04 19:48:46', '2026-08-09', 'emprestado');
+(1, 1, 'Teste Dias Uteis', '2026-08-05 09:05:42', '2026-08-14', 'emprestado');
+
+--
+-- Acionadores `emprestimos`
+--
+DELIMITER $$
+CREATE TRIGGER `calcular_data_devolucao_emprestimo_uteis` BEFORE INSERT ON `emprestimos` FOR EACH ROW BEGIN
+    DECLARE data_atual DATE;
+    DECLARE dias_adicionados INT DEFAULT 0;
+    DECLARE dias_uteis INT DEFAULT 7;  -- 7 dias úteis = ~9-10 dias corridos
+
+    -- Se a data de devolução não foi informada
+    IF NEW.data_devolucao_prevista IS NULL THEN
+        SET data_atual = DATE(NEW.data_emprestimo);
+        
+        -- Loop para adicionar apenas dias úteis
+        WHILE dias_adicionados < dias_uteis DO
+            SET data_atual = DATE_ADD(data_atual, INTERVAL 1 DAY);
+            
+            -- Verifica se o dia é útil (segunda a sexta)
+            -- DAYOFWEEK: 1=Domingo, 2=Segunda, 3=Terça, 4=Quarta, 5=Quinta, 6=Sexta, 7=Sábado
+            IF DAYOFWEEK(data_atual) BETWEEN 2 AND 6 THEN
+                SET dias_adicionados = dias_adicionados + 1;
+            END IF;
+        END WHILE;
+        
+        SET NEW.data_devolucao_prevista = data_atual;
+    END IF;
+    
+    -- Define status padrão
+    IF NEW.status IS NULL THEN
+        SET NEW.status = 'emprestado';
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -85,7 +121,7 @@ CREATE TABLE `login_admin` (
 --
 
 INSERT INTO `login_admin` (`id_adm`, `email_adm`, `senha_adm`, `nome_adm`) VALUES
-(1, 'adm@gmail.com', '$2y$10$Hti4Ki5Ee7.q7YiGxyUikOd2l9A6lxD8IK9mafCr.46JTVPaqn.mC', 'Administrador Principal');
+(1, 'adm@gmail.com', '$2y$10$cJO5nz5PPXFymNZZX/uEXuNLCpeAIowfNLo1bIbEtdCUIB/c5p/vq', 'Admiro');
 
 -- --------------------------------------------------------
 
@@ -108,36 +144,7 @@ CREATE TABLE `login_aluno` (
 --
 
 INSERT INTO `login_aluno` (`id_aluno`, `nome_aluno`, `serie_aluno`, `email_aluno`, `senha_aluno`, `relembrar_token`, `token_expiracao`) VALUES
-(1, 'Ana Beatriz Silva', '1º ano', 'ana.beatriz@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(2, 'Bruno Henrique Costa', '2º ano', 'bruno.henrique@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(3, 'Carla Fernanda Lima', '3º ano', 'carla.fernanda@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(4, 'Daniel Oliveira Souza', '1º ano', 'daniel.oliveira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(5, 'Eduarda Martins Ribeiro', '2º ano', 'eduarda.martins@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(6, 'Felipe Augusto Santos', '3º ano', 'felipe.augusto@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(7, 'Gabriela Ferreira Alves', '1º ano', 'gabriela.ferreira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(8, 'Henrique Gomes Pereira', '2º ano', 'henrique.gomes@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(9, 'Isabela Rocha Mendes', '3º ano', 'isabela.rocha@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(10, 'João Pedro Almeida', '1º ano', 'joao.pedro@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(11, 'Larissa Cristina Nunes', '2º ano', 'larissa.cristina@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(12, 'Mateus Carvalho Lima', '3º ano', 'mateus.carvalho@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(13, 'Natália Fernandes Silva', '1º ano', 'natalia.fernandes@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(14, 'Otávio Ribeiro Santos', '2º ano', 'otavio.ribeiro@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(15, 'Patrícia Oliveira Souza', '3º ano', 'patricia.oliveira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(16, 'Rafael Almeida Santos', '1º ano', 'rafael.almeida@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(17, 'Sabrina Lima Costa', '2º ano', 'sabrina.lima@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(18, 'Thiago Pereira Gomes', '3º ano', 'thiago.pereira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(19, 'Vanessa Rodrigues Silva', '1º ano', 'vanessa.rodrigues@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(20, 'Wagner Martins Oliveira', '2º ano', 'wagner.martins@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(21, 'Yasmin Santos Alves', '3º ano', 'yasmin.santos@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(22, 'Alexandre Costa Silva', '1º ano', 'alexandre.costa@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(23, 'Beatriz Fernandes Lima', '2º ano', 'beatriz.fernandes@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(24, 'Caio Henrique Santos', '3º ano', 'caio.henrique@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(25, 'Diana Oliveira Souza', '1º ano', 'diana.oliveira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(26, 'Emanuel Silva Costa', '2º ano', 'emanuel.silva@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(27, 'Fernanda Lima Santos', '3º ano', 'fernanda.lima@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(28, 'Guilherme Almeida Silva', '1º ano', 'guilherme.almeida@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(29, 'Helena Martins Santos', '2º ano', 'helena.martins@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL),
-(30, 'Igor Oliveira Costa', '3º ano', 'igor.oliveira@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL);
+(1, 'João Silva Santos', '1º ano', 'joao.silva@gmail.com', '$2y$10$UjYfAoV0huuduzU1rslgSuzYZHVUh5zJHSjJMUizmTZ8dWif7zmOW', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -155,44 +162,6 @@ CREATE TABLE `notificacoes` (
   `criado_em` timestamp NOT NULL DEFAULT current_timestamp(),
   `id_envio` varchar(36) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `notificacoes`
---
-
-INSERT INTO `notificacoes` (`id`, `id_aluno`, `titulo`, `mensagem`, `tipo`, `lida`, `criado_em`, `id_envio`) VALUES
-(379, 22, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(380, 1, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(381, 23, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(382, 2, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(383, 24, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(384, 3, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(385, 4, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(386, 25, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(387, 5, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(388, 26, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(389, 6, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(390, 27, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(391, 7, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(392, 28, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(393, 29, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(394, 8, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(395, 30, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(396, 9, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(397, 10, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(398, 11, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(399, 12, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(400, 13, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(401, 14, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(402, 15, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(403, 16, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(404, 17, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(405, 18, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(406, 19, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(407, 20, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(408, 21, 'Aviso', 'boa noite', 'aviso', 0, '2026-08-05 01:25:29', '6a7291091dd3c_1785893129'),
-(409, 1, 'Aviso', 'bom dia', 'aviso', 0, '2026-08-05 01:27:49', '6a729195aefe8_1785893269'),
-(410, 3, 'Aviso', 'vava', 'aviso', 0, '2026-08-05 01:28:02', '6a7291a2e2209_1785893282');
 
 -- --------------------------------------------------------
 
@@ -214,39 +183,7 @@ CREATE TABLE `reservas` (
 --
 
 INSERT INTO `reservas` (`id_reserva`, `id_aluno`, `titulo_item`, `data_reserva`, `data_limite`, `status`) VALUES
-(1, 1, 'O Pequeno Príncipe', '2026-08-04 19:48:46', '2026-08-11', 'aprovada'),
-(2, 2, 'Dom Casmurro', '2026-08-04 19:48:46', '2026-08-09', 'aprovada'),
-(3, 3, 'Física - Vol. 1', '2026-08-04 19:48:46', '2026-08-07', 'pendente'),
-(4, 4, 'Matemática - Vol. 2', '2026-08-04 19:48:46', '2026-08-14', 'aprovada'),
-(5, 5, 'Química Orgânica', '2026-08-04 19:48:46', '2026-08-12', 'rejeitada'),
-(6, 6, 'História do Brasil', '2026-08-04 19:48:46', '2026-08-10', 'pendente'),
-(7, 7, 'Geografia Mundial', '2026-08-04 19:48:46', '2026-08-08', 'aprovada'),
-(8, 8, 'Inglês - Intermediário', '2026-08-04 19:48:46', '2026-08-13', 'pendente'),
-(9, 9, 'Português - Gramática', '2026-08-04 19:48:46', '2026-08-11', 'aprovada'),
-(10, 10, 'Biologia - Vol. 1', '2026-08-04 19:48:46', '2026-08-09', 'rejeitada'),
-(11, 11, 'Literatura Brasileira', '2026-08-04 19:48:46', '2026-08-12', 'pendente'),
-(12, 12, 'Filosofia - Ética', '2026-08-04 19:48:46', '2026-08-07', 'aprovada'),
-(13, 13, 'Sociologia - Sociedade', '2026-08-04 19:48:46', '2026-08-10', 'pendente'),
-(14, 14, 'Arte - História da Arte', '2026-08-04 19:48:46', '2026-08-14', 'expirada'),
-(15, 15, 'Educação Física', '2026-08-04 19:48:46', '2026-08-08', 'aprovada'),
-(16, 16, 'Matemática - Vol. 3', '2026-08-04 19:48:46', '2026-08-11', 'pendente'),
-(17, 17, 'Química - Vol. 2', '2026-08-04 19:48:46', '2026-08-09', 'aprovada'),
-(18, 18, 'História Antiga', '2026-08-04 19:48:46', '2026-08-13', 'rejeitada'),
-(19, 19, 'Geografia - Clima', '2026-08-04 19:48:46', '2026-08-10', 'pendente'),
-(20, 20, 'Inglês - Avançado', '2026-08-04 19:48:46', '2026-08-07', 'aprovada'),
-(21, 21, 'Português - Redação', '2026-08-04 19:48:46', '2026-08-12', 'pendente'),
-(22, 22, 'Física - Vol. 2', '2026-08-04 19:48:46', '2026-08-14', 'expirada'),
-(23, 23, 'Biologia - Vol. 2', '2026-08-04 19:48:46', '2026-08-08', 'aprovada'),
-(24, 24, 'Literatura - Poesia', '2026-08-04 19:48:46', '2026-08-11', 'pendente'),
-(25, 25, 'Filosofia - Política', '2026-08-04 19:48:46', '2026-08-09', 'rejeitada'),
-(26, 26, 'Sociologia - Cultura', '2026-08-04 19:48:46', '2026-08-13', 'aprovada'),
-(27, 27, 'Arte - Pintura', '2026-08-04 19:48:46', '2026-08-10', 'pendente'),
-(28, 28, 'Educação Física - Esportes', '2026-08-04 19:48:46', '2026-08-07', 'aprovada'),
-(29, 29, 'Matemática - Geometria', '2026-08-04 19:48:46', '2026-08-12', 'pendente'),
-(30, 30, 'Química - Vol. 3', '2026-08-04 19:48:46', '2026-08-14', 'aprovada'),
-(31, 11, 'dad', '2026-08-04 20:08:27', '2026-08-15', 'rejeitada'),
-(32, 4, 'Blue Lock cap.11', '2026-08-04 20:16:44', '2026-08-11', 'aprovada'),
-(33, 25, 'dadddd', '2026-08-04 20:17:23', '2026-08-06', 'aprovada');
+(2, 1, 'Teste Trigger Reserva', '2026-08-05 09:07:28', '2026-08-12', 'pendente');
 
 --
 -- Acionadores `reservas`
@@ -263,6 +200,13 @@ DELIMITER ;
 --
 -- Índices para tabelas despejadas
 --
+
+--
+-- Índices de tabela `configuracoes`
+--
+ALTER TABLE `configuracoes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `chave` (`chave`);
 
 --
 -- Índices de tabela `emprestimos`
@@ -304,10 +248,16 @@ ALTER TABLE `reservas`
 --
 
 --
+-- AUTO_INCREMENT de tabela `configuracoes`
+--
+ALTER TABLE `configuracoes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT de tabela `emprestimos`
 --
 ALTER TABLE `emprestimos`
-  MODIFY `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `login_admin`
@@ -319,19 +269,19 @@ ALTER TABLE `login_admin`
 -- AUTO_INCREMENT de tabela `login_aluno`
 --
 ALTER TABLE `login_aluno`
-  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `notificacoes`
 --
 ALTER TABLE `notificacoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=411;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restrições para tabelas despejadas

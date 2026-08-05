@@ -2,47 +2,61 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
-header('Content-Type: application/json');
-
 if (!isset($_SESSION['admin_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Sessão expirada.']);
+    header('Location: login_adm.php');
     exit;
 }
 
 $db = null;
-if (isset($conn)) {
-    $db = $conn;
-} elseif (isset($conexao)) {
-    $db = $conexao;
-} elseif (isset($pdo)) {
-    $db = $pdo;
-}
+if (isset($conn)) $db = $conn;
+elseif (isset($conexao)) $db = $conexao;
+elseif (isset($pdo)) $db = $pdo;
 
 if (!$db) {
-    echo json_encode(['success' => false, 'message' => 'Erro de conexão com o banco de dados.']);
+    $_SESSION['msg_erro'] = 'Erro de conexão com o banco de dados.';
+    header('Location: pendencias_adm.php');
     exit;
 }
 
-$data = json_decode(file_get_contents('php://input'), true);
+// ========== RECEBER DADOS DO POST ==========
+$id_emprestimo = isset($_POST['id']) ? intval($_POST['id']) : 0;
+$novo_status = isset($_POST['status']) ? trim($_POST['status']) : '';
 
-$id_emprestimo = isset($data['id']) ? intval($data['id']) : 0;
-$novo_status = isset($data['status']) ? trim($data['status']) : '';
-
-if ($id_emprestimo <= 0 || !in_array($novo_status, ['devolvido', 'emprestado', 'atrasado'])) {
-    echo json_encode(['success' => false, 'message' => 'Dados inválidos.']);
+if ($id_emprestimo <= 0) {
+    $_SESSION['msg_erro'] = 'ID do empréstimo inválido.';
+    header('Location: pendencias_adm.php');
     exit;
 }
 
-// Atualiza o status do empréstimo no MySQL
+if (!in_array($novo_status, ['devolvido', 'emprestado', 'atrasado'])) {
+    $_SESSION['msg_erro'] = 'Status inválido.';
+    header('Location: pendencias_adm.php');
+    exit;
+}
+
+// ========== ATUALIZAR ==========
 $stmt = $db->prepare("UPDATE emprestimos SET status = ? WHERE id_emprestimo = ?");
-if ($stmt) {
-    $stmt->bind_param("si", $novo_status, $id_emprestimo);
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Status atualizado com sucesso.']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Erro ao atualizar no banco de dados.']);
-    }
-    $stmt->close();
-} else {
-    echo json_encode(['success' => false, 'message' => 'Erro na preparação da consulta.']);
+if (!$stmt) {
+    $_SESSION['msg_erro'] = 'Erro na preparação da consulta.';
+    header('Location: pendencias_adm.php');
+    exit;
 }
+
+$stmt->bind_param("si", $novo_status, $id_emprestimo);
+
+if ($stmt->execute()) {
+    $affected = $stmt->affected_rows;
+    if ($affected > 0) {
+        $_SESSION['msg_sucesso'] = 'Empréstimo devolvido com sucesso!';
+    } else {
+        $_SESSION['msg_erro'] = 'Nenhuma alteração foi feita. Verifique se o empréstimo existe.';
+    }
+} else {
+    $_SESSION['msg_erro'] = 'Erro ao atualizar: ' . $stmt->error;
+}
+
+$stmt->close();
+
+header('Location: pendencias_adm.php');
+exit;
+?>

@@ -1,7 +1,74 @@
 // ========== VARIÁVEIS GLOBAIS ==========
-let reservas = []; // será preenchida com reservasData no DOMContentLoaded
+let reservas = [];
 let filtroAtual = 'todos';
 let buscaAtual = '';
+let ordemAtual = 'recente';
+let notificacoes = [];
+
+// ========== FUNÇÕES AUXILIARES PARA NOTIFICAÇÕES ==========
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatarData(data) {
+    const d = new Date(data);  // <-- REMOVI O '+ "UTC"'
+    const agora = new Date();
+    const diff = Math.floor((agora - d) / 1000);
+    
+    if (diff < 60) return 'Agora pouco';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+    if (diff < 172800) return 'Ontem';
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+}
+
+function renderizarDropdownNotificacoes() {
+    const lista = document.getElementById('notification-list-dropdown');
+    if (!lista) return;
+
+    if (!notificacoes || notificacoes.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-notifications">
+                <i class="far fa-bell-slash"></i>
+                <p>Nenhuma notificação enviada</p>
+            </div>
+        `;
+        return;
+    }
+
+    lista.innerHTML = notificacoes.slice(0, 10).map(notificacao => {
+        const isPendencia = notificacao.tipo === 'pendencia';
+        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
+        const label = isPendencia ? 'Pendência' : 'Aviso';
+        
+        const totalAlunos = parseInt(notificacao.total_alunos, 10) || 0;
+        const textoAlunos = totalAlunos === 1 ? '1 aluno' : totalAlunos + ' alunos';
+        
+        return `
+            <div class="notification-item">
+                <div class="notification-icon" style="color: ${corIcon};">
+                    <i class="fas ${icone}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">
+                        <strong style="color: ${corIcon};">${label}</strong><br>
+                        ${escapeHtml(notificacao.mensagem)}
+                    </div>
+                    <div class="notification-footer">
+                        <span class="notification-date">${formatarData(notificacao.criado_em)}</span>
+                        <span class="notification-destinatarios">
+                            <i class="fas fa-users"></i> ${textoAlunos}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
 // ========== RENDERIZAR RESERVAS ==========
 function renderizarReservas() {
@@ -12,7 +79,6 @@ function renderizarReservas() {
 
     if (!tbody) return;
 
-    // Filtrar reservas
     let reservasFiltradas = reservas;
     
     if (filtroAtual !== 'todos') {
@@ -24,6 +90,21 @@ function renderizarReservas() {
         reservasFiltradas = reservasFiltradas.filter(r => 
             r.aluno && r.aluno.toLowerCase().startsWith(termo)
         );
+    }
+    
+    // ========== ORDENAR ==========
+    if (ordemAtual === 'recente') {
+        reservasFiltradas.sort((a, b) => {
+            const dataA = new Date(a.data_reserva);
+            const dataB = new Date(b.data_reserva);
+            return dataB - dataA;
+        });
+    } else {
+        reservasFiltradas.sort((a, b) => {
+            const dataA = new Date(a.data_reserva);
+            const dataB = new Date(b.data_reserva);
+            return dataA - dataB;
+        });
     }
     
     atualizarBadges();
@@ -58,8 +139,8 @@ function renderizarReservas() {
             'expirada': 'fa-clock'
         }[reserva.status] || 'fa-circle';
         
-        const dataReservaFormatada = formatarData(reserva.data_reserva);
-        const dataLimiteFormatada = formatarData(reserva.data_limite);
+        const dataReservaFormatada = formatarDataBR(reserva.data_reserva);
+        const dataLimiteFormatada = formatarDataBR(reserva.data_limite);
         const inicialAluno = reserva.aluno ? reserva.aluno.trim().charAt(0).toUpperCase() : '?';
 
         return `
@@ -82,10 +163,10 @@ function renderizarReservas() {
                 </td>
                 <td class="acoes-cell">
                     ${reserva.status === 'pendente' ? `
-                        <button class="btn-acao btn-aprovar" onclick="aprovarReserva(${reserva.id})">
+                        <button class="btn-acao btn-aprovar" onclick="confirmarAprovacao(${reserva.id}, '${escapeHtml(reserva.material)}', '${escapeHtml(reserva.aluno)}')">
                             <i class="fas fa-check"></i> Aprovar
                         </button>
-                        <button class="btn-acao btn-rejeitar" onclick="rejeitarReserva(${reserva.id})">
+                        <button class="btn-acao btn-rejeitar" onclick="confirmarRejeicao(${reserva.id}, '${escapeHtml(reserva.material)}', '${escapeHtml(reserva.aluno)}')">
                             <i class="fas fa-times"></i> Rejeitar
                         </button>
                     ` : `
@@ -97,8 +178,8 @@ function renderizarReservas() {
     }).join('');
 }
 
-// ========== FUNÇÕES AUXILIARES DE DATA (FORMATO DD/MM/AAAA) ==========
-function formatarData(dataStr) {
+// ========== FUNÇÕES AUXILIARES ==========
+function formatarDataBR(dataStr) {
     if (!dataStr) return '-';
     const dataApenas = dataStr.split(' ')[0];
     const partes = dataApenas.split('-');
@@ -106,13 +187,6 @@ function formatarData(dataStr) {
         return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
     return dataStr;
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 function atualizarBadges() {
@@ -184,6 +258,45 @@ function initFiltros() {
     }
 }
 
+// ========== ORDENAÇÃO ==========
+function initOrdenacao() {
+    const btnOrdenacao = document.getElementById('btn-ordenacao');
+    const dropdown = document.getElementById('ordenacao-dropdown');
+    const items = document.querySelectorAll('.ordenacao-item');
+    const label = document.getElementById('ordenacao-label');
+    
+    if (!btnOrdenacao || !dropdown) return;
+    
+    btnOrdenacao.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+    });
+    
+    document.addEventListener('click', function(e) {
+        if (!btnOrdenacao.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+    
+    items.forEach(item => {
+        item.addEventListener('click', function() {
+            items.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+            
+            ordemAtual = this.dataset.ordem;
+            
+            if (ordemAtual === 'recente') {
+                label.textContent = 'Mais recente';
+            } else {
+                label.textContent = 'Mais antigo';
+            }
+            
+            dropdown.classList.remove('show');
+            renderizarReservas();
+        });
+    });
+}
+
 // ========== SIDEBAR ==========
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -220,7 +333,7 @@ function initProfileDropdown() {
     });
 }
 
-// ========== NOTIFICAÇÕES ==========
+// ========== NOTIFICAÇÕES (SININHO) - SEM AJAX ==========
 function initNotifications() {
     const btn = document.getElementById('notification-btn');
     const dropdown = document.getElementById('notification-dropdown');
@@ -229,6 +342,9 @@ function initNotifications() {
     btn.addEventListener('click', (e) => {
         e.stopPropagation();
         dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            renderizarDropdownNotificacoes();
+        }
     });
 
     document.addEventListener('click', (e) => {
@@ -238,47 +354,52 @@ function initNotifications() {
     });
 }
 
-// ========== AÇÕES DE STATUS ==========
-async function alterarStatusReserva(id, novoStatus) {
-    try {
-        const response = await fetch('atualizar_status_reserva.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: id, status: novoStatus })
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            const reserva = reservas.find(r => Number(r.id) === Number(id));
-            if (reserva) {
-                reserva.status = novoStatus;
-                renderizarReservas();
-            } else {
-                location.reload();
-            }
-
-            if (novoStatus === 'aprovada') {
-                showToast('Reserva aprovada com sucesso!', 'success');
-            } else if (novoStatus === 'rejeitada') {
-                showToast('Reserva rejeitada com sucesso.', 'error');
-            }
-        } else {
-            showToast(result.message || 'Erro ao atualizar status.', 'error');
-        }
-    } catch (error) {
-        showToast('Erro de comunicação com o servidor.', 'error');
+// ========== CONFIRMAÇÃO DE APROVAÇÃO ==========
+window.confirmarAprovacao = function(id, material, aluno) {
+    if (confirm(`✅ Deseja aprovar a reserva do livro "${material}" do aluno ${aluno}?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'atualizar_status_reserva.php';
+        
+        const inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.name = 'id';
+        inputId.value = id;
+        
+        const inputStatus = document.createElement('input');
+        inputStatus.type = 'hidden';
+        inputStatus.name = 'status';
+        inputStatus.value = 'aprovada';
+        
+        form.appendChild(inputId);
+        form.appendChild(inputStatus);
+        document.body.appendChild(form);
+        form.submit();
     }
-}
-
-window.aprovarReserva = function(id) {
-    if (!confirm('Deseja aprovar esta reserva?')) return;
-    alterarStatusReserva(id, 'aprovada');
 };
 
-window.rejeitarReserva = function(id) {
-    if (!confirm('Deseja rejeitar esta reserva?')) return;
-    alterarStatusReserva(id, 'rejeitada');
+// ========== CONFIRMAÇÃO DE REJEIÇÃO ==========
+window.confirmarRejeicao = function(id, material, aluno) {
+    if (confirm(`❌ Deseja rejeitar a reserva do livro "${material}" do aluno ${aluno}?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'atualizar_status_reserva.php';
+        
+        const inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.name = 'id';
+        inputId.value = id;
+        
+        const inputStatus = document.createElement('input');
+        inputStatus.type = 'hidden';
+        inputStatus.name = 'status';
+        inputStatus.value = 'rejeitada';
+        
+        form.appendChild(inputId);
+        form.appendChild(inputStatus);
+        document.body.appendChild(form);
+        form.submit();
+    }
 };
 
 // ========== TOAST ==========
@@ -324,15 +445,21 @@ document.addEventListener('DOMContentLoaded', function() {
         reservas = reservasData;
     }
     
+    if (typeof notificacoesData !== 'undefined') {
+        notificacoes = notificacoesData;
+    }
+    
     initSidebar();
     initProfileDropdown();
     initNotifications();
     initFiltros();
+    initOrdenacao();
     
     renderizarReservas();
+    renderizarDropdownNotificacoes();
 });
 
-// ========== MENSAGENS FLASH (via SESSION) ==========
+// ========== MENSAGENS FLASH ==========
 document.addEventListener('DOMContentLoaded', function() {
     const flashMsg = document.getElementById('flash-msg');
     if (flashMsg) {

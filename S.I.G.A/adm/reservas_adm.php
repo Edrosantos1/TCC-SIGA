@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
+$config_classes = $GLOBALS['config_classes'] ?? '';
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
@@ -21,6 +22,39 @@ if (isset($conn)) {
     $db = $conexao;
 } elseif (isset($pdo)) {
     $db = $pdo;
+}
+
+// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+$notificacoes = array();
+if ($db) {
+    try {
+        $sql = "
+            SELECT 
+                n.id_envio,
+                n.titulo,
+                n.mensagem,
+                n.tipo,
+                MAX(n.criado_em) AS criado_em,
+                COUNT(DISTINCT n.id_aluno) AS total_alunos
+            FROM notificacoes n
+            WHERE n.id_envio IS NOT NULL AND n.id_envio != ''
+            GROUP BY n.id_envio, n.titulo, n.mensagem, n.tipo
+            ORDER BY criado_em DESC
+            LIMIT 5
+        ";
+
+        if ($db instanceof mysqli) {
+            $result = $db->query($sql);
+            $notificacoes = $result->fetch_all(MYSQLI_ASSOC);
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->query($sql);
+            $notificacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $notificacoes = [];
+        }
+    } catch (Exception $e) {
+        $notificacoes = [];
+    }
 }
 
 // ========== CANCELAR RESERVAS EXPIRADAS ==========
@@ -124,7 +158,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../assets/css/modal_reserva.css?v=<?= time() ?>">
 </head>
-<body>
+<body class="<?= $config_classes ?>">
 
     <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar" id="sidebar">
@@ -194,20 +228,35 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
 
+                <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
+                        <?php if (count($notificacoes) > 0): ?>
+                            <span class="badge" style="
+                                position: absolute;
+                                top: -4px;
+                                right: -4px;
+                                background: #e74c3c;
+                                color: white;
+                                font-size: 10px;
+                                font-weight: 700;
+                                min-width: 18px;
+                                height: 18px;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0 5px;
+                            "><?= count($notificacoes) ?></span>
+                        <?php endif; ?>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
                         <div class="notification-header">
-                            <h4><i class="fas fa-bell"></i> Notificações</h4>
-                            <button class="mark-read-btn">Marcar todas como lidas</button>
+                            <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
-                        <div class="notification-list" id="notification-list">
-                            <div class="empty-notifications">
-                                <i class="far fa-bell-slash"></i>
-                                <p>Nenhuma notificação</p>
-                            </div>
+                        <div class="notification-list" id="notification-list-dropdown">
+                            <!-- Preenchido via JS -->
                         </div>
                     </div>
                 </div>
@@ -218,7 +267,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         <main class="dashboard-main">
 
             <!-- ========== CABEÇALHO DA PÁGINA ========== -->
-<!-- ========== CABEÇALHO DA PÁGINA ========== -->
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-bookmark"></i> Gerenciar Reservas</h1>
@@ -266,9 +314,28 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     </button>
                 </div>
 
-                <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
-                    <span><i class="fas fa-search"></i> Buscando por: "<strong id="busca-termo"></strong>"</span>
-                    <button class="limpar-busca" id="limpar-busca"><i class="fas fa-times"></i></button>
+                <div class="filtros-acoes">
+                    <!-- ========== BOTÃO DE ORDENAÇÃO ========== -->
+                    <div class="ordenacao-wrapper">
+                        <button class="btn-ordenacao" id="btn-ordenacao" title="Ordenar reservas">
+                            <i class="fas fa-sort"></i>
+                            <span id="ordenacao-label">Mais recente</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="ordenacao-dropdown" id="ordenacao-dropdown">
+                            <button class="ordenacao-item active" data-ordem="recente">
+                                <i class="fas fa-arrow-down"></i> Mais recente
+                            </button>
+                            <button class="ordenacao-item" data-ordem="antigo">
+                                <i class="fas fa-arrow-up"></i> Mais antigo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
+                        <span><i class="fas fa-search"></i> Buscando por: "<strong id="busca-termo"></strong>"</span>
+                        <button class="limpar-busca" id="limpar-busca"><i class="fas fa-times"></i></button>
+                    </div>
                 </div>
             </div>
 
@@ -380,6 +447,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <script>
         const reservasData = <?= $reservas_json ?>;
         const alunosData = <?= $alunos_json ?>;
+        const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     </script>
 
     <!-- ========== SCRIPTS ========== -->
