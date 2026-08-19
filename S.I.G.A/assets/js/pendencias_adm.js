@@ -152,8 +152,8 @@ function renderizarPendencias() {
                 </td>
                 <td class="material-nome">${escapeHtml(pendencia.material)}</td>
                 <td><span class="tipo-badge">${escapeHtml(pendencia.tipo || 'Livro')}</span></td>
-                <td>${dataEmprestimoFormatada}</td>
-                <td>${dataLimiteFormatada}</td>
+                <td class="col-data">${dataEmprestimoFormatada}</td>
+                <td class="col-data">${dataLimiteFormatada}</td>
                 <td>
                     <span class="status-badge status-${statusClass}">
                         <i class="fas ${statusIcon}"></i>

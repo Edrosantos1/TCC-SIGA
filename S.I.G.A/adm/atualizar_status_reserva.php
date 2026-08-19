@@ -20,13 +20,21 @@ if (!$db) {
     exit;
 }
 
+/// ============================================================
+// 1. AÇÃO INDIVIDUAL (via id + acao OU id + status)
 // ============================================================
-// 1. AÇÃO INDIVIDUAL (via id + status)
-// ============================================================
-if (isset($_POST['id']) && is_numeric($_POST['id']) && isset($_POST['status'])) {
+if (isset($_POST['id']) && is_numeric($_POST['id'])) {
     $id = intval($_POST['id']);
-    $status = $_POST['status'];
-    if (!in_array($status, ['aprovada', 'rejeitada'])) {
+    $status = null;
+
+    // Verifica se veio 'status' (direto) ou 'acao' (mapeando para status)
+    if (isset($_POST['status']) && in_array($_POST['status'], ['aprovada', 'rejeitada'])) {
+        $status = $_POST['status'];
+    } elseif (isset($_POST['acao']) && in_array($_POST['acao'], ['aprovar', 'rejeitar'])) {
+        $status = ($_POST['acao'] === 'aprovar') ? 'aprovada' : 'rejeitada';
+    }
+
+    if (!$status) {
         $_SESSION['msg_erro'] = 'Status inválido.';
         header('Location: reservas_adm.php');
         exit;

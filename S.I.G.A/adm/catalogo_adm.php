@@ -19,10 +19,6 @@ if (!$db) {
     die('Erro de conexão com o banco de dados.');
 }
 
-// ========== VARIÁVEIS ==========
-$mensagem = '';
-$tipo_mensagem = '';
-
 // ========== PROCESSAR AÇÕES ==========
 $action = $_GET['action'] ?? '';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -138,220 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
     exit;
 }
 
-// --- IMPORTAÇÃO DA API (Google Books) ---
-if (isset($_POST['importar_api'])) {
-    // ========== CONFIGURAÇÃO ==========
-    $apiKey = 'SUA_CHAVE_GOOGLE_BOOKS_AQUI'; // <--- SUBSTITUA AQUI
-
-    // ========== FUNÇÃO DE BUSCA GOOGLE BOOKS ==========
-    function buscarGoogleBooks($query, $tipo, $maxResultados = 1000) {
-        global $apiKey;
-        $itens = [];
-        $startIndex = 0;
-        $maxPorPagina = 40;
-        $totalObtido = 0;
-
-        while ($totalObtido < $maxResultados) {
-            $url = "https://www.googleapis.com/books/v1/volumes?q=" . urlencode($query) . "&langRestrict=pt&maxResults=" . $maxPorPagina . "&startIndex=" . $startIndex . "&key=" . $apiKey;
-            
-            $json = @file_get_contents($url);
-            if ($json === false) break;
-            $data = json_decode($json, true);
-            
-            if (!isset($data['items']) || empty($data['items'])) break;
-
-            foreach ($data['items'] as $item) {
-                $volume = $item['volumeInfo'] ?? [];
-                
-                $titulo = $volume['title'] ?? 'Sem título';
-                $autor = isset($volume['authors']) ? implode(', ', $volume['authors']) : 'Autor desconhecido';
-                $editora = $volume['publisher'] ?? '';
-                $ano = isset($volume['publishedDate']) ? (int)substr($volume['publishedDate'], 0, 4) : null;
-                $isbn = '';
-                if (isset($volume['industryIdentifiers'])) {
-                    foreach ($volume['industryIdentifiers'] as $id) {
-                        if ($id['type'] === 'ISBN_13' || $id['type'] === 'ISBN_10') {
-                            $isbn = $id['identifier'];
-                            break;
-                        }
-                    }
-                }
-                $descricao = $volume['description'] ?? '';
-                $capa_url = $volume['imageLinks']['thumbnail'] ?? $volume['imageLinks']['smallThumbnail'] ?? '';
-
-                if (strlen($titulo) > 255) $titulo = substr($titulo, 0, 252) . '...';
-                if (strlen($autor) > 255) $autor = substr($autor, 0, 252) . '...';
-                if (strlen($editora) > 255) $editora = substr($editora, 0, 252) . '...';
-                if ($isbn && strlen($isbn) > 20) $isbn = substr($isbn, 0, 20);
-                if (strlen($descricao) > 65535) $descricao = substr($descricao, 0, 65532) . '...';
-
-                if (!empty($capa_url) && strpos($capa_url, 'http://') === 0) {
-                    $capa_url = 'https://' . substr($capa_url, 7);
-                }
-
-                $itens[] = [
-                    'titulo' => $titulo,
-                    'autor' => $autor,
-                    'tipo' => $tipo,
-                    'editora' => $editora,
-                    'ano_publicacao' => $ano,
-                    'isbn' => $isbn,
-                    'descricao' => $descricao,
-                    'quantidade' => rand(1, 5),
-                    'localizacao' => 'P' . rand(1, 10),
-                    'capa_url' => $capa_url
-                ];
-
-                $totalObtido++;
-                if ($totalObtido >= $maxResultados) break 2;
-            }
-
-            $totalItems = $data['totalItems'] ?? 0;
-            if ($startIndex + $maxPorPagina >= $totalItems) break;
-            $startIndex += $maxPorPagina;
-            sleep(0.5);
-        }
-        return $itens;
-    }
-
-    // ========== BUSCAR LIVROS E REVISTAS ==========
-    $itens = [];
-    $itens = array_merge($itens, buscarGoogleBooks('ficção', 'livro', 300));
-    $itens = array_merge($itens, buscarGoogleBooks('ciência', 'livro', 200));
-    $itens = array_merge($itens, buscarGoogleBooks('história', 'livro', 150));
-    $itens = array_merge($itens, buscarGoogleBooks('romance', 'livro', 150));
-    $itens = array_merge($itens, buscarGoogleBooks('aventura', 'livro', 100));
-    $itens = array_merge($itens, buscarGoogleBooks('fantasia', 'livro', 100));
-    $itens = array_merge($itens, buscarGoogleBooks('revista', 'revista', 50));
-    $itens = array_merge($itens, buscarGoogleBooks('magazine', 'revista', 50));
-    $itens = array_merge($itens, buscarGoogleBooks('jornal', 'revista', 50));
-
-    if (count($itens) > 1000) $itens = array_slice($itens, 0, 1000);
-
-    // ========== INSERIR NO BANCO ==========
-    $inseridos = 0;
-    $ignorados = 0;
-    $erros = 0;
-
-    try {
-        if ($db instanceof mysqli) {
-            $check = $db->query("SHOW COLUMNS FROM catalogo LIKE 'capa_url'");
-            if ($check->num_rows === 0) {
-                $db->query("ALTER TABLE catalogo ADD COLUMN capa_url VARCHAR(255) NULL");
-            }
-        } elseif ($db instanceof PDO) {
-            $stmt = $db->query("SHOW COLUMNS FROM catalogo LIKE 'capa_url'");
-            if ($stmt->rowCount() === 0) {
-                $db->exec("ALTER TABLE catalogo ADD COLUMN capa_url VARCHAR(255) NULL");
-            }
-        }
-    } catch (Exception $e) {}
-
-    $pastaCapas = __DIR__ . '/../uploads/capas/';
-    if (!is_dir($pastaCapas)) {
-        mkdir($pastaCapas, 0755, true);
-    }
-
-    foreach ($itens as $item) {
-        $existe = false;
-        try {
-            if ($db instanceof mysqli) {
-                $sql_check = "SELECT id_catalogo FROM catalogo 
-                              WHERE titulo COLLATE utf8mb4_general_ci = ? 
-                                AND autor COLLATE utf8mb4_general_ci = ?";
-                $stmt = $db->prepare($sql_check);
-                $stmt->bind_param('ss', $item['titulo'], $item['autor']);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                if ($result->num_rows > 0) $existe = true;
-                $stmt->close();
-            } elseif ($db instanceof PDO) {
-                $sql_check = "SELECT id_catalogo FROM catalogo 
-                              WHERE titulo COLLATE utf8mb4_general_ci = ? 
-                                AND autor COLLATE utf8mb4_general_ci = ?";
-                $stmt = $db->prepare($sql_check);
-                $stmt->execute([$item['titulo'], $item['autor']]);
-                if ($stmt->fetchColumn()) $existe = true;
-            }
-        } catch (Exception $e) {
-            $erros++;
-            continue;
-        }
-
-        if ($existe) {
-            $ignorados++;
-            continue;
-        }
-
-        try {
-            if ($db instanceof mysqli) {
-                $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $db->prepare($sql);
-                $stmt->bind_param('ssssisssss', 
-                    $item['titulo'], $item['autor'], $item['tipo'], $item['editora'], 
-                    $item['ano_publicacao'], $item['isbn'], $item['descricao'], 
-                    $item['quantidade'], $item['localizacao'], $item['capa_url']
-                );
-                if ($stmt->execute()) {
-                    $inseridos++;
-                    $novoId = $stmt->insert_id;
-                    if (!empty($item['capa_url'])) {
-                        $capaConteudo = @file_get_contents($item['capa_url']);
-                        if ($capaConteudo !== false) {
-                            $nomeArquivo = $novoId . '.jpg';
-                            $caminhoCompleto = $pastaCapas . $nomeArquivo;
-                            if (file_put_contents($caminhoCompleto, $capaConteudo)) {
-                                $capaLocal = 'uploads/capas/' . $nomeArquivo;
-                                $updateSql = "UPDATE catalogo SET capa_url = ? WHERE id_catalogo = ?";
-                                $updateStmt = $db->prepare($updateSql);
-                                $updateStmt->bind_param('si', $capaLocal, $novoId);
-                                $updateStmt->execute();
-                                $updateStmt->close();
-                            }
-                        }
-                    }
-                } else {
-                    $erros++;
-                }
-                $stmt->close();
-            } elseif ($db instanceof PDO) {
-                $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $db->prepare($sql);
-                $stmt->execute([
-                    $item['titulo'], $item['autor'], $item['tipo'], $item['editora'], 
-                    $item['ano_publicacao'], $item['isbn'], $item['descricao'], 
-                    $item['quantidade'], $item['localizacao'], $item['capa_url']
-                ]);
-                $inseridos++;
-                $novoId = $db->lastInsertId();
-                if (!empty($item['capa_url'])) {
-                    $capaConteudo = @file_get_contents($item['capa_url']);
-                    if ($capaConteudo !== false) {
-                        $nomeArquivo = $novoId . '.jpg';
-                        $caminhoCompleto = $pastaCapas . $nomeArquivo;
-                        if (file_put_contents($caminhoCompleto, $capaConteudo)) {
-                            $capaLocal = 'uploads/capas/' . $nomeArquivo;
-                            $updateSql = "UPDATE catalogo SET capa_url = ? WHERE id_catalogo = ?";
-                            $updateStmt = $db->prepare($updateSql);
-                            $updateStmt->execute([$capaLocal, $novoId]);
-                        }
-                    }
-                }
-            }
-        } catch (Exception $e) {
-            $erros++;
-        }
-    }
-
-    $_SESSION['flash_message'] = "Importação concluída: $inseridos inseridos, $ignorados duplicatas ignoradas, $erros erros.";
-    $_SESSION['flash_type'] = ($erros > 0) ? 'warning' : 'success';
-    header('Location: catalogo_adm.php');
-    exit;
-}
-
-// ========== RECUPERAR FLASH MESSAGE ==========
+// ========== RECUPERAR MENSAGENS FLASH ==========
+$mensagem = '';
+$tipo_mensagem = '';
 if (isset($_SESSION['flash_message'])) {
     $mensagem = $_SESSION['flash_message'];
     $tipo_mensagem = $_SESSION['flash_type'] ?? 'info';
@@ -360,7 +145,7 @@ if (isset($_SESSION['flash_message'])) {
 }
 
 // ========== PAGINAÇÃO E FILTROS ==========
-$porPagina = 20;
+$porPagina = 21;
 $paginaAtual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 $offset = ($paginaAtual - 1) * $porPagina;
 
@@ -416,7 +201,7 @@ if ($db instanceof mysqli) {
     $itens = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// ========== DADOS PARA EDIÇÃO (MODAL) ==========
+// ========== DADOS PARA EDIÇÃO ==========
 $editItem = null;
 if ($action === 'edit' && $id > 0) {
     if ($db instanceof mysqli) {
@@ -433,7 +218,7 @@ if ($action === 'edit' && $id > 0) {
     }
 }
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+// ========== BUSCAR NOTIFICAÇÕES ==========
 $notificacoes_sininho = array();
 if ($db) {
     try {
@@ -451,15 +236,12 @@ if ($db) {
             ORDER BY criado_em DESC
             LIMIT 5
         ";
-
         if ($db instanceof mysqli) {
             $result = $db->query($sql);
             $notificacoes_sininho = $result->fetch_all(MYSQLI_ASSOC);
         } elseif ($db instanceof PDO) {
             $stmt = $db->query($sql);
             $notificacoes_sininho = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $notificacoes_sininho = [];
         }
     } catch (Exception $e) {
         $notificacoes_sininho = [];
@@ -546,7 +328,7 @@ if ($db) {
                     <div class="dropdown-divider"></div>
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
-                <!-- ========== SININHO (corrigido) ========== -->
+                <!-- ========== SININHO ========== -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
@@ -579,11 +361,14 @@ if ($db) {
                 </div>
             <?php endif; ?>
 
+            <!-- IMPORTAR LIVROS -->
             <div class="catalogo-actions">
                 <div class="left">
                     <button class="btn-cadastrar" id="btn-novo-item"><i class="fas fa-plus"></i> Novo Item</button>
-                    <form method="POST" style="display:inline;" onsubmit="return confirm('Isso importará até 1000 itens da Google Books (idioma português). Pode demorar alguns segundos. Continuar?');">
-                        <button type="submit" name="importar_api" class="btn-import"><i class="fas fa-cloud-download-alt"></i> Importar da API</button>
+                    <form method="POST" action="importar_google_books.php" style="display:inline;">
+                        <button type="submit" name="importar" class="btn-import" onclick="return confirm('Importar até 1000 livros da Google Books? Isso pode demorar alguns segundos.')">
+                            <i class="fas fa-cloud-download-alt"></i> Importar 1000 livros
+                        </button>
                     </form>
                 </div>
                 <div>
@@ -591,6 +376,7 @@ if ($db) {
                 </div>
             </div>
 
+            <!-- FILTROS -->
             <div class="filtros-container">
                 <form method="GET" action="catalogo_adm.php" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; width:100%;">
                     <select name="tipo">
@@ -605,19 +391,40 @@ if ($db) {
                 </form>
             </div>
 
+            <!-- LISTA DE ITENS -->
             <?php if (empty($itens)): ?>
-                <div class="empty-state">
-                    <i class="fas fa-box-open"></i>
-                    <h3>Nenhum item encontrado</h3>
-                    <p>Cadastre novos itens ou importe da API.</p>
-                </div>
-            <?php else: ?>
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-book-open"></i>
+        </div>
+        <h3> Seu catálogo está vazio</h3>
+        <p>Comece agora mesmo! Importe livros da Google Books ou cadastre manualmente.</p>
+        <div class="empty-actions">
+            <button class="btn-cadastrar" id="btn-novo-item-empty">
+                <i class="fas fa-plus"></i> Cadastrar novo item
+            </button>
+            <form method="POST" action="importar_google_books.php" style="display:inline;">
+                <button type="submit" name="importar" class="btn-import-empty" onclick="return confirm('Importar até 1000 livros da Google Books? Isso pode demorar alguns segundos.')">
+                    <i class="fas fa-cloud-download-alt"></i> Importar da Google Books
+                </button>
+            </form>
+        </div>
+        <p class="empty-hint">💡 Dica: A importação automática traz livros com capas!</p>
+    </div>
+<?php endif; ?>
                 <div class="catalogo-grid">
                     <?php foreach ($itens as $item): ?>
                         <div class="catalogo-card" data-id="<?= $item['id_catalogo'] ?>">
                             <div class="card-capa">
                                 <?php if (!empty($item['capa_url'])): ?>
-                                    <img src="<?= htmlspecialchars($item['capa_url']) ?>" alt="Capa de <?= htmlspecialchars($item['titulo']) ?>" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-book\' style=\'font-size:48px;color:#b0c4de;\'></i>';">
+                                    <?php 
+                                    $caminhoCompleto = __DIR__ . '/../' . $item['capa_url'];
+                                    ?>
+                                    <?php if (file_exists($caminhoCompleto)): ?>
+                                        <img src="../<?= htmlspecialchars($item['capa_url']) ?>" alt="Capa" loading="lazy">
+                                    <?php else: ?>
+                                        <div class="capa-placeholder"><i class="fas fa-book"></i></div>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <div class="capa-placeholder"><i class="fas fa-book"></i></div>
                                 <?php endif; ?>
@@ -648,8 +455,6 @@ if ($db) {
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
-            <?php endif; ?>
-
         </main>
     </div>
 

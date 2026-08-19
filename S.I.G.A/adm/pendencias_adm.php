@@ -151,8 +151,10 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
     <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../assets/css/meus_emprestimos.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/pendencias_adm.css?v=<?= time() ?>">
     <script src="../assets/js/pendencias_adm.js?v=<?= time() ?>" defer></script>
+    <style>
+</style>
 </head>
 <body class="<?= $config_classes ?>">
     

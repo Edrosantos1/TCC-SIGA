@@ -1,0 +1,597 @@
+/* =============================================
+   pendencias_adm.css — SiGA ITJ Admin (espelhando reservas)
+   ============================================= */
+
+/* ========== PAGE HEADER ========== */
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0b4b9b;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-header h1 i {
+    color: #e67e22;
+}
+
+.page-subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* ========== FILTROS (idêntico ao de reservas) ========== */
+.filtros-container {
+    background: white;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filtros-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filtro-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #555;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: #f5f7fa;
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.filtro-tab:hover {
+    background: #e8edf5;
+    color: #0b4b9b;
+}
+
+.filtro-tab.active {
+    background: #0b4b9b;
+    color: white;
+    border-color: #0b4b9b;
+    box-shadow: 0 2px 8px rgba(11, 75, 155, 0.15);
+}
+
+.filtro-tab.active .tab-badge {
+    background: rgba(255,255,255,0.25);
+    color: white;
+}
+
+.tab-badge {
+    background: #e8edf5;
+    padding: 1px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+}
+
+/* Badges específicos de pendências */
+.tab-badge.atrasado {
+    background: #fef0ef;
+    color: #e74c3c;
+}
+.tab-badge.emprestado {
+    background: #eafaf1;
+    color: #27ae60;
+}
+
+.filtro-busca-ativa {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f0f7ff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #0b4b9b;
+    border: 1px solid #dbeafe;
+}
+
+.limpar-busca {
+    color: #e74c3c;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.limpar-busca:hover {
+    background: #fef0ef;
+}
+
+/* ========== TABELA ========== */
+.reservas-table-wrapper {
+    background: white;
+    border-radius: 14px;
+    overflow-x: auto;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.reservas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.reservas-table thead {
+    background: #f8faff;
+}
+
+.reservas-table thead th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #edf2f7;
+    white-space: nowrap;
+}
+
+/* Alinhamento centralizado: Tipo, Status, Ações */
+.reservas-table thead th:nth-child(3), /* Tipo */
+.reservas-table thead th:nth-child(6), /* Status */
+.reservas-table thead th:nth-child(7) { /* Ações */
+    text-align: center;
+}
+
+.reservas-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f4fd;
+    vertical-align: middle;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Célula de material flexível */
+.reservas-table tbody td.material-nome {
+    white-space: normal;
+    min-width: 160px;
+    color: #1f1f1f;
+}
+
+/* Centralização do corpo */
+.reservas-table tbody td:nth-child(3),
+.reservas-table tbody td:nth-child(6),
+.reservas-table tbody td:nth-child(7) {
+    text-align: center;
+}
+
+.reservas-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.reservas-table tbody tr:hover td {
+    background: #fafcff;
+}
+
+.pendencia-row {
+    transition: background 0.2s;
+    animation: fadeInRow 0.3s ease forwards;
+}
+
+@keyframes fadeInRow {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== ALUNO INFO ========== */
+.aluno-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.aluno-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #0b4b9b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.aluno-nome {
+    font-weight: 500;
+    color: #1f1f1f;
+}
+
+/* ========== TIPO BADGE ========== */
+.tipo-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: #eaf4ff;
+    color: #0b4b9b;
+    border: 1px solid #dbeafe;
+    display: inline-block;
+}
+
+/* ========== STATUS BADGE (espelhando reservas) ========== */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+}
+
+.status-emprestado {
+    background: #eafaf1;
+    color: #27ae60;
+    border-color: #d4f0e0;
+}
+
+.status-atrasado {
+    background: #fef0ef;
+    color: #e74c3c;
+    border-color: #fde2df;
+    animation: pulse-atrasado 2s infinite;
+}
+
+.status-devolvido {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #e2e8f0;
+}
+
+@keyframes pulse-atrasado {
+    0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.2); }
+    70% { box-shadow: 0 0 0 6px rgba(231, 76, 60, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+/* ========== AÇÕES ========== */
+.acoes-cell {
+    text-align: center;
+    white-space: nowrap !important;
+}
+
+.btn-acao {
+    border: none;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin: 0 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-aprovar {
+    background: #eafaf1;
+    color: #27ae60;
+    border: 1px solid #d4f0e0;
+}
+.btn-aprovar:hover {
+    background: #27ae60;
+    color: white;
+    border-color: #27ae60;
+    transform: scale(1.05);
+}
+
+.btn-rejeitar {
+    background: #fef0ef;
+    color: #e74c3c;
+    border: 1px solid #fde2df;
+}
+.btn-rejeitar:hover {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+.sem-acao {
+    color: #ccc;
+    font-size: 14px;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: #d1d9e6;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    color: #1f1f1f;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+/* ========== TOAST ========== */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    padding: 14px 20px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    animation: toastIn 0.4s ease forwards;
+    border: 1px solid #f0f4fd;
+}
+
+.toast-success { border-left: 3px solid #27ae60; }
+.toast-success i { color: #27ae60; }
+
+.toast-error { border-left: 3px solid #e74c3c; }
+.toast-error i { color: #e74c3c; }
+
+.toast-info { border-left: 3px solid #0b4b9b; }
+.toast-info i { color: #0b4b9b; }
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ========== ORDENAÇÃO ========== */
+.filtros-acoes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ordenacao-wrapper {
+    position: relative;
+}
+
+.btn-ordenacao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #f5f7fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-ordenacao:hover {
+    background: #e8edf5;
+    border-color: #cbd5e1;
+}
+
+.btn-ordenacao i {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.btn-ordenacao .fa-chevron-down {
+    font-size: 11px;
+    transition: transform 0.3s;
+}
+
+.ordenacao-wrapper.active .btn-ordenacao .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.ordenacao-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    min-width: 180px;
+    z-index: 100;
+    display: none;
+    overflow: hidden;
+    padding: 4px;
+}
+
+.ordenacao-dropdown.show {
+    display: block;
+}
+
+.ordenacao-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.ordenacao-item:hover {
+    background: #f1f5f9;
+}
+
+.ordenacao-item.active {
+    background: #eaf4ff;
+    color: #0b4b9b;
+}
+
+.ordenacao-item i {
+    width: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.ordenacao-item.active i {
+    color: #0b4b9b;
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filtros-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtros-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+    }
+
+    .filtro-tab {
+        white-space: nowrap;
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .reservas-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .reservas-table {
+        font-size: 13px;
+        min-width: 700px;
+    }
+
+    .reservas-table thead th,
+    .reservas-table tbody td {
+        padding: 10px 12px;
+    }
+
+    .btn-acao {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+/* ========== CORREÇÕES TEMA ESCURO - BUSCA ALUNO ========== */
+body.tema-escuro .busca-aluno-container input {
+    background: #0f1a3a !important;
+    border-color: #2a3a5e !important;
+    color: #f0f0f0 !important;
+}
+body.tema-escuro .busca-aluno-container input::placeholder {
+    color: #6a7a8a !important;
+}
+body.tema-escuro .busca-aluno-container .search-icon {
+    color: #6a7a8a !important;
+}
+
+/* ========== CORREÇÕES TEMA ALTO CONTRASTE - BUSCA ALUNO ========== */
+body.tema-alto_contraste .busca-aluno-container input {
+    background: #000000 !important;
+    border-color: #ffffff !important;
+    color: #ffffff !important;
+}
+body.tema-alto_contraste .busca-aluno-container input::placeholder {
+    color: #888888 !important;
+}
+body.tema-alto_contraste .busca-aluno-container .search-icon {
+    color: #888888 !important;
+}
+.col-data {
+    text-align: center;
+    white-space: nowrap;
+    min-width: 110px;
+}
+/* Centralizar colunas de data */
+.reservas-table thead th:nth-child(4),
+.reservas-table thead th:nth-child(5),
+.reservas-table tbody td:nth-child(4),
+.reservas-table tbody td:nth-child(5) {
+    text-align: center;
+}

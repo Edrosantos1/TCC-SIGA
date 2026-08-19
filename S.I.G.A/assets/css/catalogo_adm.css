@@ -72,8 +72,8 @@
 /* ========== GRADE DE CAPAS ========== */
 .catalogo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 28px;
     margin: 20px 0;
 }
 
@@ -82,16 +82,17 @@
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
 }
 .catalogo-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.12);
 }
 
 .card-capa {
-    height: 220px;
+    position: relative;
+    height: 280px;
     background: #f0f4fd;
     display: flex;
     align-items: center;
@@ -102,10 +103,28 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.catalogo-card:hover .card-capa img {
+    transform: scale(1.06);
 }
 .capa-placeholder {
     font-size: 48px;
     color: #b0c4de;
+}
+
+/* Badge disponível */
+.badge-disponivel {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(39, 174, 96, 0.9);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    backdrop-filter: blur(2px);
 }
 
 .card-info {
@@ -300,8 +319,11 @@
 /* ========== RESPONSIVO ========== */
 @media (max-width: 768px) {
     .catalogo-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 16px;
+    }
+    .card-capa {
+        height: 200px;
     }
     .form-grid {
         grid-template-columns: 1fr;
@@ -311,5 +333,121 @@
 @media (max-width: 480px) {
     .catalogo-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .card-capa {
+        height: 160px;
+    }
+    .card-info h4 {
+        font-size: 13px;
+    }
+    .card-info .autor {
+        font-size: 11px;
+    }
+}
+/* ========== EMPTY STATE MELHORADO ========== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 20px;
+    border: 2px dashed #d1d9e6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.empty-icon {
+    font-size: 72px;
+    color: #b0c4de;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #94a3b8;
+    font-size: 16px;
+    margin-bottom: 24px;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-import-empty {
+    background: #0b4b9b;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.btn-import-empty:hover {
+    background: #1a5aab;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(11,75,155,0.3);
+}
+
+.btn-import-empty i {
+    margin-right: 8px;
+}
+
+.btn-cadastrar {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.btn-cadastrar:hover {
+    background: #2ecc71;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39,174,96,0.3);
+}
+
+.empty-hint {
+    margin-top: 20px;
+    font-size: 13px !important;
+    color: #94a3b8 !important;
+    background: #f8faff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* Responsivo */
+@media (max-width: 480px) {
+    .empty-state {
+        padding: 40px 16px;
+        margin: 20px auto;
+    }
+    .empty-icon {
+        font-size: 48px;
+    }
+    .empty-state h3 {
+        font-size: 20px;
+    }
+    .empty-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    .empty-actions button {
+        width: 100%;
+        justify-content: center;
     }
 }
