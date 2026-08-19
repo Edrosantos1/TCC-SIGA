@@ -184,7 +184,11 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
             </a>
-            <a href="notificacoes_adm.php" class="nav-item">
+            <a href="catalogo_adm.php" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Catálogo</span>
+            </a>
+            <a href="notificacoes_adm.php" class="nav-item active">
                 <i class="fas fa-bell"></i>
                 <span>Notificações</span>
             </a>
