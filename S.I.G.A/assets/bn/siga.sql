@@ -239,7 +239,7 @@ INSERT INTO `configuracoes` (`chave`, `valor`, `descricao`) VALUES
 
 CREATE TABLE configuracoes_aluno (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
+    usuario_id BIGINT UNSIGNED NOT NULL,
     chave VARCHAR(50) NOT NULL,
     valor VARCHAR(255) NOT NULL,
     descricao VARCHAR(255),
