@@ -1006,3 +1006,362 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   animation: modalSerieSpin .7s linear infinite;
 }
 @keyframes modalSerieSpin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+
+/* ─── TABLETS E TELAS MÉDIAS ─── */
+@media (max-width: 1024px) {
+  .container form {
+    padding: 0 40px;
+  }
+  .dot-title {
+    font-size: 28px;
+  }
+  .toggle-panel {
+    padding: 0 30px;
+  }
+  .toggle-panel p {
+    font-size: 13px;
+    line-height: 20px;
+  }
+  .btn-secondary {
+    padding: 10px 30px;
+    font-size: 11px;
+  }
+}
+
+/* ─── MOBILE (≤ 768px) ─── */
+@media (max-width: 768px) {
+  /* Fundo da página */
+  body {
+    background: #021a3a;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .full-background {
+    height: auto;
+    min-height: 100vh;
+    display: block;
+    padding: 20px 15px;
+  }
+
+  /* Container principal – layout em coluna */
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    min-height: 80vh;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+    background: transparent;
+  }
+
+  /* Remove posicionamento absoluto dos formulários */
+  .form-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    opacity: 1 !important;
+    z-index: auto;
+    transition: none;
+    margin-bottom: 20px;
+  }
+
+  /* Exibe apenas o formulário ativo */
+  .sign-in {
+    display: block;
+    width: 100%;
+  }
+  .sign-up {
+    display: none;
+    width: 100%;
+  }
+  .container.active .sign-in {
+    display: none;
+  }
+  .container.active .sign-up {
+    display: block;
+  }
+
+  /* Ajuste dos formulários (cartões) */
+  .sign-in form,
+  .sign-up form {
+    padding: 30px 25px;
+    border-radius: 24px;
+    backdrop-filter: none;
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  }
+  .sign-up form {
+    background: #021a3a;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Cabeçalho fixo – reposicionado */
+  .auth-header {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 20px;
+    padding: 0;
+    justify-content: flex-start;
+    color: #ffffff;
+  }
+  .auth-header a {
+    color: #ffffff;
+  }
+  .auth-header .back-arrow:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+
+  /* Seletor de idioma – reposicionado */
+  .language-wrapper {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-end;
+    z-index: 10;
+  }
+  .language-button {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+  }
+  .language-button svg {
+    stroke: #ffffff;
+  }
+  .language-list {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Toggle (painel lateral) transformado em barra de abas */
+  .toggle-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    transform: none !important;
+    z-index: 10;
+    isolation: auto;
+    contain: none;
+    margin: 10px 0 0;
+    order: -1; /* coloca acima dos formulários */
+  }
+  .toggle {
+    width: 100%;
+    left: 0;
+    height: auto;
+    min-height: auto;
+    transform: none !important;
+    background: transparent;
+    background-image: none;
+    will-change: auto;
+    backface-visibility: visible;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+    padding: 0;
+  }
+
+  /* Remove os painéis com textos, mantém apenas os botões */
+  .toggle-panel {
+    position: relative;
+    width: auto;
+    height: auto;
+    transform: none !important;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+  }
+  .toggle-panel h1,
+  .toggle-panel p {
+    display: none;
+  }
+  .toggle-panel .btn-secondary {
+    margin: 0;
+    padding: 12px 30px;
+    font-size: 13px;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    background: transparent;
+    border-radius: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: auto;
+    min-width: 120px;
+  }
+  .toggle-panel .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  /* Botão ativo (destacar o formulário atual) */
+  .container:not(.active) .toggle-left .btn-secondary,
+  .container.active .toggle-right .btn-secondary {
+    background: #ffffff;
+    color: #021a3a;
+    border-color: #ffffff;
+  }
+
+  /* Ajuste dos elementos dentro dos formulários */
+  .input-group input,
+  .input-group select {
+    padding: 14px 45px 14px 18px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+  .input-group .icon-input,
+  .input-group .toggle-eye {
+    margin-left: -40px;
+    font-size: 1rem;
+  }
+  .dot-title {
+    font-size: 26px;
+    margin-bottom: 15px;
+  }
+  .options-group {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .btn-primary {
+    padding: 14px 0;
+    font-size: 14px;
+    border-radius: 25px;
+  }
+  .google-login-btn {
+    padding: 12px 16px;
+    font-size: 13px;
+    max-width: 240px;
+  }
+  .password-requirements {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .req-item {
+    font-size: 11px;
+    white-space: normal;
+  }
+  .strength-indicator {
+    margin: -2px 0 10px 0;
+  }
+
+  /* Modal de série – responsivo */
+  #modalSerieGoogle .modal-box {
+    padding: 28px 20px 24px 30px;
+    width: 95vw;
+    border-radius: 16px;
+  }
+  #modalSerieGoogle .grade-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  #modalSerieGoogle .grade {
+    font-size: 0.9rem;
+    padding: 8px 0;
+  }
+}
+
+/* ─── SMARTPHONES PEQUENOS (≤ 480px) ─── */
+@media (max-width: 480px) {
+  .full-background {
+    padding: 10px;
+  }
+
+  .sign-in form,
+  .sign-up form {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+  .dot-title {
+    font-size: 22px;
+  }
+  .auth-header .brand-logo {
+    font-size: 17px;
+  }
+  .auth-header .back-arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+  }
+  .input-group input,
+  .input-group select {
+    padding: 12px 38px 12px 14px;
+    font-size: 13px;
+  }
+  .input-group .icon-input,
+  .input-group .toggle-eye {
+    margin-left: -34px;
+    font-size: 0.9rem;
+  }
+  .btn-primary {
+    font-size: 13px;
+    padding: 12px 0;
+  }
+  .toggle-panel .btn-secondary {
+    padding: 10px 20px;
+    font-size: 12px;
+    min-width: 90px;
+  }
+  .google-login-btn {
+    max-width: 200px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+  .google-login-btn i {
+    font-size: 16px;
+  }
+
+  /* Ajuste do seletor de idioma */
+  .language-button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .flag {
+    width: 20px;
+    height: 16px;
+  }
+  .language-button svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Modal */
+  #modalSerieGoogle .modal-box {
+    padding: 20px 14px 20px 22px;
+  }
+  #modalSerieGoogle .grade-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  #modalSerieGoogle .grade {
+    font-size: 0.8rem;
+    padding: 6px 0;
+  }
+  #modalSerieGoogle .dot-title {
+    font-size: 1.2rem;
+  }
+  #modalSerieGoogle .modal-box p {
+    font-size: 0.8rem;
+  }
+}

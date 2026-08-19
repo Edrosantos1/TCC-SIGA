@@ -1,0 +1,247 @@
+/* =============================================
+   configuracoes_adm.css — Configurações do Admin
+   ============================================= */
+
+.config-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.config-header {
+    margin-bottom: 28px;
+}
+
+.config-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0b4b9b;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.config-header p {
+    color: #64748b;
+    font-size: 15px;
+    margin-top: 4px;
+}
+
+/* ========== CONFIG CARDS ========== */
+.config-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px 28px;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 20px;
+}
+
+.config-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0b4b9b;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.config-card .desc {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
+
+/* ========== OPÇÕES EM GRID ========== */
+.opcoes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.opcao-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #fafcff;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    position: relative;
+}
+
+.opcao-card:hover {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+}
+
+.opcao-card.active {
+    border-color: #0b4b9b;
+    background: #eaf4ff;
+    color: #0b4b9b;
+    box-shadow: 0 0 0 3px rgba(11, 75, 155, 0.1);
+}
+
+.opcao-card input[type="radio"] {
+    display: none;
+}
+
+.opcao-card i {
+    font-size: 20px;
+}
+
+.opcao-card span {
+    font-size: 12px;
+}
+
+/* ========== TOGGLE SWITCH ========== */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    position: relative;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-switch .slider {
+    width: 44px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 30px;
+    transition: all 0.3s;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.toggle-switch .slider::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: all 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch input:checked + .slider {
+    background: #0b4b9b;
+}
+
+.toggle-switch input:checked + .slider::before {
+    transform: translateX(20px);
+}
+
+.toggle-switch .toggle-label {
+    user-select: none;
+}
+
+/* ========== BOTÃO SALVAR ========== */
+.btn-salvar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px;
+    background: #0b4b9b;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-salvar:hover {
+    background: #0a3d7a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(11, 75, 155, 0.25);
+}
+
+/* ========== FLASH MESSAGES ========== */
+.flash-message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    animation: slideDown 0.4s ease forwards;
+}
+
+.flash-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+.flash-error {
+    background: #fef2f2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.flash-message i {
+    font-size: 20px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .config-card {
+        padding: 18px 16px;
+    }
+
+    .opcoes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .config-header h1 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .opcoes-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .opcao-card {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+
+    .toggle-switch {
+        font-size: 13px;
+    }
+}

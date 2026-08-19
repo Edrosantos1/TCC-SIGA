@@ -2,11 +2,11 @@
 session_start();
 
 // Se já estiver logado, redireciona
-if (isset($_SESSION['id_adm']) || isset($_SESSION['admin_id'])) {
-    header('Location: dashboard_adm.php');  // <--- ERA dashboard_admin.php (com "n" no final)
+if (isset($_SESSION['admin_id']) || isset($_SESSION['id_adm'])) {
+    header('Location: dashboard_adm.php');
     exit;
 }
-$erro = isset($_GET['erro']) ? $_GET['erro'] : '';
+$erro = isset($_GET['erro']) ? htmlspecialchars($_GET['erro']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -71,10 +71,10 @@ $erro = isset($_GET['erro']) ? $_GET['erro'] : '';
       <!-- LADO DIREITO -->
       <div class="form-container">
         
-        <!-- MENSAGEM DE ERRO ACIMA DA CAIXA BRANCA -->
+        <!-- MENSAGEM DE ERRO -->
         <?php if ($erro): ?>
-          <div class="error-message" id="error-message" style="color: #dc2626; background: rgba(220,38,38,0.08); border: 1px solid #dc2626; padding: 14px; border-radius: 8px; text-align: center;">
-            <?php echo htmlspecialchars($erro); ?>
+          <div class="error-message" id="error-message" style="color: #dc2626; background: rgba(220,38,38,0.08); border: 1px solid #dc2626; padding: 14px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+            <?= $erro ?>
           </div>
         <?php endif; ?>
 
@@ -105,7 +105,6 @@ $erro = isset($_GET['erro']) ? $_GET['erro'] : '';
     </div>
   </div>
 
-  <!-- JS -->
   <script src="../assets/js/login_adm.js"></script>
 </body>
 </html>

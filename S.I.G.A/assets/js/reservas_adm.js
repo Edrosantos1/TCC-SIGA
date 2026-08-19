@@ -14,7 +14,7 @@ function escapeHtml(text) {
 }
 
 function formatarData(data) {
-    const d = new Date(data);  // <-- REMOVI O '+ "UTC"'
+    const d = new Date(data);
     const agora = new Date();
     const diff = Math.floor((agora - d) / 1000);
     
@@ -143,8 +143,15 @@ function renderizarReservas() {
         const dataLimiteFormatada = formatarDataBR(reserva.data_limite);
         const inicialAluno = reserva.aluno ? reserva.aluno.trim().charAt(0).toUpperCase() : '?';
 
+        // Checkbox apenas para pendentes
+        const isPendente = reserva.status === 'pendente';
+        const checkboxHtml = isPendente 
+            ? `<input type="checkbox" class="checkbox-reserva" name="ids[]" value="${reserva.id}">`
+            : '';
+
         return `
             <tr class="reserva-row" data-id="${reserva.id}">
+                <td style="text-align: center;">${checkboxHtml}</td>
                 <td>
                     <div class="aluno-info">
                         <span class="aluno-avatar">${escapeHtml(inicialAluno)}</span>
@@ -176,6 +183,9 @@ function renderizarReservas() {
             </tr>
         `;
     }).join('');
+
+    // Atualizar estado dos botões de seleção em massa
+    atualizarBotoesMassa();
 }
 
 // ========== FUNÇÕES AUXILIARES ==========
@@ -354,9 +364,10 @@ function initNotifications() {
     });
 }
 
-// ========== CONFIRMAÇÃO DE APROVAÇÃO ==========
+// ========== CONFIRMAÇÃO DE APROVAÇÃO (individual) ==========
 window.confirmarAprovacao = function(id, material, aluno) {
     if (confirm(`✅ Deseja aprovar a reserva do livro "${material}" do aluno ${aluno}?`)) {
+        // Cria um form com os dados
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = 'atualizar_status_reserva.php';
@@ -366,19 +377,19 @@ window.confirmarAprovacao = function(id, material, aluno) {
         inputId.name = 'id';
         inputId.value = id;
         
-        const inputStatus = document.createElement('input');
-        inputStatus.type = 'hidden';
-        inputStatus.name = 'status';
-        inputStatus.value = 'aprovada';
+        const inputAcao = document.createElement('input');
+        inputAcao.type = 'hidden';
+        inputAcao.name = 'acao';
+        inputAcao.value = 'aprovar';
         
         form.appendChild(inputId);
-        form.appendChild(inputStatus);
+        form.appendChild(inputAcao);
         document.body.appendChild(form);
         form.submit();
     }
 };
 
-// ========== CONFIRMAÇÃO DE REJEIÇÃO ==========
+// ========== CONFIRMAÇÃO DE REJEIÇÃO (individual) ==========
 window.confirmarRejeicao = function(id, material, aluno) {
     if (confirm(`❌ Deseja rejeitar a reserva do livro "${material}" do aluno ${aluno}?`)) {
         const form = document.createElement('form');
@@ -390,17 +401,89 @@ window.confirmarRejeicao = function(id, material, aluno) {
         inputId.name = 'id';
         inputId.value = id;
         
-        const inputStatus = document.createElement('input');
-        inputStatus.type = 'hidden';
-        inputStatus.name = 'status';
-        inputStatus.value = 'rejeitada';
+        const inputAcao = document.createElement('input');
+        inputAcao.type = 'hidden';
+        inputAcao.name = 'acao';
+        inputAcao.value = 'rejeitar';
         
         form.appendChild(inputId);
-        form.appendChild(inputStatus);
+        form.appendChild(inputAcao);
         document.body.appendChild(form);
         form.submit();
     }
 };
+
+// ========== SELEÇÃO EM MASSA ==========
+function atualizarBotoesMassa() {
+    const checkboxes = document.querySelectorAll('.checkbox-reserva:checked');
+    const count = checkboxes.length;
+    const btnAprovar = document.querySelector('.btn-aprovar-massa');
+    const btnRejeitar = document.querySelector('.btn-rejeitar-massa');
+    const info = document.getElementById('selecionados-info');
+
+    if (count > 0) {
+        if (btnAprovar) btnAprovar.disabled = false;
+        if (btnRejeitar) btnRejeitar.disabled = false;
+        if (info) info.textContent = `${count} reserva${count > 1 ? 's' : ''} selecionada${count > 1 ? 's' : ''}`;
+    } else {
+        if (btnAprovar) btnAprovar.disabled = true;
+        if (btnRejeitar) btnRejeitar.disabled = true;
+        if (info) info.textContent = 'Nenhum selecionado';
+    }
+
+    // Atualiza o checkbox "selecionar todos"
+    const selecionarTodos = document.getElementById('selecionarTodos');
+    if (selecionarTodos) {
+        const todos = document.querySelectorAll('.checkbox-reserva');
+        const marcados = document.querySelectorAll('.checkbox-reserva:checked');
+        selecionarTodos.checked = todos.length > 0 && marcados.length === todos.length;
+    }
+}
+
+// ========== EVENTOS DE SELEÇÃO ==========
+document.addEventListener('DOMContentLoaded', function() {
+    // Selecionar todos
+    const selecionarTodos = document.getElementById('selecionarTodos');
+    if (selecionarTodos) {
+        selecionarTodos.addEventListener('change', function() {
+            const checked = this.checked;
+            document.querySelectorAll('.checkbox-reserva').forEach(cb => cb.checked = checked);
+            atualizarBotoesMassa();
+        });
+    }
+
+    // Mudança em qualquer checkbox
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('checkbox-reserva')) {
+            atualizarBotoesMassa();
+        }
+    });
+
+    // Interceptar submit do formulário de ações em massa
+    const formMassa = document.getElementById('formReservasMassa');
+    if (formMassa) {
+        formMassa.addEventListener('submit', function(e) {
+            const checkboxes = document.querySelectorAll('.checkbox-reserva:checked');
+            if (checkboxes.length === 0) {
+                e.preventDefault();
+                showToast('Selecione pelo menos uma reserva.', 'error');
+                return;
+            }
+            const acao = this.querySelector('button[type="submit"][name="acao"]:focus')?.value;
+            if (!acao) {
+                e.preventDefault();
+                showToast('Selecione uma ação (Aprovar ou Rejeitar).', 'error');
+                return;
+            }
+            const mensagem = acao === 'aprovar' 
+                ? `Deseja aprovar ${checkboxes.length} reserva${checkboxes.length > 1 ? 's' : ''}?`
+                : `Deseja rejeitar ${checkboxes.length} reserva${checkboxes.length > 1 ? 's' : ''}?`;
+            if (!confirm(mensagem)) {
+                e.preventDefault();
+            }
+        });
+    }
+});
 
 // ========== TOAST ==========
 function criarContainerToast() {

@@ -1,0 +1,315 @@
+/* =============================================
+   catalogo_adm.css — Estilos específicos do catálogo
+   ============================================= */
+
+/* ========== AÇÕES ========== */
+.catalogo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+.catalogo-actions .left {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.btn-import {
+    background: #0b4b9b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.btn-import:hover { background: #1a5aab; }
+.btn-import i { margin-right: 6px; }
+
+.btn-cadastrar {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.btn-cadastrar:hover { background: #2ecc71; }
+
+/* ========== FILTROS ========== */
+.filtros-container {
+    background: white;
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    border: 1px solid #f0f4fd;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.filtros-container select,
+.filtros-container input {
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+.filtros-container button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #0b4b9b;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+}
+.filtros-container button:hover { background: #1a5aab; }
+
+/* ========== GRADE DE CAPAS ========== */
+.catalogo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 24px;
+    margin: 20px 0;
+}
+
+.catalogo-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.catalogo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+.card-capa {
+    height: 220px;
+    background: #f0f4fd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.card-capa img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.capa-placeholder {
+    font-size: 48px;
+    color: #b0c4de;
+}
+
+.card-info {
+    padding: 14px 16px;
+}
+.card-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.card-info .autor {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0 0 8px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tipo-badge {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.tipo-livro { background: #dbeafe; color: #1e40af; }
+.tipo-revista { background: #fef3c7; color: #92400e; }
+.tipo-tcc { background: #d1fae5; color: #065f46; }
+
+.card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+    justify-content: flex-end;
+}
+.card-actions button {
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+.btn-editar { color: #f39c12; }
+.btn-editar:hover { background: #fef3c7; }
+.btn-excluir { color: #e74c3c; }
+.btn-excluir:hover { background: #fde2df; }
+
+/* ========== PAGINAÇÃO ========== */
+.paginacao {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+.paginacao a {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: #f0f4fd;
+    color: #0b4b9b;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.paginacao a.active {
+    background: #0b4b9b;
+    color: white;
+}
+.paginacao a:hover:not(.active) {
+    background: #d5edfd;
+}
+
+/* ========== MODAL ========== */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(3px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-container {
+    background: white;
+    border-radius: 20px;
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f4fd;
+    padding-bottom: 12px;
+}
+.modal-header h3 {
+    font-size: 20px;
+    color: #0b4b9b;
+    margin: 0;
+}
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+.modal-close:hover { color: #e74c3c; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.form-grid .full-width { grid-column: 1 / -1; }
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.form-group label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #1e293b;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0b4b9b;
+    box-shadow: 0 0 0 3px rgba(11,75,155,0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+.btn-salvar {
+    background: #0b4b9b;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.btn-salvar:hover { background: #1a5aab; }
+.btn-cancelar {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.btn-cancelar:hover { background: #7f8c8d; }
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+    .catalogo-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .modal-container { padding: 16px; }
+}
+@media (max-width: 480px) {
+    .catalogo-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

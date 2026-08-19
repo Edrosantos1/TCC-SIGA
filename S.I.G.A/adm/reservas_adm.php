@@ -24,7 +24,7 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO ==========
 $notificacoes = array();
 if ($db) {
     try {
@@ -157,6 +157,73 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
     <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../assets/css/modal_reserva.css?v=<?= time() ?>">
+    <style>
+        /* Estilos para ações em massa */
+        .acoes-massa {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8faff;
+            border-bottom: 1px solid #edf2f7;
+            border-radius: 14px 14px 0 0;
+            flex-wrap: wrap;
+        }
+        .btn-acao-massa {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-acao-massa:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .btn-aprovar-massa {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #d4f0e0;
+        }
+        .btn-aprovar-massa:not(:disabled):hover {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+            transform: scale(1.02);
+        }
+        .btn-rejeitar-massa {
+            background: #fef0ef;
+            color: #e74c3c;
+            border: 1px solid #fde2df;
+        }
+        .btn-rejeitar-massa:not(:disabled):hover {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+            transform: scale(1.02);
+        }
+        .selecionados-info {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-left: auto;
+        }
+        .reservas-table tbody td:first-child,
+        .reservas-table thead th:first-child {
+            text-align: center;
+            width: 40px;
+        }
+        .checkbox-reserva {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="<?= $config_classes ?>">
 
@@ -186,6 +253,10 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <a href="pendencias_adm.php" class="nav-item">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
+            </a>
+            <a href="catalogo_adm.php" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Catálogo</span>
             </a>
             <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
@@ -342,22 +413,37 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <!-- ========== LISTA DE RESERVAS ========== -->
             <div class="reservas-list-container">
                 <div class="reservas-table-wrapper">
-                    <table class="reservas-table">
-                        <thead>
-                            <tr>
-                                <th>Aluno</th>
-                                <th>Material</th>
-                                <th>Tipo</th>
-                                <th>Data da Reserva</th>
-                                <th>Data Limite</th>
-                                <th>Status</th>
-                                <th class="text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reservas-tbody">
-                            <!-- Renderizado via JavaScript -->
-                        </tbody>
-                    </table>
+                    <form id="formReservasMassa" method="POST" action="atualizar_status_reserva.php">
+                        <div class="acoes-massa">
+                            <button type="submit" name="acao" value="aprovar" class="btn-acao-massa btn-aprovar-massa" disabled>
+                                <i class="fas fa-check"></i> Aprovar Selecionados
+                            </button>
+                            <button type="submit" name="acao" value="rejeitar" class="btn-acao-massa btn-rejeitar-massa" disabled>
+                                <i class="fas fa-times"></i> Rejeitar Selecionados
+                            </button>
+                            <span class="selecionados-info" id="selecionados-info">Nenhum selecionado</span>
+                        </div>
+
+                        <table class="reservas-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center;">
+                                        <input type="checkbox" id="selecionarTodos">
+                                    </th>
+                                    <th>Aluno</th>
+                                    <th>Material</th>
+                                    <th>Tipo</th>
+                                    <th>Data da Reserva</th>
+                                    <th>Data Limite</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservas-tbody">
+                                <!-- Renderizado via JavaScript -->
+                            </tbody>
+                        </table>
+                    </form>
                 </div>
                 <div class="empty-state" id="empty-state" style="display: none;">
                     <i class="fas fa-inbox"></i>

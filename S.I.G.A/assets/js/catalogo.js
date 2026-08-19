@@ -1,7 +1,4 @@
-// catalogo.js
-// ===================== DADOS VINDOS DA API =====================
-let catalogItems = [];
-let isLoading = false;
+// catalogo.js - Versão com dados injetados via PHP
 
 // ===================== TRADUÇÕES DO CATÁLOGO =====================
 const catalogTranslations = {
@@ -94,18 +91,8 @@ const catalogTranslations = {
   }
 };
 
-// Mesclar com as traduções do dashboard (se existirem)
-if (typeof dashboardTranslations !== 'undefined') {
-  for (let lang in catalogTranslations) {
-    if (dashboardTranslations[lang]) {
-      Object.assign(dashboardTranslations[lang], catalogTranslations[lang]);
-    } else {
-      dashboardTranslations[lang] = catalogTranslations[lang];
-    }
-  }
-}
-
-// ===================== ESTADO =====================
+// ===================== ESTADO GLOBAL =====================
+let catalogItems = [];
 let currentItems = [];
 let displayedItems = [];
 let itemsPerPage = 12;
@@ -123,8 +110,7 @@ function getCatalogTranslation(key, lang) {
   return t[key] || key;
 }
 
-// ===================== GARANTIR FUNÇÃO DE FEEDBACK =====================
-// Se a função global do dashboard não existir, cria uma fallback simples.
+// Feedback (fallback se não existir a função global)
 if (typeof window.showFeedbackMessage !== 'function') {
   window.showFeedbackMessage = function(message) {
     const msgDiv = document.createElement('div');
@@ -144,68 +130,50 @@ if (typeof window.showFeedbackMessage !== 'function') {
   };
 }
 
-// ===================== CARREGAR DADOS DA API =====================
-async function fetchCatalog() {
-  const grid = document.getElementById('catalog-grid');
-  const empty = document.getElementById('catalog-empty');
-  const loadMoreBtn = document.getElementById('load-more-btn');
-  const lang = getCurrentLanguage();
-
-  // Exibe mensagem de carregamento
-  if (grid) {
-    grid.innerHTML = `<div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> ${getCatalogTranslation('loading', lang)}</div>`;
-  }
-  if (empty) empty.style.display = 'none';
-  if (loadMoreBtn) loadMoreBtn.style.display = 'none';
-
-  try {
-    const response = await fetch('/S.I.G.A/api/catalogo.php', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'same-origin',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.error) {
-      throw new Error(data.error);
-    }
-
-    catalogItems = data;
+// ===================== CARREGAR DADOS (INJETADOS) =====================
+function loadCatalogData() {
+  if (window.catalogData && Array.isArray(window.catalogData)) {
+    catalogItems = window.catalogData;
     currentItems = [...catalogItems];
     displayedItems = [];
+    currentPage = 0;
 
-    loadCatalogState();
-    applyFilters();
-
-    console.log('Catálogo carregado com sucesso!', catalogItems.length, 'itens');
-  } catch (error) {
-    console.error('Erro ao carregar catálogo:', error);
-    if (grid) {
-      grid.innerHTML = `<div class="loading-error"><i class="fas fa-exclamation-triangle"></i> ${getCatalogTranslation('error', lang)}</div>`;
+    // Carregar favoritos do PHP (já vem no window.favoritosPHP)
+    if (window.favoritosPHP) {
+      favorites = new Set();
+      for (let key in window.favoritosPHP) {
+        // key é "tipo_id", mas o toggle_favorito usa apenas item_id
+        // Precisamos extrair o id. O formato é "livro_1", "tcc_2", etc.
+        const parts = key.split('_');
+        const id = parseInt(parts[1]);
+        if (!isNaN(id)) favorites.add(id);
+      }
     }
-    window.showFeedbackMessage(getCatalogTranslation('error', lang));
+
+    // Carregar reservas do localStorage (se houver)
+    try {
+      const res = localStorage.getItem('catalog_reservations');
+      if (res) reservations = new Set(JSON.parse(res));
+    } catch(e) {}
+
+    renderCatalog();
+    const empty = document.getElementById('catalog-empty');
+    if (empty) empty.style.display = 'none';
+    const loadMore = document.getElementById('load-more-btn');
+    if (loadMore) loadMore.style.display = currentItems.length > itemsPerPage ? 'inline-block' : 'none';
+
+    console.log(`Catálogo carregado: ${catalogItems.length} itens.`);
+  } else {
+    console.warn('Dados do catálogo não encontrados (window.catalogData).');
+    const grid = document.getElementById('catalog-grid');
+    if (grid) {
+      grid.innerHTML = `<div class="loading-error"><i class="fas fa-exclamation-triangle"></i> ${getCatalogTranslation('error', getCurrentLanguage())}</div>`;
+    }
   }
 }
 
-// ===================== ESTADO LOCAL STORAGE =====================
-function loadCatalogState() {
-  try {
-    const fav = localStorage.getItem('catalog_favorites');
-    if (fav) favorites = new Set(JSON.parse(fav));
-    const res = localStorage.getItem('catalog_reservations');
-    if (res) reservations = new Set(JSON.parse(res));
-  } catch (e) { console.warn('Erro ao carregar estado do catálogo', e); }
-}
-
+// ===================== ESTADO LOCAL STORAGE (RESERVAS) =====================
 function saveCatalogState() {
-  localStorage.setItem('catalog_favorites', JSON.stringify([...favorites]));
   localStorage.setItem('catalog_reservations', JSON.stringify([...reservations]));
 }
 
@@ -259,8 +227,8 @@ function createItemCard(item, index, lang) {
       <div class="card-title">${item.title}</div>
       <div class="card-author">${item.author}</div>
       <div class="card-meta">
-        <span>${item.year}</span>
-        <span>${item.category}</span>
+        <span>${item.year || ''}</span>
+        <span>${item.category || ''}</span>
       </div>
       <div class="card-actions">
         <button class="btn-favorite ${isFav ? 'favorited' : ''}" data-action="favorite">
@@ -350,7 +318,7 @@ function applyFilters() {
     filtered = filtered.filter(item =>
       item.title.toLowerCase().includes(searchTerm) ||
       item.author.toLowerCase().includes(searchTerm) ||
-      item.category.toLowerCase().includes(searchTerm)
+      (item.category && item.category.toLowerCase().includes(searchTerm))
     );
   }
 
@@ -362,7 +330,7 @@ function applyFilters() {
       filtered.sort((a, b) => a.author.localeCompare(b.author));
       break;
     case 'year':
-      filtered.sort((a, b) => b.year - a.year);
+      filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
       break;
     default:
       break;
@@ -382,7 +350,7 @@ function toggleFavorite(id) {
     favorites.add(id);
     window.showFeedbackMessage('Adicionado aos favoritos');
   }
-  saveCatalogState();
+  // Atualiza o estado visual nos cards e modal
   refreshCurrentView();
 }
 
@@ -391,6 +359,7 @@ function toggleReserve(id) {
     reservations.delete(id);
     window.showFeedbackMessage('Reserva cancelada');
   } else {
+    // Verificar disponibilidade
     const item = catalogItems.find(i => i.id === id);
     if (item && !item.available) {
       window.showFeedbackMessage('Item indisponível para reserva');
@@ -404,6 +373,7 @@ function toggleReserve(id) {
 }
 
 function refreshCurrentView() {
+  // Re-renderiza a lista atual mantendo a página
   const page = currentPage;
   currentPage = 0;
   renderCatalog();
@@ -449,6 +419,7 @@ function openItemModal(id) {
   const resBtn = document.getElementById('modal-reserve-btn');
   const resText = document.getElementById('modal-reserve-text');
 
+  // Preencher dados
   if (item.cover) {
     coverImg.src = item.cover;
     coverImg.alt = item.title;
@@ -463,8 +434,8 @@ function openItemModal(id) {
 
   titleEl.textContent = item.title;
   authorEl.textContent = item.author;
-  yearEl.textContent = `Ano: ${item.year}`;
-  categoryEl.textContent = `Categoria: ${item.category}`;
+  yearEl.textContent = item.year ? `Ano: ${item.year}` : 'Ano não informado';
+  categoryEl.textContent = `Categoria: ${item.category || 'Não categorizado'}`;
   typeEl.textContent = `Tipo: ${getItemTypeLabel(item.type, lang)}`;
   descEl.textContent = item.description || 'Sem descrição disponível.';
 
@@ -476,18 +447,23 @@ function openItemModal(id) {
     availEl.className = 'availability unavailable';
   }
 
+  // Atualizar botão favoritar
   const favLabel = isFav ? getCatalogTranslation('action_favorited', lang) : getCatalogTranslation('action_favorite', lang);
   favIcon.className = isFav ? 'fas fa-heart' : 'far fa-heart';
   favText.textContent = favLabel;
   favBtn.classList.toggle('favorited', isFav);
 
+  // Atualizar botão reservar
   const resLabel = isRes ? getCatalogTranslation('action_reserved', lang) : getCatalogTranslation('action_reserve', lang);
   resText.textContent = resLabel;
   resBtn.classList.toggle('reserved', isRes);
 
+  // Configurar actions
+  // Remover listeners antigos clonando
   const newFavBtn = favBtn.cloneNode(true);
   favBtn.parentNode.replaceChild(newFavBtn, favBtn);
-  newFavBtn.addEventListener('click', () => {
+  newFavBtn.addEventListener('click', (e) => {
+    e.preventDefault();
     toggleFavorite(id);
     openItemModal(id);
   });
@@ -499,6 +475,7 @@ function openItemModal(id) {
     openItemModal(id);
   });
 
+  // Abrir modal
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -511,9 +488,13 @@ function closeItemModal() {
 
 // ===================== INICIALIZAÇÃO =====================
 document.addEventListener('DOMContentLoaded', () => {
+  // Aplicar idioma inicial
   applyCatalogLanguage(getCurrentLanguage());
-  fetchCatalog();
 
+  // Carregar dados do catálogo (injetados)
+  loadCatalogData();
+
+  // Configurar filtros
   const filterCategory = document.getElementById('filter-category');
   const filterSort = document.getElementById('filter-sort');
   const filterSearch = document.getElementById('filter-search');
@@ -529,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadMoreBtn = document.getElementById('load-more-btn');
   if (loadMoreBtn) loadMoreBtn.addEventListener('click', loadMoreItems);
 
+  // Modal
   const modalOverlay = document.getElementById('item-modal-overlay');
   const modalClose = document.getElementById('item-modal-close');
   if (modalOverlay) {
@@ -541,6 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeItemModal();
   });
 
+  // Escuta mudanças de idioma
   window.addEventListener('storage', (e) => {
     if (e.key === 'dashboard_lang') {
       const lang = e.newValue || 'pt';
@@ -548,19 +531,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Disparar evento de idioma (caso o dashboard já tenha aplicado)
   document.addEventListener('languageChanged', (e) => {
     applyCatalogLanguage(e.detail.lang);
   });
 
-  console.log('%cCatálogo SiGA ITJ carregado!', 'color: #0b4b9b; font-weight: bold;');
+  console.log('%cCatálogo SiGA ITJ carregado com dados unificados!', 'color: #0b4b9b; font-weight: bold;');
 });
 
 // ===================== APLICA IDIOMA =====================
 function applyCatalogLanguage(lang) {
   const t = catalogTranslations[lang] || catalogTranslations.pt;
 
-  document.getElementById('catalog-title').textContent = t.catalog_title;
-  document.getElementById('catalog-subtitle').textContent = t.catalog_subtitle;
+  const title = document.getElementById('catalog-title');
+  const subtitle = document.getElementById('catalog-subtitle');
+  if (title) title.textContent = t.catalog_title;
+  if (subtitle) subtitle.textContent = t.catalog_subtitle;
 
   const catLabel = document.getElementById('filter-category-label');
   if (catLabel) catLabel.textContent = t.filter_category;
@@ -570,8 +556,7 @@ function applyCatalogLanguage(lang) {
 
   const catSelect = document.getElementById('filter-category');
   if (catSelect) {
-    const options = catSelect.options;
-    for (let opt of options) {
+    for (let opt of catSelect.options) {
       const val = opt.value;
       if (val === 'all') opt.textContent = t.filter_all;
       else if (val === 'book') opt.textContent = t.filter_books;
@@ -582,8 +567,7 @@ function applyCatalogLanguage(lang) {
 
   const sortSelect = document.getElementById('filter-sort');
   if (sortSelect) {
-    const options = sortSelect.options;
-    for (let opt of options) {
+    for (let opt of sortSelect.options) {
       const val = opt.value;
       if (val === 'relevance') opt.textContent = t.sort_relevance;
       else if (val === 'title') opt.textContent = t.sort_title;
@@ -601,11 +585,36 @@ function applyCatalogLanguage(lang) {
   const loadBtn = document.getElementById('load-more-btn');
   if (loadBtn) loadBtn.textContent = t.load_more;
 
-  if (catalogItems.length > 0) {
-    refreshCurrentView();
+  // Atualizar textos dos cards já renderizados
+  document.querySelectorAll('.catalog-item-card').forEach(card => {
+    const id = parseInt(card.dataset.id);
+    const item = catalogItems.find(i => i.id === id);
+    if (!item) return;
+    const isFav = favorites.has(id);
+    const isRes = reservations.has(id);
+    const favSpan = card.querySelector('.btn-favorite span');
+    const resSpan = card.querySelector('.btn-reserve span');
+    if (favSpan) {
+      favSpan.textContent = isFav ? t.action_favorited : t.action_favorite;
+    }
+    if (resSpan) {
+      resSpan.textContent = isRes ? t.action_reserved : t.action_reserve;
+    }
+    const typeBadge = card.querySelector('.card-type-badge');
+    if (typeBadge) {
+      typeBadge.textContent = getItemTypeLabel(item.type, lang);
+    }
+  });
+
+  // Se houver modal aberto, atualizar também
+  const modalTitle = document.getElementById('modal-title');
+  if (modalTitle) {
+    // Não temos contexto do item atual, mas podemos ignorar ou atualizar somente se aberto
   }
 }
 
+// ===================== INTEGRAÇÃO COM O SELETOR DE IDIOMA GLOBAL =====================
+// Se a função applyDashboardLanguage existir, estendemos
 if (typeof applyDashboardLanguage === 'function') {
   const originalApply = applyDashboardLanguage;
   window.applyDashboardLanguage = function(lang) {

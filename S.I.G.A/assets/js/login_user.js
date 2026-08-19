@@ -885,20 +885,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // O prompt só funciona se for chamado por interação do usuário (clique)
     try {
       google.accounts.id.disableAutoSelect();
-      // IMPORTANTE: passar um callback para saber quando o Google
-      // decide NÃO exibir o prompt (isso acontece de forma silenciosa,
-      // sem erro nenhum, então sem esse callback fica impossível saber
-      // o motivo — é o que estava fazendo parecer que "nada acontece").
-      google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          console.warn("⚠️ Prompt NÃO exibido. Motivo:", notification.getNotDisplayedReason());
-          mostrarErroGoogle("Não foi possível abrir a seleção de conta do Google. Verifique se cookies de terceiros estão habilitados, ou tente pelo botão do Google diretamente.");
-        } else if (notification.isSkippedMoment()) {
-          console.warn("⚠️ Prompt pulado. Motivo:", notification.getSkippedReason());
-        } else if (notification.isDismissedMoment()) {
-          console.log("ℹ️ Prompt fechado pelo usuário. Motivo:", notification.getDismissedReason());
-        }
-      });
+      google.accounts.id.prompt();
       console.log("📱 Prompt do Google acionado.");
     } catch (e) {
       console.error("❌ Erro ao chamar prompt:", e);

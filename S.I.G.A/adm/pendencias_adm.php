@@ -185,6 +185,10 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
                 <?php endif; ?>
             </a>
+            <a href="catalogo_adm.php" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Catálogo</span>
+            </a>
             <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
                 <span>Notificações</span>

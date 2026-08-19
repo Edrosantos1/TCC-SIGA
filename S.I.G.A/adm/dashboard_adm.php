@@ -155,6 +155,10 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
             </a>
+            <a href="catalogo_adm.php" class="nav-item">
+                <i class="fas fa-book"></i>
+                <span>Catálogo</span>
+            </a>
             <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
                 <span>Notificações</span>
