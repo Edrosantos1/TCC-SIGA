@@ -145,7 +145,7 @@ if (isset($_SESSION['flash_message'])) {
 }
 
 // ========== PAGINAÇÃO E FILTROS ==========
-$porPagina = 21;
+$porPagina = 20;
 $paginaAtual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 $offset = ($paginaAtual - 1) * $porPagina;
 

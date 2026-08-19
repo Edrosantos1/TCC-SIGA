@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
-set_time_limit(600);
+set_time_limit(0); // sem limite de tempo
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -17,18 +17,23 @@ if (!$db) {
 
 // ========== CONFIGURAÇÕES ==========
 $apiKey = 'AIzaSyDyeeGS6sl3jIX8n-eGoGKY4dtxNtpqeOw';
-$maxItens = 1000;
+$maxItens = 600; // meta
 $termos = [
     'literatura brasileira', 'romance', 'ficção científica', 'aventura',
     'história do brasil', 'biografia', 'poesia', 'filosofia',
     'educação', 'ciência', 'tecnologia', 'arte', 'culinária',
-    'autoajuda', 'religião', 'revista', 'magazine'
+    'autoajuda', 'religião', 'revista', 'magazine',
+    'contos', 'crônicas', 'teatro', 'ensaio', 'psicologia',
+    'sociologia', 'política', 'economia', 'direito', 'medicina',
+    'saúde', 'esporte', 'viagem', 'infantil', 'juvenil',
+    'quadrinhos', 'gibi', 'mangá', 'hq', 'terror', 'suspense'
 ];
 
 $inseridos = 0;
 $ignorados = 0;
 $capasBaixadas = 0;
 $capasFalhas = 0;
+$totalRetornados = 0;
 
 // ========== CRIAR PASTA PARA CAPAS ==========
 $pastaCapas = __DIR__ . '/../assets/capas/';
@@ -45,6 +50,7 @@ function baixarCapa($url, $id) {
     $nome = $id . '.' . $ext;
     $caminho = $pastaCapas . $nome;
     
+    // Tenta com file_get_contents
     $conteudo = @file_get_contents($url);
     if ($conteudo === false) {
         $ch = curl_init();
@@ -67,20 +73,35 @@ function baixarCapa($url, $id) {
     return null;
 }
 
-// ========== FUNÇÃO PARA BUSCAR LIVROS ==========
-function buscarGoogleBooks($termo, $startIndex = 0, $max = 40) {
+// ========== FUNÇÃO PARA BUSCAR GOOGLE BOOKS COM RETRY ==========
+function buscarGoogleBooks($termo, $startIndex = 0, $max = 40, $tentativas = 3) {
     global $apiKey;
     $url = "https://www.googleapis.com/books/v1/volumes?q=" . urlencode($termo) . "&startIndex={$startIndex}&maxResults={$max}&langRestrict=pt&key=" . $apiKey;
     
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    
-    return json_decode($response, true);
+    for ($t = 0; $t < $tentativas; $t++) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode == 200) {
+            $data = json_decode($response, true);
+            if (isset($data['items']) && count($data['items']) > 0) {
+                return $data;
+            } else {
+                // Nenhum item, mas resposta ok
+                return $data;
+            }
+        } else {
+            // Erro, espera e tenta novamente
+            sleep(2 * ($t + 1));
+        }
+    }
+    return null; // falhou todas as tentativas
 }
 
 echo "<h2>📚 Importando até $maxItens livros da Google Books...</h2>";
@@ -90,14 +111,25 @@ flush();
 // ========== LOOP DE IMPORTAÇÃO ==========
 foreach ($termos as $termo) {
     if ($inseridos >= $maxItens) break;
+    
     $start = 0;
     $maxPorPagina = 40;
+    $maxPaginasPorTermo = 15; // 15 * 40 = 600 itens por termo (mas limitamos pelo total)
+    $paginas = 0;
     
-    while ($inseridos < $maxItens && $start < 200) {
+    while ($inseridos < $maxItens && $paginas < $maxPaginasPorTermo) {
         $data = buscarGoogleBooks($termo, $start, $maxPorPagina);
-        if (empty($data['items'])) break;
+        if (!$data || empty($data['items'])) {
+            // Se não veio nenhum item, pula para o próximo termo
+            break;
+        }
         
-        foreach ($data['items'] as $item) {
+        $items = $data['items'];
+        $totalRetornados += count($items);
+        echo "<p>🔍 Termo '<strong>" . htmlspecialchars($termo) . "</strong>' – página " . ($paginas+1) . " – retornou " . count($items) . " itens.</p>";
+        flush();
+        
+        foreach ($items as $item) {
             if ($inseridos >= $maxItens) break;
             
             $info = $item['volumeInfo'] ?? [];
@@ -116,10 +148,11 @@ foreach ($termos as $termo) {
                 $autor = substr($autor, 0, 252) . '...';
             }
             
-            // ========== VERIFICAR DUPLICATA ==========
+            // ========== VERIFICAR DUPLICATA (somente por título, mais flexível) ==========
             $existe = false;
-            $stmt = $db->prepare("SELECT id_catalogo FROM catalogo WHERE titulo = ? AND autor = ?");
-            $stmt->bind_param('ss', $titulo, $autor);
+            // Busca por título exato ou similar (pode ser case-insensitive)
+            $stmt = $db->prepare("SELECT id_catalogo FROM catalogo WHERE titulo = ?");
+            $stmt->bind_param('s', $titulo);
             $stmt->execute();
             if ($stmt->get_result()->num_rows > 0) $existe = true;
             $stmt->close();
@@ -189,12 +222,23 @@ foreach ($termos as $termo) {
                 $statusCapa = $capaLocal ? '🖼️' : '📖';
                 echo "<p>✅ $inseridos – " . htmlspecialchars($titulo) . " " . $statusCapa . "</p>";
                 flush();
+            } else {
+                // erro no insert
+                echo "<p>❌ Erro ao inserir: " . htmlspecialchars($titulo) . "</p>";
+                flush();
             }
             $stmt->close();
         }
+        
         $start += $maxPorPagina;
-        sleep(1);
+        $paginas++;
+        
+        // Pequena pausa entre páginas para não sobrecarregar a API
+        usleep(300000); // 0.3 segundos
     }
+    
+    // Pausa entre termos
+    sleep(1);
 }
 
 // ========== FINALIZAR ==========
@@ -202,6 +246,7 @@ echo "<hr>";
 echo "<h2 style='color:green;'>✅ Importação concluída!</h2>";
 echo "<p><strong>Inseridos:</strong> $inseridos</p>";
 echo "<p><strong>Ignorados (duplicatas):</strong> $ignorados</p>";
+echo "<p><strong>Total retornados pela API:</strong> $totalRetornados</p>";
 echo "<p><strong>Capas baixadas:</strong> $capasBaixadas</p>";
 echo "<p><strong>Capas com falha:</strong> $capasFalhas</p>";
 
