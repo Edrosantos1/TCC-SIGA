@@ -24,7 +24,18 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO ==========
+// ============================================
+// ARQUIVAMENTO AUTOMÁTICO (corrigido – sem loop)
+// ============================================
+if (file_exists(__DIR__ . '/executar_arquivamento.php')) {
+    if (!isset($_SESSION['_arquivamento_executado'])) {
+        $_SESSION['_arquivamento_executado'] = true;
+        $arquivou = include __DIR__ . '/executar_arquivamento.php';
+        unset($_SESSION['_arquivamento_executado']);
+    }
+}
+
+// ========== BUSCAR NOTIFICAÇÕES ==========
 $notificacoes = array();
 if ($db) {
     try {
@@ -66,20 +77,18 @@ if (file_exists(__DIR__ . '/cancelar_reservas_expiradas.php')) {
 $reservas = array();
 
 if ($db) {
-    $query = "
-        SELECT 
-            r.id_reserva AS id,
-            l.nome_aluno AS aluno,
-            r.id_aluno,
-            r.titulo_item AS material,
-            'Livro' AS tipo,
-            r.data_reserva,
-            r.data_limite,
-            r.status
-        FROM reservas r
-        INNER JOIN login_aluno l ON r.id_aluno = l.id_aluno
-    ";
-    
+$query = "
+    SELECT 
+        r.id_reserva AS id,
+        l.nome_aluno AS aluno,
+        r.id_aluno,
+        r.titulo_item AS material,
+        r.data_reserva,
+        r.data_limite,
+        r.status
+    FROM reservas r
+    INNER JOIN login_aluno l ON r.id_aluno = l.id_aluno
+";
     if ($filtro_aluno_id > 0) {
         $query .= " WHERE r.id_aluno = " . intval($filtro_aluno_id);
     }
@@ -104,6 +113,7 @@ $total_pendentes = 0;
 $total_aprovadas = 0;
 $total_rejeitadas = 0;
 $total_expiradas = 0;
+$total_retiradas = 0;
 
 foreach ($reservas as $r) {
     if ($r['status'] === 'pendente') {
@@ -114,13 +124,15 @@ foreach ($reservas as $r) {
         $total_rejeitadas++;
     } elseif ($r['status'] === 'expirada') {
         $total_expiradas++;
+    } elseif ($r['status'] === 'retirada') {
+        $total_retiradas++;
     }
 }
 
 $total_geral = count($reservas);
 $reservas_json = json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-// ========== CARREGAR TODOS OS ALUNOS PARA O JS ==========
+// ========== CARREGAR ALUNOS ==========
 $alunos = array();
 if ($db) {
     $sql_alunos = "SELECT id_aluno, nome_aluno, serie_aluno FROM login_aluno ORDER BY nome_aluno";
@@ -158,7 +170,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../assets/css/modal_reserva.css?v=<?= time() ?>">
     <style>
-        /* Estilos para ações em massa */
         .acoes-massa {
             display: flex;
             align-items: center;
@@ -223,12 +234,73 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             height: 16px;
             cursor: pointer;
         }
+        .aviso-arquivamento {
+            position: relative;
+            background: #f0f7ff;
+            border-left: 4px solid #0b4b9b;
+            padding: 12px 44px 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .aviso-arquivamento i {
+            color: #0b4b9b;
+            font-size: 20px;
+        }
+        .aviso-arquivamento span {
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .aviso-arquivamento a {
+            color: #0b4b9b;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .aviso-arquivamento a:hover {
+            text-decoration: underline;
+        }
+        .fechar-aviso {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        .fechar-aviso:hover {
+            background: rgba(11, 75, 155, 0.08);
+            color: #0b4b9b;
+        }
+        .btn-arquivar {
+            background: #f0f4fd;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #0b4b9b;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-arquivar:hover {
+            background: #dbe7f9;
+        }
     </style>
 </head>
 <body class="<?= $config_classes ?>">
 
     <!-- ========== SIDEBAR ========== -->
-    <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
@@ -245,24 +317,26 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="reservas_adm.php" class="nav-item active">
+            <a href="reservas_adm.php" class="nav-item">
                 <i class="fas fa-bookmark"></i>
                 <span>Reservas</span>
-                <span class="nav-badge" id="reservas-badge"><?= $total_pendentes ?></span>
             </a>
-            <a href="pendencias_adm.php" class="nav-item">
+            <a href="pendencias_adm.php" class="nav-item active">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
+                <?php if ($total_atrasados > 0): ?>
+                    <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
+                <?php endif; ?>
             </a>
             <a href="catalogo_adm.php" class="nav-item">
                 <i class="fas fa-book"></i>
                 <span>Catálogo</span>
             </a>
+            <a href="extrato_adm.php" class="nav-item"><i class="fas fa-history"></i><span>Extrato</span></a>
             <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
                 <span>Notificações</span>
             </a>
-            <div class="nav-divider"></div>
             <a href="logout_adm.php" class="nav-item nav-logout">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>
@@ -299,7 +373,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
 
-                <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
+                <!-- NOTIFICAÇÕES -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
@@ -326,9 +400,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                         <div class="notification-header">
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
-                        <div class="notification-list" id="notification-list-dropdown">
-                            <!-- Preenchido via JS -->
-                        </div>
+                        <div class="notification-list" id="notification-list-dropdown"></div>
                     </div>
                 </div>
             </div>
@@ -354,10 +426,25 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <i class="fas fa-times"></i> Limpar Filtro
                         </a>
                     <?php endif; ?>
+                    <a href="executar_arquivamento.php" class="btn-arquivar">
+                        <i class="fas fa-archive"></i> Arquivar Agora
+                    </a>
                     <button class="btn-primary" id="btn-nova-reserva">
                         <i class="fas fa-plus"></i> Nova Reserva Manual
                     </button>
                 </div>
+            </div>
+
+            <!-- AVISO DE ARQUIVAMENTO -->
+            <div class="aviso-arquivamento" id="avisoArquivamento">
+                <i class="fas fa-info-circle"></i>
+                <span>
+                    <strong>Arquivamento mensal:</strong> As reservas com status diferente de <strong>"pendente"</strong> serão movidas para o 
+                    <a href="extrato_adm.php">Extrato</a> automaticamente quando completar 1 mês desde o último arquivamento.
+                </span>
+                <button class="fechar-aviso" onclick="document.getElementById('avisoArquivamento').style.display='none'" title="Fechar">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <!-- ========== FILTROS ========== -->
@@ -383,10 +470,13 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                         <i class="fas fa-clock"></i> Expiradas
                         <span class="tab-badge expirada" id="badge-expirada"><?= $total_expiradas ?></span>
                     </button>
+                    <button class="filtro-tab" data-status="retirada">
+                        <i class="fas fa-hand-holding-heart"></i> Retiradas
+                        <span class="tab-badge retirada" id="badge-retirada"><?= $total_retiradas ?></span>
+                    </button>
                 </div>
 
                 <div class="filtros-acoes">
-                    <!-- ========== BOTÃO DE ORDENAÇÃO ========== -->
                     <div class="ordenacao-wrapper">
                         <button class="btn-ordenacao" id="btn-ordenacao" title="Ordenar reservas">
                             <i class="fas fa-sort"></i>
@@ -455,7 +545,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         </main>
     </div>
 
-    <!-- ========== MODAL NOVA RESERVA (COM BUSCA LOCAL) ========== -->
+    <!-- ========== MODAL NOVA RESERVA ========== -->
     <div class="modal-overlay" id="modalReserva">
         <div class="modal-reserva">
             <div class="modal-header">
@@ -466,7 +556,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             </div>
             <form id="formNovaReserva" method="POST" action="salvar_reserva_manual.php">
                 <div class="modal-body">
-                    <!-- Busca de Aluno -->
                     <div class="form-group">
                         <label>Buscar Aluno <span class="required">*</span></label>
                         <div class="busca-aluno-container">
@@ -485,12 +574,10 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                         </div>
                         <input type="hidden" id="idAlunoSelecionado" name="id_aluno" value="">
                     </div>
-                    <!-- Material -->
                     <div class="form-group">
                         <label>Material <span class="required">*</span></label>
                         <input type="text" name="material" id="materialReserva" placeholder="Ex: O Pequeno Príncipe, Física Vol. 1" required />
                     </div>
-                    <!-- Tipo -->
                     <div class="form-group">
                         <label>Tipo de Material</label>
                         <select name="tipo" id="tipoMaterial">
@@ -502,7 +589,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <option value="Outro">📦 Outro</option>
                         </select>
                     </div>
-                    <!-- Data Limite -->
                     <div class="form-group">
                         <label>Data Limite <span class="required">*</span></label>
                         <input type="date" name="data_limite" id="dataLimite" required />

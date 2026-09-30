@@ -9,6 +9,7 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 $nome_bibliotecaria = isset($_SESSION['admin_nome']) ? $_SESSION['admin_nome'] : 'Bibliotecária';
+$total_atrasados = isset($total_atrasados) ? (int)$total_atrasados : 0;
 
 // ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
@@ -39,74 +40,52 @@ if ($db) {
         $alunos = array();
     }
 }
-
 $alunos_json = json_encode($alunos);
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+// ========== NOTIFICAÇÕES DO SININHO ==========
 $notificacoes_sininho = array();
 if ($db) {
     try {
         $sql = "
-            SELECT 
-                n.id_envio,
-                n.titulo,
-                n.mensagem,
-                n.tipo,
-                MAX(n.criado_em) AS criado_em,
-                COUNT(DISTINCT n.id_aluno) AS total_alunos
+            SELECT n.id_envio, n.titulo, n.mensagem, n.tipo,
+                   MAX(n.criado_em) AS criado_em,
+                   COUNT(DISTINCT n.id_aluno) AS total_alunos
             FROM notificacoes n
             WHERE n.id_envio IS NOT NULL AND n.id_envio != ''
             GROUP BY n.id_envio, n.titulo, n.mensagem, n.tipo
             ORDER BY criado_em DESC
             LIMIT 5
         ";
-
         if ($db instanceof mysqli) {
             $result = $db->query($sql);
             $notificacoes_sininho = $result->fetch_all(MYSQLI_ASSOC);
         } elseif ($db instanceof PDO) {
             $stmt = $db->query($sql);
             $notificacoes_sininho = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $notificacoes_sininho = [];
         }
     } catch (Exception $e) {
         $notificacoes_sininho = [];
     }
 }
 
-// ========== BUSCAR HISTÓRICO COM FILTROS ==========
+// ========== HISTÓRICO COM FILTROS ==========
 $historico = array();
 if ($db) {
     try {
         $filtro_data = '';
         switch ($periodo_filtro) {
-            case 'hoje':
-                $filtro_data = "AND DATE(n.criado_em) = CURDATE()";
-                break;
-            case 'semana':
-                $filtro_data = "AND n.criado_em >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
-                break;
-            case 'mes':
-                $filtro_data = "AND n.criado_em >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
-                break;
-            case 'todo':
-            default:
-                $filtro_data = "";
-                break;
+            case 'hoje':   $filtro_data = "AND DATE(n.criado_em) = CURDATE()"; break;
+            case 'semana': $filtro_data = "AND n.criado_em >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"; break;
+            case 'mes':    $filtro_data = "AND n.criado_em >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)"; break;
+            default:       $filtro_data = ""; break;
         }
-
         $order_by = ($ordenacao_filtro === 'mais_antigo') ? 'ASC' : 'DESC';
 
         $sql = "
-            SELECT 
-                n.id_envio,
-                n.titulo,
-                n.mensagem,
-                n.tipo,
-                MAX(n.criado_em) AS criado_em,
-                COUNT(DISTINCT n.id_aluno) AS total_alunos,
-                GROUP_CONCAT(DISTINCT l.nome_aluno SEPARATOR ', ') AS alunos_nomes
+            SELECT n.id_envio, n.titulo, n.mensagem, n.tipo,
+                   MAX(n.criado_em) AS criado_em,
+                   COUNT(DISTINCT n.id_aluno) AS total_alunos,
+                   GROUP_CONCAT(DISTINCT l.nome_aluno SEPARATOR ', ') AS alunos_nomes
             FROM notificacoes n
             INNER JOIN login_aluno l ON n.id_aluno = l.id_aluno
             WHERE n.id_envio IS NOT NULL AND n.id_envio != '' {$filtro_data}
@@ -114,22 +93,15 @@ if ($db) {
             ORDER BY criado_em {$order_by}
             LIMIT 100
         ";
-
         if ($db instanceof mysqli) {
             $result = $db->query($sql);
             $historico = $result->fetch_all(MYSQLI_ASSOC);
         } elseif ($db instanceof PDO) {
             $stmt = $db->query($sql);
             $historico = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $historico = [];
         }
-
         foreach ($historico as &$item) {
             $item['total_alunos'] = (int)$item['total_alunos'];
-            if ($item['total_alunos'] > 5) {
-                $item['alunos_nomes'] = 'Todos os alunos';
-            }
             $item['id'] = $item['id_envio'];
         }
         unset($item);
@@ -138,7 +110,6 @@ if ($db) {
     }
 }
 
-// ========== MENSAGENS FLASH ==========
 $msg_sucesso = $_SESSION['msg_sucesso'] ?? null;
 $msg_erro = $_SESSION['msg_erro'] ?? null;
 unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
@@ -160,9 +131,19 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         const notificacoesData = <?= json_encode($notificacoes_sininho) ?>;
     </script>
     <script src="../assets/js/notificacoes_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/dashboard_adm.css?v=<?= time() ?>">
+<link rel="stylesheet" href="../assets/css/notificacoes_adm.css?v=<?= time() ?>">
+<link rel="stylesheet" href="../assets/css/ui_alerts.css?v=<?= time() ?>">   <!-- NOVO -->
+
+<script>
+    const alunosData = <?= $alunos_json ?>;
+    const notificacoesData = <?= json_encode($notificacoes_sininho) ?>;
+</script>
+<script src="../assets/js/ui_alerts.js?v=<?= time() ?>"></script>            <!-- NOVO: ANTES dos outros -->
+<script src="../assets/js/notificacoes_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="<?= $config_classes ?>">
-    
+
     <!-- ========== SIDEBAR ========== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -177,44 +158,28 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         </div>
 
         <nav class="sidebar-nav" id="sidebar-nav">
-            <a href="dashboard_adm.php" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="reservas_adm.php" class="nav-item">
-                <i class="fas fa-bookmark"></i>
-                <span>Reservas</span>
-            </a>
+            <a href="dashboard_adm.php" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+            <a href="reservas_adm.php" class="nav-item"><i class="fas fa-bookmark"></i><span>Reservas</span></a>
             <a href="pendencias_adm.php" class="nav-item">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>Pendências</span>
+                <i class="fas fa-exclamation-circle"></i><span>Pendências</span>
+                <?php if ($total_atrasados > 0): ?>
+                    <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
+                <?php endif; ?>
             </a>
-            <a href="catalogo_adm.php" class="nav-item">
-                <i class="fas fa-book"></i>
-                <span>Catálogo</span>
-            </a>
-            <a href="notificacoes_adm.php" class="nav-item active">
-                <i class="fas fa-bell"></i>
-                <span>Notificações</span>
-            </a>
-            <div class="nav-divider"></div>
-            <a href="logout_adm.php" class="nav-item nav-logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sair</span>
-            </a>
+            <a href="catalogo_adm.php" class="nav-item"><i class="fas fa-book"></i><span>Catálogo</span></a>
+            <a href="extrato_adm.php" class="nav-item"><i class="fas fa-history"></i><span>Extrato</span></a>
+            <a href="notificacoes_adm.php" class="nav-item active"><i class="fas fa-bell"></i><span>Notificações</span></a>
+            <a href="logout_adm.php" class="nav-item nav-logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
         </nav>
     </aside>
 
     <!-- ========== CONTEÚDO PRINCIPAL ========== -->
     <div class="main-content">
 
-        <!-- ========== TOP HEADER ========== -->
         <header class="top-header">
             <div class="header-right" style="width: 100%; justify-content: flex-end;">
                 <div class="admin-profile" id="admin-profile-btn">
-                    <div class="admin-avatar">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
+                    <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
                     <div class="admin-info">
                         <span class="admin-label">Administradora</span>
                         <strong class="admin-name"><?= htmlspecialchars($nome_bibliotecaria) ?></strong>
@@ -229,66 +194,35 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
 
-                <!-- ========== SININHO ========== -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
                         <?php if (count($notificacoes_sininho) > 0): ?>
-                            <span class="badge" style="
-                                position: absolute;
-                                top: -4px;
-                                right: -4px;
-                                background: #e74c3c;
-                                color: white;
-                                font-size: 10px;
-                                font-weight: 700;
-                                min-width: 18px;
-                                height: 18px;
-                                border-radius: 50%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                padding: 0 5px;
-                            "><?= count($notificacoes_sininho) ?></span>
+                            <span class="badge"><?= count($notificacoes_sininho) ?></span>
                         <?php endif; ?>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
                         <div class="notification-header">
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
-                        <div class="notification-list" id="notification-list-dropdown">
-                            <!-- Preenchido via JS -->
-                        </div>
+                        <div class="notification-list" id="notification-list-dropdown"></div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- ========== MAIN ========== -->
         <main class="dashboard-main">
 
-            <!-- ========== MENSAGENS FLASH ========== -->
-            <?php if ($msg_sucesso): ?>
-                <div class="flash-message flash-success">
-                    <i class="fas fa-check-circle"></i>
-                    <?= htmlspecialchars($msg_sucesso) ?>
+            <!-- ========== WELCOME ========== -->
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1><i class="fas fa-bullhorn"></i> Central de <span>Notificações</span></h1>
+                    <p>Envie avisos e comunicados para os alunos da biblioteca</p>
                 </div>
-            <?php elseif ($msg_erro): ?>
-                <div class="flash-message flash-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <?= htmlspecialchars($msg_erro) ?>
-                </div>
-            <?php endif; ?>
-
-            <!-- ========== CABEÇALHO ========== -->
-            <div class="page-header">
-                <div>
-                    <h1><i class="fas fa-bullhorn"></i> Central de Notificações</h1>
-                    <p class="page-subtitle">Envie avisos e comunicados para os alunos</p>
-                </div>
+                <div class="welcome-date" id="welcome-date"></div>
             </div>
 
-            <!-- ========== BLOCO DE COMPOSIÇÃO ========== -->
+            <!-- ========== COMPOSIÇÃO ========== -->
             <div class="compose-card">
                 <form id="form-notificacao" method="POST" action="enviar_notificacao_adm.php" autocomplete="off">
 
@@ -307,15 +241,13 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                         <div class="aluno-busca-wrapper" id="aluno-busca-wrapper" style="display:none;">
                             <div class="search-container busca-aluno-container">
                                 <i class="fas fa-search search-icon"></i>
-                                <input type="text" id="busca-aluno-input" placeholder='Digite o nome do aluno...' autocomplete="off">
+                                <input type="text" id="busca-aluno-input" placeholder="Digite o nome do aluno..." autocomplete="off">
                             </div>
                             <div class="aluno-sugestoes" id="aluno-sugestoes"></div>
                             <div class="aluno-selecionado" id="aluno-selecionado" style="display:none;">
                                 <i class="fas fa-user-check"></i>
                                 <span id="aluno-selecionado-nome"></span>
-                                <button type="button" id="remover-aluno-selecionado" title="Remover">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                                <button type="button" id="remover-aluno-selecionado" title="Remover"><i class="fas fa-times"></i></button>
                             </div>
                             <input type="hidden" id="id-aluno-selecionado" name="id_aluno" value="">
                         </div>
@@ -352,33 +284,32 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                 </form>
             </div>
 
-            <!-- ========== HISTÓRICO COM FILTROS ========== -->
+            <!-- ========== HISTÓRICO ========== -->
             <div class="historico-card">
-                <h3><i class="fas fa-history"></i> Histórico de notificações enviadas</h3>
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Histórico de notificações enviadas</h2>
+                </div>
 
-                <!-- ========== FILTROS VIA GET (LINKS DIRETOS - SEM AJAX) ========== -->
                 <div class="filtros-historico">
-                    <div style="display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center; width: 100%;">
-                        <div class="filtro-periodo">
-                            <span class="filtro-label"><i class="fas fa-calendar-alt"></i> Período:</span>
-                            <div class="filtro-group">
-                                <a href="?periodo=semana&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'semana' ? 'active' : '' ?>">Esta semana</a>
-                                <a href="?periodo=hoje&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'hoje' ? 'active' : '' ?>">Hoje</a>
-                                <a href="?periodo=mes&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'mes' ? 'active' : '' ?>">Este mês</a>
-                                <a href="?periodo=todo&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'todo' ? 'active' : '' ?>">Todo o tempo</a>
-                            </div>
+                    <div class="filtro-periodo">
+                        <span class="filtro-label"><i class="fas fa-calendar-alt"></i> Período:</span>
+                        <div class="filtro-group">
+                            <a href="?periodo=semana&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'semana' ? 'active' : '' ?>">Esta semana</a>
+                            <a href="?periodo=hoje&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'hoje' ? 'active' : '' ?>">Hoje</a>
+                            <a href="?periodo=mes&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'mes' ? 'active' : '' ?>">Este mês</a>
+                            <a href="?periodo=todo&ordenacao=<?= urlencode($ordenacao_filtro) ?>" class="filtro-btn <?= $periodo_filtro === 'todo' ? 'active' : '' ?>">Todo o tempo</a>
                         </div>
+                    </div>
 
-                        <div class="filtros-ordenacao">
-                            <span class="filtro-label"><i class="fas fa-sort"></i> Ordenar:</span>
-                            <div class="filtro-group">
-                                <a href="?periodo=<?= urlencode($periodo_filtro) ?>&ordenacao=mais_recente" class="filtro-btn <?= $ordenacao_filtro === 'mais_recente' ? 'active' : '' ?>">
-                                    <i class="fas fa-arrow-down"></i> Mais recente
-                                </a>
-                                <a href="?periodo=<?= urlencode($periodo_filtro) ?>&ordenacao=mais_antigo" class="filtro-btn <?= $ordenacao_filtro === 'mais_antigo' ? 'active' : '' ?>">
-                                    <i class="fas fa-arrow-up"></i> Mais antigo
-                                </a>
-                            </div>
+                    <div class="filtros-ordenacao">
+                        <span class="filtro-label"><i class="fas fa-sort"></i> Ordenar:</span>
+                        <div class="filtro-group">
+                            <a href="?periodo=<?= urlencode($periodo_filtro) ?>&ordenacao=mais_recente" class="filtro-btn <?= $ordenacao_filtro === 'mais_recente' ? 'active' : '' ?>">
+                                <i class="fas fa-arrow-down"></i> Mais recente
+                            </a>
+                            <a href="?periodo=<?= urlencode($periodo_filtro) ?>&ordenacao=mais_antigo" class="filtro-btn <?= $ordenacao_filtro === 'mais_antigo' ? 'active' : '' ?>">
+                                <i class="fas fa-arrow-up"></i> Mais antigo
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -390,7 +321,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     </div>
                 <?php else: ?>
                     <div class="historico-lista">
-                        <?php foreach ($historico as $item): 
+                        <?php foreach ($historico as $item):
                             $totalAlunos = (int)$item['total_alunos'];
                             $textoAlunos = ($totalAlunos === 1) ? '1 aluno' : $totalAlunos . ' alunos';
                         ?>
@@ -410,20 +341,14 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                                         <i class="fas fa-users"></i> <?= $textoAlunos ?>
                                     </span>
                                 </div>
-                                
-                                <div class="historico-mensagem">
-                                    <?= htmlspecialchars($item['mensagem']) ?>
-                                </div>
-                                
-                                <div class="historico-alunos">
-                                    <?php if ($item['alunos_nomes'] === 'Todos os alunos'): ?>
-                                        <span style="display: inline-flex; align-items: center; gap: 6px; background: #eaf4ff; padding: 4px 14px; border-radius: 12px; color: #0b4b9b; font-weight: 600; font-size: 12px;">
-                                            <i class="fas fa-globe"></i> Enviado para todos os alunos
-                                        </span>
-                                    <?php else: ?>
-                                        <?= htmlspecialchars($item['alunos_nomes']) ?>
-                                    <?php endif; ?>
-                                </div>
+
+                                <div class="historico-mensagem"><?= htmlspecialchars($item['mensagem']) ?></div>
+
+                                <?php if ($totalAlunos === 1 && !empty($item['alunos_nomes'])): ?>
+                                    <div class="historico-alunos">
+                                        <i class="fas fa-user"></i> <?= htmlspecialchars($item['alunos_nomes']) ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>

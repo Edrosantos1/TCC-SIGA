@@ -1,264 +1,380 @@
-// catalogo.js - Versão com dados injetados via PHP
+/* =============================================
+   catalogo.js — Catálogo (v2)
+   UX/UI: ui_alerts nas confirmações + toast melhorado
+   ============================================= */
 
-// ===================== TRADUÇÕES DO CATÁLOGO =====================
+// ===================== TRADUÇÕES =====================
 const catalogTranslations = {
   pt: {
     catalog_title: 'Catálogo',
     catalog_subtitle: 'Explore nosso acervo de livros, revistas e TCCs',
-    filter_category: 'Categoria',
-    filter_sort: 'Ordenar por',
     filter_all: 'Todos',
     filter_books: 'Livros',
     filter_magazines: 'Revistas',
     filter_tcc: 'TCCs',
-    sort_relevance: 'Relevância',
-    sort_title: 'Título',
-    sort_author: 'Autor',
-    sort_year: 'Ano',
-    search_placeholder: 'Buscar no catálogo...',
+    search_placeholder: 'Buscar por título ou autor...',
     no_results: 'Nenhum resultado encontrado',
-    details_title: 'Detalhes',
     availability_available: 'Disponível',
     availability_unavailable: 'Indisponível',
     action_favorite: 'Favoritar',
     action_favorited: 'Favoritado',
     action_reserve: 'Reservar',
     action_reserved: 'Reservado',
-    load_more: 'Carregar mais',
+    action_cancel_reserve: 'Cancelar reserva',
     type_book: 'Livro',
     type_magazine: 'Revista',
     type_tcc: 'TCC',
-    loading: 'Carregando catálogo...',
     error: 'Erro ao carregar o catálogo. Tente novamente.',
+    feedback_fav_added: 'Adicionado aos favoritos',
+    feedback_fav_removed: 'Removido dos favoritos',
+    feedback_fav_error: 'Não foi possível atualizar o favorito',
+    feedback_reserve_success: 'Reserva realizada com sucesso!',
+    feedback_reserve_error: 'Erro ao reservar: {error}',
+    feedback_reserve_unavailable: 'Item indisponível para reserva',
+    feedback_cancel_success: 'Reserva cancelada!',
+    feedback_cancel_error: 'Erro ao cancelar reserva.',
+    confirm_cancel_title: 'Cancelar reserva',
+    confirm_cancel_msg: 'Tem certeza que deseja cancelar a reserva de "{titulo}"?',
+    confirm_cancel_yes: 'Sim, cancelar',
+    confirm_cancel_no: 'Manter reserva',
+    confirm_unfav_title: 'Remover dos favoritos',
+    confirm_unfav_msg: 'Deseja remover "{titulo}" dos favoritos?',
+    confirm_unfav_yes: 'Sim, remover',
+    confirm_unfav_no: 'Cancelar'
   },
   en: {
     catalog_title: 'Catalog',
     catalog_subtitle: 'Explore our collection of books, magazines and theses',
-    filter_category: 'Category',
-    filter_sort: 'Sort by',
     filter_all: 'All',
     filter_books: 'Books',
     filter_magazines: 'Magazines',
     filter_tcc: 'Theses',
-    sort_relevance: 'Relevance',
-    sort_title: 'Title',
-    sort_author: 'Author',
-    sort_year: 'Year',
-    search_placeholder: 'Search in catalog...',
+    search_placeholder: 'Search by title or author...',
     no_results: 'No results found',
-    details_title: 'Details',
     availability_available: 'Available',
     availability_unavailable: 'Unavailable',
     action_favorite: 'Favorite',
     action_favorited: 'Favorited',
     action_reserve: 'Reserve',
     action_reserved: 'Reserved',
-    load_more: 'Load more',
+    action_cancel_reserve: 'Cancel reservation',
     type_book: 'Book',
     type_magazine: 'Magazine',
     type_tcc: 'Thesis',
-    loading: 'Loading catalog...',
     error: 'Error loading catalog. Please try again.',
+    feedback_fav_added: 'Added to favorites',
+    feedback_fav_removed: 'Removed from favorites',
+    feedback_fav_error: 'Could not update favorite',
+    feedback_reserve_success: 'Reservation made successfully!',
+    feedback_reserve_error: 'Error reserving: {error}',
+    feedback_reserve_unavailable: 'Item unavailable for reservation',
+    feedback_cancel_success: 'Reservation cancelled!',
+    feedback_cancel_error: 'Error cancelling reservation.',
+    confirm_cancel_title: 'Cancel reservation',
+    confirm_cancel_msg: 'Are you sure you want to cancel the reservation for "{titulo}"?',
+    confirm_cancel_yes: 'Yes, cancel',
+    confirm_cancel_no: 'Keep reservation',
+    confirm_unfav_title: 'Remove from favorites',
+    confirm_unfav_msg: 'Remove "{titulo}" from favorites?',
+    confirm_unfav_yes: 'Yes, remove',
+    confirm_unfav_no: 'Cancel'
   },
   es: {
     catalog_title: 'Catálogo',
     catalog_subtitle: 'Explora nuestro acervo de libros, revistas y TFCs',
-    filter_category: 'Categoría',
-    filter_sort: 'Ordenar por',
     filter_all: 'Todos',
     filter_books: 'Libros',
     filter_magazines: 'Revistas',
     filter_tcc: 'TFCs',
-    sort_relevance: 'Relevancia',
-    sort_title: 'Título',
-    sort_author: 'Autor',
-    sort_year: 'Año',
-    search_placeholder: 'Buscar en el catálogo...',
+    search_placeholder: 'Buscar por título o autor...',
     no_results: 'No se encontraron resultados',
-    details_title: 'Detalles',
     availability_available: 'Disponible',
     availability_unavailable: 'No disponible',
     action_favorite: 'Favoritar',
     action_favorited: 'Favorito',
     action_reserve: 'Reservar',
     action_reserved: 'Reservado',
-    load_more: 'Cargar más',
+    action_cancel_reserve: 'Cancelar reserva',
     type_book: 'Libro',
     type_magazine: 'Revista',
     type_tcc: 'TFC',
-    loading: 'Cargando catálogo...',
     error: 'Error al cargar el catálogo. Intente de nuevo.',
+    feedback_fav_added: 'Agregado a favoritos',
+    feedback_fav_removed: 'Eliminado de favoritos',
+    feedback_fav_error: 'No se pudo actualizar el favorito',
+    feedback_reserve_success: '¡Reserva realizada con éxito!',
+    feedback_reserve_error: 'Error al reservar: {error}',
+    feedback_reserve_unavailable: 'Artículo no disponible para reserva',
+    feedback_cancel_success: '¡Reserva cancelada!',
+    feedback_cancel_error: 'Error al cancelar reserva.',
+    confirm_cancel_title: 'Cancelar reserva',
+    confirm_cancel_msg: '¿Está seguro de cancelar la reserva de "{titulo}"?',
+    confirm_cancel_yes: 'Sí, cancelar',
+    confirm_cancel_no: 'Mantener reserva',
+    confirm_unfav_title: 'Quitar de favoritos',
+    confirm_unfav_msg: '¿Quitar "{titulo}" de favoritos?',
+    confirm_unfav_yes: 'Sí, quitar',
+    confirm_unfav_no: 'Cancelar'
   }
 };
 
+if (typeof dashboardTranslations !== 'undefined') {
+  for (let lang in catalogTranslations) {
+    if (dashboardTranslations[lang]) {
+      Object.assign(dashboardTranslations[lang], catalogTranslations[lang]);
+    } else {
+      dashboardTranslations[lang] = catalogTranslations[lang];
+    }
+  }
+}
+
 // ===================== ESTADO GLOBAL =====================
 let catalogItems = [];
-let currentItems = [];
-let displayedItems = [];
-let itemsPerPage = 12;
-let currentPage = 0;
 let favorites = new Set();
 let reservations = new Set();
 
-// ===================== FUNÇÕES AUXILIARES =====================
+// ===================== AUXILIARES =====================
 function getCurrentLanguage() {
   return localStorage.getItem('dashboard_lang') || 'pt';
 }
 
-function getCatalogTranslation(key, lang) {
-  const t = catalogTranslations[lang] || catalogTranslations.pt;
-  return t[key] || key;
+function tCat(key, params = {}) {
+  const lang = getCurrentLanguage();
+  const dict = catalogTranslations[lang] || catalogTranslations.pt;
+  let text = dict[key] || key;
+  for (let [k, v] of Object.entries(params)) {
+    text = text.replace(new RegExp(`{${k}}`, 'g'), v);
+  }
+  return text;
 }
 
-// Feedback (fallback se não existir a função global)
+// ===================== TOAST =====================
 if (typeof window.showFeedbackMessage !== 'function') {
-  window.showFeedbackMessage = function(message) {
-    const msgDiv = document.createElement('div');
-    msgDiv.textContent = message;
-    msgDiv.style.cssText = `
-      position: fixed; bottom: 20px; left: 50%;
-      transform: translateX(-50%); background: #0b4b9b;
-      color: white; padding: 12px 24px; border-radius: 8px;
-      z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      transition: opacity 0.3s;
+  window.showFeedbackMessage = function(message, type = 'info') {
+    const colors = {
+      success: { bg: '#27ae60', shadow: 'rgba(39,174,96,0.28)', icon: 'fa-check-circle' },
+      error:   { bg: '#e74c3c', shadow: 'rgba(231,76,60,0.28)', icon: 'fa-exclamation-circle' },
+      warning: { bg: '#e67e22', shadow: 'rgba(230,126,34,0.28)', icon: 'fa-exclamation-triangle' },
+      info:    { bg: '#0b4b9b', shadow: 'rgba(11,75,155,0.28)', icon: 'fa-info-circle' }
+    };
+    const c = colors[type] || colors.info;
+
+    const toast = document.createElement('div');
+    toast.className = 'siga-toast';
+    toast.innerHTML = `<i class="fas ${c.icon}"></i><span>${message}</span>`;
+    toast.style.cssText = `
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: ${c.bg}; color: white;
+      padding: 13px 22px; border-radius: 12px;
+      z-index: 100000;
+      box-shadow: 0 10px 28px ${c.shadow};
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+      max-width: calc(100vw - 32px);
     `;
-    document.body.appendChild(msgDiv);
+    document.body.appendChild(toast);
+    void toast.offsetWidth;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+
     setTimeout(() => {
-      msgDiv.style.opacity = '0';
-      setTimeout(() => msgDiv.remove(), 500);
-    }, 2000);
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(16px)';
+      setTimeout(() => toast.remove(), 350);
+    }, 2600);
   };
 }
 
-// ===================== CARREGAR DADOS (INJETADOS) =====================
-function loadCatalogData() {
-  if (window.catalogData && Array.isArray(window.catalogData)) {
-    catalogItems = window.catalogData;
-    currentItems = [...catalogItems];
-    displayedItems = [];
-    currentPage = 0;
-
-    // Carregar favoritos do PHP (já vem no window.favoritosPHP)
-    if (window.favoritosPHP) {
-      favorites = new Set();
-      for (let key in window.favoritosPHP) {
-        // key é "tipo_id", mas o toggle_favorito usa apenas item_id
-        // Precisamos extrair o id. O formato é "livro_1", "tcc_2", etc.
-        const parts = key.split('_');
-        const id = parseInt(parts[1]);
-        if (!isNaN(id)) favorites.add(id);
-      }
-    }
-
-    // Carregar reservas do localStorage (se houver)
+function showFeedback(message, type = 'info') {
+  if (window.showFeedbackMessage) {
+    // Tenta passar o tipo, se a assinatura suportar
     try {
-      const res = localStorage.getItem('catalog_reservations');
-      if (res) reservations = new Set(JSON.parse(res));
-    } catch(e) {}
-
-    renderCatalog();
-    const empty = document.getElementById('catalog-empty');
-    if (empty) empty.style.display = 'none';
-    const loadMore = document.getElementById('load-more-btn');
-    if (loadMore) loadMore.style.display = currentItems.length > itemsPerPage ? 'inline-block' : 'none';
-
-    console.log(`Catálogo carregado: ${catalogItems.length} itens.`);
-  } else {
-    console.warn('Dados do catálogo não encontrados (window.catalogData).');
-    const grid = document.getElementById('catalog-grid');
-    if (grid) {
-      grid.innerHTML = `<div class="loading-error"><i class="fas fa-exclamation-triangle"></i> ${getCatalogTranslation('error', getCurrentLanguage())}</div>`;
+      window.showFeedbackMessage(message, type);
+    } catch (e) {
+      window.showFeedbackMessage(message);
     }
   }
 }
 
-// ===================== ESTADO LOCAL STORAGE (RESERVAS) =====================
+// ===================== CARREGAR DADOS =====================
+async function loadCatalogData() {
+  if (window.catalogData && Array.isArray(window.catalogData)) {
+    catalogItems = window.catalogData;
+
+    if (window.favoritosPHP) {
+      favorites = new Set();
+      for (let key in window.favoritosPHP) {
+        const parts = key.split('_');
+        const id = parseInt(parts[1]);
+        if (!isNaN(id)) favorites.add(String(id));
+      }
+    }
+
+    try {
+      const res = localStorage.getItem('catalog_reservations');
+      if (res) reservations = new Set(JSON.parse(res).map(id => String(id)));
+    } catch (e) {}
+
+    await syncReservationsFromAPI();
+    renderCatalog();
+  } else {
+    const grid = document.getElementById('catalog-grid');
+    if (grid) {
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:40px; color:#94a3b8;">
+          <i class="fas fa-exclamation-triangle" style="font-size:36px; opacity:.5; margin-bottom:10px; display:block;"></i>
+          ${tCat('error')}
+        </div>`;
+    }
+  }
+}
+
+async function syncReservationsFromAPI() {
+  try {
+    const response = await fetch('../api/aluno_reservas.php', { credentials: 'same-origin' });
+    if (!response.ok) throw new Error('Erro ao buscar reservas');
+    const data = await response.json();
+    reservations = new Set();
+    data.forEach(reserva => {
+      if (reserva.status === 'pendente' || reserva.status === 'aprovada') {
+        if (reserva.id_catalogo) reservations.add(String(reserva.id_catalogo));
+      }
+    });
+    localStorage.setItem('catalog_reservations', JSON.stringify([...reservations]));
+  } catch (error) {
+    console.warn('Não foi possível sincronizar reservas:', error);
+  }
+}
+
 function saveCatalogState() {
   localStorage.setItem('catalog_reservations', JSON.stringify([...reservations]));
 }
 
-// ===================== RENDERIZAÇÃO =====================
+// ===================== HELPERS DE TIPO =====================
 function getItemTypeLabel(type, lang) {
+  const t = type ? type.toLowerCase() : '';
   const map = {
-    book: getCatalogTranslation('type_book', lang),
-    magazine: getCatalogTranslation('type_magazine', lang),
-    tcc: getCatalogTranslation('type_tcc', lang),
+    book: 'type_book', livro: 'type_book',
+    magazine: 'type_magazine', revista: 'type_magazine',
+    tcc: 'type_tcc'
   };
-  return map[type] || type;
+  return map[t] ? tCat(map[t]) : type;
 }
 
-function getCoverColor(index) {
-  const colors = [
-    '#0b4b9b', '#17c8cc', '#6a11cb', '#f7971e', '#e91e63',
-    '#11998e', '#4568dc', '#c94b4b', '#134e5e', '#ff6b6b',
-    '#4ecdc4', '#45b7d1', '#f9ca24', '#6ab04c', '#eb4d4b'
-  ];
-  return colors[index % colors.length];
+function getTypeIcon(type) {
+  const t = (type || '').toLowerCase();
+  if (t === 'livro' || t === 'book') return 'fa-book';
+  if (t === 'revista' || t === 'magazine') return 'fa-newspaper';
+  if (t === 'tcc') return 'fa-graduation-cap';
+  return 'fa-book';
 }
 
+function getBadgeClass(type) {
+  const t = (type || '').toLowerCase();
+  if (t === 'livro' || t === 'book') return 'tipo-livro';
+  if (t === 'revista' || t === 'magazine') return 'tipo-revista';
+  if (t === 'tcc') return 'tipo-tcc';
+  return 'tipo-livro';
+}
+
+// ===================== RENDER =====================
 function createItemCard(item, index, lang) {
-  const card = document.createElement('div');
-  card.className = 'catalog-item-card';
-  card.dataset.id = item.id;
+  const card = document.createElement('article');
+  card.className = 'catalogo-card';
+  const itemId = String(item.id || item.id_catalogo);
+  card.dataset.id = itemId;
 
-  const isFav = favorites.has(item.id);
-  const isRes = reservations.has(item.id);
-  const typeLabel = getItemTypeLabel(item.type, lang);
-  const coverColor = getCoverColor(index);
+  const isFav = favorites.has(itemId);
+  const isRes = reservations.has(itemId);
+  const itemType = item.tipo || item.type || 'livro';
+  const typeLabel = getItemTypeLabel(itemType, lang);
+  const coverUrl = item.capa_url || item.cover;
+  const title = item.title || item.titulo || '';
+  const author = item.author || item.autor || 'Autor não informado';
 
+  // Capa
   let coverHTML;
-  if (item.cover) {
-    coverHTML = `<img src="${item.cover}" alt="${item.title}" class="card-cover">`;
+  if (coverUrl && coverUrl !== '') {
+    coverHTML = `<img src="${coverUrl}" alt="Capa de ${title}" loading="lazy">`;
   } else {
+    const icon = getTypeIcon(itemType);
     coverHTML = `
-      <div class="card-cover-placeholder" style="background: ${coverColor}">
-        <i class="fas ${item.type === 'book' ? 'fa-book' : item.type === 'magazine' ? 'fa-newspaper' : 'fa-graduation-cap'}"></i>
-        <span>${item.title}</span>
-      </div>
-    `;
+      <div class="capa-placeholder">
+        <i class="fas ${icon}"></i>
+        <span>${title}</span>
+      </div>`;
   }
 
+  const badgeClass = getBadgeClass(itemType);
+
   card.innerHTML = `
-    <div class="card-cover-wrapper">
+    <div class="card-capa">
       ${coverHTML}
-      <span class="card-type-badge">${typeLabel}</span>
+      <span class="tipo-badge ${badgeClass}">
+        <i class="fas ${getTypeIcon(itemType)}"></i> ${typeLabel}
+      </span>
     </div>
     <div class="card-info">
-      <div class="card-title">${item.title}</div>
-      <div class="card-author">${item.author}</div>
-      <div class="card-meta">
-        <span>${item.year || ''}</span>
-        <span>${item.category || ''}</span>
-      </div>
+      <h4 title="${title}">${title}</h4>
+      <p class="autor">${author}</p>
       <div class="card-actions">
-        <button class="btn-favorite ${isFav ? 'favorited' : ''}" data-action="favorite">
-          <i class="fas ${isFav ? 'fa-heart' : 'fa-heart'}"></i>
-          <span>${isFav ? getCatalogTranslation('action_favorited', lang) : getCatalogTranslation('action_favorite', lang)}</span>
+        <button class="btn-favorite ${isFav ? 'favorited' : ''}" data-action="favorite" type="button" aria-label="${isFav ? tCat('action_favorited') : tCat('action_favorite')}">
+          <i class="fas fa-heart"></i>
+          <span>${isFav ? tCat('action_favorited') : tCat('action_favorite')}</span>
         </button>
-        <button class="btn-reserve ${isRes ? 'reserved' : ''}" data-action="reserve">
-          <i class="fas fa-hand-holding"></i>
-          <span>${isRes ? getCatalogTranslation('action_reserved', lang) : getCatalogTranslation('action_reserve', lang)}</span>
-        </button>
+        ${isRes ? `
+          <button class="btn-reserve reserved" data-action="reserve" disabled type="button">
+            <i class="fas fa-check"></i>
+            <span>${tCat('action_reserved')}</span>
+          </button>
+          <button class="btn-cancel-reserve" data-action="cancel-reserve" type="button" aria-label="${tCat('action_cancel_reserve')}">
+            <i class="fas fa-times"></i>
+          </button>
+        ` : `
+          <button class="btn-reserve" data-action="reserve" type="button">
+            <i class="fas fa-hand-holding"></i>
+            <span>${tCat('action_reserve')}</span>
+          </button>
+        `}
       </div>
     </div>
   `;
 
+  // Click no card → abre modal (exceto em botões)
   card.addEventListener('click', (e) => {
     if (e.target.closest('button')) return;
-    openItemModal(item.id);
+    openItemModal(itemId);
   });
 
+  // Ações
   const favBtn = card.querySelector('.btn-favorite');
-  favBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleFavorite(item.id);
-  });
+  if (favBtn) {
+    favBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite(itemId);
+    });
+  }
 
-  const resBtn = card.querySelector('.btn-reserve');
-  resBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    toggleReserve(item.id);
-  });
+  const resBtn = card.querySelector('.btn-reserve:not([disabled])');
+  if (resBtn) {
+    resBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleReserve(itemId);
+    });
+  }
+
+  const cancelBtn = card.querySelector('[data-action="cancel-reserve"]');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      confirmCancelReserve(itemId);
+    });
+  }
 
   return card;
 }
@@ -266,142 +382,186 @@ function createItemCard(item, index, lang) {
 function renderCatalog() {
   const grid = document.getElementById('catalog-grid');
   const empty = document.getElementById('catalog-empty');
-  const loadMoreBtn = document.getElementById('load-more-btn');
-
   if (!grid) return;
 
   const lang = getCurrentLanguage();
-  const start = currentPage * itemsPerPage;
-  const end = start + itemsPerPage;
 
-  if (currentPage === 0) {
+  if (catalogItems.length === 0) {
     grid.innerHTML = '';
-    displayedItems = [];
-  }
-
-  const itemsToShow = currentItems.slice(start, end);
-
-  if (itemsToShow.length === 0 && currentPage === 0) {
-    empty.style.display = 'block';
-    loadMoreBtn.style.display = 'none';
+    if (empty) empty.style.display = 'block';
     return;
   }
 
-  empty.style.display = 'none';
+  if (empty) empty.style.display = 'none';
 
-  itemsToShow.forEach((item, idx) => {
-    const card = createItemCard(item, start + idx, lang);
-    grid.appendChild(card);
-    displayedItems.push(item);
+  grid.innerHTML = '';
+  catalogItems.forEach((item, idx) => {
+    grid.appendChild(createItemCard(item, idx, lang));
   });
-
-  if (end >= currentItems.length) {
-    loadMoreBtn.style.display = 'none';
-  } else {
-    loadMoreBtn.style.display = 'inline-block';
-  }
-}
-
-// ===================== FILTROS E ORDENAÇÃO =====================
-function applyFilters() {
-  const category = document.getElementById('filter-category')?.value || 'all';
-  const sort = document.getElementById('filter-sort')?.value || 'relevance';
-  const searchTerm = document.getElementById('filter-search')?.value.toLowerCase().trim() || '';
-
-  let filtered = [...catalogItems];
-
-  if (category !== 'all') {
-    filtered = filtered.filter(item => item.type === category);
-  }
-
-  if (searchTerm) {
-    filtered = filtered.filter(item =>
-      item.title.toLowerCase().includes(searchTerm) ||
-      item.author.toLowerCase().includes(searchTerm) ||
-      (item.category && item.category.toLowerCase().includes(searchTerm))
-    );
-  }
-
-  switch (sort) {
-    case 'title':
-      filtered.sort((a, b) => a.title.localeCompare(b.title));
-      break;
-    case 'author':
-      filtered.sort((a, b) => a.author.localeCompare(b.author));
-      break;
-    case 'year':
-      filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
-      break;
-    default:
-      break;
-  }
-
-  currentItems = filtered;
-  currentPage = 0;
-  renderCatalog();
 }
 
 // ===================== AÇÕES =====================
-function toggleFavorite(id) {
-  if (favorites.has(id)) {
-    favorites.delete(id);
-    window.showFeedbackMessage('Removido dos favoritos');
-  } else {
-    favorites.add(id);
-    window.showFeedbackMessage('Adicionado aos favoritos');
+async function toggleFavorite(id) {
+  const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
+  if (!item) return;
+
+  const title = item.title || item.titulo || 'este item';
+  const wasFav = favorites.has(id);
+
+  // Se está removendo, pede confirmação
+  if (wasFav && typeof window.uiConfirm === 'function') {
+    const ok = await window.uiConfirm(
+      tCat('confirm_unfav_msg', { titulo: title }),
+      {
+        titulo: tCat('confirm_unfav_title'),
+        tipo: 'warning',
+        textoConfirmar: tCat('confirm_unfav_yes'),
+        textoCancelar: tCat('confirm_unfav_no')
+      }
+    );
+    if (!ok) return;
   }
-  // Atualiza o estado visual nos cards e modal
-  refreshCurrentView();
+
+  const tipo = item.tipo || item.type || 'livro';
+
+  // Otimista
+  if (wasFav) favorites.delete(String(id));
+  else favorites.add(String(id));
+
+  // Feedback visual imediato
+  renderCatalog();
+
+  try {
+    const response = await fetch('../aluno/toggle_favorito.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      credentials: 'same-origin',
+      body: new URLSearchParams({
+        item_id: id,
+        tipo_item: tipo,
+        redirect: 'catalogo.php'
+      })
+    });
+    if (!response.ok) throw new Error('Falha ao salvar favorito');
+
+    showFeedback(wasFav ? tCat('feedback_fav_removed') : tCat('feedback_fav_added'),
+                 wasFav ? 'info' : 'success');
+  } catch (error) {
+    // Rollback
+    if (wasFav) favorites.add(String(id));
+    else favorites.delete(String(id));
+    renderCatalog();
+    showFeedback(tCat('feedback_fav_error'), 'error');
+    console.error(error);
+  }
 }
 
-function toggleReserve(id) {
-  if (reservations.has(id)) {
-    reservations.delete(id);
-    window.showFeedbackMessage('Reserva cancelada');
-  } else {
-    // Verificar disponibilidade
-    const item = catalogItems.find(i => i.id === id);
-    if (item && !item.available) {
-      window.showFeedbackMessage('Item indisponível para reserva');
+async function toggleReserve(id) {
+  const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
+  if (!item) return;
+
+  // Verifica disponibilidade
+  const qty = item.quantity ?? item.quantidade;
+  if (qty !== undefined && qty <= 0 && !reservations.has(id)) {
+    showFeedback(tCat('feedback_reserve_unavailable'), 'warning');
+    return;
+  }
+
+  try {
+    const response = await fetch('../api/aluno_reservas.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        id_catalogo: id,
+        tipo: item.tipo || item.type || 'livro'
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 409) {
+        reservations.add(String(id));
+        saveCatalogState();
+        renderCatalog();
+        return;
+      }
+      throw new Error(data.error || 'Erro ao reservar');
+    }
+
+    reservations.add(String(id));
+    saveCatalogState();
+    renderCatalog();
+    showFeedback(tCat('feedback_reserve_success'), 'success');
+  } catch (error) {
+    showFeedback(tCat('feedback_reserve_error', { error: error.message }), 'error');
+    console.error('Erro ao reservar:', error);
+  }
+}
+
+async function confirmCancelReserve(id) {
+  const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
+  const title = item?.title || item?.titulo || 'este item';
+
+  if (typeof window.uiConfirm === 'function') {
+    const ok = await window.uiConfirm(
+      tCat('confirm_cancel_msg', { titulo: title }),
+      {
+        titulo: tCat('confirm_cancel_title'),
+        tipo: 'warning',
+        textoConfirmar: tCat('confirm_cancel_yes'),
+        textoCancelar: tCat('confirm_cancel_no')
+      }
+    );
+    if (!ok) return;
+  }
+
+  try {
+    const listRes = await fetch('../api/aluno_reservas.php', { credentials: 'same-origin' });
+    const data = await listRes.json();
+    const reservaAtiva = data.find(r =>
+      String(r.id_catalogo) === String(id) &&
+      (r.status === 'pendente' || r.status === 'aprovada')
+    );
+
+    if (!reservaAtiva) {
+      reservations.delete(String(id));
+      saveCatalogState();
+      renderCatalog();
+      showFeedback(tCat('feedback_cancel_success'), 'info');
       return;
     }
-    reservations.add(id);
-    window.showFeedbackMessage('Reserva realizada com sucesso!');
-  }
-  saveCatalogState();
-  refreshCurrentView();
-}
 
-function refreshCurrentView() {
-  // Re-renderiza a lista atual mantendo a página
-  const page = currentPage;
-  currentPage = 0;
-  renderCatalog();
-  if (page > 0 && currentItems.length > itemsPerPage) {
-    for (let i = 0; i < page; i++) {
-      loadMoreItems();
-    }
-  }
-}
+    const deleteRes = await fetch('../api/aluno_reservas.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'cancel', id: reservaAtiva.id_reserva }),
+      credentials: 'same-origin'
+    });
+    const result = await deleteRes.json();
+    if (!deleteRes.ok) throw new Error(result.error || 'Erro ao cancelar');
 
-function loadMoreItems() {
-  const totalItems = currentItems.length;
-  const displayedCount = displayedItems.length;
-  if (displayedCount < totalItems) {
-    currentPage++;
+    reservations.delete(String(id));
+    saveCatalogState();
     renderCatalog();
+    showFeedback(tCat('feedback_cancel_success'), 'success');
+  } catch (error) {
+    if (error.message !== 'Esta reserva não pode mais ser cancelada') {
+      showFeedback(tCat('feedback_cancel_error'), 'error');
+    }
+    console.error(error);
   }
 }
 
 // ===================== MODAL =====================
 function openItemModal(id) {
-  const item = catalogItems.find(i => i.id === id);
+  const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
   if (!item) return;
 
   const lang = getCurrentLanguage();
   const isFav = favorites.has(id);
   const isRes = reservations.has(id);
-  const coverColor = getCoverColor(catalogItems.indexOf(item));
 
   const overlay = document.getElementById('item-modal-overlay');
   const coverImg = document.getElementById('modal-cover-img');
@@ -410,107 +570,143 @@ function openItemModal(id) {
   const authorEl = document.getElementById('modal-author');
   const yearEl = document.getElementById('modal-year');
   const categoryEl = document.getElementById('modal-category');
-  const typeEl = document.getElementById('modal-type');
   const descEl = document.getElementById('modal-description');
   const availEl = document.getElementById('modal-availability');
+  const typeBadgeEl = document.getElementById('modal-type-badge');
   const favBtn = document.getElementById('modal-favorite-btn');
   const favIcon = document.getElementById('modal-favorite-icon');
   const favText = document.getElementById('modal-favorite-text');
   const resBtn = document.getElementById('modal-reserve-btn');
   const resText = document.getElementById('modal-reserve-text');
 
-  // Preencher dados
-  if (item.cover) {
-    coverImg.src = item.cover;
-    coverImg.alt = item.title;
+  const itemType = item.tipo || item.type || 'livro';
+  const typeLabel = getItemTypeLabel(itemType, lang);
+
+  // Badge de tipo no modal
+  if (typeBadgeEl) {
+    typeBadgeEl.textContent = typeLabel;
+    typeBadgeEl.style.background = '#eaf4ff';
+    typeBadgeEl.style.color = '#0b4b9b';
+    if (itemType === 'revista') { typeBadgeEl.style.background = '#fff4ec'; typeBadgeEl.style.color = '#d35400'; }
+    if (itemType === 'tcc') { typeBadgeEl.style.background = '#f3e8ff'; typeBadgeEl.style.color = '#6a11cb'; }
+  }
+
+  // Capa
+  const coverUrl = item.capa_url || item.cover;
+  if (coverUrl && coverUrl !== '') {
+    coverImg.src = coverUrl;
+    coverImg.alt = item.title || item.titulo;
     coverImg.style.display = 'block';
     coverPlaceholder.style.display = 'none';
   } else {
     coverImg.style.display = 'none';
     coverPlaceholder.style.display = 'flex';
-    coverPlaceholder.style.background = coverColor;
-    coverPlaceholder.querySelector('span').textContent = item.title;
+    coverPlaceholder.innerHTML = `
+      <i class="fas ${getTypeIcon(itemType)}"></i>
+      <span>${item.title || item.titulo || ''}</span>`;
   }
 
-  titleEl.textContent = item.title;
-  authorEl.textContent = item.author;
-  yearEl.textContent = item.year ? `Ano: ${item.year}` : 'Ano não informado';
-  categoryEl.textContent = `Categoria: ${item.category || 'Não categorizado'}`;
-  typeEl.textContent = `Tipo: ${getItemTypeLabel(item.type, lang)}`;
-  descEl.textContent = item.description || 'Sem descrição disponível.';
+  // Textos
+  titleEl.textContent = item.title || item.titulo || '';
+  authorEl.textContent = item.author || item.autor || 'Autor não informado';
 
-  if (item.available) {
-    availEl.textContent = getCatalogTranslation('availability_available', lang);
+  const year = item.year || item.ano_publicacao;
+  yearEl.textContent = year ? `Ano: ${year}` : 'Ano não informado';
+  yearEl.style.display = 'inline-block';
+
+  categoryEl.textContent = `Categoria: ${item.category || 'Não categorizado'}`;
+
+  descEl.textContent = item.description || item.descricao || 'Sem descrição disponível.';
+
+  // Disponibilidade
+  const qty = item.quantity ?? item.quantidade;
+  const isAvail = item.available !== undefined ? item.available : (qty > 0);
+  if (isAvail) {
+    availEl.textContent = tCat('availability_available');
     availEl.className = 'availability available';
   } else {
-    availEl.textContent = getCatalogTranslation('availability_unavailable', lang);
+    availEl.textContent = tCat('availability_unavailable');
     availEl.className = 'availability unavailable';
   }
 
-  // Atualizar botão favoritar
-  const favLabel = isFav ? getCatalogTranslation('action_favorited', lang) : getCatalogTranslation('action_favorite', lang);
+  // Botão favorito
   favIcon.className = isFav ? 'fas fa-heart' : 'far fa-heart';
-  favText.textContent = favLabel;
+  favText.textContent = isFav ? tCat('action_favorited') : tCat('action_favorite');
   favBtn.classList.toggle('favorited', isFav);
 
-  // Atualizar botão reservar
-  const resLabel = isRes ? getCatalogTranslation('action_reserved', lang) : getCatalogTranslation('action_reserve', lang);
-  resText.textContent = resLabel;
+  // Botão reservar
+  resText.textContent = isRes ? tCat('action_reserved') : tCat('action_reserve');
   resBtn.classList.toggle('reserved', isRes);
+  resBtn.disabled = isRes;
 
-  // Configurar actions
-  // Remover listeners antigos clonando
+  // Remove listeners antigos clonando
   const newFavBtn = favBtn.cloneNode(true);
   favBtn.parentNode.replaceChild(newFavBtn, favBtn);
-  newFavBtn.addEventListener('click', (e) => {
+  newFavBtn.addEventListener('click', async (e) => {
     e.preventDefault();
-    toggleFavorite(id);
-    openItemModal(id);
+    await toggleFavorite(id);
+    if (overlay.classList.contains('open')) openItemModal(id);
   });
 
   const newResBtn = resBtn.cloneNode(true);
   resBtn.parentNode.replaceChild(newResBtn, resBtn);
-  newResBtn.addEventListener('click', () => {
-    toggleReserve(id);
-    openItemModal(id);
+  newResBtn.addEventListener('click', async () => {
+    if (newResBtn.disabled) return;
+    await toggleReserve(id);
+    if (overlay.classList.contains('open')) openItemModal(id);
   });
 
-  // Abrir modal
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeItemModal() {
   const overlay = document.getElementById('item-modal-overlay');
+  if (!overlay) return;
   overlay.classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// ===================== INICIALIZAÇÃO =====================
-document.addEventListener('DOMContentLoaded', () => {
-  // Aplicar idioma inicial
-  applyCatalogLanguage(getCurrentLanguage());
+// ===================== IDIOMA =====================
+function applyCatalogLanguage(lang) {
+  const t = catalogTranslations[lang] || catalogTranslations.pt;
 
-  // Carregar dados do catálogo (injetados)
+  const title = document.getElementById('catalog-title');
+  const subtitle = document.getElementById('catalog-subtitle');
+  if (title) title.innerHTML = `<i class="fas fa-compass"></i> ${t.catalog_title}`;
+  if (subtitle) subtitle.textContent = t.catalog_subtitle;
+
+  const noResults = document.getElementById('catalog-no-results');
+  if (noResults) noResults.textContent = t.no_results;
+
+  const searchInput = document.querySelector('.filter-search input');
+  if (searchInput) searchInput.placeholder = t.search_placeholder;
+
+  // Chips
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    const val = chip.value;
+    const label = val === '' ? t.filter_all :
+                  val === 'livro' ? t.filter_books :
+                  val === 'revista' ? t.filter_magazines :
+                  val === 'tcc' ? t.filter_tcc : val;
+    const span = chip.querySelector('.chip-text');
+    if (span) span.textContent = label;
+  });
+}
+
+if (typeof applyDashboardLanguage === 'function') {
+  const originalApply = applyDashboardLanguage;
+  window.applyDashboardLanguage = function (lang) {
+    originalApply(lang);
+    applyCatalogLanguage(lang);
+  };
+}
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+  applyCatalogLanguage(getCurrentLanguage());
   loadCatalogData();
 
-  // Configurar filtros
-  const filterCategory = document.getElementById('filter-category');
-  const filterSort = document.getElementById('filter-sort');
-  const filterSearch = document.getElementById('filter-search');
-  const filterSearchBtn = document.getElementById('filter-search-btn');
-
-  if (filterCategory) filterCategory.addEventListener('change', applyFilters);
-  if (filterSort) filterSort.addEventListener('change', applyFilters);
-  if (filterSearch) filterSearch.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') applyFilters();
-  });
-  if (filterSearchBtn) filterSearchBtn.addEventListener('click', applyFilters);
-
-  const loadMoreBtn = document.getElementById('load-more-btn');
-  if (loadMoreBtn) loadMoreBtn.addEventListener('click', loadMoreItems);
-
-  // Modal
   const modalOverlay = document.getElementById('item-modal-overlay');
   const modalClose = document.getElementById('item-modal-close');
   if (modalOverlay) {
@@ -523,102 +719,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeItemModal();
   });
 
-  // Escuta mudanças de idioma
   window.addEventListener('storage', (e) => {
-    if (e.key === 'dashboard_lang') {
-      const lang = e.newValue || 'pt';
-      applyCatalogLanguage(lang);
-    }
+    if (e.key === 'dashboard_lang') applyCatalogLanguage(e.newValue || 'pt');
   });
 
-  // Disparar evento de idioma (caso o dashboard já tenha aplicado)
   document.addEventListener('languageChanged', (e) => {
     applyCatalogLanguage(e.detail.lang);
   });
-
-  console.log('%cCatálogo SiGA ITJ carregado com dados unificados!', 'color: #0b4b9b; font-weight: bold;');
 });
-
-// ===================== APLICA IDIOMA =====================
-function applyCatalogLanguage(lang) {
-  const t = catalogTranslations[lang] || catalogTranslations.pt;
-
-  const title = document.getElementById('catalog-title');
-  const subtitle = document.getElementById('catalog-subtitle');
-  if (title) title.textContent = t.catalog_title;
-  if (subtitle) subtitle.textContent = t.catalog_subtitle;
-
-  const catLabel = document.getElementById('filter-category-label');
-  if (catLabel) catLabel.textContent = t.filter_category;
-
-  const sortLabel = document.getElementById('filter-sort-label');
-  if (sortLabel) sortLabel.textContent = t.filter_sort;
-
-  const catSelect = document.getElementById('filter-category');
-  if (catSelect) {
-    for (let opt of catSelect.options) {
-      const val = opt.value;
-      if (val === 'all') opt.textContent = t.filter_all;
-      else if (val === 'book') opt.textContent = t.filter_books;
-      else if (val === 'magazine') opt.textContent = t.filter_magazines;
-      else if (val === 'tcc') opt.textContent = t.filter_tcc;
-    }
-  }
-
-  const sortSelect = document.getElementById('filter-sort');
-  if (sortSelect) {
-    for (let opt of sortSelect.options) {
-      const val = opt.value;
-      if (val === 'relevance') opt.textContent = t.sort_relevance;
-      else if (val === 'title') opt.textContent = t.sort_title;
-      else if (val === 'author') opt.textContent = t.sort_author;
-      else if (val === 'year') opt.textContent = t.sort_year;
-    }
-  }
-
-  const searchInput = document.getElementById('filter-search');
-  if (searchInput) searchInput.placeholder = t.search_placeholder;
-
-  const emptyMsg = document.getElementById('catalog-no-results');
-  if (emptyMsg) emptyMsg.textContent = t.no_results;
-
-  const loadBtn = document.getElementById('load-more-btn');
-  if (loadBtn) loadBtn.textContent = t.load_more;
-
-  // Atualizar textos dos cards já renderizados
-  document.querySelectorAll('.catalog-item-card').forEach(card => {
-    const id = parseInt(card.dataset.id);
-    const item = catalogItems.find(i => i.id === id);
-    if (!item) return;
-    const isFav = favorites.has(id);
-    const isRes = reservations.has(id);
-    const favSpan = card.querySelector('.btn-favorite span');
-    const resSpan = card.querySelector('.btn-reserve span');
-    if (favSpan) {
-      favSpan.textContent = isFav ? t.action_favorited : t.action_favorite;
-    }
-    if (resSpan) {
-      resSpan.textContent = isRes ? t.action_reserved : t.action_reserve;
-    }
-    const typeBadge = card.querySelector('.card-type-badge');
-    if (typeBadge) {
-      typeBadge.textContent = getItemTypeLabel(item.type, lang);
-    }
-  });
-
-  // Se houver modal aberto, atualizar também
-  const modalTitle = document.getElementById('modal-title');
-  if (modalTitle) {
-    // Não temos contexto do item atual, mas podemos ignorar ou atualizar somente se aberto
-  }
-}
-
-// ===================== INTEGRAÇÃO COM O SELETOR DE IDIOMA GLOBAL =====================
-// Se a função applyDashboardLanguage existir, estendemos
-if (typeof applyDashboardLanguage === 'function') {
-  const originalApply = applyDashboardLanguage;
-  window.applyDashboardLanguage = function(lang) {
-    originalApply(lang);
-    applyCatalogLanguage(lang);
-  };
-}

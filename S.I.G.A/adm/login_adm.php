@@ -46,7 +46,7 @@ $erro = isset($_GET['erro']) ? htmlspecialchars($_GET['erro']) : '';
         <i class="fas fa-arrow-left"></i>
       </a>
       <a href="../index.html" class="brand-logo">
-        <i class="fas fa-book-reader icon-logo"></i> SiGA ITJ
+        <i class="fas fa-book-reader icon-logo"></i> SIGA ITJ
       </a>
     </div>
 
@@ -78,7 +78,7 @@ $erro = isset($_GET['erro']) ? htmlspecialchars($_GET['erro']) : '';
           </div>
         <?php endif; ?>
 
-        <form id="form-login-adm" autocomplete="off" action="../includes/DBlogin_adm.php" method="POST">
+        <form id="form-login-adm" autocomplete="off" action="../includes/db_login_adm.php" method="POST">
           <h1 class="dot-title">Login Admin</h1>
 
           <div class="input-group">

@@ -12,7 +12,7 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 
 // ========== FILTRO POR ALUNO ==========
 $filtro_aluno_id = isset($_GET['aluno_id']) ? intval($_GET['aluno_id']) : 0;
-$filtro_aluno_nome = isset($_GET['aluno_nome']) ? urldecode($_GET['aluno_nome']) : '';
+$filtro_aluno_nome = '';
 
 // ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
@@ -24,47 +24,40 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+// ========== NOTIFICAÇÕES (sininho) ==========
 $notificacoes = array();
 if ($db) {
     try {
         $sql = "
-            SELECT 
-                n.id_envio,
-                n.titulo,
-                n.mensagem,
-                n.tipo,
-                MAX(n.criado_em) AS criado_em,
-                COUNT(DISTINCT n.id_aluno) AS total_alunos
+            SELECT n.id_envio, n.titulo, n.mensagem, n.tipo,
+                   MAX(n.criado_em) AS criado_em,
+                   COUNT(DISTINCT n.id_aluno) AS total_alunos
             FROM notificacoes n
             WHERE n.id_envio IS NOT NULL AND n.id_envio != ''
             GROUP BY n.id_envio, n.titulo, n.mensagem, n.tipo
             ORDER BY criado_em DESC
             LIMIT 5
         ";
-
         if ($db instanceof mysqli) {
             $result = $db->query($sql);
             $notificacoes = $result->fetch_all(MYSQLI_ASSOC);
         } elseif ($db instanceof PDO) {
             $stmt = $db->query($sql);
             $notificacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $notificacoes = [];
         }
     } catch (Exception $e) {
         $notificacoes = [];
     }
 }
 
-// ========== BUSCAR EMPRÉSTIMOS/PENDÊNCIAS ==========
+// ========== PENDÊNCIAS ==========
 $pendencias = array();
-
 if ($db) {
     $query = "
         SELECT 
             e.id_emprestimo AS id,
             l.nome_aluno AS aluno,
+            l.serie_aluno AS serie,
             e.titulo_item AS material,
             'Livro' AS tipo,
             e.data_emprestimo,
@@ -74,40 +67,44 @@ if ($db) {
         INNER JOIN login_aluno l ON e.id_aluno = l.id_aluno
         WHERE e.status IN ('emprestado', 'atrasado')
     ";
-    
     if ($filtro_aluno_id > 0) {
         $query .= " AND e.id_aluno = " . intval($filtro_aluno_id);
     }
-    
     $query .= " ORDER BY e.data_devolucao_prevista ASC";
-    
+
     if ($db instanceof mysqli) {
         $result = $db->query($query);
-        if ($result) {
-            $pendencias = $result->fetch_all(MYSQLI_ASSOC);
-        }
+        if ($result) $pendencias = $result->fetch_all(MYSQLI_ASSOC);
     } elseif ($db instanceof PDO) {
         $stmt = $db->query($query);
-        if ($stmt) {
-            $pendencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
+        if ($stmt) $pendencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 
-// ========== CONTAGENS E ATUALIZAÇÃO DINÂMICA DE STATUS ==========
+// ========== CONTAGENS + DIAS RESTANTES/ATRASADOS ==========
 $total_no_prazo = 0;
 $total_atrasados = 0;
+$total_vence_hoje = 0;
 $data_hoje = date('Y-m-d');
 
 foreach ($pendencias as &$p) {
+    $hoje_ts  = strtotime($data_hoje);
+    $limite_ts = strtotime($p['data_limite']);
+    $dias_diff = (int)floor(($limite_ts - $hoje_ts) / 86400);
+
     if ($p['status'] !== 'devolvido' && $p['data_limite'] < $data_hoje) {
         $p['status'] = 'atrasado';
     }
-    
+
     if ($p['status'] === 'atrasado') {
+        $p['dias_restantes'] = $dias_diff; // negativo
+        $p['dias_atraso'] = abs($dias_diff);
         $total_atrasados++;
     } else {
+        $p['dias_restantes'] = $dias_diff; // positivo ou 0
+        $p['dias_atraso'] = 0;
         $total_no_prazo++;
+        if ($dias_diff === 0) $total_vence_hoje++;
     }
 }
 unset($p);
@@ -115,29 +112,33 @@ unset($p);
 $total_geral = count($pendencias);
 $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-// ========== CARREGAR ALUNOS PARA O JS ==========
+// ========== ALUNOS ==========
 $alunos = array();
 if ($db) {
     $sql_alunos = "SELECT id_aluno, nome_aluno, serie_aluno FROM login_aluno ORDER BY nome_aluno";
     if ($db instanceof mysqli) {
         $result_alunos = $db->query($sql_alunos);
         if ($result_alunos) {
-            while ($row = $result_alunos->fetch_assoc()) {
-                $alunos[] = $row;
-            }
+            while ($row = $result_alunos->fetch_assoc()) $alunos[] = $row;
         }
     } elseif ($db instanceof PDO) {
         $stmt = $db->query($sql_alunos);
-        if ($stmt) {
-            $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
+        if ($stmt) $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-// ========== MENSAGENS FLASH ==========
+// Nome do aluno filtrado: busca no banco (o PHP já decodifica o $_GET, não usar urldecode de novo)
+if ($filtro_aluno_id > 0) {
+    foreach ($alunos as $a) {
+        if ((int)$a['id_aluno'] === $filtro_aluno_id) { $filtro_aluno_nome = $a['nome_aluno']; break; }
+    }
+    if ($filtro_aluno_nome === '' && isset($_GET['aluno_nome'])) $filtro_aluno_nome = (string)$_GET['aluno_nome'];
+}
+
+// ========== FLASH ==========
 $msg_sucesso = $_SESSION['msg_sucesso'] ?? null;
-$msg_erro = $_SESSION['msg_erro'] ?? null;
+$msg_erro    = $_SESSION['msg_erro'] ?? null;
 unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 ?>
 <!DOCTYPE html>
@@ -147,77 +148,58 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendências — SiGA ITJ Admin</title>
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
     <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../assets/css/pendencias_adm.css?v=<?= time() ?>">
     <script src="../assets/js/pendencias_adm.js?v=<?= time() ?>" defer></script>
-    <style>
-</style>
 </head>
 <body class="<?= $config_classes ?>">
-    
-    <!-- ========== SIDEBAR ========== -->
-    <aside class="sidebar" id="sidebar">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar" aria-label="Menu principal">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
                 <span>SiGA ITJ</span>
             </div>
-            <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
-                <span></span>
-                <span></span>
+            <button class="collapse-icon" id="collapseBtn" title="Recolher menu" aria-label="Recolher menu">
+                <span></span><span></span>
             </button>
         </div>
 
         <nav class="sidebar-nav" id="sidebar-nav">
-            <a href="dashboard_adm.php" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="reservas_adm.php" class="nav-item">
-                <i class="fas fa-bookmark"></i>
-                <span>Reservas</span>
-            </a>
+            <a href="dashboard_adm.php" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+            <a href="reservas_adm.php" class="nav-item"><i class="fas fa-bookmark"></i><span>Reservas</span></a>
             <a href="pendencias_adm.php" class="nav-item active">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>Pendências</span>
+                <i class="fas fa-exclamation-circle"></i><span>Pendências</span>
                 <?php if ($total_atrasados > 0): ?>
                     <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
                 <?php endif; ?>
             </a>
-            <a href="catalogo_adm.php" class="nav-item">
-                <i class="fas fa-book"></i>
-                <span>Catálogo</span>
-            </a>
-            <a href="notificacoes_adm.php" class="nav-item">
-                <i class="fas fa-bell"></i>
-                <span>Notificações</span>
-            </a>
-            <div class="nav-divider"></div>
-            <a href="logout_adm.php" class="nav-item nav-logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sair</span>
-            </a>
+            <a href="catalogo_adm.php" class="nav-item"><i class="fas fa-book"></i><span>Catálogo</span></a>
+            <a href="extrato_adm.php" class="nav-item"><i class="fas fa-history"></i><span>Extrato</span></a>
+            <a href="notificacoes_adm.php" class="nav-item"><i class="fas fa-bell"></i><span>Notificações</span></a>
+            <a href="logout_adm.php" class="nav-item nav-logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
         </nav>
     </aside>
 
-    <!-- ========== CONTEÚDO PRINCIPAL ========== -->
+    <!-- MAIN -->
     <div class="main-content">
 
-        <!-- ========== TOP HEADER ========== -->
+        <!-- TOP HEADER -->
         <header class="top-header">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" placeholder="Pesquisar pendências por aluno..." autocomplete="off">
+                <input type="text" id="search-input" placeholder="Pesquisar por aluno ou livro…  ( / )" autocomplete="off" aria-label="Pesquisar por aluno ou livro">
             </div>
 
             <div class="header-right">
-                <div class="admin-profile" id="admin-profile-btn">
-                    <div class="admin-avatar">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
+                <div class="admin-profile" id="admin-profile-btn" tabindex="0" role="button" aria-haspopup="true">
+                    <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
                     <div class="admin-info">
                         <span class="admin-label">Administradora</span>
                         <strong class="admin-name"><?= htmlspecialchars($nome_bibliotecaria) ?></strong>
@@ -232,98 +214,111 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
 
-                <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
                 <div class="notification-container">
-                    <button class="notification-btn" id="notification-btn" title="Notificações">
+                    <button class="notification-btn" id="notification-btn" title="Notificações" aria-label="Ver notificações">
                         <i class="fas fa-bell"></i>
                         <?php if (count($notificacoes) > 0): ?>
-                            <span class="badge" style="
-                                position: absolute;
-                                top: -4px;
-                                right: -4px;
-                                background: #e74c3c;
-                                color: white;
-                                font-size: 10px;
-                                font-weight: 700;
-                                min-width: 18px;
-                                height: 18px;
-                                border-radius: 50%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                padding: 0 5px;
-                            "><?= count($notificacoes) ?></span>
+                            <span class="badge-notif"><?= count($notificacoes) ?></span>
                         <?php endif; ?>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
                         <div class="notification-header">
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
-                        <div class="notification-list" id="notification-list-dropdown">
-                            <!-- Preenchido via JS -->
-                        </div>
+                        <div class="notification-list" id="notification-list-dropdown"></div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- ========== MAIN ========== -->
         <main class="dashboard-main">
 
-            <!-- ========== MENSAGENS FLASH ========== -->
-            <?php if ($msg_sucesso): ?>
-                <div class="flash-message flash-success">
-                    <i class="fas fa-check-circle"></i>
-                    <?= htmlspecialchars($msg_sucesso) ?>
-                </div>
-            <?php elseif ($msg_erro): ?>
-                <div class="flash-message flash-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <?= htmlspecialchars($msg_erro) ?>
-                </div>
-            <?php endif; ?>
-
-            <!-- ========== CABEÇALHO DA PÁGINA ========== -->
+            <!-- PAGE HEADER -->
             <div class="page-header">
                 <div>
-                    <h1><i class="fas fa-exclamation-circle"></i> Empréstimos & Pendências</h1>
+                    <h1><i class="fas fa-exclamation-circle"></i> Empréstimos &amp; Pendências</h1>
                     <p class="page-subtitle">
-                        Acompanhe os materiais emprestados e registre as devoluções
+                        Acompanhe os materiais emprestados e registre as devoluções em um clique.
                         <?php if ($filtro_aluno_id > 0): ?>
-                            <br><strong style="color: #0b4b9b;">📌 Aluno: <?= htmlspecialchars($filtro_aluno_nome) ?></strong>
+                            <br><strong class="filtro-aluno-tag">
+                                <i class="fas fa-user"></i> <?= htmlspecialchars($filtro_aluno_nome) ?>
+                            </strong>
                         <?php endif; ?>
                     </p>
                 </div>
                 <?php if ($filtro_aluno_id > 0): ?>
-                    <div>
-                        <a href="pendencias_adm.php" style="background: #f0f4fd; border: none; padding: 10px 20px; border-radius: 10px; text-decoration: none; color: #0b4b9b; font-weight: 600; display: inline-block;">
-                            <i class="fas fa-times"></i> Limpar Filtro
-                        </a>
-                    </div>
+                    <a href="pendencias_adm.php" class="btn-limpar-filtro">
+                        <i class="fas fa-times"></i> Limpar Filtro
+                    </a>
                 <?php endif; ?>
             </div>
 
-            <!-- ========== FILTROS ========== -->
+            <!-- CARDS DE ESTATÍSTICAS (informativos — os filtros ficam nas tabs abaixo) -->
+            <div class="stats-grid">
+                <div class="stat-card stat-total" role="group" aria-label="Total de empréstimos ativos">
+                    <span class="stat-icon"><i class="fas fa-book-open"></i></span>
+                    <span class="stat-info">
+                        <span class="stat-label">Total Ativos</span>
+                        <span class="stat-value" id="stat-total"><?= $total_geral ?></span>
+                    </span>
+                </div>
+                <div class="stat-card stat-atraso" role="group" aria-label="Empréstimos em atraso">
+                    <span class="stat-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                    <span class="stat-info">
+                        <span class="stat-label">Em Atraso</span>
+                        <span class="stat-value" id="stat-atraso"><?= $total_atrasados ?></span>
+                    </span>
+                </div>
+                <div class="stat-card stat-prazo" role="group" aria-label="Empréstimos no prazo">
+                    <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
+                    <span class="stat-info">
+                        <span class="stat-label">No Prazo</span>
+                        <span class="stat-value" id="stat-prazo"><?= $total_no_prazo ?></span>
+                    </span>
+                </div>
+                <div class="stat-card stat-hoje" role="group" aria-label="Empréstimos que vencem hoje">
+                    <span class="stat-icon"><i class="fas fa-hourglass-half"></i></span>
+                    <span class="stat-info">
+                        <span class="stat-label">Vence Hoje</span>
+                        <span class="stat-value" id="stat-hoje"><?= $total_vence_hoje ?></span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
             <div class="filtros-container">
-                <div class="filtros-tabs" id="filtros-tabs">
-                    <button class="filtro-tab active" data-status="todos">
+                <div class="filtros-tabs" id="filtros-tabs" role="tablist" aria-label="Filtrar por situação">
+                    <button class="filtro-tab active" data-status="todos" role="tab" aria-selected="true">
                         <i class="fas fa-list"></i> Todos
                         <span class="tab-badge" id="badge-todos"><?= $total_geral ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="atrasado">
+                    <button class="filtro-tab" data-status="atrasado" role="tab" aria-selected="false">
                         <i class="fas fa-exclamation-triangle"></i> Atrasados
-                        <span class="tab-badge cancelada" id="badge-atrasado"><?= $total_atrasados ?></span>
+                        <span class="tab-badge atrasado" id="badge-atrasado"><?= $total_atrasados ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="emprestado">
+                    <button class="filtro-tab" data-status="hoje" role="tab" aria-selected="false">
+                        <i class="fas fa-hourglass-half"></i> Vence hoje
+                        <span class="tab-badge hoje" id="badge-hoje"><?= $total_vence_hoje ?></span>
+                    </button>
+                    <button class="filtro-tab" data-status="emprestado" role="tab" aria-selected="false">
                         <i class="fas fa-clock"></i> No Prazo
-                        <span class="tab-badge aprovada" id="badge-emprestado"><?= $total_no_prazo ?></span>
+                        <span class="tab-badge emprestado" id="badge-emprestado"><?= $total_no_prazo ?></span>
                     </button>
                 </div>
 
                 <div class="filtros-acoes">
-                    <!-- ========== BOTÃO DE ORDENAÇÃO ========== -->
+                    <span class="resultado-info" id="resultado-info" aria-live="polite"></span>
+
+                    <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
+                        <span><i class="fas fa-search"></i> "<strong id="busca-termo"></strong>"</span>
+                        <span class="busca-count" id="busca-count">0</span>
+                        <button class="limpar-busca" id="limpar-busca" aria-label="Limpar busca">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
                     <div class="ordenacao-wrapper">
-                        <button class="btn-ordenacao" id="btn-ordenacao" title="Ordenar empréstimos">
+                        <button class="btn-ordenacao" id="btn-ordenacao" title="Ordenar empréstimos" aria-haspopup="true">
                             <i class="fas fa-sort"></i>
                             <span id="ordenacao-label">Mais recente</span>
                             <i class="fas fa-chevron-down"></i>
@@ -335,52 +330,102 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <button class="ordenacao-item" data-ordem="antigo">
                                 <i class="fas fa-arrow-up"></i> Mais antigo
                             </button>
+                            <button class="ordenacao-item" data-ordem="urgencia">
+                                <i class="fas fa-fire"></i> Mais urgentes
+                            </button>
+                            <button class="ordenacao-item" data-ordem="aluno">
+                                <i class="fas fa-user"></i> Aluno (A–Z)
+                            </button>
                         </div>
-                    </div>
-
-                    <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
-                        <span><i class="fas fa-search"></i> Buscando por: "<strong id="busca-termo"></strong>"</span>
-                        <button class="limpar-busca" id="limpar-busca"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
             </div>
 
-            <!-- ========== LISTA DE PENDÊNCIAS ========== -->
+            <!-- LISTA -->
             <div class="reservas-list-container">
-                <div class="reservas-table-wrapper">
-                    <table class="reservas-table">
+                <div class="reservas-table-wrapper" id="table-wrapper">
+                    <table class="reservas-table" aria-label="Lista de pendências">
                         <thead>
                             <tr>
-                                <th>Aluno</th>
+                                <th class="col-aluno">Aluno</th>
                                 <th>Material</th>
-                                <th>Tipo</th>
-                                <th>Data Empréstimo</th>
-                                <th>Devolução Prevista</th>
-                                <th>Status</th>
+                                <th class="text-center">Tipo</th>
+                                <th class="text-center">Empréstimo</th>
+                                <th class="text-center">Devolução</th>
+                                <th class="text-center">Status</th>
                                 <th class="text-center">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="pendencias-tbody">
-                            <!-- Preenchido via JS -->
-                        </tbody>
+                        <tbody id="pendencias-tbody"></tbody>
                     </table>
                 </div>
+
+                <!-- Empty state -->
                 <div class="empty-state" id="empty-state" style="display: none;">
-                    <i class="fas fa-inbox"></i>
-                    <h3>Nenhum empréstimo ativo no momento</h3>
-                    <p id="empty-message">Não há pendências cadastradas</p>
+                    <div class="empty-illustration">
+                        <i class="fas fa-inbox" id="empty-icon"></i>
+                    </div>
+                    <h3 id="empty-title">Tudo em ordem! 🎉</h3>
+                    <p id="empty-message">Nenhum empréstimo ativo no momento.</p>
+                    <a href="catalogo_adm.php" class="empty-cta" id="empty-catalogo">
+                        <i class="fas fa-book"></i> Ir para o Catálogo
+                    </a>
+                    <button type="button" class="empty-cta" id="empty-limpar" style="display:none;">
+                        <i class="fas fa-rotate-left"></i> Limpar filtros
+                    </button>
                 </div>
             </div>
 
         </main>
     </div>
 
-<script>
-    const pendenciasData = <?= $pendencias_json ?>;
-    const alunosData = <?= $alunos_json ?>;
-    const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-</script>
+    <!-- MODAL: CONFIRMAR DEVOLUÇÃO -->
+    <div class="modal-overlay" id="modal-devolucao" hidden>
+        <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-devolucao-titulo">
+            <div class="modal-header">
+                <div class="modal-icon"><i class="fas fa-undo-alt"></i></div>
+                <div class="modal-header-text">
+                    <h3 id="modal-devolucao-titulo">Registrar devolução</h3>
+                    <p>Confirme os dados antes de finalizar.</p>
+                </div>
+            </div>
 
+            <div class="modal-info">
+                <div class="modal-info-row">
+                    <span class="modal-info-label"><i class="fas fa-book"></i> Material</span>
+                    <span class="modal-info-value" id="modal-material"></span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-info-label"><i class="fas fa-user-graduate"></i> Aluno</span>
+                    <span class="modal-info-value" id="modal-aluno"></span>
+                </div>
+                <div class="modal-info-row" id="modal-prazo-linha">
+                    <span class="modal-info-label"><i class="fas fa-calendar-day"></i> Prazo de devolução</span>
+                    <span class="modal-info-value">
+                        <span id="modal-prazo"></span>
+                        <span class="modal-prazo-badge" id="modal-prazo-badge"></span>
+                    </span>
+                </div>
+            </div>
+
+            <p class="modal-aviso"><i class="fas fa-info-circle"></i> Esta ação não pode ser desfeita.</p>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-modal btn-cancelar" id="modal-cancelar">Cancelar</button>
+                <button type="button" class="btn-modal btn-confirmar" id="modal-confirmar">
+                    <i class="fas fa-check"></i> Confirmar devolução
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const pendenciasData   = <?= $pendencias_json ?>;
+    const alunosData       = <?= $alunos_json ?>;
+    const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    const msgSucesso       = <?= json_encode($msg_sucesso, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    const msgErro          = <?= json_encode($msg_erro, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
 
 </body>
 </html>

@@ -1,0 +1,208 @@
+/* =============================================
+   ui_alerts.css — Alertas minimalistas
+   SiGA ITJ
+   ============================================= */
+
+.ui-alert-container {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    pointer-events: none;
+}
+
+/* ========== OVERLAY — fade simples ========== */
+.ui-alert-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: auto;
+    z-index: 100001;
+    transition: opacity 0.2s ease;
+}
+.ui-alert-overlay.show { opacity: 1; }
+.ui-alert-overlay.hide { opacity: 0; transition-duration: 0.15s; }
+
+/* ========== CARD ========== */
+.ui-alert-card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 26px 24px 20px;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+
+    transform: translateY(8px) scale(0.98);
+    opacity: 0;
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+.ui-alert-overlay.show .ui-alert-card {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+/* ========== BOTÃO FECHAR ========== */
+.ui-alert-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.ui-alert-close:hover { background: #f1f5f9; color: #475569; }
+
+/* ========== ÍCONE ========== */
+.ui-alert-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.ui-alert-success .ui-alert-icon { background: #27ae60; }
+.ui-alert-error   .ui-alert-icon { background: #e74c3c; }
+.ui-alert-warning .ui-alert-icon { background: #e67e22; }
+.ui-alert-info    .ui-alert-icon { background: #0b4b9b; }
+.ui-alert-question .ui-alert-icon { background: #0b4b9b; }
+
+/* ========== TÍTULO / MENSAGEM ========== */
+.ui-alert-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a2333;
+    margin: 0 0 6px;
+}
+
+.ui-alert-message {
+    font-size: 14px;
+    color: #5b6473;
+    line-height: 1.5;
+    margin: 0 0 20px;
+    word-break: break-word;
+}
+
+/* ========== AÇÕES ========== */
+.ui-alert-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.ui-alert-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 22px;
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: background 0.15s ease;
+}
+
+.ui-alert-btn-confirm {
+    background: #0b4b9b;
+    color: #ffffff;
+}
+.ui-alert-btn-confirm:hover { background: #093b7b; }
+.ui-alert-btn-confirm:active { background: #072f61; }
+
+.ui-alert-success .ui-alert-btn-confirm { background: #27ae60; }
+.ui-alert-success .ui-alert-btn-confirm:hover { background: #1e8449; }
+
+.ui-alert-error .ui-alert-btn-confirm { background: #e74c3c; }
+.ui-alert-error .ui-alert-btn-confirm:hover { background: #c0392b; }
+
+.ui-alert-warning .ui-alert-btn-confirm { background: #e67e22; }
+.ui-alert-warning .ui-alert-btn-confirm:hover { background: #d35400; }
+
+.ui-alert-btn-cancel {
+    background: #f1f5f9;
+    color: #5b6473;
+}
+.ui-alert-btn-cancel:hover { background: #e2e8f0; color: #1a2333; }
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 480px) {
+    .ui-alert-card { padding: 22px 20px 18px; }
+    .ui-alert-actions { flex-direction: column-reverse; }
+    .ui-alert-btn { width: 100%; }
+}
+
+/* ========== ACESSIBILIDADE ========== */
+@media (prefers-reduced-motion: reduce) {
+    .ui-alert-overlay,
+    .ui-alert-card {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========== TEMA ESCURO ========== */
+body.tema-escuro .ui-alert-card {
+    background: #1a2a4a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+body.tema-escuro .ui-alert-title { color: #f0f0f0; }
+body.tema-escuro .ui-alert-message { color: #b0c0d0; }
+body.tema-escuro .ui-alert-close { color: #8a9aaa; }
+body.tema-escuro .ui-alert-close:hover { background: #1a3a5a; color: #ffffff; }
+body.tema-escuro .ui-alert-btn-cancel {
+    background: #0f1a3a;
+    color: #b0c0d0;
+}
+body.tema-escuro .ui-alert-btn-cancel:hover { background: #1a3a5a; color: #ffffff; }
+
+/* ========== TEMA ALTO CONTRASTE ========== */
+body.tema-alto_contraste .ui-alert-overlay { background: rgba(0, 0, 0, 0.85); }
+body.tema-alto_contraste .ui-alert-card {
+    background: #1a1a1a;
+    border: 2px solid #ffffff;
+    box-shadow: none;
+}
+body.tema-alto_contraste .ui-alert-title { color: #ffffff; }
+body.tema-alto_contraste .ui-alert-message { color: #ffffff; }
+body.tema-alto_contraste .ui-alert-close { color: #ffffff; }
+body.tema-alto_contraste .ui-alert-close:hover { background: #333333; }
+body.tema-alto_contraste .ui-alert-icon {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+body.tema-alto_contraste .ui-alert-btn-confirm {
+    background: #ffffff;
+    color: #000000;
+}
+body.tema-alto_contraste .ui-alert-btn-confirm:hover { background: #cccccc; }
+body.tema-alto_contraste .ui-alert-btn-cancel {
+    background: #222222;
+    color: #ffffff;
+    border: 1px solid #ffffff;
+}
+body.tema-alto_contraste .ui-alert-btn-cancel:hover { background: #333333; }

@@ -8,12 +8,21 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = $_SESSION['usuario_id'];
+$favoritosStmt = $conn->prepare('SELECT item_id, tipo_item FROM favoritos WHERE usuario_id = ?');
+$favoritosStmt->bind_param('i', $usuario_id);
+$favoritosStmt->execute();
+$favoritosResult = $favoritosStmt->get_result();
+$favoritos = [];
+while ($favorito = $favoritosResult->fetch_assoc()) {
+    $favoritos[$favorito['tipo_item'] . '_' . $favorito['item_id']] = true;
+}
+$favoritosStmt->close();
+
 $sql = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
 $primeiroNome = 'Aluno';
 if ($row = $result->fetch_assoc()) {
     $nomeCompleto = trim($row['nome_aluno']);
@@ -21,198 +30,342 @@ if ($row = $result->fetch_assoc()) {
     $primeiroNome = $partes[0] ?: 'Aluno';
 }
 $stmt->close();
+
+// ========== NOTIFICAÇÕES ==========
+$notificacoes = array();
+$sql_notif = "
+    SELECT n.id_envio, n.titulo, n.mensagem, n.tipo, n.criado_em
+    FROM notificacoes n
+    WHERE n.id_aluno = ?
+    ORDER BY n.criado_em DESC
+    LIMIT 5
+";
+$stmt_notif = $conn->prepare($sql_notif);
+if ($stmt_notif) {
+    $stmt_notif->bind_param("i", $usuario_id);
+    $stmt_notif->execute();
+    $notificacoes = $stmt_notif->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt_notif->close();
+}
+
+// ========== PAGINAÇÃO E FILTROS ==========
+$porPagina = 20;
+$paginaAtual = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
+$offset = ($paginaAtual - 1) * $porPagina;
+
+$filtroTipo = isset($_GET['tipo']) ? $_GET['tipo'] : '';
+$filtroBusca = isset($_GET['busca']) ? trim($_GET['busca']) : '';
+
+$where = "1=1";
+$params = [];
+if ($filtroTipo) {
+    $where .= " AND tipo = ?";
+    $params[] = $filtroTipo;
+}
+if ($filtroBusca) {
+    $where .= " AND (titulo LIKE ? OR autor LIKE ?)";
+    $termo = '%' . $filtroBusca . '%';
+    $params[] = $termo;
+    $params[] = $termo;
+}
+
+$countSql = "SELECT COUNT(*) as total FROM catalogo WHERE $where";
+$stmt = $conn->prepare($countSql);
+if (!$stmt) {
+    $total = 0;
+} else {
+    if (!empty($params)) {
+        $types = str_repeat('s', count($params));
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $total = $stmt->get_result()->fetch_assoc()['total'];
+    $stmt->close();
+}
+
+$totalPaginas = ceil($total / $porPagina);
+
+$sql = "SELECT id_catalogo, titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url 
+        FROM catalogo 
+        WHERE $where 
+        ORDER BY titulo ASC 
+        LIMIT ? OFFSET ?";
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    $itens = [];
+} else {
+    $params[] = $porPagina;
+    $params[] = $offset;
+    $types = str_repeat('s', count($params) - 2) . 'ii';
+    $stmt->bind_param($types, ...$params);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        $itens = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    } else {
+        $itens = [];
+    }
+    $stmt->close();
+}
+
+$catalogData = [];
+foreach ($itens as $row) {
+    $capa = $row['capa_url'];
+    if (!empty($capa) && strpos($capa, 'http') !== 0 && strpos($capa, '/') !== 0) {
+        $capa = '../' . $capa;
+    }
+    $catalogData[] = [
+        'id'          => $row['id_catalogo'],
+        'title'       => $row['titulo'],
+        'author'      => $row['autor'],
+        'type'        => $row['tipo'],
+        'year'        => $row['ano_publicacao'],
+        'category'    => '',
+        'cover'       => $capa,
+        'quantity'    => $row['quantidade'],
+        'available'   => $row['quantidade'] > 0,
+        'description' => $row['descricao'],
+    ];
+}
+$catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo - SiGA ITJ</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - SiGA ITJ</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
+    <link rel="stylesheet" href="../assets/css/catalogo.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/student_unified.css">
+    <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
+    <link rel="stylesheet" href="../assets/css/ui_alerts.css">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
-  <link rel="stylesheet" href="../assets/css/catalogo.css">
-
-  <script src="../assets/js/dashboard_aluno.js" defer></script>
-  <script src="../assets/js/catalogo.js" defer></script>
+    <script src="../assets/js/ui_alerts.js"></script>
+    <script src="../assets/js/dashboard_aluno.js" defer></script>
+    <script src="../assets/js/notificacoes_aluno.js" defer></script>
+    <script>
+        window.catalogData = <?= $catalogDataJson ?>;
+        window.favoritosPHP = <?= json_encode($favoritos) ?>;
+        window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    </script>
+    <script src="../assets/js/catalogo.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
-
-  <!-- SIDEBAR (mesma estrutura do dashboard) -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">
-        <i class="fas fa-book-reader"></i>
-        <span>SiGA ITJ</span>
-      </div>
-      <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="dashboard_aluno.php" class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>Visão Geral</span>
-      </a>
-      <a href="catalogo.php" class="nav-item active">
-        <i class="fas fa-search"></i>
-        <span>Catálogo</span>
-      </a>
-      <a href="meus_emprestimos.php" class="nav-item">
-        <i class="fas fa-book"></i>
-        <span>Meus Empréstimos</span>
-      </a>
-      <a href="reservas.php" class="nav-item">
-        <i class="fas fa-clock"></i>
-        <span>Minhas Reservas</span>
-      </a>
-      <a href="historico.php" class="nav-item">
-        <i class="fas fa-history"></i>
-        <span>Histórico</span>
-      </a>
-    </nav>
-  </aside>
-
-  <!-- CONTEÚDO PRINCIPAL -->
-  <div class="main-content">
-    <!-- TOP HEADER (idêntico ao dashboard) -->
-    <header class="top-header">
-      <div class="search-container">
-      </div>
-
-      <div class="header-right">
-        <!-- SELETOR DE IDIOMA -->
-        <div class="language-wrapper">
-          <button class="language-button" aria-label="Selecionar idioma">
-            <img src="../assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
-            <span>PT</span>
-            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-          </button>
-          <ul class="language-list">
-            <li data-lang="pt" tabindex="0"><img src="../assets/Imagens/br.png" class="flag" alt="Português"> Português</li>
-            <li data-lang="en" tabindex="0"><img src="../assets/Imagens/us.png" class="flag" alt="English"> English</li>
-            <li data-lang="es" tabindex="0"><img src="../assets/Imagens/es.png" class="flag" alt="Español"> Español</li>
-          </ul>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"><i class="fas fa-book-reader"></i><span>SiGA ITJ</span></div>
+            <button class="collapse-icon" id="collapseBtn"><span></span><span></span></button>
         </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard_aluno.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+            <a href="catalogo.php" class="nav-item active"><i class="fas fa-search"></i><span>Catálogo</span></a>
+            <a href="favoritos.php" class="nav-item"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
+            <a href="meus_emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+            <a href="reservas.php" class="nav-item"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
+            <a href="historico.php" class="nav-item"><i class="fas fa-history"></i><span>Histórico</span></a>
+            <a href="configuracoes_aluno.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
+        </nav>
+    </aside>
 
-        <!-- USUÁRIO -->
-        <div class="user-info">
-          <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-          <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
-        </div>
+    <div class="main-content">
+        <header class="top-header">
+            <div class="search-container"></div>
+            <div class="header-right">
+                <div class="language-wrapper">
+                    <button class="language-button">
+                        <img src="../assets/Imagens/br.png" class="flag" alt="PT"><span>PT</span>
+                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
+                    </button>
+                    <ul class="language-list">
+                        <li data-lang="pt"><img src="../assets/Imagens/br.png" class="flag" alt="Português"> Português</li>
+                        <li data-lang="en"><img src="../assets/Imagens/us.png" class="flag" alt="English"> English</li>
+                        <li data-lang="es"><img src="../assets/Imagens/es.png" class="flag" alt="Español"> Español</li>
+                    </ul>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
+                    <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
+                </div>
+                <a href="logout_user.php" class="btn-logout" title="Sair"><i class="fas fa-sign-out-alt"></i><span id="logout-text">Sair</span></a>
 
-        <!-- LOGOUT -->
-        <a href="logout_user.php" class="btn-logout" title="Sair">
-          <i class="fas fa-sign-out-alt"></i>
-          <span id="logout-text">Sair</span>
-        </a>
-
-        <!-- NOTIFICAÇÃO -->
-        <div class="notification-container">
-          <button class="notification-btn" id="notification-btn" title="Notificações">
-            <i class="fas fa-bell"></i>
-            <span class="notification-dot"></span>
-            <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
-          </button>
-          <div class="notification-dropdown" id="notification-dropdown">
-            <div class="notification-header">
-              <h4><i class="fas fa-bell"></i> Notificações</h4>
-              <button class="mark-read-btn" id="mark-read-btn">Marcar todas como lidas</button>
+                <div class="notification-container">
+                    <button class="notification-btn" id="notification-btn" title="Notificações">
+                        <i class="fas fa-bell"></i>
+                        <?php if (count($notificacoes) > 0): ?>
+                            <span class="badge"><?= count($notificacoes) ?></span>
+                        <?php endif; ?>
+                    </button>
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-header">
+                            <h4><i class="fas fa-bell"></i> Notificações</h4>
+                        </div>
+                        <div class="notification-list" id="notification-list-dropdown"></div>
+                    </div>
+                </div>
             </div>
-            <div class="notification-list" id="notification-list">
-              <div class="empty-notifications" style="display: none;">
-                <i class="far fa-bell-slash"></i>
-                <p>Nenhuma notificação nova</p>
-              </div>
+        </header>
+
+        <main class="container catalog-main">
+
+            <!-- ========== HERO ========== -->
+            <div class="catalog-hero">
+                <div class="catalog-hero-content">
+                    <h1 id="catalog-title">
+                        <i class="fas fa-compass"></i> Catálogo
+                    </h1>
+                    <p id="catalog-subtitle">Explore nosso acervo de livros, revistas e TCCs</p>
+                </div>
+                <div class="catalog-hero-stats">
+                    <div class="stat-pill">
+                        <span class="stat-pill-num"><?= number_format($total, 0, ',', '.') ?></span>
+                        <span class="stat-pill-label"><?= $total == 1 ? 'item no acervo' : 'itens no acervo' ?></span>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </header>
 
-    <!-- CONTEÚDO DO CATÁLOGO -->
-    <main class="catalog-main">
-      <div class="catalog-header">
-        <h1 id="catalog-title">Catálogo</h1>
-        <p id="catalog-subtitle">Explore nosso acervo de livros, revistas e TCCs</p>
-      </div>
+            <!-- ========== FILTROS ========== -->
+            <form method="GET" action="catalogo.php" class="catalog-filters" id="catalog-filters">
+                <div class="filter-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text"
+                           name="busca"
+                           placeholder="Buscar por título ou autor..."
+                           value="<?= htmlspecialchars($filtroBusca) ?>"
+                           autocomplete="off">
+                </div>
 
-      <!-- Filtros -->
-      <div class="catalog-filters">
-        <div class="filter-group">
-          <label for="filter-category" id="filter-category-label">Categoria</label>
-          <select id="filter-category">
-            <option value="all" id="filter-category-all">Todos</option>
-            <option value="book" id="filter-category-books">Livros</option>
-            <option value="magazine" id="filter-category-magazines">Revistas</option>
-            <option value="tcc" id="filter-category-tcc">TCCs</option>
-          </select>
-        </div>
+                <div class="filter-chips" role="group" aria-label="Filtrar por tipo">
+                    <button type="submit" name="tipo" value="" class="filter-chip <?= $filtroTipo === '' ? 'active' : '' ?>">
+                        <i class="fas fa-layer-group"></i> Todos
+                    </button>
+                    <button type="submit" name="tipo" value="livro" class="filter-chip <?= $filtroTipo === 'livro' ? 'active' : '' ?>">
+                        <i class="fas fa-book"></i> Livros
+                    </button>
+                    <button type="submit" name="tipo" value="revista" class="filter-chip <?= $filtroTipo === 'revista' ? 'active' : '' ?>">
+                        <i class="fas fa-newspaper"></i> Revistas
+                    </button>
+                    <button type="submit" name="tipo" value="tcc" class="filter-chip <?= $filtroTipo === 'tcc' ? 'active' : '' ?>">
+                        <i class="fas fa-graduation-cap"></i> TCCs
+                    </button>
+                </div>
 
-        <div class="filter-group">
-          <label for="filter-sort" id="filter-sort-label">Ordenar por</label>
-          <select id="filter-sort">
-            <option value="relevance" id="filter-sort-relevance">Relevância</option>
-            <option value="title" id="filter-sort-title">Título</option>
-            <option value="author" id="filter-sort-author">Autor</option>
-            <option value="year" id="filter-sort-year">Ano</option>
-          </select>
-        </div>
+                <div class="filter-actions">
+                    <?php if ($filtroTipo || $filtroBusca): ?>
+                        <a href="catalogo.php" class="filter-clear" title="Limpar filtros">
+                            <i class="fas fa-times"></i> Limpar
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
 
-        <div class="filter-group search-filter">
-          <input type="text" id="filter-search" placeholder="Buscar no catálogo...">
-          <button id="filter-search-btn"><i class="fas fa-search"></i></button>
-        </div>
-      </div>
+            <!-- ========== RESULTADOS ========== -->
+            <?php if ($filtroTipo || $filtroBusca): ?>
+                <div class="filter-summary">
+                    <i class="fas fa-info-circle"></i>
+                    <?php
+                        $resumo = [];
+                        if ($filtroBusca) $resumo[] = 'busca: "' . htmlspecialchars($filtroBusca) . '"';
+                        if ($filtroTipo) $resumo[] = 'tipo: ' . htmlspecialchars(ucfirst($filtroTipo));
+                    ?>
+                    Mostrando <strong><?= $total ?></strong> <?= $total == 1 ? 'resultado' : 'resultados' ?> · <?= implode(' · ', $resumo) ?>
+                </div>
+            <?php endif; ?>
 
-      <!-- Grade de resultados -->
-      <div class="catalog-grid" id="catalog-grid">
-        <!-- Os cards serão inseridos via JS -->
-      </div>
+            <!-- ========== GRID ========== -->
+            <div class="catalogo-grid" id="catalog-grid"></div>
 
-      <!-- Mensagem de nenhum resultado -->
-      <div class="catalog-empty" id="catalog-empty" style="display: none;">
-        <i class="fas fa-search"></i>
-        <p id="catalog-no-results">Nenhum resultado encontrado</p>
-      </div>
+            <!-- ========== PAGINAÇÃO ========== -->
+            <?php if ($totalPaginas > 1): ?>
+            <nav class="paginacao" aria-label="Paginação do catálogo">
+                <?php if ($paginaAtual > 1): ?>
+                    <a href="?pagina=<?= $paginaAtual-1 ?>&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>" class="page-nav">
+                        <i class="fas fa-chevron-left"></i> Anterior
+                    </a>
+                <?php endif; ?>
 
-      <!-- Paginação / carregar mais (simples) -->
-      <div class="catalog-load-more" id="catalog-load-more">
-        <button id="load-more-btn">Carregar mais</button>
-      </div>
-    </main>
-  </div>
+                <?php
+                $range = 2;
+                $start = max(1, $paginaAtual - $range);
+                $end = min($totalPaginas, $paginaAtual + $range);
+                if ($start > 1): ?>
+                    <a href="?pagina=1&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>">1</a>
+                    <?php if ($start > 2): ?><span class="page-dots">…</span><?php endif; ?>
+                <?php endif; ?>
 
-  <!-- MODAL DE DETALHES DO ITEM -->
-  <div class="modal-overlay" id="item-modal-overlay">
-    <div class="modal-container" id="item-modal">
-      <button class="modal-close" id="item-modal-close"><i class="fas fa-times"></i></button>
-      <div class="modal-content">
-        <div class="modal-cover">
-          <img id="modal-cover-img" src="" alt="Capa">
-          <div class="modal-cover-placeholder" id="modal-cover-placeholder" style="display: none;">
-            <i class="fas fa-book"></i>
-            <span>Título</span>
-          </div>
-        </div>
-        <div class="modal-info">
-          <h2 id="modal-title">Título</h2>
-          <p id="modal-author">Autor</p>
-          <p id="modal-year">Ano</p>
-          <p id="modal-category">Categoria</p>
-          <p id="modal-type">Tipo</p>
-          <p id="modal-description">Descrição</p>
-          <p id="modal-availability" class="availability available">Disponível</p>
-          <div class="modal-actions">
-            <button id="modal-favorite-btn"><i class="far fa-heart" id="modal-favorite-icon"></i> <span id="modal-favorite-text">Favoritar</span></button>
-            <button id="modal-reserve-btn"><i class="fas fa-hand-holding"></i> <span id="modal-reserve-text">Reservar</span></button>
-          </div>
-        </div>
-      </div>
+                <?php for ($i = $start; $i <= $end; $i++): ?>
+                    <a href="?pagina=<?= $i ?>&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>"
+                       class="<?= $i === $paginaAtual ? 'active' : '' ?>"
+                       <?= $i === $paginaAtual ? 'aria-current="page"' : '' ?>>
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+
+                <?php if ($end < $totalPaginas): ?>
+                    <?php if ($end < $totalPaginas - 1): ?><span class="page-dots">…</span><?php endif; ?>
+                    <a href="?pagina=<?= $totalPaginas ?>&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>"><?= $totalPaginas ?></a>
+                <?php endif; ?>
+
+                <?php if ($paginaAtual < $totalPaginas): ?>
+                    <a href="?pagina=<?= $paginaAtual+1 ?>&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>" class="page-nav">
+                        Próximo <i class="fas fa-chevron-right"></i>
+                    </a>
+                <?php endif; ?>
+            </nav>
+            <?php endif; ?>
+
+            <!-- ========== EMPTY STATE ========== -->
+            <div id="catalog-empty" style="display:none;">
+                <div class="catalog-empty-inner">
+                    <div class="empty-illustration">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 id="catalog-no-results">Nenhum resultado encontrado</h3>
+                    <p>Tente ajustar os filtros ou explorar outra categoria.</p>
+                    <a href="catalogo.php" class="empty-cta">
+                        <i class="fas fa-undo"></i> Limpar filtros
+                    </a>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
 
+    <!-- ========== MODAL ========== -->
+    <div class="modal-overlay" id="item-modal-overlay">
+        <div class="modal-container">
+            <button class="modal-close" id="item-modal-close" aria-label="Fechar"><i class="fas fa-times"></i></button>
+            <div class="modal-content">
+                <div class="modal-cover">
+                    <img id="modal-cover-img" src="" alt="Capa">
+                    <div class="modal-cover-placeholder" id="modal-cover-placeholder" style="display:none;">
+                        <i class="fas fa-book"></i><span>Título</span>
+                    </div>
+                </div>
+                <div class="modal-info">
+                    <span class="modal-type-badge" id="modal-type-badge">Livro</span>
+                    <h2 id="modal-title">Título</h2>
+                    <p id="modal-author">Autor</p>
+                    <div class="modal-meta">
+                        <span id="modal-year"></span>
+                        <span id="modal-category"></span>
+                    </div>
+                    <p id="modal-type" style="display:none;"></p>
+                    <p id="modal-description" class="modal-description">Descrição</p>
+                    <p id="modal-availability" class="availability available">Disponível</p>
+                    <div class="modal-actions">
+                        <button id="modal-favorite-btn" type="button">
+                            <i class="far fa-heart" id="modal-favorite-icon"></i>
+                            <span id="modal-favorite-text">Favoritar</span>
+                        </button>
+                        <button id="modal-reserve-btn" type="button" class="btn-primary-action">
+                            <i class="fas fa-hand-holding"></i>
+                            <span id="modal-reserve-text">Reservar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

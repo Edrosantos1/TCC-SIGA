@@ -88,7 +88,6 @@
   align-items: center;
   gap: 20px;
   transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
   flex-wrap: wrap;
 }
 
@@ -151,6 +150,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
 }
 
 .reserva-info .meta i {
@@ -170,7 +170,7 @@
   color: #854d0e;
 }
 
-.status-ready {
+.status-approved {
   background: #d1fae5;
   color: #065f46;
 }
@@ -189,6 +189,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .reserva-actions button {
@@ -232,6 +233,25 @@
   background: #e2e8f0;
 }
 
+/* Estilo do texto "Pronto para retirada" */
+.status-ready-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #d1fae5;
+  color: #065f46;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.status-ready-text i {
+  font-size: 14px;
+  color: #065f46;
+}
+
 /* Empty state */
 .reservas-empty {
   text-align: center;
@@ -249,72 +269,9 @@
   font-size: 16px;
 }
 
-/* Modal */
-.status-badge {
-  display: inline-block;
-  padding: 4px 14px;
-  border-radius: 30px;
-  font-weight: 500;
-  font-size: 14px;
-  margin: 8px 0 12px;
-}
-
-.expiry-info {
-  font-size: 14px;
-  color: #475569;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.btn-danger {
-  background: #fee2e2;
-  color: #991b1b;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-}
-
-.btn-danger:hover {
-  background: #fecaca;
-}
-
-.btn-success {
-  background: #d1fae5;
-  color: #065f46;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-}
-
-.btn-success:hover {
-  background: #a7f3d0;
-}
-
-.btn-danger:disabled,
-.btn-success:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+/* Modal - não utilizado, mas mantido por compatibilidade */
+.modal-overlay {
+  display: none;
 }
 
 /* Responsive */
@@ -354,4 +311,21 @@
     width: 100%;
     justify-content: center;
   }
+}
+.status-retirada {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-retirada-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
 }

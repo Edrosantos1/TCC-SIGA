@@ -159,7 +159,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 <body class="<?= $config_classes ?>">
 
     <!-- ========== SIDEBAR ========== -->
-    <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
@@ -180,19 +180,22 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                 <i class="fas fa-bookmark"></i>
                 <span>Reservas</span>
             </a>
-            <a href="pendencias_adm.php" class="nav-item">
+            <a href="pendencias_adm.php" class="nav-item active">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
+                <?php if ($total_atrasados > 0): ?>
+                    <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
+                <?php endif; ?>
             </a>
             <a href="catalogo_adm.php" class="nav-item">
                 <i class="fas fa-book"></i>
                 <span>Catálogo</span>
             </a>
-            <a href="notificacoes_adm.php" class="nav-item active">
+            <a href="extrato_adm.php" class="nav-item"><i class="fas fa-history"></i><span>Extrato</span></a>
+            <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
                 <span>Notificações</span>
             </a>
-            <div class="nav-divider"></div>
             <a href="logout_adm.php" class="nav-item nav-logout">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>

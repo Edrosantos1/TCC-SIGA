@@ -9,11 +9,53 @@ if (file_exists($configPath)) {
     exit;
 }
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isset($_SESSION['usuario_id'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Não autorizado']);
+    exit;
 }
 
-$historicoData = [
+$usuario_id = (int) $_SESSION['usuario_id'];
+$historicoData = [];
+$sql = "SELECT e.id_emprestimo AS id, 'loan' AS type, e.id_catalogo AS itemId,
+               e.titulo_item AS title, COALESCE(c.autor, '') AS author,
+               c.ano_publicacao AS year, c.capa_url AS cover,
+               DATE(e.data_emprestimo) AS date, e.status,
+               e.data_devolucao_prevista AS dueDate, NULL AS returnedAt,
+               NULL AS reservedAt, NULL AS pickedUpAt
+        FROM emprestimos e LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
+        WHERE e.id_aluno = ?
+        UNION ALL
+        SELECT r.id_reserva AS id, 'reservation' AS type, r.id_catalogo AS itemId,
+               r.titulo_item AS title, COALESCE(c.autor, '') AS author,
+               c.ano_publicacao AS year, c.capa_url AS cover,
+               DATE(r.data_reserva) AS date, r.status, NULL AS dueDate,
+               NULL AS returnedAt, r.data_reserva AS reservedAt, NULL AS pickedUpAt
+        FROM reservas r LEFT JOIN catalogo c ON c.id_catalogo = r.id_catalogo
+        WHERE r.id_aluno = ?
+        ORDER BY date DESC";
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Erro ao consultar histórico']);
+    exit;
+}
+$stmt->bind_param('ii', $usuario_id, $usuario_id);
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    if ($row['type'] === 'loan') {
+        $row['status'] = $row['status'] === 'devolvido' ? 'returned' : ($row['status'] === 'atrasado' ? 'overdue' : 'pending');
+    } else {
+        $row['status'] = $row['status'] === 'retirada' ? 'completed' : ($row['status'] === 'cancelada' ? 'cancelled' : $row['status']);
+    }
+    $row['cover'] = $row['cover'] ?: null;
+    $historicoData[] = $row;
+}
+$stmt->close();
+echo json_encode($historicoData);
+/*
     // Empréstimos
     [
         'id' => 1,
@@ -96,4 +138,4 @@ $historicoData = [
     ],
 ];
 
-echo json_encode($historicoData);
+*/

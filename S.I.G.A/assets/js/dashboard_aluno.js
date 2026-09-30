@@ -11,10 +11,11 @@ const dashboardTranslations = {
     notification_title: "Notificações",
     nav_overview: "Visão Geral",
     nav_catalog: "Catálogo",
+    nav_favorites: "Meus Favoritos",
     nav_loans: "Meus Empréstimos",
     nav_reservations: "Minhas Reservas",
     nav_history: "Histórico",
-    last_viewed_title: "Em Andamento",
+      last_viewed_title: "Meus Empréstimos Ativos",
     rating_label: "Avalie este material:",
     continue_reading: "Continuar Leitura →",
     progress_text: "% concluído • Página {current} de {total}",
@@ -37,10 +38,11 @@ const dashboardTranslations = {
     notification_title: "Notifications",
     nav_overview: "Overview",
     nav_catalog: "Catalog",
+    nav_favorites: "My Favorites",
     nav_loans: "My Loans",
     nav_reservations: "My Reservations",
     nav_history: "History",
-    last_viewed_title: "In Progress",
+      last_viewed_title: "My Active Loans",
     rating_label: "Rate this material:",
     continue_reading: "Continue Reading →",
     progress_text: "% completed • Page {current} of {total}",
@@ -63,10 +65,11 @@ const dashboardTranslations = {
     notification_title: "Notificaciones",
     nav_overview: "Visión General",
     nav_catalog: "Catálogo",
+    nav_favorites: "Mis Favoritos",
     nav_loans: "Mis Préstamos",
     nav_reservations: "Mis Reservas",
     nav_history: "Historial",
-    last_viewed_title: "En Progresso",
+      last_viewed_title: "Mis Préstamos Activos",
     rating_label: "Califica este material:",
     continue_reading: "Continuar Lectura →",
     progress_text: "% completado • Página {current} de {total}",
@@ -120,9 +123,16 @@ function applyDashboardLanguage(lang) {
   const notifBtn = document.getElementById('notification-btn');
   if (notifBtn) notifBtn.title = t.notification_title;
 
-  // Sidebar
+  // ========== SIDEBAR ==========
   const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-  const navTexts = [t.nav_overview, t.nav_catalog, t.nav_loans, t.nav_reservations, t.nav_history];
+  const navTexts = [
+    t.nav_overview, 
+    t.nav_catalog, 
+    t.nav_favorites, 
+    t.nav_loans, 
+    t.nav_reservations, 
+    t.nav_history
+  ];
   navItems.forEach((item, idx) => {
     const span = item.querySelector('span');
     if (span && navTexts[idx]) span.textContent = navTexts[idx];
@@ -237,347 +247,28 @@ function initLanguageSwitcher() {
   applyDashboardLanguage(savedLang);
 }
 
-// ===================== SISTEMA DE NOTIFICAÇÕES =====================
-let notificationsData = [];
-let unreadCount = 0;
-
-// Dados mockados (exemplo)
-const rawNotifications = [
-  {
-    id: 1,
-    type: 'overdue',
-    params: { book: 'Introdução à Programação com Python', days: 3 },
-    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    read: false
-  },
-  {
-    id: 2,
-    type: 'reminder',
-    params: {},
-    date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    read: false
-  },
-  {
-    id: 3,
-    type: 'newBook',
-    params: { book: 'Clean Architecture' },
-    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    read: true
-  }
-];
-
-function translateNotification(notif, lang) {
-  const t = dashboardTranslations[lang]?.notifications;
-  if (!t) return 'Notificação';
-  
-  switch (notif.type) {
-    case 'overdue':
-      return t.overdue.replace('{book}', notif.params.book).replace('{days}', notif.params.days);
-    case 'reminder':
-      return t.reminder;
-    case 'newBook':
-      return t.newBook.replace('{book}', notif.params.book);
-    case 'reservationReady':
-      return t.reservationReady.replace('{book}', notif.params.book);
-    default:
-      return 'Notificação';
-  }
-}
-
-function formatRelativeDate(date) {
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-  
-  if (diffMins < 1) return 'agora mesmo';
-  if (diffMins < 60) return `há ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
-  if (diffHours < 24) return `há ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
-  if (diffDays === 1) return 'ontem';
-  return `há ${diffDays} dias`;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-function getCurrentLanguage() {
-  return localStorage.getItem('dashboard_lang') || 'pt';
-}
-
-function saveNotificationsToLocal() {
-  const toStore = notificationsData.map(n => ({
-    ...n,
-    date: n.date.toISOString()
-  }));
-  localStorage.setItem('dashboard_notifications', JSON.stringify(toStore));
-}
-
-function loadNotifications() {
-  const stored = localStorage.getItem('dashboard_notifications');
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      notificationsData = parsed.map(n => ({
-        ...n,
-        date: new Date(n.date)
-      }));
-    } catch(e) { console.error(e); }
-  }
-  
-  if (!notificationsData.length) {
-    notificationsData = rawNotifications.map(n => ({
-      ...n,
-      date: new Date(n.date)
-    }));
-    saveNotificationsToLocal();
-  }
-  
-  renderNotifications(getCurrentLanguage());
-}
-
-function renderNotifications(lang) {
-  const listContainer = document.getElementById('notification-list');
-  const emptyDiv = listContainer?.querySelector('.empty-notifications');
-  const badge = document.getElementById('notification-badge');
-  const dot = document.querySelector('.notification-dot');
-  
-  if (!listContainer) return;
-  
-  unreadCount = notificationsData.filter(n => !n.read).length;
-  
-  if (badge) {
-    if (unreadCount > 0) {
-      badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
-  }
-  
-  if (dot) {
-    dot.style.opacity = unreadCount > 0 ? '1' : '0.3';
-  }
-  
-  if (notificationsData.length === 0) {
-    if (emptyDiv) emptyDiv.style.display = 'block';
-    const items = listContainer.querySelectorAll('.notification-item');
-    items.forEach(item => item.remove());
-    return;
-  }
-  
-  if (emptyDiv) emptyDiv.style.display = 'none';
-  
-  const existingItems = listContainer.querySelectorAll('.notification-item');
-  existingItems.forEach(item => item.remove());
-  
-  const sorted = [...notificationsData].sort((a, b) => b.date - a.date);
-  
-  sorted.forEach(notif => {
-    const message = translateNotification(notif, lang);
-    const relativeDate = formatRelativeDate(notif.date);
-    const item = document.createElement('div');
-    item.className = `notification-item ${!notif.read ? 'unread' : ''}`;
-    item.dataset.id = notif.id;
-    
-    let iconClass = 'fas fa-exclamation-triangle';
-    if (notif.type === 'reminder') iconClass = 'fas fa-clock';
-    else if (notif.type === 'newBook') iconClass = 'fas fa-book';
-    else if (notif.type === 'reservationReady') iconClass = 'fas fa-check-circle';
-    
-    item.innerHTML = `
-      <div class="notification-icon">
-        <i class="${iconClass}"></i>
-      </div>
-      <div class="notification-content">
-        <div class="notification-message">${escapeHtml(message)}</div>
-        <div class="notification-date">
-          <i class="far fa-calendar-alt"></i> ${relativeDate}
-        </div>
-      </div>
-    `;
-    
-    item.addEventListener('click', () => {
-      if (!notif.read) {
-        notif.read = true;
-        renderNotifications(getCurrentLanguage());
-        saveNotificationsToLocal();
-      }
-    });
-    
-    listContainer.appendChild(item);
-  });
-}
-
-function markAllAsRead() {
-  let changed = false;
-  notificationsData.forEach(n => {
-    if (!n.read) {
-      n.read = true;
-      changed = true;
-    }
-  });
-  if (changed) {
-    renderNotifications(getCurrentLanguage());
-    saveNotificationsToLocal();
-    showFeedbackMessage('Todas as notificações foram marcadas como lidas');
-  }
-}
-
-function initNotifications() {
-  const notifBtn = document.getElementById('notification-btn');
-  const dropdown = document.getElementById('notification-dropdown');
-  const markReadBtn = document.getElementById('mark-read-btn');
-  
-  if (!notifBtn || !dropdown) return;
-  
-  loadNotifications();
-  
-  notifBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdown.classList.toggle('show');
-  });
-  
-  document.addEventListener('click', (e) => {
-    if (!notifBtn.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.classList.remove('show');
-    }
-  });
-  
-  if (markReadBtn) {
-    markReadBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      markAllAsRead();
-    });
-  }
-}
-
-// ===================== HISTÓRICO DE VISUALIZADOS =====================
-
-// Dados mockados — em produção, viriam do backend/localStorage
-const recentlyViewedData = [
-  {
-    id: 1,
-    title: 'Introdução à Programação com Python',
-    author: 'Eric Matthes',
-    cover: '../assets/Imagens/capa-exemplo.jpg',
-    type: 'book',
-    progress: 68,
-    page: 214,
-    totalPages: 412,
-    href: 'ler.php?id=1'
-  },
-  {
-    id: 2,
-    title: 'Clean Code',
-    author: 'Robert C. Martin',
-    cover: null,
-    type: 'book',
-    progress: 35,
-    page: 112,
-    totalPages: 320,
-    href: 'ler.php?id=2'
-  },
-  {
-    id: 3,
-    title: 'Engenharia de Software Moderna',
-    author: 'Marco Tulio Valente',
-    cover: null,
-    type: 'book',
-    progress: 10,
-    page: 28,
-    totalPages: 280,
-    href: 'ler.php?id=3'
-  }
-];
-
-function getItemTypeIcon(type) {
-  switch (type) {
-    case 'magazine': return 'fas fa-newspaper';
-    case 'tcc': return 'fas fa-graduation-cap';
-    default: return 'fas fa-book';
-  }
-}
-
-function renderRecentItems() {
-  const mainItem = recentlyViewedData[0];
-  const recentItems = recentlyViewedData.slice(1, 3);
-
-  if (mainItem) {
-    const mainLink = document.getElementById('last-viewed-main-link');
-    if (mainLink) mainLink.href = mainItem.href;
-
-    const mainCover = document.getElementById('last-viewed-cover');
-    if (mainCover) {
-      mainCover.src = mainItem.cover || '../assets/Imagens/capa-exemplo.jpg';
-      mainCover.alt = mainItem.title;
-    }
-
-    const mainTitle = document.getElementById('last-viewed-title');
-    if (mainTitle) mainTitle.textContent = mainItem.title;
-
-    const mainAuthor = document.getElementById('last-viewed-author');
-    if (mainAuthor) mainAuthor.textContent = mainItem.author;
-
-    const mainProgress = document.getElementById('last-viewed-progress');
-    if (mainProgress) mainProgress.style.width = `${mainItem.progress}%`;
-
-    const mainProgressText = document.getElementById('last-viewed-progress-text');
-    const lang = getCurrentLanguage();
-    const t = dashboardTranslations[lang];
-    if (mainProgressText && t) {
-      mainProgressText.textContent = t.progress_text
-        .replace('%', mainItem.progress + '%')
-        .replace('{current}', mainItem.page)
-        .replace('{total}', mainItem.totalPages);
-    }
-  }
-
-  const list = document.getElementById('recent-items-list');
-  if (!list) return;
-  list.innerHTML = '';
-
-  recentItems.forEach(item => {
-    const card = document.createElement('a');
-    card.href = item.href;
-    card.className = 'recent-item-card';
-    card.title = item.title;
-
-    const coverHTML = item.cover
-      ? `<img src="${item.cover}" alt="${item.title}" class="recent-item-cover">`
-      : `<div class="recent-item-cover placeholder"><i class="${getItemTypeIcon(item.type)}"></i></div>`;
-
-    card.innerHTML = `
-      ${coverHTML}
-      <div class="recent-item-info">
-        <div class="recent-item-title">${item.title}</div>
-        <div class="recent-item-author">${item.author}</div>
-        <div class="recent-item-mini-progress">
-          <div class="recent-item-mini-progress-fill" style="width: ${item.progress}%"></div>
-        </div>
-      </div>
-    `;
-
-    list.appendChild(card);
-  });
-}
-
 // ===================== INICIALIZAÇÃO =====================
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Collapse da sidebar
+  // 1. Collapse da sidebar - SEM RESTAURAR ESTADO AUTOMATICAMENTE
   const sidebar = document.getElementById('sidebar');
   const collapseBtn = document.getElementById('collapseBtn');
+  
   if (collapseBtn && sidebar) {
+    // Remove qualquer classe 'collapsed' que possa ter sido salva anteriormente
+    sidebar.classList.remove('collapsed');
+    
+    // Evento de clique para alternar a classe manualmente
     collapseBtn.addEventListener('click', () => {
       sidebar.classList.toggle('collapsed');
+      // Salva o estado atual para que outras páginas mantenham, mas NÃO restauramos automaticamente
       localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
     });
-    if (localStorage.getItem('sidebarCollapsed') === 'true') {
-      sidebar.classList.add('collapsed');
-    }
+    
+    // NÃO restauramos o estado salvo automaticamente - sempre inicia expandido
+    // Se quiser manter a consistência com o estado salvo, descomente a linha abaixo:
+    // if (localStorage.getItem('sidebarCollapsed') === 'true') {
+    //   sidebar.classList.add('collapsed');
+    // }
   }
 
   // 2. Barra de pesquisa
@@ -595,16 +286,32 @@ document.addEventListener('DOMContentLoaded', () => {
   initLanguageSwitcher();
   
   // 4. Inicializa notificações
+  if (typeof window.notificacoesData !== 'undefined') {
+    notificacoes = window.notificacoesData;
+  }
+  if (window.favoritosPHP) {
+    Object.keys(window.favoritosPHP).forEach(key => {
+      const parts = key.split('_');
+      if (parts[0] === 'tcc' && parts[1]) tccActiveFavorites.add(Number(parts[1]));
+    });
+  }
+  fetch('../api/aluno_reservas.php', { credentials: 'same-origin' })
+    .then(response => response.ok ? response.json() : [])
+    .then(data => data.forEach(reserva => {
+      if ((reserva.status === 'pendente' || reserva.status === 'aprovada') && reserva.id_catalogo) {
+        tccActiveReserves.add(Number(reserva.id_catalogo));
+      }
+    }))
+    .catch(() => {});
   initNotifications();
+  renderizarDropdownNotificacoes();
 
-  // 5. Renderiza itens visualizados recentemente
-  renderRecentItems();
-
-  // 6. Inicializa carrossel de TCCs
+  // 5. Inicializa carrossel de TCCs
   initTccCarousel();
 
   console.log('%cDashboard SiGA ITJ carregado com sucesso!', 'color: #0b4b9b; font-weight: bold;');
 });
+
 // ===================== CARROSSEL DE TCCs =====================
 
 // Traduções do carrossel
@@ -656,8 +363,19 @@ const tccTranslations = {
   }
 };
 
-// Dados mockados dos TCCs — em produção, viria da API
-const tccData = [
+// TCCs cadastrados no banco e injetados pela página.
+const tccData = (window.tccsData || []).map(item => ({
+  id: Number(item.id_catalogo),
+  title: item.titulo || 'TCC sem título',
+  author: item.autor || 'Autor não informado',
+  cover: item.capa_url || null,
+  year: item.ano_publicacao || 'Ano não informado',
+  area: item.autor || 'TCC',
+  theme: item.descricao || 'Descrição não informada',
+  members: (item.autor || 'Autor não informado').split(',').map(member => member.trim())
+}));
+/*
+const legacyTccData = [
   {
     id: 1,
     title: 'Sistema de Monitoramento de Estufa com IoT',
@@ -730,7 +448,7 @@ const tccData = [
     theme: 'Desenvolvimento de um assistente virtual baseado em processamento de linguagem natural para auxílio no atendimento de uma biblioteca escolar, com funcionalidades de consulta de acervo e reserva de livros.',
     members: ['Vitória Nascimento', 'Henrique Castro']
   }
-];
+]; */
 
 // Paleta de gradientes para os placeholders
 const tccGradients = [
@@ -921,6 +639,8 @@ function openTccModal(id) {
   const tcc = tccData.find(t => t.id === id);
   if (!tcc) return;
   tccCurrentId = id;
+  const itemId = document.getElementById('tcc-modal-item-id');
+  if (itemId) itemId.value = id;
 
   const lang = getCurrentLanguage();
   const tr = tccTranslations[lang] || tccTranslations.pt;
@@ -939,7 +659,6 @@ function openTccModal(id) {
       coverImg.src = '';
       coverImg.alt = tcc.title;
       coverImg.style.background = gradient;
-      // fallback visual com ícone via CSS: apenas oculta o img quebrado
       coverImg.style.display = 'none';
 
       // Criar/atualizar placeholder no modal
@@ -1047,12 +766,108 @@ function applyTccLanguage(lang) {
   if (subtitleEl) subtitleEl.textContent = t.section_subtitle;
 }
 
-// Patch: integrar com o seletor de idioma já existente
-const _originalApplyDashboardLanguage = applyDashboardLanguage;
-// Sobrescreve para também aplicar ao carrossel
-(function patchLanguage() {
-  const originalFn = applyDashboardLanguage;
-  window._tccLanguagePatch = function(lang) {
-    applyTccLanguage(lang);
-  };
-})();
+// ========== NOTIFICAÇÕES (SININHO) ==========
+let notificacoes = [];
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatarData(data) {
+    const d = new Date(data);
+    const agora = new Date();
+    const diff = Math.floor((agora - d) / 1000);
+
+    if (diff < 60) return 'Agora pouco';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
+    if (diff < 172800) return 'Ontem';
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+}
+
+function renderizarDropdownNotificacoes() {
+    const lista = document.getElementById('notification-list-dropdown');
+    if (!lista) return;
+
+    if (!notificacoes || notificacoes.length === 0) {
+        lista.innerHTML = `
+            <div class="empty-notifications">
+                <i class="far fa-bell-slash"></i>
+                <p>Nenhuma notificação nova</p>
+            </div>
+        `;
+        return;
+    }
+
+    lista.innerHTML = notificacoes.map(notificacao => {
+        const isPendencia = notificacao.tipo === 'pendencia';
+        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
+        const label = isPendencia ? 'Pendência' : 'Aviso';
+
+        return `
+            <div class="notification-item">
+                <div class="notification-icon" style="color: ${corIcon};">
+                    <i class="fas ${icone}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-message">
+                        <strong style="color: ${corIcon};">${label}</strong><br>
+                        ${escapeHtml(notificacao.mensagem)}
+                    </div>
+                    <div class="notification-footer">
+                        <span class="notification-date">${formatarData(notificacao.criado_em)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function initNotifications() {
+    const btn = document.getElementById('notification-btn');
+    const dropdown = document.getElementById('notification-dropdown');
+    if (!btn || !dropdown) return;
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            renderizarDropdownNotificacoes();
+        }
+    });
+
+    const markReadBtn = document.getElementById('mark-read-btn');
+    if (markReadBtn) {
+      markReadBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        try {
+          const response = await fetch('../api/aluno_notificacoes.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ action: 'mark_all_read' })
+          });
+          if (!response.ok) throw new Error('Falha ao atualizar notificações');
+          notificacoes = notificacoes.map(item => ({ ...item, lida: true }));
+          renderizarDropdownNotificacoes();
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+}
+
+// ===================== FUNÇÃO PARA OBTER IDIOMA ATUAL =====================
+function getCurrentLanguage() {
+  return localStorage.getItem('dashboard_lang') || 'pt';
+}

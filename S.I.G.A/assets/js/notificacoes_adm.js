@@ -5,7 +5,7 @@ let destinatarioAtual = 'todos';
 let categoriaAtual = 'aviso';
 let notificacoesHeader = [];
 
-// ========== FUNÇÕES AUXILIARES ==========
+// ========== AUXILIARES ==========
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -14,26 +14,30 @@ function escapeHtml(text) {
 }
 
 function formatarData(data) {
-    const d = new Date(data);  // <-- REMOVI O '+ "UTC"'
+    const d = new Date(data);
     const agora = new Date();
     const diff = Math.floor((agora - d) / 1000);
-    
+
     if (diff < 60) return 'Agora pouco';
     if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
     if (diff < 172800) return 'Ontem';
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function atualizarBadge(total) {
-    const badge = document.querySelector('.notification-btn .badge');
-    if (badge) {
-        if (total > 0) {
-            badge.textContent = total;
-            badge.style.display = 'flex';
-        } else {
-            badge.style.display = 'none';
+    const btn = document.getElementById('notification-btn');
+    if (!btn) return;
+    let badge = btn.querySelector('.badge');
+    if (total > 0) {
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'badge';
+            btn.appendChild(badge);
         }
+        badge.textContent = total;
+    } else if (badge) {
+        badge.remove();
     }
 }
 
@@ -47,8 +51,8 @@ function renderizarDropdownNotificacoes() {
             <div class="empty-notifications">
                 <i class="far fa-bell-slash"></i>
                 <p>Nenhuma notificação enviada</p>
-            </div>
-        `;
+            </div>`;
+        atualizarBadge(0);
         return;
     }
 
@@ -57,10 +61,10 @@ function renderizarDropdownNotificacoes() {
         const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
         const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
         const label = isPendencia ? 'Pendência' : 'Aviso';
-        
+
         const totalAlunos = parseInt(notificacao.total_alunos, 10) || 0;
         const textoAlunos = totalAlunos === 1 ? '1 aluno' : totalAlunos + ' alunos';
-        
+
         return `
             <div class="notification-item">
                 <div class="notification-icon" style="color: ${corIcon};">
@@ -78,8 +82,7 @@ function renderizarDropdownNotificacoes() {
                         </span>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }).join('');
 
     atualizarBadge(notificacoesHeader.length);
@@ -121,7 +124,7 @@ function initProfileDropdown() {
     });
 }
 
-// ========== NOTIFICAÇÕES (SININHO) - SEM AJAX ==========
+// ========== SININHO ==========
 function initNotifications() {
     const btn = document.getElementById('notification-btn');
     const dropdown = document.getElementById('notification-dropdown');
@@ -142,7 +145,7 @@ function initNotifications() {
     });
 }
 
-// ========== TRAVA DE DUPLO ENVIO NO FORMULÁRIO ==========
+// ========== TRAVA DE DUPLO ENVIO ==========
 function initFormNotificacao() {
     const form = document.getElementById('form-notificacao');
     const btnEnviar = document.getElementById('btn-enviar-notificacao');
@@ -162,7 +165,6 @@ function initFormNotificacao() {
             return;
         }
 
-        // Desabilita o botão para evitar duplo clique e envios duplicados
         setTimeout(() => {
             btnEnviar.disabled = true;
             btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
@@ -170,7 +172,7 @@ function initFormNotificacao() {
     });
 }
 
-// ========== ATUALIZAR CATEGORIA POR DESTINATÁRIO ==========
+// ========== CATEGORIA POR DESTINATÁRIO ==========
 function atualizarCategoriaPorDestinatario() {
     const tabPendencia = document.querySelector('.categoria-tab[data-categoria="pendencia"]');
     const tabAviso = document.querySelector('.categoria-tab[data-categoria="aviso"]');
@@ -189,7 +191,7 @@ function atualizarCategoriaPorDestinatario() {
     }
 }
 
-// ========== DESTINATÁRIO TABS ==========
+// ========== DESTINATÁRIO ==========
 function initDestinatarioTabs() {
     const tabs = document.querySelectorAll('.dest-tab');
     const buscaWrapper = document.getElementById('aluno-busca-wrapper');
@@ -215,7 +217,7 @@ function initDestinatarioTabs() {
     });
 }
 
-// ========== CATEGORIA TABS ==========
+// ========== CATEGORIA ==========
 function initCategoriaTabs() {
     const tabs = document.querySelectorAll('.categoria-tab');
 
@@ -257,9 +259,7 @@ function initBuscaAluno() {
         if (e.key === 'Enter') {
             e.preventDefault();
             const primeiraSugestao = sugestoesBox.querySelector('.aluno-sugestao-item');
-            if (primeiraSugestao) {
-                primeiraSugestao.click();
-            }
+            if (primeiraSugestao) primeiraSugestao.click();
         }
     });
 
@@ -274,7 +274,7 @@ function initBuscaAluno() {
 function renderizarSugestoesAluno(termo) {
     const sugestoesBox = document.getElementById('aluno-sugestoes');
     const termoLower = termo.toLowerCase().trim();
-    
+
     const resultados = alunos
         .filter(a => (a.nome_aluno || '').toLowerCase().startsWith(termoLower))
         .slice(0, 6);
@@ -296,7 +296,7 @@ function renderizarSugestoesAluno(termo) {
     sugestoesBox.style.display = 'block';
 
     sugestoesBox.querySelectorAll('.aluno-sugestao-item').forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function () {
             const id = this.dataset.id;
             const aluno = alunos.find(a => String(a.id_aluno) === String(id));
             if (aluno) selecionarAluno(aluno);
@@ -339,14 +339,20 @@ function initRemoverAlunoSelecionado() {
     btn.addEventListener('click', limparAlunoSelecionado);
 }
 
+// ========== DATA/HORA (welcome) ==========
+function renderDate() {
+    const el = document.getElementById('welcome-date');
+    if (!el) return;
+    const now = new Date();
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    el.innerHTML = `<strong>${now.getDate()}</strong>${meses[now.getMonth()]}, ${now.getFullYear()}`;
+}
+
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function () {
-    if (typeof alunosData !== 'undefined') {
-        alunos = alunosData;
-    }
-    if (typeof notificacoesData !== 'undefined') {
-        notificacoesHeader = notificacoesData;
-    }
+    if (typeof alunosData !== 'undefined') alunos = alunosData;
+    if (typeof notificacoesData !== 'undefined') notificacoesHeader = notificacoesData;
 
     initSidebar();
     initProfileDropdown();
@@ -356,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initCategoriaTabs();
     initBuscaAluno();
     initRemoverAlunoSelecionado();
+    renderDate();
 
     atualizarCategoriaPorDestinatario();
     renderizarDropdownNotificacoes();

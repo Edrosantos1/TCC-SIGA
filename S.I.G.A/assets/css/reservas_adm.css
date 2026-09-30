@@ -133,6 +133,10 @@
     background: #f1f5f9;
     color: #64748b;
 }
+.tab-badge.retirada {
+    background: #f5f3ff;
+    color: #7c3aed;
+}
 
 .filtro-busca-ativa {
     display: flex;
@@ -205,11 +209,11 @@
     box-shadow: 0 0 0 3px rgba(11, 75, 155, 0.1);
 }
 
-/* ========== TABELA (PADRÃO PENDÊNCIAS) ========== */
+/* ========== TABELA (LAYOUT FIXO — SEM SCROLL HORIZONTAL) ========== */
 .reservas-table-wrapper {
     background: white;
     border-radius: 14px;
-    overflow-x: auto;
+    overflow: hidden;
     border: 1px solid #f0f4fd;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
@@ -218,6 +222,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
+    table-layout: fixed;
 }
 
 .reservas-table thead {
@@ -226,7 +231,7 @@
 
 .reservas-table thead th {
     text-align: left;
-    padding: 14px 16px;
+    padding: 12px 10px;
     font-size: 11px;
     font-weight: 700;
     color: #94a3b8;
@@ -234,35 +239,83 @@
     letter-spacing: 0.05em;
     border-bottom: 1px solid #edf2f7;
     white-space: nowrap;
-}
-
-/* Alinhamento centralizado nas colunas específicas */
-.reservas-table thead th:nth-child(4), /* Tipo */
-.reservas-table thead th:nth-child(7), /* Status */
-.reservas-table thead th:nth-child(8) { /* Ações */
-    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .reservas-table tbody td {
-    padding: 12px 16px;
+    padding: 12px 10px;
     border-bottom: 1px solid #f0f4fd;
     vertical-align: middle;
-    text-align: left;
-    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Célula de material flexível */
-.reservas-table tbody td.material-nome {
-    white-space: normal;
-    min-width: 160px;
-    color: #1f1f1f;
-}
-
-/* Centralização do corpo */
-.reservas-table tbody td:nth-child(4),
-.reservas-table tbody td:nth-child(7),
-.reservas-table tbody td:nth-child(8) {
+/* ========== LARGURAS DAS COLUNAS (SOMA = 100%) ========== */
+/* 1. Checkbox */
+.reservas-table thead th:nth-child(1),
+.reservas-table tbody td:nth-child(1) {
+    width: 4%;
     text-align: center;
+    padding-left: 8px;
+    padding-right: 4px;
+}
+
+/* 2. Aluno */
+.reservas-table thead th:nth-child(2),
+.reservas-table tbody td:nth-child(2) {
+    width: 19%;
+}
+
+/* 3. Material */
+.reservas-table thead th:nth-child(3),
+.reservas-table tbody td:nth-child(3) {
+    width: 21%;
+    white-space: normal;
+    word-break: break-word;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+/* 4. Tipo */
+.reservas-table thead th:nth-child(4),
+.reservas-table tbody td:nth-child(4) {
+    width: 8%;
+    text-align: center;
+}
+
+/* 5. Data da Reserva */
+.reservas-table thead th:nth-child(5),
+.reservas-table tbody td:nth-child(5) {
+    width: 10%;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+/* 6. Data Limite */
+.reservas-table thead th:nth-child(6),
+.reservas-table tbody td:nth-child(6) {
+    width: 10%;
+    text-align: center;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+/* 7. Status */
+.reservas-table thead th:nth-child(7),
+.reservas-table tbody td:nth-child(7) {
+    width: 12%;
+    text-align: center;
+}
+
+/* 8. Ações */
+.reservas-table thead th:nth-child(8),
+.reservas-table tbody td:nth-child(8) {
+    width: 16%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: visible;
 }
 
 .reservas-table tbody tr:last-child td {
@@ -281,19 +334,20 @@
 .aluno-info {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    min-width: 0;
 }
 
 .aluno-avatar {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: #0b4b9b;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     flex-shrink: 0;
 }
@@ -301,18 +355,26 @@
 .aluno-nome {
     font-weight: 500;
     color: #1f1f1f;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 /* ========== TIPO BADGE ========== */
 .tipo-badge {
     font-size: 11px;
     font-weight: 600;
-    padding: 3px 10px;
+    padding: 3px 8px;
     border-radius: 20px;
     background: #eaf4ff;
     color: #0b4b9b;
     border: 1px solid #dbeafe;
     display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* ========== STATUS BADGE ========== */
@@ -320,12 +382,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    font-size: 12px;
+    gap: 4px;
+    font-size: 11px;
     font-weight: 600;
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
     border: 1px solid transparent;
+    max-width: 100%;
+    white-space: nowrap;
 }
 
 .status-pendente {
@@ -352,6 +416,18 @@
     border-color: #e2e8f0;
 }
 
+/* 🆕 RETIRADA — roxo/violeta moderno */
+.status-retirada {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    color: #7c3aed;
+    border-color: #ddd6fe;
+    box-shadow: 0 1px 3px rgba(124, 58, 237, 0.08);
+}
+
+.status-retirada i {
+    color: #7c3aed;
+}
+
 /* ========== AÇÕES ========== */
 .acoes-cell {
     text-align: center;
@@ -361,15 +437,19 @@
 .btn-acao {
     border: none;
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 11px;
     font-weight: 600;
     transition: all 0.2s;
-    margin: 0 2px;
+    margin: 0 1px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+}
+
+.btn-acao i {
+    font-size: 10px;
 }
 
 .btn-aprovar {
@@ -394,6 +474,39 @@
     color: white;
     border-color: #e74c3c;
     transform: scale(1.05);
+}
+
+/* 🆕 BOTÃO CONFIRMAR RETIRADA — roxo/violeta bonito */
+.btn-retirar {
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    color: #7c3aed;
+    border: 1px solid #ddd6fe;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(124, 58, 237, 0.08);
+}
+
+.btn-retirar i {
+    font-size: 10px;
+}
+
+.btn-retirar:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: white;
+    border-color: #7c3aed;
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.btn-retirar:active {
+    transform: translateY(0) scale(1);
 }
 
 .sem-acao {
@@ -463,12 +576,6 @@
 }
 
 /* ========== CHECKBOX NA TABELA ========== */
-.reservas-table tbody td:first-child,
-.reservas-table thead th:first-child {
-    text-align: center;
-    width: 40px;
-}
-
 .checkbox-reserva {
     width: 16px;
     height: 16px;
@@ -680,6 +787,66 @@
 }
 
 /* ========== RESPONSIVO ========== */
+@media (max-width: 1100px) {
+    .reservas-table {
+        font-size: 12px;
+    }
+
+    .reservas-table thead th,
+    .reservas-table tbody td {
+        padding: 10px 6px;
+    }
+
+    .btn-acao {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+
+    .btn-acao i {
+        font-size: 9px;
+    }
+
+    .btn-retirar {
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+
+    .btn-retirar i {
+        font-size: 9px;
+    }
+
+    .aluno-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Esconde colunas menos críticas */
+    .reservas-table thead th:nth-child(4), /* Tipo */
+    .reservas-table tbody td:nth-child(4),
+    .reservas-table thead th:nth-child(5), /* Data Reserva */
+    .reservas-table tbody td:nth-child(5) {
+        display: none;
+    }
+
+    .reservas-table thead th:nth-child(2),
+    .reservas-table tbody td:nth-child(2) { width: 24%; }
+
+    .reservas-table thead th:nth-child(3),
+    .reservas-table tbody td:nth-child(3) { width: 26%; }
+
+    .reservas-table thead th:nth-child(6),
+    .reservas-table tbody td:nth-child(6) { width: 13%; }
+
+    .reservas-table thead th:nth-child(7),
+    .reservas-table tbody td:nth-child(7) { width: 14%; }
+
+    .reservas-table thead th:nth-child(8),
+    .reservas-table tbody td:nth-child(8) { width: 19%; }
+}
+
 @media (max-width: 768px) {
     .page-header {
         flex-direction: column;
@@ -703,25 +870,6 @@
         padding: 6px 12px;
     }
 
-    .reservas-table-wrapper {
-        overflow-x: auto;
-    }
-
-    .reservas-table {
-        font-size: 13px;
-        min-width: 700px;
-    }
-
-    .reservas-table thead th,
-    .reservas-table tbody td {
-        padding: 10px 12px;
-    }
-
-    .btn-acao {
-        font-size: 11px;
-        padding: 4px 8px;
-    }
-
     .acoes-massa {
         flex-direction: column;
         align-items: stretch;
@@ -732,6 +880,24 @@
         margin-left: 0;
         text-align: center;
     }
+
+    /* Esconde também Status em telas muito pequenas */
+    .reservas-table thead th:nth-child(7),
+    .reservas-table tbody td:nth-child(7) {
+        display: none;
+    }
+
+    .reservas-table thead th:nth-child(2),
+    .reservas-table tbody td:nth-child(2) { width: 28%; }
+
+    .reservas-table thead th:nth-child(3),
+    .reservas-table tbody td:nth-child(3) { width: 32%; }
+
+    .reservas-table thead th:nth-child(6),
+    .reservas-table tbody td:nth-child(6) { width: 18%; }
+
+    .reservas-table thead th:nth-child(8),
+    .reservas-table tbody td:nth-child(8) { width: 22%; }
 }
 
 /* ========== CORREÇÕES TEMA ESCURO - BUSCA ALUNO ========== */

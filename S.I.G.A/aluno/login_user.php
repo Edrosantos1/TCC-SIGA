@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login / Registro - SiGA ITJ</title>
+  <title>Login / Registro - SIGA ITJ</title>
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- CSS -->
@@ -42,7 +42,7 @@
         <i class="fas fa-arrow-left"></i>
       </a>
       <a href="../index.html" class="brand-logo">
-        <span class="fas fa-book-reader icon-logo"></span> SiGA ITJ
+        <span class="fas fa-book-reader icon-logo"></span> SIGA ITJ
       </a>
     </div>
 
@@ -52,7 +52,7 @@
       <!-- ================= LOGIN ================= -->
       <!-- DOM order 1: é o formulário visível por padrão -->
       <div class="form-container sign-in">
-        <form id="form-login" action="../includes/DBlogin_user.php" method="POST" autocomplete="off" novalidate>
+        <form id="form-login" action="../includes/aluno_login.php" method="POST" autocomplete="off" novalidate>
           <h1 id="title-login" class="dot-title">Faça seu Login</h1>
           <div class="error-message" style="display:none;"></div>
 
@@ -86,7 +86,7 @@
       <!-- ================= REGISTRO ================= -->
       <!-- DOM order 2: oculto por padrão — inert remove da Tab nav e da a11y tree -->
       <div class="form-container sign-up" inert>
-        <form id="form-register" action="../includes/DBcadastro_user.php" method="POST" autocomplete="off" novalidate>
+        <form id="form-register" action="../includes/aluno_cadastro.php" method="POST" autocomplete="off" novalidate>
           <h1 id="title-register" class="dot-title">Crie sua Conta</h1>
           <div class="reg-error-message" style="display:none;"></div>
 
@@ -161,9 +161,6 @@
           <div class="buttons-layout">
             <button type="submit" class="btn-primary" id="btn-submit-register">Criar conta</button>
             <div class="google-login-container">
-              <button type="button" class="google-login-btn" id="googleRegisterBtn">
-                <i class="fab fa-google"></i> Cadastrar com Google
-              </button>
             </div>
           </div>
         </form>

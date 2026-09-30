@@ -7,7 +7,11 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
-
+// Aceita GET também (para links diretos)
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id']) && isset($_GET['acao'])) {
+    $_POST['id'] = $_GET['id'];
+    $_POST['acao'] = $_GET['acao'];
+}
 // Identifica a conexão
 $db = null;
 if (isset($conn)) $db = $conn;

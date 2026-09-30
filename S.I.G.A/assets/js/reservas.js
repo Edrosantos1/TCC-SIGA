@@ -1,101 +1,3 @@
-// reservas.js
-// ===================== DADOS MOCKADOS =====================
-// Em produção, viriam da API/banco de dados
-
-const reservasData = [
-  {
-    id: 1,
-    itemId: 1,
-    title: 'Introdução à Programação com Python',
-    author: 'Eric Matthes',
-    year: 2019,
-    type: 'book',
-    cover: null,
-    reservedAt: '2026-07-28',
-    expiryDate: '2026-08-04',
-    status: 'pending', // pending, ready, cancelled, completed
-    available: true,
-  },
-  {
-    id: 2,
-    itemId: 4,
-    title: 'O Pequeno Príncipe',
-    author: 'Antoine de Saint-Exupéry',
-    year: 1943,
-    type: 'book',
-    cover: null,
-    reservedAt: '2026-07-30',
-    expiryDate: '2026-08-06',
-    status: 'ready',
-    available: true,
-  },
-  {
-    id: 3,
-    itemId: 11,
-    title: 'National Geographic - Edição Brasil',
-    author: 'National Geographic Society',
-    year: 2024,
-    type: 'magazine',
-    cover: null,
-    reservedAt: '2026-07-25',
-    expiryDate: '2026-08-01',
-    status: 'pending',
-    available: true,
-  },
-  {
-    id: 4,
-    itemId: 16,
-    title: 'Sistema de Monitoramento de Estufa com IoT',
-    author: 'Ana Paula Ferreira, Lucas Rodrigues, Thiago Mendes',
-    year: 2024,
-    type: 'tcc',
-    cover: null,
-    reservedAt: '2026-07-20',
-    expiryDate: '2026-07-27',
-    status: 'completed',
-    available: true,
-  },
-  {
-    id: 5,
-    itemId: 6,
-    title: 'O Hobbit',
-    author: 'J.R.R. Tolkien',
-    year: 1937,
-    type: 'book',
-    cover: null,
-    reservedAt: '2026-07-15',
-    expiryDate: '2026-07-22',
-    status: 'cancelled',
-    available: true,
-  },
-  {
-    id: 6,
-    itemId: 8,
-    title: 'A Arte da Guerra',
-    author: 'Sun Tzu',
-    year: -500,
-    type: 'book',
-    cover: null,
-    reservedAt: '2026-07-10',
-    expiryDate: '2026-07-17',
-    status: 'cancelled',
-    available: true,
-  },
-  {
-    id: 7,
-    itemId: 19,
-    title: 'Reconhecimento de Gestos com Machine Learning',
-    author: 'Diego Carvalho, Fernanda Oliveira',
-    year: 2023,
-    type: 'tcc',
-    cover: null,
-    reservedAt: '2026-06-28',
-    expiryDate: '2026-07-05',
-    status: 'completed',
-    available: false,
-  },
-];
-
 // ===================== TRADUÇÕES =====================
 const reservasTranslations = {
   pt: {
@@ -104,26 +6,20 @@ const reservasTranslations = {
     tab_active: 'Ativas',
     tab_history: 'Histórico',
     status_pending: 'Pendente',
-    status_ready: 'Disponível para retirada',
+    status_approved: 'Pronto para retirada',
     status_cancelled: 'Cancelada',
+    status_rejected: 'Rejeitada',
+    status_expired: 'Expirada',
     status_completed: 'Concluída',
+    status_retirada: 'Retirada (Emprestado)',
     reserved_on: 'Reservado em',
     expires_on: 'Expira em',
     empty_active: 'Você não tem reservas ativas no momento.',
     empty_history: 'Nenhuma reserva no histórico.',
     cancel_reserve: 'Cancelar Reserva',
-    confirm_pickup: 'Confirmar Retirada',
-    detail: 'Detalhes',
-    modal_cancel: 'Cancelar Reserva',
-    modal_pickup: 'Confirmar Retirada',
     feedback_cancel_success: 'Reserva cancelada com sucesso!',
     feedback_cancel_error: 'Não foi possível cancelar a reserva.',
-    feedback_pickup_success: 'Retirada confirmada! Aproveite o material.',
-    feedback_pickup_error: 'Não foi possível confirmar a retirada.',
-    confirm_cancel_title: 'Confirmar cancelamento',
-    confirm_cancel_message: 'Tem certeza que deseja cancelar esta reserva?',
-    confirm_pickup_title: 'Confirmar retirada',
-    confirm_pickup_message: 'Confirme que você está retirando este material.',
+    feedback_load_error: 'Erro ao carregar reservas. Tente novamente.',
   },
   en: {
     page_title: 'My Reservations',
@@ -131,26 +27,20 @@ const reservasTranslations = {
     tab_active: 'Active',
     tab_history: 'History',
     status_pending: 'Pending',
-    status_ready: 'Ready for pickup',
+    status_approved: 'Ready for pickup',
     status_cancelled: 'Cancelled',
+    status_rejected: 'Rejected',
+    status_expired: 'Expired',
     status_completed: 'Completed',
+    status_retirada: 'Picked up',
     reserved_on: 'Reserved on',
     expires_on: 'Expires on',
     empty_active: 'You have no active reservations.',
     empty_history: 'No reservations in history.',
     cancel_reserve: 'Cancel Reservation',
-    confirm_pickup: 'Confirm Pickup',
-    detail: 'Details',
-    modal_cancel: 'Cancel Reservation',
-    modal_pickup: 'Confirm Pickup',
     feedback_cancel_success: 'Reservation cancelled successfully!',
     feedback_cancel_error: 'Unable to cancel reservation.',
-    feedback_pickup_success: 'Pickup confirmed! Enjoy the material.',
-    feedback_pickup_error: 'Unable to confirm pickup.',
-    confirm_cancel_title: 'Confirm cancellation',
-    confirm_cancel_message: 'Are you sure you want to cancel this reservation?',
-    confirm_pickup_title: 'Confirm pickup',
-    confirm_pickup_message: 'Confirm that you are picking up this material.',
+    feedback_load_error: 'Error loading reservations. Please try again.',
   },
   es: {
     page_title: 'Mis Reservas',
@@ -158,30 +48,24 @@ const reservasTranslations = {
     tab_active: 'Activas',
     tab_history: 'Historial',
     status_pending: 'Pendiente',
-    status_ready: 'Disponible para retirar',
+    status_approved: 'Listo para retirar',
     status_cancelled: 'Cancelada',
+    status_rejected: 'Rechazada',
+    status_expired: 'Expirada',
     status_completed: 'Completada',
+    status_retirada: 'Retirada',
     reserved_on: 'Reservado el',
     expires_on: 'Expira el',
     empty_active: 'No tienes reservas activas.',
     empty_history: 'No hay reservas en el historial.',
     cancel_reserve: 'Cancelar Reserva',
-    confirm_pickup: 'Confirmar Retiro',
-    detail: 'Detalles',
-    modal_cancel: 'Cancelar Reserva',
-    modal_pickup: 'Confirmar Retiro',
     feedback_cancel_success: '¡Reserva cancelada con éxito!',
     feedback_cancel_error: 'No se pudo cancelar la reserva.',
-    feedback_pickup_success: '¡Retiro confirmado! Disfruta del material.',
-    feedback_pickup_error: 'No se pudo confirmar el retiro.',
-    confirm_cancel_title: 'Confirmar cancelación',
-    confirm_cancel_message: '¿Estás seguro de cancelar esta reserva?',
-    confirm_pickup_title: 'Confirmar retiro',
-    confirm_pickup_message: 'Confirma que estás retirando este material.',
+    feedback_load_error: 'Error al cargar reservas. Intente de nuevo.',
   }
 };
 
-// Mesclar com as traduções do dashboard
+// Mesclar com traduções do dashboard
 if (typeof dashboardTranslations !== 'undefined') {
   for (let lang in reservasTranslations) {
     if (dashboardTranslations[lang]) {
@@ -193,9 +77,8 @@ if (typeof dashboardTranslations !== 'undefined') {
 }
 
 // ===================== ESTADO =====================
-let reservas = [...reservasData];
+let reservas = [];
 let activeTab = 'active';
-let currentReservaId = null;
 
 // ===================== FUNÇÕES AUXILIARES =====================
 function getCurrentLanguage() {
@@ -216,21 +99,31 @@ function showFeedbackMessage(message) {
   msgDiv.textContent = message;
   msgDiv.style.cssText = `
     position: fixed; bottom: 20px; left: 50%;
-    transform: translateX(-50%); background: #0b4b9b;
-    color: white; padding: 12px 24px; border-radius: 8px;
-    z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: translateX(-50%);
+    background: #0b4b9b;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: opacity 0.3s;
   `;
   document.body.appendChild(msgDiv);
   setTimeout(() => {
     msgDiv.style.opacity = '0';
     setTimeout(() => msgDiv.remove(), 500);
-  }, 2000);
+  }, 3000);
 }
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
 }
 
 function getCoverColor(index) {
@@ -244,22 +137,48 @@ function getCoverColor(index) {
 
 function getStatusClass(status) {
   switch (status) {
-    case 'pending': return 'status-pending';
-    case 'ready': return 'status-ready';
-    case 'cancelled': return 'status-cancelled';
-    case 'completed': return 'status-completed';
+    case 'pendente': return 'status-pending';
+    case 'aprovada': return 'status-approved';
+    case 'cancelada': return 'status-cancelled';
+    case 'rejeitada': return 'status-rejected';
+    case 'expirada': return 'status-expired';
+    case 'retirada': return 'status-retirada';
     default: return '';
   }
 }
 
 function getStatusLabel(status, lang) {
   const map = {
-    pending: 'status_pending',
-    ready: 'status_ready',
-    cancelled: 'status_cancelled',
-    completed: 'status_completed',
+    pendente: 'status_pending',
+    aprovada: 'status_approved',
+    cancelada: 'status_cancelled',
+    rejeitada: 'status_rejected',
+    expirada: 'status_expired',
+    retirada: 'status_retirada',
   };
   return getReservaTranslation(map[status] || 'status_pending', lang);
+}
+
+// ===================== CARREGAR RESERVAS DA API =====================
+async function fetchReservas() {
+  try {
+    const response = await fetch('../api/aluno_reservas.php', {
+      credentials: 'same-origin'
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Erro ${response.status}: ${text}`);
+    }
+    const data = await response.json();
+    reservas = data;
+    renderReservas();
+  } catch (error) {
+    console.error('Erro ao carregar reservas:', error);
+    const lang = getCurrentLanguage();
+    showFeedbackMessage(getReservaTranslation('feedback_load_error', lang));
+    reservas = [];
+    renderReservas();
+  }
 }
 
 // ===================== RENDERIZAÇÃO =====================
@@ -274,18 +193,18 @@ function renderReservas() {
 
   const lang = getCurrentLanguage();
 
-  // Filtrar ativas (pending, ready)
-  const activeReservas = reservas.filter(r => r.status === 'pending' || r.status === 'ready');
-  // Histórico (cancelled, completed)
-  const historyReservas = reservas.filter(r => r.status === 'cancelled' || r.status === 'completed');
+  // Ativas: pendente e aprovada (ainda não retiradas)
+  const activeReservas = reservas.filter(r => r.status === 'pendente' || r.status === 'aprovada');
+  // Histórico: rejeitada, expirada, cancelada, retirada
+  const historyReservas = reservas.filter(r => 
+    ['rejeitada', 'expirada', 'cancelada', 'retirada'].includes(r.status)
+  );
 
-  // Atualizar badge
   if (activeCount) activeCount.textContent = activeReservas.length;
 
   // Renderizar ativas
   if (activeReservas.length === 0) {
     activeList.innerHTML = '';
-    // Mostrar mensagem vazia se a aba ativa estiver selecionada
     if (activeTab === 'active') {
       empty.style.display = 'block';
       emptyMsg.textContent = getReservaTranslation('empty_active', lang);
@@ -317,7 +236,7 @@ function renderReservas() {
 
   // Ajustar visibilidade das listas
   if (activeTab === 'active') {
-    activeList.style.display = 'flex';
+    activeList.style.display = 'grid';
     historyList.style.display = 'none';
     if (activeReservas.length === 0) {
       empty.style.display = 'block';
@@ -326,7 +245,7 @@ function renderReservas() {
     }
   } else {
     activeList.style.display = 'none';
-    historyList.style.display = 'flex';
+    historyList.style.display = 'grid';
     if (historyReservas.length === 0) {
       empty.style.display = 'block';
     } else {
@@ -338,201 +257,110 @@ function renderReservas() {
 function createReservaCard(reserva, index, lang) {
   const card = document.createElement('div');
   card.className = 'reserva-card';
-  card.dataset.id = reserva.id;
+  card.dataset.id = reserva.id_reserva || reserva.id;
 
   const coverColor = getCoverColor(index);
   const statusLabel = getStatusLabel(reserva.status, lang);
   const statusClass = getStatusClass(reserva.status);
 
+  const title = reserva.titulo || reserva.titulo_item || 'Título não disponível';
+  const author = reserva.autor || 'Autor não informado';
+  let cover = reserva.capa_url || null;
+  if (cover && !cover.startsWith('http') && !cover.startsWith('/')) {
+    cover = '../' + cover;
+  }
+  const type = reserva.tipo || 'livro';
+  const reservedAt = reserva.data_reserva;
+  const expiryDate = reserva.data_limite;
+
   let coverHTML;
-  if (reserva.cover) {
-    coverHTML = `<img src="${reserva.cover}" alt="${reserva.title}" class="reserva-cover">`;
+  if (cover) {
+    coverHTML = `<img src="${cover}" alt="${title}" class="reserva-cover" onerror="this.style.display='none'">`;
   } else {
-    const iconMap = { book: 'fa-book', magazine: 'fa-newspaper', tcc: 'fa-graduation-cap' };
-    const icon = iconMap[reserva.type] || 'fa-book';
+    const iconMap = { livro: 'fa-book', revista: 'fa-newspaper', tcc: 'fa-graduation-cap' };
+    const icon = iconMap[type] || 'fa-book';
     coverHTML = `
       <div class="reserva-cover-placeholder" style="background: ${coverColor}">
         <i class="fas ${icon}"></i>
-        <span>${reserva.title}</span>
+        <span>${title}</span>
       </div>
     `;
   }
 
-  const isActive = reserva.status === 'pending' || reserva.status === 'ready';
-  const showCancel = isActive && reserva.status !== 'ready';
-  const showPickup = reserva.status === 'ready';
+  let actionsHTML = '';
+  if (reserva.status === 'pendente') {
+    actionsHTML = `
+      <div class="reserva-actions">
+        <button class="btn-cancel" data-action="cancel">
+          <i class="fas fa-times"></i> ${getReservaTranslation('cancel_reserve', lang)}
+        </button>
+      </div>
+    `;
+  } else if (reserva.status === 'aprovada') {
+    actionsHTML = `
+      <div class="reserva-actions">
+        <span class="status-ready-text">
+          <i class="fas fa-check-circle"></i> ${getReservaTranslation('status_approved', lang)}
+        </span>
+      </div>
+    `;
+  } else if (reserva.status === 'retirada') {
+    actionsHTML = `
+      <div class="reserva-actions">
+        <span class="status-retirada-text">
+          <i class="fas fa-hand-holding-heart"></i> ${getReservaTranslation('status_retirada', lang)}
+        </span>
+      </div>
+    `;
+  }
 
   card.innerHTML = `
     ${coverHTML}
     <div class="reserva-info">
-      <div class="title">${reserva.title}</div>
-      <div class="author">${reserva.author}</div>
+      <div class="title">${title}</div>
+      <div class="author">${author}</div>
       <div class="meta">
-        <span><i class="far fa-calendar-alt"></i> ${getReservaTranslation('reserved_on', lang)}: ${formatDate(reserva.reservedAt)}</span>
-        ${reserva.expiryDate ? `<span><i class="far fa-hourglass"></i> ${getReservaTranslation('expires_on', lang)}: ${formatDate(reserva.expiryDate)}</span>` : ''}
+        <span><i class="far fa-calendar-alt"></i> ${getReservaTranslation('reserved_on', lang)}: ${formatDate(reservedAt)}</span>
+        ${expiryDate ? `<span><i class="far fa-hourglass"></i> ${getReservaTranslation('expires_on', lang)}: ${formatDate(expiryDate)}</span>` : ''}
         <span class="reserva-status ${statusClass}">${statusLabel}</span>
       </div>
     </div>
-    <div class="reserva-actions">
-      ${showCancel ? `<button class="btn-cancel" data-action="cancel"><i class="fas fa-times"></i> ${getReservaTranslation('cancel_reserve', lang)}</button>` : ''}
-      ${showPickup ? `<button class="btn-pickup" data-action="pickup"><i class="fas fa-check"></i> ${getReservaTranslation('confirm_pickup', lang)}</button>` : ''}
-      <button class="btn-detail" data-action="detail"><i class="fas fa-info-circle"></i> ${getReservaTranslation('detail', lang)}</button>
-    </div>
+    ${actionsHTML}
   `;
 
-  // Eventos dos botões
   const cancelBtn = card.querySelector('[data-action="cancel"]');
   if (cancelBtn) {
     cancelBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      handleCancel(reserva.id);
+      handleCancel(reserva.id_reserva || reserva.id);
     });
   }
-
-  const pickupBtn = card.querySelector('[data-action="pickup"]');
-  if (pickupBtn) {
-    pickupBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      handlePickup(reserva.id);
-    });
-  }
-
-  const detailBtn = card.querySelector('[data-action="detail"]');
-  if (detailBtn) {
-    detailBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openReservaModal(reserva.id);
-    });
-  }
-
-  // Clique no card abre modal
-  card.addEventListener('click', () => {
-    openReservaModal(reserva.id);
-  });
 
   return card;
 }
 
-// ===================== AÇÕES =====================
-function handleCancel(reservaId) {
+// ===================== AÇÕES COM API =====================
+async function handleCancel(reservaId) {
   const lang = getCurrentLanguage();
-  const confirmMsg = getReservaTranslation('confirm_cancel_message', lang);
+  const confirmMsg = 'Tem certeza que deseja cancelar esta reserva?';
   if (!confirm(confirmMsg)) return;
 
-  const reserva = reservas.find(r => r.id === reservaId);
-  if (!reserva) return;
+  try {
+    const response = await fetch('../api/aluno_reservas.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ action: 'cancel', id: reservaId })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Erro ao cancelar');
 
-  // Simula cancelamento
-  reserva.status = 'cancelled';
-  showFeedbackMessage(getReservaTranslation('feedback_cancel_success', lang));
-  renderReservas();
-  closeReservaModal();
-}
-
-function handlePickup(reservaId) {
-  const lang = getCurrentLanguage();
-  const confirmMsg = getReservaTranslation('confirm_pickup_message', lang);
-  if (!confirm(confirmMsg)) return;
-
-  const reserva = reservas.find(r => r.id === reservaId);
-  if (!reserva) return;
-
-  // Simula confirmação de retirada
-  reserva.status = 'completed';
-  showFeedbackMessage(getReservaTranslation('feedback_pickup_success', lang));
-  renderReservas();
-  closeReservaModal();
-}
-
-// ===================== MODAL =====================
-function openReservaModal(reservaId) {
-  const reserva = reservas.find(r => r.id === reservaId);
-  if (!reserva) return;
-
-  currentReservaId = reservaId;
-  const lang = getCurrentLanguage();
-  const coverColor = getCoverColor(reservas.indexOf(reserva));
-
-  const overlay = document.getElementById('reserva-modal-overlay');
-  const coverImg = document.getElementById('modal-cover-img');
-  const coverPlaceholder = document.getElementById('modal-cover-placeholder');
-  const titleEl = document.getElementById('modal-title');
-  const authorEl = document.getElementById('modal-author');
-  const yearEl = document.getElementById('modal-year');
-  const typeEl = document.getElementById('modal-type');
-  const reserveDateEl = document.getElementById('modal-reserve-date');
-  const expiryDateEl = document.getElementById('modal-expiry-date');
-  const statusEl = document.getElementById('modal-status');
-  const cancelBtn = document.getElementById('modal-cancel-btn');
-  const pickupBtn = document.getElementById('modal-pickup-btn');
-  const cancelText = document.getElementById('modal-cancel-text');
-  const pickupText = document.getElementById('modal-pickup-text');
-  const actionsDiv = document.getElementById('modal-actions');
-
-  // Preencher dados
-  if (reserva.cover) {
-    coverImg.src = reserva.cover;
-    coverImg.alt = reserva.title;
-    coverImg.style.display = 'block';
-    coverPlaceholder.style.display = 'none';
-  } else {
-    coverImg.style.display = 'none';
-    coverPlaceholder.style.display = 'flex';
-    coverPlaceholder.style.background = coverColor;
-    coverPlaceholder.querySelector('span').textContent = reserva.title;
+    showFeedbackMessage(getReservaTranslation('feedback_cancel_success', lang));
+    await fetchReservas();
+  } catch (error) {
+    console.error(error);
+    showFeedbackMessage(getReservaTranslation('feedback_cancel_error', lang));
   }
-
-  titleEl.textContent = reserva.title;
-  authorEl.textContent = reserva.author;
-  yearEl.textContent = `Ano: ${reserva.year}`;
-  const typeMap = { book: 'Livro', magazine: 'Revista', tcc: 'TCC' };
-  typeEl.textContent = `Tipo: ${typeMap[reserva.type] || reserva.type}`;
-  reserveDateEl.textContent = `${getReservaTranslation('reserved_on', lang)}: ${formatDate(reserva.reservedAt)}`;
-  expiryDateEl.textContent = reserva.expiryDate ? `${getReservaTranslation('expires_on', lang)}: ${formatDate(reserva.expiryDate)}` : '';
-
-  const statusLabel = getStatusLabel(reserva.status, lang);
-  const statusClass = getStatusClass(reserva.status);
-  statusEl.textContent = statusLabel;
-  statusEl.className = `status-badge ${statusClass}`;
-
-  // Botões
-  const isActive = reserva.status === 'pending' || reserva.status === 'ready';
-  const showCancel = isActive && reserva.status !== 'ready';
-  const showPickup = reserva.status === 'ready';
-
-  if (cancelText) cancelText.textContent = getReservaTranslation('modal_cancel', lang);
-  if (pickupText) pickupText.textContent = getReservaTranslation('modal_pickup', lang);
-
-  cancelBtn.style.display = showCancel ? 'inline-flex' : 'none';
-  pickupBtn.style.display = showPickup ? 'inline-flex' : 'none';
-  if (!showCancel && !showPickup) {
-    actionsDiv.style.display = 'none';
-  } else {
-    actionsDiv.style.display = 'flex';
-  }
-
-  // Remover listeners antigos (clonar e substituir)
-  const newCancel = cancelBtn.cloneNode(true);
-  cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
-  newCancel.addEventListener('click', () => {
-    handleCancel(reservaId);
-  });
-
-  const newPickup = pickupBtn.cloneNode(true);
-  pickupBtn.parentNode.replaceChild(newPickup, pickupBtn);
-  newPickup.addEventListener('click', () => {
-    handlePickup(reservaId);
-  });
-
-  overlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeReservaModal() {
-  const overlay = document.getElementById('reserva-modal-overlay');
-  overlay.classList.remove('open');
-  document.body.style.overflow = '';
-  currentReservaId = null;
 }
 
 // ===================== TABS =====================
@@ -547,33 +375,20 @@ function switchTab(tab) {
 
 // ===================== INICIALIZAÇÃO =====================
 document.addEventListener('DOMContentLoaded', () => {
-  // Aplicar traduções iniciais
   applyReservasLanguage(getCurrentLanguage());
 
-  // Renderizar
-  renderReservas();
+  fetchReservas();
 
-  // Eventos das abas
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       switchTab(btn.dataset.tab);
     });
   });
 
-  // Fechar modal
+  // Fechar modal (não usado)
   const overlay = document.getElementById('reserva-modal-overlay');
-  const closeBtn = document.getElementById('reserva-modal-close');
-  if (overlay) {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) closeReservaModal();
-    });
-  }
-  if (closeBtn) closeBtn.addEventListener('click', closeReservaModal);
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeReservaModal();
-  });
+  if (overlay) overlay.style.display = 'none';
 
-  // Integrar com mudança de idioma
   window.addEventListener('storage', (e) => {
     if (e.key === 'dashboard_lang') {
       const lang = e.newValue || 'pt';
@@ -587,10 +402,9 @@ document.addEventListener('DOMContentLoaded', () => {
     renderReservas();
   });
 
-  console.log('%cMinhas Reservas carregado!', 'color: #0b4b9b; font-weight: bold;');
+  console.log('%cMinhas Reservas carregado com status retirada!', 'color: #0b4b9b; font-weight: bold;');
 });
 
-// ===================== APLICA IDIOMA =====================
 function applyReservasLanguage(lang) {
   const t = reservasTranslations[lang] || reservasTranslations.pt;
 
@@ -605,18 +419,12 @@ function applyReservasLanguage(lang) {
 
   const emptyMsg = document.getElementById('empty-message');
   if (emptyMsg) {
-    if (activeTab === 'active') {
-      emptyMsg.textContent = t.empty_active;
-    } else {
-      emptyMsg.textContent = t.empty_history;
-    }
+    emptyMsg.textContent = (activeTab === 'active') ? t.empty_active : t.empty_history;
   }
 
-  // Atualizar botões nos cards (recriar)
   renderReservas();
 }
 
-// Sobrescrever função de tradução do dashboard para incluir reservas
 if (typeof applyDashboardLanguage === 'function') {
   const originalApply = applyDashboardLanguage;
   window.applyDashboardLanguage = function(lang) {

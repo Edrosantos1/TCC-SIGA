@@ -23,6 +23,14 @@ if (!$db) {
 $action = $_GET['action'] ?? '';
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+if ($action === 'toggle_destaque' && $id > 0) {
+    $stmt = $db->prepare('UPDATE catalogo SET destaque = CASE WHEN destaque = 1 THEN 0 ELSE 1 END WHERE id_catalogo = ?');
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    header('Location: catalogo_adm.php');
+    exit;
+}
+
 // --- EXCLUIR ---
 if ($action === 'delete' && $id > 0) {
     try {
@@ -69,15 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
     $quantidade = (int)($_POST['quantidade'] ?? 1);
     $localizacao = trim($_POST['localizacao'] ?? '');
     $capa_url = trim($_POST['capa_url'] ?? '');
+    $destaque = isset($_POST['destaque']) ? 1 : 0;
 
     $edit_id = isset($_POST['edit_id']) ? (int)$_POST['edit_id'] : 0;
 
     try {
         if ($edit_id > 0) {
             if ($db instanceof mysqli) {
-                $sql = "UPDATE catalogo SET titulo=?, autor=?, tipo=?, editora=?, ano_publicacao=?, isbn=?, descricao=?, quantidade=?, localizacao=?, capa_url=? WHERE id_catalogo=?";
+                $sql = "UPDATE catalogo SET titulo=?, autor=?, tipo=?, editora=?, ano_publicacao=?, isbn=?, descricao=?, quantidade=?, localizacao=?, capa_url=?, destaque=? WHERE id_catalogo=?";
                 $stmt = $db->prepare($sql);
-                $stmt->bind_param('ssssisssssi', $titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url, $edit_id);
+                $stmt->bind_param('ssssisssssii', $titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url, $destaque, $edit_id);
                 $stmt->execute();
                 if ($stmt->affected_rows >= 0) {
                     $_SESSION['flash_message'] = 'Item atualizado com sucesso.';
@@ -88,9 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
                 }
                 $stmt->close();
             } elseif ($db instanceof PDO) {
-                $sql = "UPDATE catalogo SET titulo=?, autor=?, tipo=?, editora=?, ano_publicacao=?, isbn=?, descricao=?, quantidade=?, localizacao=?, capa_url=? WHERE id_catalogo=?";
+                $sql = "UPDATE catalogo SET titulo=?, autor=?, tipo=?, editora=?, ano_publicacao=?, isbn=?, descricao=?, quantidade=?, localizacao=?, capa_url=?, destaque=? WHERE id_catalogo=?";
                 $stmt = $db->prepare($sql);
-                $stmt->execute([$titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url, $edit_id]);
+                $stmt->execute([$titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url, $destaque, $edit_id]);
                 if ($stmt->rowCount() >= 0) {
                     $_SESSION['flash_message'] = 'Item atualizado com sucesso.';
                     $_SESSION['flash_type'] = 'success';
@@ -101,9 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
             }
         } else {
             if ($db instanceof mysqli) {
-                $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url, destaque) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $db->prepare($sql);
-                $stmt->bind_param('ssssisssss', $titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url);
+                $stmt->bind_param('ssssisssssi', $titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url, $destaque);
                 $stmt->execute();
                 if ($stmt->insert_id > 0) {
                     $_SESSION['flash_message'] = 'Item cadastrado com sucesso.';
@@ -114,9 +123,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
                 }
                 $stmt->close();
             } elseif ($db instanceof PDO) {
-                $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url, destaque) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $db->prepare($sql);
-                $stmt->execute([$titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url]);
+                $stmt->execute([$titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_url, $destaque]);
                 if ($stmt->rowCount() > 0) {
                     $_SESSION['flash_message'] = 'Item cadastrado com sucesso.';
                     $_SESSION['flash_type'] = 'success';
@@ -262,7 +271,7 @@ if ($db) {
 <body class="<?= $config_classes ?>">
 
     <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
@@ -273,6 +282,7 @@ if ($db) {
                 <span></span>
             </button>
         </div>
+
         <nav class="sidebar-nav" id="sidebar-nav">
             <a href="dashboard_adm.php" class="nav-item">
                 <i class="fas fa-home"></i>
@@ -282,19 +292,22 @@ if ($db) {
                 <i class="fas fa-bookmark"></i>
                 <span>Reservas</span>
             </a>
-            <a href="pendencias_adm.php" class="nav-item">
+            <a href="pendencias_adm.php" class="nav-item active">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Pendências</span>
+                <?php if ($total_atrasados > 0): ?>
+                    <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
+                <?php endif; ?>
             </a>
-            <a href="catalogo_adm.php" class="nav-item active">
+            <a href="catalogo_adm.php" class="nav-item">
                 <i class="fas fa-book"></i>
                 <span>Catálogo</span>
             </a>
+            <a href="extrato_adm.php" class="nav-item"><i class="fas fa-history"></i><span>Extrato</span></a>
             <a href="notificacoes_adm.php" class="nav-item">
                 <i class="fas fa-bell"></i>
                 <span>Notificações</span>
             </a>
-            <div class="nav-divider"></div>
             <a href="logout_adm.php" class="nav-item nav-logout">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>
@@ -511,6 +524,9 @@ if ($db) {
                     <div class="form-group full-width">
                         <label for="descricao">Descrição</label>
                         <textarea id="descricao" name="descricao" rows="3"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label><input type="checkbox" name="destaque" id="destaque" value="1"> Exibir em Acervos em Destaque</label>
                     </div>
                 </div>
                 <div class="form-actions">

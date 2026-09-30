@@ -244,7 +244,7 @@ if (typeof dashboardTranslations !== 'undefined') {
 }
 
 // ===================== ESTADO =====================
-let allItems = [...historicoData];
+let allItems = [];
 let filteredItems = [];
 let displayedItems = [];
 let itemsPerPage = 10;
@@ -576,8 +576,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Aplicar traduções iniciais
   applyHistoricoLanguage(getCurrentLanguage());
 
-  // Aplicar filtros iniciais
-  applyFilters();
+  fetch('../api/aluno_historico.php', { credentials: 'same-origin' })
+    .then(response => response.ok ? response.json() : Promise.reject(new Error('Falha ao carregar histórico')))
+    .then(data => {
+      allItems = Array.isArray(data) ? data : [];
+      applyFilters();
+    })
+    .catch(error => {
+      console.error(error);
+      applyFilters();
+    });
 
   // Eventos dos filtros
   const filterType = document.getElementById('filter-type');
