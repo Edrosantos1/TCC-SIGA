@@ -218,50 +218,25 @@ $total_atrasados = $total_atrasados ?? 0;
     <script src="../assets/js/extrato_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
-    <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar" aria-label="Menu principal">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
                 <span>SiGA ITJ</span>
             </div>
-            <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
-                <span></span>
-                <span></span>
+            <button class="collapse-icon" id="collapseBtn" title="Recolher menu" aria-label="Recolher menu">
+                <span></span><span></span>
             </button>
         </div>
 
         <nav class="sidebar-nav" id="sidebar-nav">
-            <a href="dashboard_adm.php" class="nav-item">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-            <a href="reservas_adm.php" class="nav-item">
-                <i class="fas fa-bookmark"></i>
-                <span>Reservas</span>
-            </a>
-            <a href="pendencias_adm.php" class="nav-item">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>Pendências</span>
-                <?php if ($total_atrasados > 0): ?>
-                    <span class="nav-badge alert" id="pendencias-badge"><?= (int)$total_atrasados ?></span>
-                <?php endif; ?>
-            </a>
-            <a href="catalogo_adm.php" class="nav-item">
-                <i class="fas fa-book"></i>
-                <span>Catálogo</span>
-            </a>
-            <a href="extrato_adm.php" class="nav-item active">
-                <i class="fas fa-history"></i>
-                <span>Extrato</span>
-            </a>
-            <a href="notificacoes_adm.php" class="nav-item">
-                <i class="fas fa-bell"></i>
-                <span>Notificações</span>
-            </a>
-            <a href="logout_adm.php" class="nav-item nav-logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Sair</span>
-            </a>
+            <a href="dashboard_adm.php" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+            <a href="reservas_adm.php" class="nav-item"><i class="fas fa-bookmark"></i><span>Reservas</span></a>
+            <a href="pendencias_adm.php" class="nav-item"><i class="fas fa-exclamation-circle"></i><span>Pendências</span></a>
+            <a href="catalogo_adm.php" class="nav-item"><i class="fas fa-book"></i><span>Catálogo</span></a>
+            <a href="extrato_adm.php" class="nav-item active"><i class="fas fa-history"></i><span>Extrato</span></a>
+            <a href="notificacoes_adm.php" class="nav-item"><i class="fas fa-bell"></i><span>Notificações</span></a>
+            <a href="logout_adm.php" class="nav-item nav-logout"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a>
         </nav>
     </aside>
 

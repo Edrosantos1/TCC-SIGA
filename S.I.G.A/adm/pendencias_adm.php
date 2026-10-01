@@ -174,12 +174,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         <nav class="sidebar-nav" id="sidebar-nav">
             <a href="dashboard_adm.php" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
             <a href="reservas_adm.php" class="nav-item"><i class="fas fa-bookmark"></i><span>Reservas</span></a>
-            <a href="pendencias_adm.php" class="nav-item active">
-                <i class="fas fa-exclamation-circle"></i><span>Pendências</span>
-                <?php if ($total_atrasados > 0): ?>
-                    <span class="nav-badge alert" id="pendencias-badge"><?= $total_atrasados ?></span>
-                <?php endif; ?>
-            </a>
+            <a href="pendencias_adm.php" class="nav-item active"><i class="fas fa-exclamation-circle"></i><span>Pendências</span></a>
             <a href="catalogo_adm.php" class="nav-item"><i class="fas fa-book"></i><span>Catálogo</span></a>
             <a href="extrato_adm.php" class="nav-item"><i class="fas fa-history"></i><span>Extrato</span></a>
             <a href="notificacoes_adm.php" class="nav-item"><i class="fas fa-bell"></i><span>Notificações</span></a>
@@ -251,38 +246,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                         <i class="fas fa-times"></i> Limpar Filtro
                     </a>
                 <?php endif; ?>
-            </div>
-
-            <!-- CARDS DE ESTATÍSTICAS (informativos — os filtros ficam nas tabs abaixo) -->
-            <div class="stats-grid">
-                <div class="stat-card stat-total" role="group" aria-label="Total de empréstimos ativos">
-                    <span class="stat-icon"><i class="fas fa-book-open"></i></span>
-                    <span class="stat-info">
-                        <span class="stat-label">Total Ativos</span>
-                        <span class="stat-value" id="stat-total"><?= $total_geral ?></span>
-                    </span>
-                </div>
-                <div class="stat-card stat-atraso" role="group" aria-label="Empréstimos em atraso">
-                    <span class="stat-icon"><i class="fas fa-exclamation-triangle"></i></span>
-                    <span class="stat-info">
-                        <span class="stat-label">Em Atraso</span>
-                        <span class="stat-value" id="stat-atraso"><?= $total_atrasados ?></span>
-                    </span>
-                </div>
-                <div class="stat-card stat-prazo" role="group" aria-label="Empréstimos no prazo">
-                    <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
-                    <span class="stat-info">
-                        <span class="stat-label">No Prazo</span>
-                        <span class="stat-value" id="stat-prazo"><?= $total_no_prazo ?></span>
-                    </span>
-                </div>
-                <div class="stat-card stat-hoje" role="group" aria-label="Empréstimos que vencem hoje">
-                    <span class="stat-icon"><i class="fas fa-hourglass-half"></i></span>
-                    <span class="stat-info">
-                        <span class="stat-label">Vence Hoje</span>
-                        <span class="stat-value" id="stat-hoje"><?= $total_vence_hoje ?></span>
-                    </span>
-                </div>
             </div>
 
             <!-- FILTROS -->
@@ -370,9 +333,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <a href="catalogo_adm.php" class="empty-cta" id="empty-catalogo">
                         <i class="fas fa-book"></i> Ir para o Catálogo
                     </a>
-                    <button type="button" class="empty-cta" id="empty-limpar" style="display:none;">
-                        <i class="fas fa-rotate-left"></i> Limpar filtros
-                    </button>
                 </div>
             </div>
 
