@@ -1,5 +1,6 @@
 /* =============================================
-   configuracoes_adm.css — Configurações do Admin
+   configuracoes_aluno.css — Configurações do Aluno
+   (tamanhos de fonte em rem para respeitar a preferência "Tamanho da Fonte")
    ============================================= */
 
 .config-container {
@@ -12,7 +13,7 @@
 }
 
 .config-header h1 {
-    font-size: 26px;
+    font-size: 1.625rem;
     font-weight: 700;
     color: #0b4b9b;
     display: flex;
@@ -22,7 +23,7 @@
 
 .config-header p {
     color: #64748b;
-    font-size: 15px;
+    font-size: 0.9375rem;
     margin-top: 4px;
 }
 
@@ -37,7 +38,7 @@
 }
 
 .config-card h3 {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     color: #0b4b9b;
     margin-bottom: 2px;
@@ -47,7 +48,7 @@
 }
 
 .config-card .desc {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: #94a3b8;
     margin-bottom: 16px;
 }
@@ -71,7 +72,7 @@
     transition: all 0.3s;
     background: #fafcff;
     text-align: center;
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 500;
     color: #475569;
     position: relative;
@@ -89,16 +90,33 @@
     box-shadow: 0 0 0 3px rgba(11, 75, 155, 0.1);
 }
 
-.opcao-card input[type="radio"] {
-    display: none;
+/* Navegação por teclado (Tab + setas) */
+.opcao-card:focus-within {
+    outline: 3px solid #f59e0b;
+    outline-offset: 2px;
+}
+
+/* Escondido visualmente, mas ainda focável (display:none quebraria o teclado) */
+.opcao-card input[type="radio"],
+.toggle-switch input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
 }
 
 .opcao-card i {
-    font-size: 20px;
+    font-size: 1.25rem;
 }
 
 .opcao-card span {
-    font-size: 12px;
+    font-size: 0.75rem;
+}
+
+.opcao-card .emoji {
+    font-size: 1.25rem;
+    line-height: 1;
 }
 
 /* ========== TOGGLE SWITCH ========== */
@@ -107,14 +125,10 @@
     align-items: center;
     gap: 14px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     color: #475569;
     position: relative;
-}
-
-.toggle-switch input {
-    display: none;
 }
 
 .toggle-switch .slider {
@@ -148,11 +162,39 @@
     transform: translateX(20px);
 }
 
+.toggle-switch input:focus-visible + .slider {
+    outline: 3px solid #f59e0b;
+    outline-offset: 2px;
+}
+
 .toggle-switch .toggle-label {
     user-select: none;
 }
 
-/* ========== BOTÃO SALVAR ========== */
+/* ========== AÇÕES ========== */
+.config-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.aviso-nao-salvo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #92400e;
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.aviso-nao-salvo[hidden] {
+    display: none;
+}
+
 .btn-salvar {
     display: flex;
     align-items: center;
@@ -164,7 +206,7 @@
     color: #ffffff;
     border: none;
     border-radius: 12px;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
@@ -175,6 +217,36 @@
     background: #0a3d7a;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(11, 75, 155, 0.25);
+}
+
+.btn-restaurar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: #475569;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-restaurar:hover {
+    border-color: #94a3b8;
+    background: #f1f5f9;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .config-card[aria-label="Daltonismo"] .opcao-card.active::after {
+    content: "Paleta aplicada";
+    font-size: .6875rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
 /* ========== FLASH MESSAGES ========== */
@@ -202,7 +274,7 @@
 }
 
 .flash-message i {
-    font-size: 20px;
+    font-size: 1.25rem;
 }
 
 @keyframes slideDown {
@@ -227,21 +299,17 @@
     }
 
     .config-header h1 {
-        font-size: 20px;
+        font-size: 1.25rem;
     }
 }
 
 @media (max-width: 480px) {
-    .opcoes-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
     .opcao-card {
         padding: 10px 8px;
-        font-size: 12px;
+        font-size: 0.75rem;
     }
 
     .toggle-switch {
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 }

@@ -78,6 +78,7 @@ if ($stmt_notif) {
   <link rel="stylesheet" href="../assets/css/student_unified.css">
   <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
   <link rel="stylesheet" href="../assets/css/ui_alerts.css">
+  <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
   <script src="../assets/js/ui_alerts.js"></script>
   <script src="../assets/js/dashboard_aluno.js" defer></script>

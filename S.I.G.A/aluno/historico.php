@@ -38,6 +38,26 @@ if ($stmt_notif) {
     $notificacoes = $stmt_notif->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt_notif->close();
 }
+
+$historico = [];
+$stmt_historico = $conn->prepare(
+    "SELECT e.id_emprestimo AS id, 'loan' AS tipo, e.id_catalogo, e.titulo_item AS titulo,
+            c.autor, c.ano_publicacao AS ano, c.capa_url, DATE(e.data_emprestimo) AS data,
+            e.status, e.data_devolucao_prevista AS data_devolucao, NULL AS data_retirada
+     FROM emprestimos e LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
+     WHERE e.id_aluno = ?
+     UNION ALL
+     SELECT r.id_reserva AS id, 'reservation' AS tipo, r.id_catalogo, r.titulo_item AS titulo,
+            c.autor, c.ano_publicacao AS ano, c.capa_url, DATE(r.data_reserva) AS data,
+            r.status, NULL AS data_devolucao, r.data_reserva AS data_retirada
+     FROM reservas r LEFT JOIN catalogo c ON c.id_catalogo = r.id_catalogo
+     WHERE r.id_aluno = ?
+     ORDER BY data DESC, id DESC"
+);
+$stmt_historico->bind_param('ii', $usuario_id, $usuario_id);
+$stmt_historico->execute();
+$historico = $stmt_historico->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt_historico->close();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -52,6 +72,7 @@ if ($stmt_notif) {
   <link rel="stylesheet" href="../assets/css/historico.css">
   <link rel="stylesheet" href="../assets/css/student_unified.css">
   <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
+  <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
   <script src="../assets/js/dashboard_aluno.js" defer></script>
   <script src="../assets/js/notificacoes_aluno.js" defer></script>
@@ -201,6 +222,7 @@ if ($stmt_notif) {
   </div>
 
   <script>
+    window.historicoData = <?= json_encode($historico, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
 </body>

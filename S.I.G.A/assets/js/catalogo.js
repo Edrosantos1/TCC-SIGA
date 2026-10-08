@@ -131,7 +131,7 @@ if (typeof dashboardTranslations !== 'undefined') {
 // ===================== ESTADO GLOBAL =====================
 let catalogItems = [];
 let favorites = new Set();
-let reservations = new Set();
+let reservations = new Map();
 
 // ===================== AUXILIARES =====================
 function getCurrentLanguage() {
@@ -202,7 +202,7 @@ function showFeedback(message, type = 'info') {
 }
 
 // ===================== CARREGAR DADOS =====================
-async function loadCatalogData() {
+function loadCatalogData() {
   if (window.catalogData && Array.isArray(window.catalogData)) {
     catalogItems = window.catalogData;
 
@@ -215,12 +215,11 @@ async function loadCatalogData() {
       }
     }
 
-    try {
-      const res = localStorage.getItem('catalog_reservations');
-      if (res) reservations = new Set(JSON.parse(res).map(id => String(id)));
-    } catch (e) {}
-
-    await syncReservationsFromAPI();
+    if (window.reservasAtivas) {
+      reservations = new Map(
+        Object.entries(window.reservasAtivas).map(([id, reserva]) => [String(id), reserva.id_reserva])
+      );
+    }
     renderCatalog();
   } else {
     const grid = document.getElementById('catalog-grid');
@@ -234,25 +233,10 @@ async function loadCatalogData() {
   }
 }
 
-async function syncReservationsFromAPI() {
-  try {
-    const response = await fetch('../api/aluno_reservas.php', { credentials: 'same-origin' });
-    if (!response.ok) throw new Error('Erro ao buscar reservas');
-    const data = await response.json();
-    reservations = new Set();
-    data.forEach(reserva => {
-      if (reserva.status === 'pendente' || reserva.status === 'aprovada') {
-        if (reserva.id_catalogo) reservations.add(String(reserva.id_catalogo));
-      }
-    });
-    localStorage.setItem('catalog_reservations', JSON.stringify([...reservations]));
-  } catch (error) {
-    console.warn('Não foi possível sincronizar reservas:', error);
-  }
-}
-
-function saveCatalogState() {
-  localStorage.setItem('catalog_reservations', JSON.stringify([...reservations]));
+function submitForm(form) {
+  form.method = 'POST';
+  form.action = form.action || window.location.pathname;
+  form.submit();
 }
 
 // ===================== HELPERS DE TIPO =====================
@@ -327,20 +311,11 @@ function createItemCard(item, index, lang) {
           <i class="fas fa-heart"></i>
           <span>${isFav ? tCat('action_favorited') : tCat('action_favorite')}</span>
         </button>
-        ${isRes ? `
-          <button class="btn-reserve reserved" data-action="reserve" disabled type="button">
-            <i class="fas fa-check"></i>
-            <span>${tCat('action_reserved')}</span>
-          </button>
-          <button class="btn-cancel-reserve" data-action="cancel-reserve" type="button" aria-label="${tCat('action_cancel_reserve')}">
-            <i class="fas fa-times"></i>
-          </button>
-        ` : `
-          <button class="btn-reserve" data-action="reserve" type="button">
-            <i class="fas fa-hand-holding"></i>
-            <span>${tCat('action_reserve')}</span>
-          </button>
-        `}
+        <button class="btn-reserve ${isRes ? 'reserved' : ''}" data-action="reserve" type="button"
+                aria-pressed="${isRes}" ${isRes ? `title="${tCat('action_cancel_reserve')}"` : ''}>
+          <i class="fas ${isRes ? 'fa-check' : 'fa-hand-holding'}"></i>
+          <span>${isRes ? tCat('action_reserved') : tCat('action_reserve')}</span>
+        </button>
       </div>
     </div>
   `;
@@ -360,19 +335,11 @@ function createItemCard(item, index, lang) {
     });
   }
 
-  const resBtn = card.querySelector('.btn-reserve:not([disabled])');
+  const resBtn = card.querySelector('.btn-reserve');
   if (resBtn) {
     resBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleReserve(itemId);
-    });
-  }
-
-  const cancelBtn = card.querySelector('[data-action="cancel-reserve"]');
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      confirmCancelReserve(itemId);
     });
   }
 
@@ -401,156 +368,101 @@ function renderCatalog() {
 }
 
 // ===================== AÇÕES =====================
-async function toggleFavorite(id) {
-  const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
-  if (!item) return;
-
-  const title = item.title || item.titulo || 'este item';
-  const wasFav = favorites.has(id);
-
-  // Se está removendo, pede confirmação
-  if (wasFav && typeof window.uiConfirm === 'function') {
-    const ok = await window.uiConfirm(
-      tCat('confirm_unfav_msg', { titulo: title }),
-      {
-        titulo: tCat('confirm_unfav_title'),
-        tipo: 'warning',
-        textoConfirmar: tCat('confirm_unfav_yes'),
-        textoCancelar: tCat('confirm_unfav_no')
-      }
-    );
-    if (!ok) return;
-  }
-
-  const tipo = item.tipo || item.type || 'livro';
-
-  // Otimista
-  if (wasFav) favorites.delete(String(id));
-  else favorites.add(String(id));
-
-  // Feedback visual imediato
-  renderCatalog();
-
-  try {
-    const response = await fetch('../aluno/toggle_favorito.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      credentials: 'same-origin',
-      body: new URLSearchParams({
-        item_id: id,
-        tipo_item: tipo,
-        redirect: 'catalogo.php'
-      })
-    });
-    if (!response.ok) throw new Error('Falha ao salvar favorito');
-
-    showFeedback(wasFav ? tCat('feedback_fav_removed') : tCat('feedback_fav_added'),
-                 wasFav ? 'info' : 'success');
-  } catch (error) {
-    // Rollback
-    if (wasFav) favorites.add(String(id));
-    else favorites.delete(String(id));
-    renderCatalog();
-    showFeedback(tCat('feedback_fav_error'), 'error');
-    console.error(error);
-  }
+function createActionForm(action, fields) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = action === 'favorite' ? '../aluno/toggle_favorito.php' : '../api/aluno_reservas.php';
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+  return form;
 }
 
-async function toggleReserve(id) {
+function submitCatalogAction(form) {
+  // Formulário solto (fora do DOM) tem o submit ignorado pelos navegadores
+  form.style.display = 'none';
+  document.body.appendChild(form);
+  form.submit();
+}
+
+function toggleFavorite(id) {
   const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
   if (!item) return;
 
-  // Verifica disponibilidade
+  const wasFav = favorites.has(id);
+  if (wasFav && typeof window.uiConfirm === 'function') {
+    window.uiConfirm(tCat('confirm_unfav_msg', { titulo: item.title || item.titulo || 'este item' }), {
+      titulo: tCat('confirm_unfav_title'),
+      tipo: 'warning',
+      textoConfirmar: tCat('confirm_unfav_yes'),
+      textoCancelar: tCat('confirm_unfav_no')
+    }).then(ok => {
+      if (ok) submitCatalogAction(createActionForm('favorite', {
+        item_id: id,
+        tipo_item: item.tipo || item.type || 'livro',
+        redirect: '../aluno/catalogo.php'
+      }));
+    });
+    return;
+  }
+
+  submitCatalogAction(createActionForm('favorite', {
+    item_id: id,
+    tipo_item: item.tipo || item.type || 'livro',
+    redirect: '../aluno/catalogo.php'
+  }));
+}
+
+function toggleReserve(id) {
+  const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
+  if (!item) return;
+
+  // Já reservado → o mesmo botão passa a cancelar a reserva
+  if (reservations.has(String(id))) {
+    confirmCancelReserve(id);
+    return;
+  }
+
   const qty = item.quantity ?? item.quantidade;
   if (qty !== undefined && qty <= 0 && !reservations.has(id)) {
     showFeedback(tCat('feedback_reserve_unavailable'), 'warning');
     return;
   }
 
-  try {
-    const response = await fetch('../api/aluno_reservas.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        id_catalogo: id,
-        tipo: item.tipo || item.type || 'livro'
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      if (response.status === 409) {
-        reservations.add(String(id));
-        saveCatalogState();
-        renderCatalog();
-        return;
-      }
-      throw new Error(data.error || 'Erro ao reservar');
-    }
-
-    reservations.add(String(id));
-    saveCatalogState();
-    renderCatalog();
-    showFeedback(tCat('feedback_reserve_success'), 'success');
-  } catch (error) {
-    showFeedback(tCat('feedback_reserve_error', { error: error.message }), 'error');
-    console.error('Erro ao reservar:', error);
-  }
+  submitCatalogAction(createActionForm('reserve', {
+    id_catalogo: id,
+    tipo: item.tipo || item.type || 'livro',
+    redirect: '../aluno/catalogo.php'
+  }));
 }
 
-async function confirmCancelReserve(id) {
+function confirmCancelReserve(id) {
   const item = catalogItems.find(i => String(i.id || i.id_catalogo) === String(id));
   const title = item?.title || item?.titulo || 'este item';
 
   if (typeof window.uiConfirm === 'function') {
-    const ok = await window.uiConfirm(
-      tCat('confirm_cancel_msg', { titulo: title }),
-      {
-        titulo: tCat('confirm_cancel_title'),
-        tipo: 'warning',
-        textoConfirmar: tCat('confirm_cancel_yes'),
-        textoCancelar: tCat('confirm_cancel_no')
-      }
-    );
-    if (!ok) return;
-  }
-
-  try {
-    const listRes = await fetch('../api/aluno_reservas.php', { credentials: 'same-origin' });
-    const data = await listRes.json();
-    const reservaAtiva = data.find(r =>
-      String(r.id_catalogo) === String(id) &&
-      (r.status === 'pendente' || r.status === 'aprovada')
-    );
-
-    if (!reservaAtiva) {
-      reservations.delete(String(id));
-      saveCatalogState();
-      renderCatalog();
-      showFeedback(tCat('feedback_cancel_success'), 'info');
-      return;
-    }
-
-    const deleteRes = await fetch('../api/aluno_reservas.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'cancel', id: reservaAtiva.id_reserva }),
-      credentials: 'same-origin'
+    window.uiConfirm(tCat('confirm_cancel_msg', { titulo: title }), {
+      titulo: tCat('confirm_cancel_title'),
+      tipo: 'warning',
+      textoConfirmar: tCat('confirm_cancel_yes'),
+      textoCancelar: tCat('confirm_cancel_no')
+    }).then(ok => {
+      if (ok) submitCatalogAction(createActionForm('cancel', {
+        action: 'cancel',
+        id: reservations.get(String(id)) || id,
+        redirect: '../aluno/catalogo.php'
+      }));
     });
-    const result = await deleteRes.json();
-    if (!deleteRes.ok) throw new Error(result.error || 'Erro ao cancelar');
-
-    reservations.delete(String(id));
-    saveCatalogState();
-    renderCatalog();
-    showFeedback(tCat('feedback_cancel_success'), 'success');
-  } catch (error) {
-    if (error.message !== 'Esta reserva não pode mais ser cancelada') {
-      showFeedback(tCat('feedback_cancel_error'), 'error');
-    }
-    console.error(error);
+  } else if (confirm(tCat('confirm_cancel_msg', { titulo: title }))) {
+    submitCatalogAction(createActionForm('cancel', {
+      action: 'cancel',
+      id: reservations.get(String(id)) || id,
+      redirect: '../aluno/catalogo.php'
+    }));
   }
 }
 
@@ -637,23 +549,23 @@ function openItemModal(id) {
   // Botão reservar
   resText.textContent = isRes ? tCat('action_reserved') : tCat('action_reserve');
   resBtn.classList.toggle('reserved', isRes);
-  resBtn.disabled = isRes;
+  resBtn.disabled = false;
+  resBtn.title = isRes ? tCat('action_cancel_reserve') : '';
+  const resIcon = resBtn.querySelector('i');
+  if (resIcon) resIcon.className = isRes ? 'fas fa-check' : 'fas fa-hand-holding';
 
   // Remove listeners antigos clonando
   const newFavBtn = favBtn.cloneNode(true);
   favBtn.parentNode.replaceChild(newFavBtn, favBtn);
-  newFavBtn.addEventListener('click', async (e) => {
+  newFavBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    await toggleFavorite(id);
-    if (overlay.classList.contains('open')) openItemModal(id);
+    toggleFavorite(id);
   });
 
   const newResBtn = resBtn.cloneNode(true);
   resBtn.parentNode.replaceChild(newResBtn, resBtn);
-  newResBtn.addEventListener('click', async () => {
-    if (newResBtn.disabled) return;
-    await toggleReserve(id);
-    if (overlay.classList.contains('open')) openItemModal(id);
+  newResBtn.addEventListener('click', () => {
+    toggleReserve(id);
   });
 
   overlay.classList.add('open');

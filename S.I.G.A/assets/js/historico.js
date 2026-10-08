@@ -575,17 +575,16 @@ function closeHistoricoModal() {
 document.addEventListener('DOMContentLoaded', () => {
   // Aplicar traduções iniciais
   applyHistoricoLanguage(getCurrentLanguage());
-
-  fetch('../api/aluno_historico.php', { credentials: 'same-origin' })
-    .then(response => response.ok ? response.json() : Promise.reject(new Error('Falha ao carregar histórico')))
-    .then(data => {
-      allItems = Array.isArray(data) ? data : [];
-      applyFilters();
-    })
-    .catch(error => {
-      console.error(error);
-      applyFilters();
-    });
+  allItems = (window.historicoData || []).map(item => ({
+    ...item,
+    id: Number(item.id),
+    date: item.data ? new Date(item.data) : null,
+    dueDate: item.data_devolucao ? new Date(item.data_devolucao) : null,
+    returnedAt: item.data_retirada ? new Date(item.data_retirada) : null,
+    reservedAt: item.data_reserva ? new Date(item.data_reserva) : null,
+    pickedUpAt: item.data_retirada ? new Date(item.data_retirada) : null,
+  }));
+  applyFilters();
 
   // Eventos dos filtros
   const filterType = document.getElementById('filter-type');

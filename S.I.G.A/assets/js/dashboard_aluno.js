@@ -295,14 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (parts[0] === 'tcc' && parts[1]) tccActiveFavorites.add(Number(parts[1]));
     });
   }
-  fetch('../api/aluno_reservas.php', { credentials: 'same-origin' })
-    .then(response => response.ok ? response.json() : [])
-    .then(data => data.forEach(reserva => {
-      if ((reserva.status === 'pendente' || reserva.status === 'aprovada') && reserva.id_catalogo) {
-        tccActiveReserves.add(Number(reserva.id_catalogo));
-      }
-    }))
-    .catch(() => {});
+  if (window.reservasData) {
+    window.reservasData.forEach(reserva => {
+      if (reserva.id_catalogo) tccActiveReserves.add(Number(reserva.id_catalogo));
+    });
+  }
   initNotifications();
   renderizarDropdownNotificacoes();
 
@@ -616,21 +613,8 @@ function initTccCarousel() {
 
   if (resBtn) {
     resBtn.addEventListener('click', () => {
-      const lang = getCurrentLanguage();
-      const t = tccTranslations[lang] || tccTranslations.pt;
-      const text = document.getElementById('tcc-reserve-text');
-
-      if (tccActiveReserves.has(tccCurrentId)) {
-        tccActiveReserves.delete(tccCurrentId);
-        resBtn.classList.remove('reserved');
-        if (text) text.textContent = t.reserve;
-        showFeedbackMessage(t.feedback_unreserved);
-      } else {
-        tccActiveReserves.add(tccCurrentId);
-        resBtn.classList.add('reserved');
-        if (text) text.textContent = t.reserved;
-        showFeedbackMessage(t.feedback_reserved);
-      }
+      const input = document.getElementById('tcc-reserva-item-id');
+      if (input) input.value = tccCurrentId;
     });
   }
 }
@@ -641,6 +625,8 @@ function openTccModal(id) {
   tccCurrentId = id;
   const itemId = document.getElementById('tcc-modal-item-id');
   if (itemId) itemId.value = id;
+  const reservaInput = document.getElementById('tcc-reserva-item-id');
+  if (reservaInput) reservaInput.value = id;
 
   const lang = getCurrentLanguage();
   const tr = tccTranslations[lang] || tccTranslations.pt;
@@ -839,26 +825,6 @@ function initNotifications() {
             renderizarDropdownNotificacoes();
         }
     });
-
-    const markReadBtn = document.getElementById('mark-read-btn');
-    if (markReadBtn) {
-      markReadBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        try {
-          const response = await fetch('../api/aluno_notificacoes.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ action: 'mark_all_read' })
-          });
-          if (!response.ok) throw new Error('Falha ao atualizar notificações');
-          notificacoes = notificacoes.map(item => ({ ...item, lida: true }));
-          renderizarDropdownNotificacoes();
-        } catch (error) {
-          console.error(error);
-        }
-      });
-    }
 
     document.addEventListener('click', (e) => {
         if (!btn.contains(e.target) && !dropdown.contains(e.target)) {

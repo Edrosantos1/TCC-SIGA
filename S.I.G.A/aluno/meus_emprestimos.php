@@ -38,6 +38,20 @@ if ($stmt_notif) {
     $notificacoes = $stmt_notif->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt_notif->close();
 }
+
+$emprestimos = [];
+$stmt_emprestimos = $conn->prepare(
+    "SELECT e.id_emprestimo, e.titulo_item, e.data_emprestimo, e.data_devolucao_prevista,
+            e.status, e.renovado, c.autor, c.capa_url, c.tipo
+     FROM emprestimos e
+     LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
+     WHERE e.id_aluno = ?
+     ORDER BY e.data_emprestimo DESC"
+);
+$stmt_emprestimos->bind_param('i', $usuario_id);
+$stmt_emprestimos->execute();
+$emprestimos = $stmt_emprestimos->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt_emprestimos->close();
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -54,6 +68,7 @@ if ($stmt_notif) {
   <link rel="stylesheet" href="../assets/css/meus_emprestimos.css?v=<?= time() ?>">
   <link rel="stylesheet" href="../assets/css/ui_alerts.css?v=<?= time() ?>">
   <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css?v=<?= time() ?>">
+  <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
   <script src="../assets/js/ui_alerts.js"></script>
   <script src="../assets/js/dashboard_aluno.js?v=<?= time() ?>" defer></script>
@@ -192,8 +207,52 @@ if ($stmt_notif) {
         </div>
       </div>
 
-      <div class="loans-grid" id="active-loans"></div>
-      <div class="loans-grid" id="history-loans" style="display: none;"></div>
+      <div class="loans-grid" id="active-loans">
+        <?php foreach ($emprestimos as $emprestimo):
+            $status = $emprestimo['status'];
+            $isActive = in_array($status, ['emprestado', 'atrasado', 'pendente'], true);
+            $isHistory = in_array($status, ['devolvido', 'finalizado', 'recusado'], true);
+            if (!$isActive && !$isHistory) continue;
+            $tipo = $emprestimo['tipo'] ?: 'livro';
+            $tipoIcon = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'][$tipo] ?? 'fa-book';
+            $statusLabel = match ($status) {
+                'emprestado' => 'Ativo', 'atrasado' => 'Atrasado', 'pendente' => 'Aguardando aprovação',
+                'devolvido', 'finalizado' => 'Devolvido', 'recusado' => 'Recusado', default => 'Pendente'
+            };
+        ?>
+        <article class="loan-card" data-status="<?= htmlspecialchars($status) ?>">
+          <div class="loan-cover-wrap">
+            <?php if (!empty($emprestimo['capa_url'])): ?>
+              <img class="loan-cover" src="<?= htmlspecialchars($emprestimo['capa_url']) ?>" alt="<?= htmlspecialchars($emprestimo['titulo_item']) ?>">
+            <?php else: ?>
+              <div class="loan-cover-placeholder"><i class="fas <?= $tipoIcon ?>"></i></div>
+            <?php endif; ?>
+            <span class="loan-badge status-<?= htmlspecialchars($status) ?>"><?= htmlspecialchars($statusLabel) ?></span>
+          </div>
+          <div class="loan-body">
+            <h4 class="loan-title"><?= htmlspecialchars($emprestimo['titulo_item']) ?></h4>
+            <p class="loan-author"><?= htmlspecialchars($emprestimo['autor'] ?: 'Autor não informado') ?></p>
+            <div class="loan-dates">
+              <span><i class="far fa-calendar-alt"></i> Empréstimo: <?= date('d/m/Y', strtotime($emprestimo['data_emprestimo'])) ?></span>
+              <?php if (!empty($emprestimo['data_devolucao_prevista'])): ?>
+                <span><i class="far fa-calendar-check"></i> Vencimento: <?= date('d/m/Y', strtotime($emprestimo['data_devolucao_prevista'])) ?></span>
+              <?php endif; ?>
+            </div>
+          </div>
+        </article>
+        <?php endforeach; ?>
+      </div>
+      <div class="loans-grid" id="history-loans" style="display: none;">
+        <?php foreach ($emprestimos as $emprestimo):
+            if (!in_array($emprestimo['status'], ['devolvido', 'finalizado', 'recusado'], true)) continue;
+            $tipo = $emprestimo['tipo'] ?: 'livro';
+        ?>
+        <article class="loan-card" data-status="<?= htmlspecialchars($emprestimo['status']) ?>">
+          <div class="loan-cover-wrap"><div class="loan-cover-placeholder"><i class="fas fa-book"></i></div><span class="loan-badge status-<?= htmlspecialchars($emprestimo['status']) ?>"><?= htmlspecialchars($emprestimo['status'] === 'recusado' ? 'Recusado' : 'Devolvido') ?></span></div>
+          <div class="loan-body"><h4 class="loan-title"><?= htmlspecialchars($emprestimo['titulo_item']) ?></h4><p class="loan-author"><?= htmlspecialchars($emprestimo['autor'] ?: 'Autor não informado') ?></p></div>
+        </article>
+        <?php endforeach; ?>
+      </div>
 
       <div class="loan-no-results" id="loans-no-results" hidden>
         <i class="fas fa-filter"></i>
@@ -204,21 +263,25 @@ if ($stmt_notif) {
     </main>
   </div>
 
+  <!-- ========== MODAL DE DETALHES ========== -->
   <div class="modal-overlay" id="loan-modal-overlay">
     <div class="modal-container" id="loan-modal">
-      <button class="modal-close" id="loan-modal-close"><i class="fas fa-times"></i></button>
-      <div class="modal-content">
-        <h2 id="loan-modal-title">Detalhes do Empréstimo</h2>
-        <div id="loan-modal-body"></div>
-        <div class="modal-actions">
-          <button id="loan-renew-btn" class="btn-primary">Renovar</button>
-          <button id="loan-return-btn" class="btn-secondary">Devolver</button>
-        </div>
+      <button class="modal-close" id="loan-modal-close" aria-label="Fechar">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <div class="modal-content" id="loan-modal-content">
+        <!-- Conteúdo renderizado via JS -->
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="loan-modal-cancel">Fechar</button>
       </div>
     </div>
   </div>
 
   <script>
+    window.emprestimosData = <?= json_encode($emprestimos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
 </body>

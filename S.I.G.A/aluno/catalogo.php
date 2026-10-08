@@ -18,6 +18,21 @@ while ($favorito = $favoritosResult->fetch_assoc()) {
 }
 $favoritosStmt->close();
 
+$reservasStmt = $conn->prepare(
+    "SELECT id_reserva, id_catalogo, status FROM reservas WHERE id_aluno = ? AND status IN ('pendente', 'aprovada')"
+);
+$reservasStmt->bind_param('i', $usuario_id);
+$reservasStmt->execute();
+$reservasResult = $reservasStmt->get_result();
+$reservasAtivas = [];
+while ($reserva = $reservasResult->fetch_assoc()) {
+    $reservasAtivas[(string) $reserva['id_catalogo']] = [
+        'id_reserva' => (int) $reserva['id_reserva'],
+        'status' => $reserva['status'],
+    ];
+}
+$reservasStmt->close();
+
 $sql = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -141,6 +156,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
     <link rel="stylesheet" href="../assets/css/student_unified.css">
     <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
     <link rel="stylesheet" href="../assets/css/ui_alerts.css">
+    <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
     <script src="../assets/js/ui_alerts.js"></script>
     <script src="../assets/js/dashboard_aluno.js" defer></script>
@@ -148,6 +164,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
     <script>
         window.catalogData = <?= $catalogDataJson ?>;
         window.favoritosPHP = <?= json_encode($favoritos) ?>;
+        window.reservasAtivas = <?= json_encode($reservasAtivas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     </script>
     <script src="../assets/js/catalogo.js?v=<?= time() ?>" defer></script>

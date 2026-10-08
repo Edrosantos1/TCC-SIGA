@@ -21,17 +21,6 @@ const loansTranslations = {
     days_today: 'Vence hoje',
     days_overdue: '{days} dias atrasado',
     days_overdue_one: '1 dia atrasado',
-    renew: 'Renovar',
-    renew_disabled: 'Indisponível',
-    return: 'Devolver',
-    modal_title: 'Detalhes do Empréstimo',
-    modal_renew_title: 'Renovar empréstimo',
-    modal_return_title: 'Devolver item',
-    modal_renew_confirm: 'Deseja renovar este empréstimo? A nova data de vencimento será {newDate}.',
-    modal_return_confirm: 'Tem certeza que deseja devolver este item?',
-    feedback_renewed: 'Empréstimo renovado com sucesso! Nova data: {newDate}',
-    feedback_returned: 'Item devolvido com sucesso!',
-    feedback_error: 'Erro ao processar ação. Tente novamente.',
     loading: 'Carregando empréstimos...',
     error: 'Erro ao carregar empréstimos. Tente novamente.',
     search_placeholder: 'Buscar nos seus empréstimos...',
@@ -49,6 +38,21 @@ const loansTranslations = {
     no_results_title: 'Nenhum item encontrado',
     no_results_text: 'Nenhum empréstimo corresponde aos filtros atuais.',
     clear_filters: 'Limpar filtros',
+    modal_title: 'Detalhes do Empréstimo',
+    detail_section: 'Informações do empréstimo',
+    detail_loan_date: 'Data do empréstimo',
+    detail_due_date: 'Vencimento',
+    detail_type: 'Tipo de material',
+    detail_code: 'Código',
+    detail_close: 'Fechar',
+    type_livro: 'Livro',
+    type_revista: 'Revista',
+    type_tcc: 'TCC',
+    days_block_ok: 'Tempo restante',
+    days_block_warning: 'Atenção',
+    days_block_danger: 'Atrasado',
+    days_block_neutral: 'Situação',
+    author_unknown: 'Autor não informado',
   },
   en: {
     loans_title: 'My Loans',
@@ -69,17 +73,6 @@ const loansTranslations = {
     days_today: 'Due today',
     days_overdue: '{days} days overdue',
     days_overdue_one: '1 day overdue',
-    renew: 'Renew',
-    renew_disabled: 'Unavailable',
-    return: 'Return',
-    modal_title: 'Loan Details',
-    modal_renew_title: 'Renew loan',
-    modal_return_title: 'Return item',
-    modal_renew_confirm: 'Do you want to renew this loan? The new due date will be {newDate}.',
-    modal_return_confirm: 'Are you sure you want to return this item?',
-    feedback_renewed: 'Loan renewed successfully! New date: {newDate}',
-    feedback_returned: 'Item returned successfully!',
-    feedback_error: 'Error processing action. Please try again.',
     loading: 'Loading loans...',
     error: 'Error loading loans. Please try again.',
     search_placeholder: 'Search your loans...',
@@ -97,6 +90,21 @@ const loansTranslations = {
     no_results_title: 'No items found',
     no_results_text: 'No loan matches the current filters.',
     clear_filters: 'Clear filters',
+    modal_title: 'Loan Details',
+    detail_section: 'Loan information',
+    detail_loan_date: 'Loan date',
+    detail_due_date: 'Due date',
+    detail_type: 'Material type',
+    detail_code: 'Code',
+    detail_close: 'Close',
+    type_livro: 'Book',
+    type_revista: 'Magazine',
+    type_tcc: 'Thesis',
+    days_block_ok: 'Time left',
+    days_block_warning: 'Attention',
+    days_block_danger: 'Overdue',
+    days_block_neutral: 'Status',
+    author_unknown: 'Author not informed',
   },
   es: {
     loans_title: 'Mis Préstamos',
@@ -117,17 +125,6 @@ const loansTranslations = {
     days_today: 'Vence hoy',
     days_overdue: '{days} días atrasado',
     days_overdue_one: '1 día atrasado',
-    renew: 'Renovar',
-    renew_disabled: 'No disponible',
-    return: 'Devolver',
-    modal_title: 'Detalles del Préstamo',
-    modal_renew_title: 'Renovar préstamo',
-    modal_return_title: 'Devolver ítem',
-    modal_renew_confirm: '¿Desea renovar este préstamo? La nueva fecha de vencimiento será {newDate}.',
-    modal_return_confirm: '¿Está seguro que desea devolver este ítem?',
-    feedback_renewed: '¡Préstamo renovado con éxito! Nueva fecha: {newDate}',
-    feedback_returned: '¡Ítem devuelto con éxito!',
-    feedback_error: 'Error al procesar la acción. Intente nuevamente.',
     loading: 'Cargando préstamos...',
     error: 'Error al cargar préstamos. Intente de nuevo.',
     search_placeholder: 'Buscar en tus préstamos...',
@@ -145,6 +142,21 @@ const loansTranslations = {
     no_results_title: 'Ningún elemento encontrado',
     no_results_text: 'Ningún préstamo coincide con los filtros actuales.',
     clear_filters: 'Limpiar filtros',
+    modal_title: 'Detalles del Préstamo',
+    detail_section: 'Información del préstamo',
+    detail_loan_date: 'Fecha del préstamo',
+    detail_due_date: 'Vencimiento',
+    detail_type: 'Tipo de material',
+    detail_code: 'Código',
+    detail_close: 'Cerrar',
+    type_livro: 'Libro',
+    type_revista: 'Revista',
+    type_tcc: 'Tesis',
+    days_block_ok: 'Tiempo restante',
+    days_block_warning: 'Atención',
+    days_block_danger: 'Atrasado',
+    days_block_neutral: 'Situación',
+    author_unknown: 'Autor no informado',
   }
 };
 
@@ -174,27 +186,6 @@ function getTranslation(key, lang, params = {}) {
   return text;
 }
 
-if (typeof window.showFeedbackMessage !== 'function') {
-  window.showFeedbackMessage = function (message) {
-    const msgDiv = document.createElement('div');
-    msgDiv.textContent = message;
-    msgDiv.style.cssText = `
-      position: fixed; bottom: 20px; left: 50%;
-      transform: translateX(-50%); background: #0b4b9b;
-      color: white; padding: 12px 24px; border-radius: 10px;
-      z-index: 100000; box-shadow: 0 8px 24px rgba(11,75,155,0.25);
-      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    `;
-    document.body.appendChild(msgDiv);
-    setTimeout(() => {
-      msgDiv.style.opacity = '0';
-      msgDiv.style.transform = 'translateX(-50%) translateY(8px)';
-      setTimeout(() => msgDiv.remove(), 400);
-    }, 2400);
-  };
-}
-
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -204,6 +195,40 @@ function formatDate(dateStr) {
 
 function getDaysBetween(date1, date2) {
   return Math.ceil((date2 - date1) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Normaliza status cru do banco.
+ */
+function mapStatus(raw) {
+  const s = String(raw || '').trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  if (s.startsWith('devolv') || s.startsWith('finaliz') ||
+      s === 'returned'  || s === 'finished' || s === 'entregue') {
+    return 'returned';
+  }
+  if (s.startsWith('recus') || s.startsWith('rejeit') ||
+      s === 'refused'   || s === 'rejected') {
+    return 'refused';
+  }
+  if (s.startsWith('atras')  || s === 'overdue' || s === 'late' || s === 'vencido') {
+    return 'overdue';
+  }
+  if (s.startsWith('pend')   || s.startsWith('aguard') ||
+      s === 'pending'        || s === 'retirado' || s === 'waiting') {
+    return 'pending';
+  }
+  return 'active';
+}
+
+function mapType(raw) {
+  const s = String(raw || '').trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (s.startsWith('revist') || s === 'magazine') return 'revista';
+  if (s.startsWith('tcc') || s.startsWith('tese') ||
+      s.startsWith('thes') || s === 'monografia') return 'tcc';
+  return 'livro';
 }
 
 // ===================== ESTADO =====================
@@ -217,7 +242,7 @@ const loansState = {
 };
 
 // ===================== CARREGAR DADOS =====================
-async function fetchLoans() {
+function fetchLoans() {
   const lang = getCurrentLanguage();
   const activeContainer = document.getElementById('active-loans');
   const historyContainer = document.getElementById('history-loans');
@@ -229,44 +254,22 @@ async function fetchLoans() {
     historyContainer.innerHTML = `<div class="loan-empty"><i class="fas fa-spinner fa-pulse"></i><p>${getTranslation('loading', lang)}</p></div>`;
   }
 
-  try {
-    const apiUrl = '../api/aluno_emprestimos.php';
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' },
-      credentials: 'same-origin'
-    });
+  const raw = window.emprestimosData || [];
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`HTTP ${response.status}: ${text}`);
-    }
+  loans = raw.map(l => ({
+    id: Number(l.id_emprestimo || l.id),
+    title: l.titulo_item || l.title || 'Sem título',
+    author: l.autor || l.author || '',
+    cover: l.capa_url || l.cover || '',
+    type: mapType(l.tipo || l.type),
+    loanDate: l.data_emprestimo ? new Date(l.data_emprestimo) : null,
+    dueDate: l.data_devolucao_prevista ? new Date(l.data_devolucao_prevista) : null,
+    status: mapStatus(l.status),
+    rawStatus: l.status,
+    renovado: Boolean(l.renovado),
+  }));
 
-    const data = await response.json();
-    if (data.error) throw new Error(data.error);
-
-    const loanRows = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
-
-    loans = loanRows.map(l => ({
-      ...l,
-      loanDate: l.loanDate ? new Date(l.loanDate) : null,
-      dueDate: l.dueDate ? new Date(l.dueDate) : null,
-    }));
-
-    const now = new Date();
-    loans.forEach(l => {
-      if (l.status !== 'returned' && l.status !== 'pending' && l.status !== 'refused' && l.dueDate && l.dueDate < now) {
-        l.status = 'overdue';
-      }
-    });
-
-    renderLoans();
-  } catch (error) {
-    console.error('Erro ao carregar empréstimos:', error);
-    if (activeContainer) {
-      activeContainer.innerHTML = `<div class="loan-empty"><i class="fas fa-exclamation-triangle"></i><p>${getTranslation('error', lang)}</p></div>`;
-    }
-  }
+  renderLoans();
 }
 
 // ===================== RENDERIZAÇÃO =====================
@@ -287,14 +290,15 @@ function getStatusLabel(status, lang) {
 }
 
 function computeDaysInfo(loan, lang) {
-  if (!['active', 'overdue'].includes(loan.status)) return { text: '', cls: 'neutral' };
+  if (loan.status !== 'active' && loan.status !== 'overdue') return { text: '', cls: 'neutral' };
   if (!loan.dueDate) return { text: '', cls: 'neutral' };
 
   const now = new Date();
   const days = getDaysBetween(now, loan.dueDate);
 
-  if (days > 7)  return { text: getTranslation('days_left', lang, { days }), cls: 'ok' };
-  if (days > 0)  return { text: days === 1 ? getTranslation('days_left_one', lang) : getTranslation('days_left', lang, { days }), cls: 'warning' };
+  if (days > 7)   return { text: getTranslation('days_left', lang, { days }), cls: 'ok' };
+  if (days > 1)   return { text: getTranslation('days_left', lang, { days }), cls: 'warning' };
+  if (days === 1) return { text: getTranslation('days_left_one', lang), cls: 'warning' };
   if (days === 0) return { text: getTranslation('days_today', lang), cls: 'warning' };
   const abs = Math.abs(days);
   return {
@@ -307,18 +311,12 @@ function createLoanCard(loan, index, lang) {
   const card = document.createElement('article');
   card.className = 'loan-card';
   card.dataset.id = loan.id;
-  card.dataset.tipo = loan.type || 'livro';
-  card.dataset.titulo = loan.title || '';
-  card.dataset.autor = loan.author || '';
+  card.dataset.tipo = loan.type;
   card.dataset.status = loan.status;
-  card.dataset.data = loan.loanDate ? loan.loanDate.getTime() : 0;
-  card.dataset.due = loan.dueDate ? loan.dueDate.getTime() : 0;
 
-  const isActive = loan.status === 'active' || loan.status === 'overdue';
   const isPending = loan.status === 'pending';
   const coverColor = getCoverColor(index);
 
-  // Capa
   let coverHTML;
   if (loan.cover) {
     coverHTML = `<img src="${loan.cover}" alt="${loan.title}" class="loan-cover" loading="lazy">`;
@@ -326,85 +324,46 @@ function createLoanCard(loan, index, lang) {
     const iconMap = { livro: 'fa-book', revista: 'fa-newspaper', tcc: 'fa-graduation-cap' };
     const icon = iconMap[loan.type] || 'fa-book';
     coverHTML = `
-      <div class="loan-cover-placeholder" style="background: ${coverColor}">
+      <div class="loan-cover-placeholder" style="background: linear-gradient(135deg, ${coverColor}, ${coverColor}cc)">
         <i class="fas ${icon}"></i>
       </div>`;
   }
 
-  // Status badge
   const statusLabel = getStatusLabel(loan.status, lang);
-  const statusClass = loan.status; // active|overdue|pending|returned|refused
-
-  // Datas
   const loanDateStr = formatDate(loan.loanDate);
-  const dueDateStr = loan.dueDate ? formatDate(loan.dueDate) : getTranslation('status_pending', lang);
-
-  // Dias restantes
-  const daysInfo = computeDaysInfo(loan, lang);
-
-  // Ações
-  let actionsHTML = '';
-  if (isActive) {
-    const canRenew = !loan.renovado && loan.status !== 'overdue';
-    actionsHTML = `
-      <div class="loan-actions">
-        <button class="btn-renew" ${!canRenew ? 'disabled' : ''} data-action="renew">
-          ${canRenew ? getTranslation('renew', lang) : getTranslation('renew_disabled', lang)}
-        </button>
-        <button class="btn-return" data-action="return">
-          ${getTranslation('return', lang)}
-        </button>
-      </div>`;
-  }
+  const dueDateStr  = loan.dueDate ? formatDate(loan.dueDate) : getTranslation('status_pending', lang);
+  const daysInfo    = computeDaysInfo(loan, lang);
 
   card.innerHTML = `
     <div class="loan-cover-wrap">
       ${coverHTML}
-      <span class="loan-badge status-${statusClass}">${statusLabel}</span>
+      <span class="loan-badge status-${loan.status}">${statusLabel}</span>
     </div>
     <div class="loan-body">
       <h4 class="loan-title" title="${loan.title}">${loan.title}</h4>
-      <p class="loan-author">${loan.author || 'Autor não informado'}</p>
+      <p class="loan-author">${loan.author || getTranslation('author_unknown', lang)}</p>
       <div class="loan-dates">
-        <span><i class="far fa-calendar-alt"></i> ${isPending ? getTranslation('loan_date', lang, { date: loanDateStr }) : getTranslation('loan_date', lang, { date: loanDateStr })}</span>
+        <span><i class="far fa-calendar-alt"></i> ${getTranslation('loan_date', lang, { date: loanDateStr })}</span>
         ${!isPending ? `<span><i class="far fa-calendar-check"></i> ${getTranslation('due_date', lang, { date: dueDateStr })}</span>` : ''}
       </div>
       ${daysInfo.text ? `<span class="loan-days ${daysInfo.cls}"><i class="fas fa-clock"></i> ${daysInfo.text}</span>` : ''}
     </div>
-    ${actionsHTML}
   `;
 
-  const renewBtn = card.querySelector('.btn-renew');
-  if (renewBtn && !renewBtn.disabled) {
-    renewBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openLoanModal(loan.id, 'renew');
-    });
-  }
-
-  const returnBtn = card.querySelector('.btn-return');
-  if (returnBtn) {
-    returnBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openLoanModal(loan.id, 'return');
-    });
-  }
-
-  card.addEventListener('click', () => openLoanModal(loan.id, 'view'));
-
+  card.addEventListener('click', () => openLoanModal(loan.id));
   return card;
 }
 
-// ===================== FILTRO + SORT + VIEW =====================
-function applyFiltersAndSort(container, list, lang) {
+// ===================== FILTRO + SORT =====================
+function applyFiltersAndSort(list) {
   const search = loansState.search;
   const filter = loansState.filter;
-  const sort = loansState.sort;
+  const sort   = loansState.sort;
 
   let filtered = list.filter(l => {
-    const tipo = l.type || '';
+    const tipo   = l.type || '';
     const titulo = (l.title || '').toLowerCase();
-    const autor = (l.author || '').toLowerCase();
+    const autor  = (l.author || '').toLowerCase();
     const matchFilter = filter === 'todos' || tipo === filter;
     const matchSearch = !search || titulo.includes(search) || autor.includes(search);
     return matchFilter && matchSearch;
@@ -433,21 +392,28 @@ function applyFiltersAndSort(container, list, lang) {
 }
 
 function renderLoans() {
-  const activeContainer = document.getElementById('active-loans');
+  const activeContainer  = document.getElementById('active-loans');
   const historyContainer = document.getElementById('history-loans');
   const toolbar = document.getElementById('loans-toolbar');
   const noResults = document.getElementById('loans-no-results');
   const lang = getCurrentLanguage();
 
-  const allActive = loans.filter(l => ['active', 'overdue', 'pending'].includes(l.status));
-  const allHistory = loans.filter(l => ['returned', 'refused'].includes(l.status));
+  // Separa ativos e histórico
+  const allActive  = loans.filter(l =>
+    l.status === 'active' || l.status === 'overdue' || l.status === 'pending'
+  );
+  const allHistory = loans.filter(l =>
+    l.status === 'returned' || l.status === 'refused'
+  );
 
-  // Mostra toolbar se há QUALQUER empréstimo
+  // Lista da aba atual
+  const sourceList = loansState.tab === 'active' ? allActive : allHistory;
+
   if (toolbar) toolbar.hidden = loans.length === 0;
 
-  // Contadores por tipo (baseado no conjunto atual — ativos + histórico)
-  const counts = { todos: loans.length, livro: 0, revista: 0, tcc: 0 };
-  loans.forEach(l => {
+  // ========== CONTADORES — APENAS DA ABA ATUAL ==========
+  const counts = { todos: sourceList.length, livro: 0, revista: 0, tcc: 0 };
+  sourceList.forEach(l => {
     const t = l.type || 'livro';
     if (counts[t] !== undefined) counts[t]++;
   });
@@ -455,36 +421,33 @@ function renderLoans() {
     const key = el.dataset.count;
     if (counts[key] !== undefined) el.textContent = counts[key];
   });
+  // =====================================================
 
   // Tab ativa
-  document.getElementById('tab-active').classList.toggle('active', loansState.tab === 'active');
-  document.getElementById('tab-history').classList.toggle('active', loansState.tab === 'history');
-  activeContainer.style.display = loansState.tab === 'active' ? 'grid' : 'none';
+  const tabActiveEl  = document.getElementById('tab-active');
+  const tabHistoryEl = document.getElementById('tab-history');
+  if (tabActiveEl)  tabActiveEl.classList.toggle('active',  loansState.tab === 'active');
+  if (tabHistoryEl) tabHistoryEl.classList.toggle('active', loansState.tab === 'history');
+
+  activeContainer.style.display  = loansState.tab === 'active'  ? 'grid' : 'none';
   historyContainer.style.display = loansState.tab === 'history' ? 'grid' : 'none';
 
-  // Determina a lista da tab atual
-  const sourceList = loansState.tab === 'active' ? allActive : allHistory;
   const targetContainer = loansState.tab === 'active' ? activeContainer : historyContainer;
-
   targetContainer.innerHTML = '';
 
-  // Empty state puro (sem empréstimos nessa categoria)
+  // Estado vazio puro
   if (sourceList.length === 0) {
-    const emptyKey = loansState.tab === 'active' ? 'empty_active' : 'empty_history';
+    const emptyKey  = loansState.tab === 'active' ? 'empty_active' : 'empty_history';
     const emptyIcon = loansState.tab === 'active' ? 'fa-book-open' : 'fa-history';
     targetContainer.innerHTML = `<div class="loan-empty"><i class="fas ${emptyIcon}"></i><p>${getTranslation(emptyKey, lang)}</p></div>`;
     if (noResults) noResults.hidden = true;
-    targetContainer.classList.toggle('list-view', false);
+    targetContainer.classList.remove('list-view');
     return;
   }
 
-  // Filtra + ordena
-  const filtered = applyFiltersAndSort(targetContainer, sourceList, lang);
-
-  // Aplica view
+  const filtered = applyFiltersAndSort(sourceList);
   targetContainer.classList.toggle('list-view', loansState.view === 'list');
 
-  // Aplica filtros: se nada passou, mostra o "no-results"
   if (filtered.length === 0) {
     if (noResults) noResults.hidden = false;
     targetContainer.style.display = 'none';
@@ -492,129 +455,101 @@ function renderLoans() {
   }
 
   if (noResults) noResults.hidden = true;
+  targetContainer.style.display = 'grid';
 
   filtered.forEach((loan, idx) => {
     targetContainer.appendChild(createLoanCard(loan, idx, lang));
   });
 }
 
-// ===================== AÇÕES =====================
-async function renewLoan(id) {
-  const lang = getCurrentLanguage();
-  const loan = loans.find(l => String(l.id) === String(id));
-  if (!loan) return;
-  if (loan.renovado || loan.status === 'overdue' || loan.status === 'returned') {
-    window.showFeedbackMessage(getTranslation('feedback_error', lang));
-    return;
-  }
-
-  try {
-    const response = await fetch('../api/aluno_emprestimos.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'renew', id: id })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Erro ao renovar');
-
-    window.showFeedbackMessage(getTranslation('feedback_renewed', lang, { newDate: formatDate(data.new_due) }));
-    await fetchLoans();
-  } catch (error) {
-    console.error(error);
-    window.showFeedbackMessage(getTranslation('feedback_error', lang));
-  }
-}
-
-async function returnLoan(id) {
-  const lang = getCurrentLanguage();
-  const loan = loans.find(l => String(l.id) === String(id));
-  if (!loan || loan.status === 'returned') return;
-
-  try {
-    const response = await fetch('../api/aluno_emprestimos.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'return', id: id })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Erro ao devolver');
-
-    window.showFeedbackMessage(getTranslation('feedback_returned', lang));
-    await fetchLoans();
-  } catch (error) {
-    console.error(error);
-    window.showFeedbackMessage(getTranslation('feedback_error', lang));
-  }
-}
-
-// ===================== MODAL =====================
-function openLoanModal(id, action) {
+// ===================== MODAL DE DETALHES =====================
+function openLoanModal(id) {
   const loan = loans.find(l => String(l.id) === String(id));
   if (!loan) return;
 
   const lang = getCurrentLanguage();
-  const overlay = document.getElementById('loan-modal-overlay');
-  const title = document.getElementById('loan-modal-title');
-  const body = document.getElementById('loan-modal-body');
-  const renewBtn = document.getElementById('loan-renew-btn');
-  const returnBtn = document.getElementById('loan-return-btn');
+  const overlay   = document.getElementById('loan-modal-overlay');
+  const content   = document.getElementById('loan-modal-content');
+  const cancelBtn = document.getElementById('loan-modal-cancel');
 
-  title.textContent = getTranslation('modal_title', lang);
-
+  const statusLabel = getStatusLabel(loan.status, lang);
   const loanDate = formatDate(loan.loanDate);
-  const dueDate = formatDate(loan.dueDate);
+  const dueDate  = formatDate(loan.dueDate);
+  const daysInfo = computeDaysInfo(loan, lang);
+  const typeLabel = getTranslation('type_' + loan.type, lang);
 
-  body.innerHTML = `
-    <p><strong>${loan.title}</strong> — ${loan.author || 'Autor não informado'}</p>
-    <p><strong>${getTranslation('loan_date', lang, { date: '' })}</strong> ${loanDate}</p>
-    <p><strong>${getTranslation('due_date', lang, { date: '' })}</strong> ${loan.status === 'pending' ? getTranslation('status_pending', lang) : dueDate}</p>
-    <p><strong>Status:</strong> ${getStatusLabel(loan.status, lang)}</p>
+  const iconMap = { livro: 'fa-book', revista: 'fa-newspaper', tcc: 'fa-graduation-cap' };
+  const coverIcon = iconMap[loan.type] || 'fa-book';
+
+  let coverHTML = loan.cover
+    ? `<img src="${loan.cover}" alt="${loan.title}">`
+    : `<div class="loan-detail-cover-ph"><i class="fas ${coverIcon}"></i></div>`;
+
+  let daysBlockHTML = '';
+  if (daysInfo.text) {
+    const label = getTranslation('days_block_' + daysInfo.cls, lang);
+    const icon = daysInfo.cls === 'danger'  ? 'fa-triangle-exclamation'
+               : daysInfo.cls === 'warning' ? 'fa-hourglass-half'
+               : daysInfo.cls === 'ok'      ? 'fa-circle-check'
+               : 'fa-circle-info';
+    daysBlockHTML = `
+      <div class="loan-detail-days ${daysInfo.cls}">
+        <i class="fas ${icon}"></i>
+        <div class="loan-detail-days-text">
+          <small>${label}</small>
+          <span>${daysInfo.text}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  const showDue = loan.dueDate ? dueDate : getTranslation('status_pending', lang);
+
+  content.innerHTML = `
+    <div class="loan-detail-hero">
+      <div class="loan-detail-cover">${coverHTML}</div>
+      <div class="loan-detail-head">
+        <span class="loan-detail-status status-${loan.status}">
+          <i class="fas fa-circle"></i> ${statusLabel}
+        </span>
+        <h3>${loan.title}</h3>
+        <p class="loan-detail-author">
+          <i class="fas fa-user-pen"></i> ${loan.author || getTranslation('author_unknown', lang)}
+        </p>
+      </div>
+    </div>
+
+    <div class="loan-detail-body">
+      <p class="loan-detail-section-title">
+        <i class="fas fa-circle-info"></i> ${getTranslation('detail_section', lang)}
+      </p>
+
+      <div class="loan-detail-grid">
+        <div class="loan-detail-item">
+          <span class="loan-detail-label"><i class="far fa-calendar-alt"></i> ${getTranslation('detail_loan_date', lang)}</span>
+          <span class="loan-detail-value">${loanDate || '—'}</span>
+        </div>
+        <div class="loan-detail-item">
+          <span class="loan-detail-label"><i class="far fa-calendar-check"></i> ${getTranslation('detail_due_date', lang)}</span>
+          <span class="loan-detail-value">${showDue || '—'}</span>
+        </div>
+        <div class="loan-detail-item">
+          <span class="loan-detail-label"><i class="fas fa-bookmark"></i> ${getTranslation('detail_type', lang)}</span>
+          <span class="loan-detail-value">${typeLabel}</span>
+        </div>
+        <div class="loan-detail-item">
+          <span class="loan-detail-label"><i class="fas fa-hashtag"></i> ${getTranslation('detail_code', lang)}</span>
+          <span class="loan-detail-value">#${String(loan.id).padStart(4, '0')}</span>
+        </div>
+      </div>
+
+      ${daysBlockHTML}
+    </div>
   `;
 
-  // RENOVAR
-  if (action === 'renew' && loan.status !== 'returned' && !loan.renovado && loan.status !== 'overdue') {
-    const newDue = new Date();
-    newDue.setDate(newDue.getDate() + 15);
-    const confirmMsg = getTranslation('modal_renew_confirm', lang, { newDate: formatDate(newDue) });
-    renewBtn.style.display = 'inline-block';
-    renewBtn.onclick = async () => {
-      const ok = window.uiConfirm
-        ? await window.uiConfirm(confirmMsg, {
-            titulo: getTranslation('modal_renew_title', lang),
-            tipo: 'question',
-            textoConfirmar: getTranslation('renew', lang),
-            textoCancelar: 'Cancelar'
-          })
-        : confirm(confirmMsg);
-      if (ok) {
-        renewLoan(id);
-        closeLoanModal();
-      }
-    };
-  } else {
-    renewBtn.style.display = 'none';
-  }
-
-  // DEVOLVER
-  if (action === 'return' && loan.status !== 'returned') {
-    const confirmMsg = getTranslation('modal_return_confirm', lang);
-    returnBtn.style.display = 'inline-block';
-    returnBtn.onclick = async () => {
-      const ok = window.uiConfirm
-        ? await window.uiConfirm(confirmMsg, {
-            titulo: getTranslation('modal_return_title', lang),
-            tipo: 'warning',
-            textoConfirmar: getTranslation('return', lang),
-            textoCancelar: 'Cancelar'
-          })
-        : confirm(confirmMsg);
-      if (ok) {
-        returnLoan(id);
-        closeLoanModal();
-      }
-    };
-  } else {
-    returnBtn.style.display = 'none';
+  if (cancelBtn) {
+    cancelBtn.onclick = closeLoanModal;
+    cancelBtn.textContent = getTranslation('detail_close', lang);
   }
 
   overlay.classList.add('open');
@@ -633,11 +568,11 @@ function initLoansToolbar() {
   const toolbar = document.getElementById('loans-toolbar');
   if (!toolbar) return;
 
-  const searchInput = document.getElementById('loans-search-input');
-  const chips = toolbar.querySelectorAll('.loan-chip');
-  const sortSelect = document.getElementById('loans-sort-select');
-  const viewButtons = toolbar.querySelectorAll('.loans-view-toggle button');
-  const clearBtn = document.getElementById('loans-clear-filters');
+  const searchInput  = document.getElementById('loans-search-input');
+  const chips        = toolbar.querySelectorAll('.loan-chip');
+  const sortSelect   = document.getElementById('loans-sort-select');
+  const viewButtons  = toolbar.querySelectorAll('.loans-view-toggle button');
+  const clearBtn     = document.getElementById('loans-clear-filters');
 
   if (searchInput) {
     let t;
@@ -690,7 +625,6 @@ function initLoansToolbar() {
     });
   }
 
-  // Restaura view salva
   try {
     const saved = localStorage.getItem('loans_view');
     if (saved === 'list' || saved === 'grid') {
@@ -724,7 +658,7 @@ function applyLoansLanguage(lang) {
     }
   });
 
-  renderLoans();
+  if (loans.length > 0) renderLoans();
 }
 
 if (typeof applyDashboardLanguage === 'function') {
@@ -741,18 +675,24 @@ document.addEventListener('DOMContentLoaded', () => {
   initLoansToolbar();
   fetchLoans();
 
-  document.getElementById('tab-active').addEventListener('click', () => {
-    loansState.tab = 'active';
-    renderLoans();
-  });
-  document.getElementById('tab-history').addEventListener('click', () => {
-    loansState.tab = 'history';
-    renderLoans();
-  });
+  const tabActiveEl  = document.getElementById('tab-active');
+  const tabHistoryEl = document.getElementById('tab-history');
+  if (tabActiveEl) {
+    tabActiveEl.addEventListener('click', () => {
+      loansState.tab = 'active';
+      renderLoans();
+    });
+  }
+  if (tabHistoryEl) {
+    tabHistoryEl.addEventListener('click', () => {
+      loansState.tab = 'history';
+      renderLoans();
+    });
+  }
 
-  const overlay = document.getElementById('loan-modal-overlay');
+  const overlay  = document.getElementById('loan-modal-overlay');
   const closeBtn = document.getElementById('loan-modal-close');
-  if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLoanModal(); });
+  if (overlay)  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLoanModal(); });
   if (closeBtn) closeBtn.addEventListener('click', closeLoanModal);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLoanModal(); });
 

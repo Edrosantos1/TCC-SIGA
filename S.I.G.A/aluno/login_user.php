@@ -12,6 +12,10 @@
   <script src="../assets/js/login_user.js" defer></script>
 </head>
 <body>
+  <form id="form-google" action="google_auth.php" method="POST" class="hidden-form">
+    <input type="hidden" name="google_token" id="google-token" value="">
+  </form>
+
   <div class="full-background">
 
     <!-- SELETOR DE IDIOMA -->
@@ -188,43 +192,19 @@
   </div><!-- /full-background -->
 
   <?php
-    /**
-     * Script PHP para capturar erros do servidor e exibir no frontend
-     * Funciona com os formulários de login e registro
-     *
-     * SEGURANÇA: $_GET['error'] vem direto da URL (não confiável).
-     * - $_GET já é decodificado automaticamente pelo PHP, então NÃO
-     *   chamamos urldecode() de novo (evita decodificação dupla).
-     * - O valor é injetado dentro de uma <script> tag. addslashes()
-     *   sozinho NÃO impede que alguém feche a tag com "</script>" e
-     *   injete HTML/JS arbitrário (XSS refletido). Por isso usamos
-     *   json_encode() com as flags JSON_HEX_*, que transforma
-     *   <, >, &, ' e " em sequências \uXXXX seguras dentro de JS.
-     */
-
-    if (isset($_GET['error'])) {
-      $error = (string) $_GET['error'];
-      $isRegistration = isset($_GET['type']) && $_GET['type'] === 'register';
-
-      $seletor = $isRegistration ? '.sign-up .reg-error-message' : '.sign-in .error-message';
-
-      $errorJson = json_encode(
-        $error,
-        JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-      );
-      $seletorJson = json_encode($seletor);
-
-      echo "<script>
-        document.addEventListener('DOMContentLoaded', function() {
-          var errorDiv = document.querySelector(" . $seletorJson . ");
-          if (errorDiv) {
-            errorDiv.textContent = " . $errorJson . ";
-            errorDiv.style.display = 'block';
-          }
-        });
-      </script>";
+    // Repassa o erro (vindo de aluno_login.php / aluno_cadastro.php / google_auth.php)
+    // para o JS, que decide onde e como exibir (e traduz códigos conhecidos).
+    $serverError = null;
+    if (isset($_GET['error']) && $_GET['error'] !== '') {
+      $serverError = [
+        'msg'      => mb_substr((string) $_GET['error'], 0, 200),
+        'register' => (isset($_GET['type']) && $_GET['type'] === 'register'),
+      ];
     }
   ?>
+  <script>
+    window.SERVER_ERROR = <?= json_encode($serverError, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?>;
+  </script>
 
 <!-- ================= MODAL: COMPLETAR SÉRIE (pós Google) ================= -->
 <!-- Exibido quando google_auth.php responde com precisa_serie: true,
@@ -255,12 +235,12 @@
       <button type="button" class="grade" data-value="3º ano">3º</button>
     </div>
 
-    <!-- input escondido: guarda o valor selecionado pra ser lido no submit -->
-    <input type="hidden" id="modal-serie-select" value="">
-
     <div class="reg-error-message" id="modalSerieError">⚠ Selecione uma série para continuar.</div>
 
-    <button type="button" class="btn-primary" id="btnConfirmarSerieGoogle">Confirmar</button>
+    <form id="form-completar-serie" action="completar_serie.php" method="POST">
+      <input type="hidden" id="modal-serie-select" name="serie" value="">
+      <button type="submit" class="btn-primary" id="btnConfirmarSerieGoogle">Confirmar</button>
+    </form>
   </div>
 </div>
   <!-- Google Sign-In SDK -->

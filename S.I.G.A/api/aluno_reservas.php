@@ -41,6 +41,7 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input) $input = $_POST;
+    $redirect = $input['redirect'] ?? 'reservas.php';
 
     // Ação de cancelamento
     if (isset($input['action']) && $input['action'] === 'cancel') {
@@ -63,6 +64,10 @@ if ($method === 'POST') {
         if (!$update) jsonResponse(['error' => 'Erro na preparação'], 500);
         $update->bind_param('i', $id);
         if ($update->execute()) {
+            if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
+                header('Location: ' . $redirect . '?mensagem=Reserva+cancelada');
+                exit;
+            }
             jsonResponse(['success' => true, 'message' => 'Reserva cancelada']);
         } else {
             jsonResponse(['error' => 'Erro ao cancelar: ' . $update->error], 500);
@@ -89,6 +94,10 @@ if ($method === 'POST') {
     $checkRes->bind_param('ii', $usuario_id, $id_catalogo);
     $checkRes->execute();
     if ($checkRes->get_result()->num_rows > 0) {
+        if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
+            header('Location: ' . $redirect . '?error=Você+já+possui+uma+reserva+ativa');
+            exit;
+        }
         jsonResponse(['error' => 'Você já possui uma reserva ativa para este item'], 409);
     }
 
@@ -97,6 +106,10 @@ if ($method === 'POST') {
     if (!$insert) jsonResponse(['error' => 'Erro na preparação da inserção'], 500);
     $insert->bind_param('iiss', $usuario_id, $id_catalogo, $item['titulo'], $data_limite);
     if ($insert->execute()) {
+        if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
+            header('Location: ' . $redirect . '?mensagem=Reserva+criada+com+sucesso');
+            exit;
+        }
         jsonResponse(['success' => true, 'message' => 'Reserva criada com sucesso', 'id' => $insert->insert_id]);
     } else {
         jsonResponse(['error' => 'Erro ao criar reserva: ' . $insert->error], 500);

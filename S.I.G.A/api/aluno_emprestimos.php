@@ -95,8 +95,12 @@ if ($method === 'POST') {
 
     $action = $input['action'] ?? '';
     $id = (int)($input['id'] ?? 0);
+    $redirect = isset($input['redirect']) ? $input['redirect'] : 'meus_emprestimos.php';
 
     if ($id <= 0) {
+        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($input['ajax'])) {
+            header('Location: ' . $redirect . '?erro=ID+invalido');
+        }
         jsonResponse(['error' => 'ID inválido'], 400);
     }
 
@@ -124,6 +128,10 @@ if ($method === 'POST') {
         $update->bind_param('si', $newDue, $id);
 
         if ($update->execute()) {
+            if (isset($_SERVER['CONTENT_TYPE']) && !str_contains($_SERVER['CONTENT_TYPE'], 'application/json')) {
+                header('Location: ' . $redirect . '?mensagem=Empr%C3%A9stimo+renovado');
+                exit;
+            }
             jsonResponse(['success' => true, 'message' => 'Renovado com sucesso', 'new_due' => $newDue]);
         } else {
             error_log("Erro ao renovar: " . $update->error);
@@ -134,6 +142,10 @@ if ($method === 'POST') {
         $update->bind_param('i', $id);
 
         if ($update->execute()) {
+            if (isset($_SERVER['CONTENT_TYPE']) && !str_contains($_SERVER['CONTENT_TYPE'], 'application/json')) {
+                header('Location: ' . $redirect . '?mensagem=Item+devolvido');
+                exit;
+            }
             jsonResponse(['success' => true, 'message' => 'Devolvido com sucesso']);
         } else {
             error_log("Erro ao devolver: " . $update->error);

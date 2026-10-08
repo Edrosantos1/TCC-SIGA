@@ -27,6 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare('UPDATE notificacoes SET lida = 1 WHERE id_aluno = ?');
     $stmt->bind_param('i', $usuario_id);
     $stmt->execute();
+    if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
+        header('Location: dashboard_aluno.php?mensagem=Notificacoes+marcadas+como+lidas');
+        exit;
+    }
     echo json_encode(['success' => true]);
     exit;
 }

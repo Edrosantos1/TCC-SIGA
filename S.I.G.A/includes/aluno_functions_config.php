@@ -1,75 +1,181 @@
 <?php
-function carregar_configuracoes_aluno($usuario_id, $conn) {
-    $defaults = [
+/**
+ * Preferências de aparência e acessibilidade do aluno (SiGA ITJ).
+ * Troque a constante se a tabela já existir com outro nome.
+ */
+const ALUNO_CONFIG_TABELA = 'configuracoes_aluno';
+
+function aluno_config_opcoes(): array
+{
+    return [
+        'tamanho_fonte' => ['pequeno', 'medio', 'grande'],
+        'tema' => ['claro', 'escuro', 'alto_contraste'],
+        'daltonismo' => ['normal', 'protanopia', 'deuteranopia', 'tritanopia'],
+        'espacamento' => ['compacto', 'normal', 'confortavel'],
+    ];
+}
+
+function aluno_config_padrao(): array
+{
+    return [
         'tamanho_fonte' => 'medio',
         'tema' => 'claro',
         'daltonismo' => 'normal',
         'espacamento' => 'normal',
         'reduzir_animacoes' => '0',
     ];
+}
 
-    $stmt = $conn->prepare('SELECT chave, valor FROM configuracoes_aluno WHERE usuario_id = ?');
-    if (!$stmt) return $defaults;
+function aluno_config_sanitizar(array $dados): array
+{
+    $padrao = aluno_config_padrao();
+    $limpo = $padrao;
+
+    foreach (aluno_config_opcoes() as $campo => $validos) {
+        $valor = $dados[$campo] ?? $padrao[$campo];
+        $limpo[$campo] = (is_string($valor) && in_array($valor, $validos, true))
+            ? $valor
+            : $padrao[$campo];
+    }
+
+    $limpo['reduzir_animacoes'] = !empty($dados['reduzir_animacoes']) ? '1' : '0';
+    return $limpo;
+}
+
+function aluno_config_criar_tabela(mysqli $conn): void
+{
+    if (!$conn->query(
+        "CREATE TABLE IF NOT EXISTS `" . ALUNO_CONFIG_TABELA . "` (
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            usuario_id BIGINT UNSIGNED NOT NULL,
+            chave VARCHAR(50) NOT NULL,
+            valor VARCHAR(255) NOT NULL,
+            descricao VARCHAR(255) DEFAULT NULL,
+            atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uk_usuario_chave (usuario_id, chave),
+            CONSTRAINT configuracoes_aluno_usuario_fk
+                FOREIGN KEY (usuario_id) REFERENCES login_aluno (id_aluno) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    )) {
+        throw new RuntimeException('Não foi possível criar a tabela de preferências: ' . $conn->error);
+    }
+}
+
+function aluno_config_guardar_sessao(int $usuario_id, array $config): void
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    $_SESSION['aluno_prefs'] = $config;
+    $_SESSION['aluno_prefs_uid'] = $usuario_id;
+}
+
+function carregar_configuracoes_aluno($usuario_id, $conn): array
+{
+    $usuario_id = (int) $usuario_id;
+    $config = aluno_config_padrao();
+
+    aluno_config_criar_tabela($conn);
+    $stmt = $conn->prepare(
+        "SELECT chave, valor FROM `" . ALUNO_CONFIG_TABELA . "` WHERE usuario_id = ?"
+    );
+    if (!$stmt) {
+        throw new RuntimeException('Não foi possível consultar as preferências: ' . $conn->error);
+    }
+
     $stmt->bind_param('i', $usuario_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
-        if (array_key_exists($row['chave'], $defaults)) {
-            $defaults[$row['chave']] = $row['valor'];
-        }
+    if (!$stmt->execute()) {
+        $erro = $stmt->error;
+        $stmt->close();
+        throw new RuntimeException('Não foi possível carregar as preferências: ' . $erro);
+    }
+
+    $resultado = $stmt->get_result();
+    $dados = [];
+    while ($linha = $resultado->fetch_assoc()) {
+        $dados[$linha['chave']] = $linha['valor'];
     }
     $stmt->close();
-    return $defaults;
+
+    if ($dados) {
+        $config = aluno_config_sanitizar($dados);
+    }
+
+    aluno_config_guardar_sessao($usuario_id, $config);
+    return $config;
 }
 
-function salvar_configuracoes_aluno($usuario_id, $dados, $conn) {
-    $permitidas = [
-        'tamanho_fonte' => ['pequeno', 'medio', 'grande'],
-        'tema' => ['claro', 'escuro', 'alto_contraste'],
-        'daltonismo' => ['normal', 'protanopia', 'deuteranopia', 'tritanopia'],
-        'espacamento' => ['compacto', 'normal', 'confortavel'],
-    ];
+function salvar_configuracoes_aluno($usuario_id, array $dados, $conn): bool
+{
+    $usuario_id = (int) $usuario_id;
+    $config = aluno_config_sanitizar($dados);
+    aluno_config_criar_tabela($conn);
 
-    foreach ($permitidas as $chave => $valores) {
-        $valor = $dados[$chave] ?? '';
-        if (!in_array($valor, $valores, true)) continue;
-        $stmt = $conn->prepare('SELECT id FROM configuracoes_aluno WHERE usuario_id = ? AND chave = ? LIMIT 1');
-        if ($stmt) {
-            $stmt->bind_param('is', $usuario_id, $chave);
-            $stmt->execute();
-            $exists = $stmt->get_result()->num_rows > 0;
-            $stmt->close();
-            $stmt = $conn->prepare($exists
-                ? 'UPDATE configuracoes_aluno SET valor = ? WHERE usuario_id = ? AND chave = ?'
-                : 'INSERT INTO configuracoes_aluno (usuario_id, chave, valor) VALUES (?, ?, ?)');
-            if ($exists) {
-                $stmt->bind_param('sis', $valor, $usuario_id, $chave);
-            } else {
-                $stmt->bind_param('iss', $usuario_id, $chave, $valor);
+    $stmt = $conn->prepare(
+        "INSERT INTO `" . ALUNO_CONFIG_TABELA . "` (usuario_id, chave, valor)
+         VALUES (?, ?, ?)
+         ON DUPLICATE KEY UPDATE valor = VALUES(valor)"
+    );
+    if (!$stmt) {
+        throw new RuntimeException('Não foi possível preparar o salvamento das preferências: ' . $conn->error);
+    }
+
+    $chave = '';
+    $valor = '';
+    $stmt->bind_param('iss', $usuario_id, $chave, $valor);
+    try {
+        if (!$conn->begin_transaction()) {
+            throw new RuntimeException('Não foi possível iniciar o salvamento: ' . $conn->error);
+        }
+        foreach ($config as $chave => $valor) {
+            if (!$stmt->execute()) {
+                throw new RuntimeException('Não foi possível salvar a preferência "' . $chave . '": ' . $stmt->error);
             }
-            $stmt->execute();
-            $stmt->close();
         }
+        if (!$conn->commit()) {
+            throw new RuntimeException('Não foi possível confirmar o salvamento: ' . $conn->error);
+        }
+    } catch (Throwable $e) {
+        $conn->rollback();
+        $stmt->close();
+        throw $e;
+    }
+    $stmt->close();
+
+    aluno_config_guardar_sessao($usuario_id, $config);
+    return true;
+}
+
+function aluno_config_da_sessao($conn = null): array
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
 
-    $valor = isset($dados['reduzir_animacoes']) ? '1' : '0';
-    $stmt = $conn->prepare('SELECT id FROM configuracoes_aluno WHERE usuario_id = ? AND chave = ? LIMIT 1');
-    if ($stmt) {
-        $chave = 'reduzir_animacoes';
-        $stmt->bind_param('is', $usuario_id, $chave);
-        $stmt->execute();
-        $exists = $stmt->get_result()->num_rows > 0;
-        $stmt->close();
-        $stmt = $conn->prepare($exists
-            ? 'UPDATE configuracoes_aluno SET valor = ? WHERE usuario_id = ? AND chave = ?'
-            : 'INSERT INTO configuracoes_aluno (usuario_id, chave, valor) VALUES (?, ?, ?)');
-        if ($exists) {
-            $stmt->bind_param('sis', $valor, $usuario_id, $chave);
-        } else {
-            $stmt->bind_param('iss', $usuario_id, $chave, $valor);
-        }
-        $stmt->execute();
-        $stmt->close();
+    $usuario_id = (int) ($_SESSION['usuario_id'] ?? 0);
+    if ($usuario_id === 0) {
+        return aluno_config_padrao();
     }
+
+    if (!empty($_SESSION['aluno_prefs'])
+        && (int) ($_SESSION['aluno_prefs_uid'] ?? 0) === $usuario_id) {
+        return aluno_config_sanitizar($_SESSION['aluno_prefs']);
+    }
+
+    if ($conn instanceof mysqli) {
+        return carregar_configuracoes_aluno($usuario_id, $conn);
+    }
+
+    return aluno_config_padrao();
 }
-?>
+
+function aluno_config_atributos(array $config): array
+{
+    return [
+        'data-tema' => $config['tema'],
+        'data-fonte' => $config['tamanho_fonte'],
+        'data-daltonismo' => $config['daltonismo'],
+        'data-espacamento' => $config['espacamento'],
+        'data-animacoes' => $config['reduzir_animacoes'] === '1' ? 'reduzidas' : 'normais',
+    ];
+}

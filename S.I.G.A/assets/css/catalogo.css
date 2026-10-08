@@ -399,18 +399,12 @@
 .btn-reserve.reserved {
     background: #d1fae5;
     color: #065f46;
-    cursor: default;
 }
-.btn-reserve:disabled {
-    opacity: 0.75;
-    cursor: default;
-}
-.btn-cancel-reserve {
-    flex: 0 0 38px !important;
+/* Reservado: clicar cancela, então o hover sinaliza isso */
+.btn-reserve.reserved:hover {
+    background: #fee2e2;
     color: #b91c1c;
-    background: #fef2f2;
 }
-.btn-cancel-reserve:hover { background: #fee2e2; }
 
 /* ===================== PAGINAÇÃO ===================== */
 .paginacao {
@@ -730,6 +724,10 @@
     background: #d1fae5;
     color: #065f46;
     box-shadow: none;
+}
+.modal-actions .btn-primary-action.reserved:hover {
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 /* ===================== ACESSIBILIDADE ===================== */

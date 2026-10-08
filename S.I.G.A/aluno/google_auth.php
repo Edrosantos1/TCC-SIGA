@@ -1,15 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/conexao.php';
-header('Content-Type: application/json');
 
 // ============================================================
 // 1. RECEBE O TOKEN (apenas o token, sem email/nome do POST)
 // ============================================================
 $google_token = $_POST['google_token'] ?? '';
 if (!$google_token) {
-    http_response_code(400);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Token não fornecido.']);
+    header('Location: login_user.php?error=Token+não+fornecido');
     exit;
 }
 
@@ -67,8 +65,7 @@ function verificarTokenGoogle($id_token) {
 
 $userData = verificarTokenGoogle($google_token);
 if (!$userData) {
-    http_response_code(401);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Token inválido ou expirado.']);
+    header('Location: login_user.php?error=Token+inválido+ou+expirado');
     exit;
 }
 
@@ -78,13 +75,11 @@ $nome  = $userData['name'];
 
 // (Opcional) Validações extras
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(400);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Email inválido.']);
+    header('Location: login_user.php?error=Email+inválido');
     exit;
 }
 if (strlen(trim($nome)) < 2) {
-    http_response_code(400);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Nome inválido.']);
+    header('Location: login_user.php?error=Nome+inválido');
     exit;
 }
 
@@ -152,16 +147,15 @@ try {
     setcookie('relembrar_token', $tokenLembrar, time() + 30*24*60*60, '/', '', false, true);
     setcookie('user_id', $_SESSION['usuario_id'], time() + 30*24*60*60, '/', '', false, true);
 
-    echo json_encode([
-        'sucesso'      => true,
-        'mensagem'     => $mensagem,
-        'novo'         => $novo,
-        'precisa_serie' => $precisaSerie
-    ]);
+    if ($precisaSerie) {
+        header('Location: login_user.php?status=serie_necessaria&novo=' . ($novo ? '1' : '0'));
+    } else {
+        header('Location: dashboard_aluno.php?mensagem=Login+realizado+com+sucesso');
+    }
+    exit;
 
 } catch (Exception $e) {
-    http_response_code(500);
     error_log("Erro no google_auth.php: " . $e->getMessage());
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno. Tente novamente.']);
+    header('Location: login_user.php?error=Erro+interno.+Tente+novamente');
 }
-?>
+exit;

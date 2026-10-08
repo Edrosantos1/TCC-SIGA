@@ -38,6 +38,121 @@ if ($stmt_notif) {
     $notificacoes = $stmt_notif->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt_notif->close();
 }
+
+$reservas = [];
+$stmt_reservas = $conn->prepare(
+    "SELECT r.id_reserva, r.id_catalogo, r.titulo_item, r.data_reserva, r.data_limite, r.status,
+            c.autor, c.capa_url, c.tipo
+     FROM reservas r
+     LEFT JOIN catalogo c ON c.id_catalogo = r.id_catalogo
+     WHERE r.id_aluno = ?
+     ORDER BY r.data_reserva DESC"
+);
+$stmt_reservas->bind_param('i', $usuario_id);
+$stmt_reservas->execute();
+$reservas = $stmt_reservas->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt_reservas->close();
+
+// ========== AUXILIARES DE EXIBIÇÃO ==========
+const RESERVA_STATUS = [
+    'pendente'  => ['Pendente',             'status-pending',   'fa-hourglass-half'],
+    'aprovada'  => ['Pronto para retirada', 'status-approved',  'fa-check-circle'],
+    'cancelada' => ['Cancelada',            'status-cancelled', 'fa-ban'],
+    'rejeitada' => ['Rejeitada',            'status-rejected',  'fa-times-circle'],
+    'expirada'  => ['Expirada',             'status-expired',   'fa-clock'],
+    'retirada'  => ['Retirada',             'status-retirada',  'fa-hand-holding-heart'],
+];
+const RESERVA_TIPOS = [
+    'livro'   => ['Livro',   'fa-book',           'tipo-livro'],
+    'revista' => ['Revista', 'fa-newspaper',      'tipo-revista'],
+    'tcc'     => ['TCC',     'fa-graduation-cap', 'tipo-tcc'],
+];
+
+function reservaEsc($valor): string {
+    return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
+}
+
+function reservaCapaUrl(?string $capa): string {
+    $capa = trim((string) $capa);
+    if ($capa === '') return '';
+    if (preg_match('#^(https?:)?//#', $capa) || $capa[0] === '/') return $capa;
+    return '../' . $capa;
+}
+
+function renderReservaCard(array $r): void {
+    $status = isset(RESERVA_STATUS[$r['status']]) ? $r['status'] : 'pendente';
+    [$statusLabel, $statusCss, $statusIcon] = RESERVA_STATUS[$status];
+
+    $tipo = strtolower((string) ($r['tipo'] ?? 'livro'));
+    if (!isset(RESERVA_TIPOS[$tipo])) $tipo = 'livro';
+    [$tipoLabel, $tipoIcon, $tipoCss] = RESERVA_TIPOS[$tipo];
+
+    $titulo = $r['titulo_item'] ?: 'Título não disponível';
+    $autor  = $r['autor'] ?: 'Autor não informado';
+    $capa   = reservaCapaUrl($r['capa_url'] ?? '');
+    $ativa  = in_array($status, ['pendente', 'aprovada'], true);
+
+    $dataReserva = !empty($r['data_reserva']) ? date('d/m/Y', strtotime($r['data_reserva'])) : '';
+    $limite      = !empty($r['data_limite'])  ? date('d/m/Y', strtotime($r['data_limite']))  : '';
+
+    $prazoTexto = '';
+    $urgencia   = '';
+    if ($ativa && $limite) {
+        $dias = (int) (new DateTime('today'))
+            ->diff(new DateTime(date('Y-m-d', strtotime($r['data_limite']))))
+            ->format('%r%a');
+        if ($dias < 0)       $prazoTexto = 'Prazo vencido';
+        elseif ($dias === 0) $prazoTexto = 'Vence hoje';
+        elseif ($dias === 1) $prazoTexto = 'Falta 1 dia';
+        else                 $prazoTexto = "Faltam {$dias} dias";
+        $urgencia = $dias <= 1 ? 'is-urgent' : ($dias <= 3 ? 'is-soon' : '');
+    }
+    ?>
+        <article class="reserva-card is-<?= reservaEsc($status) ?>" data-id="<?= (int) $r['id_reserva'] ?>">
+          <div class="reserva-cover-wrap">
+            <?php if ($capa !== ''): ?>
+              <img class="reserva-cover-bg" src="<?= reservaEsc($capa) ?>" alt="" aria-hidden="true" loading="lazy">
+              <img class="reserva-cover" src="<?= reservaEsc($capa) ?>" alt="" loading="lazy">
+            <?php else: ?>
+              <div class="reserva-cover-placeholder <?= $tipoCss ?>"><i class="fas <?= $tipoIcon ?>"></i><span><?= reservaEsc($titulo) ?></span></div>
+            <?php endif; ?>
+          </div>
+          <div class="reserva-body">
+            <div class="reserva-top">
+              <span class="tipo-badge <?= $tipoCss ?>"><i class="fas <?= $tipoIcon ?>"></i> <?= $tipoLabel ?></span>
+              <span class="reserva-status <?= $statusCss ?>"><i class="fas <?= $statusIcon ?>"></i> <?= $statusLabel ?></span>
+            </div>
+            <h3 class="title" title="<?= reservaEsc($titulo) ?>"><?= reservaEsc($titulo) ?></h3>
+            <p class="author"><?= reservaEsc($autor) ?></p>
+            <dl class="reserva-dates">
+              <div class="reserva-date">
+                <dt><i class="far fa-calendar-alt"></i> Reservado em</dt>
+                <dd><?= $dataReserva ?></dd>
+              </div>
+              <?php if ($limite): ?>
+              <div class="reserva-date <?= $urgencia ?>">
+                <dt><i class="far fa-hourglass"></i> <?= $ativa ? 'Expira em' : 'Prazo' ?></dt>
+                <dd><?= $limite ?><?php if ($prazoTexto): ?><span class="prazo-chip"><?= $prazoTexto ?></span><?php endif; ?></dd>
+              </div>
+              <?php endif; ?>
+            </dl>
+            <?php if ($status === 'pendente'): ?>
+              <div class="reserva-actions">
+                <form method="POST" action="../api/aluno_reservas.php" onsubmit="return confirm('Tem certeza que deseja cancelar esta reserva?');">
+                  <input type="hidden" name="action" value="cancel">
+                  <input type="hidden" name="id" value="<?= (int) $r['id_reserva'] ?>">
+                  <input type="hidden" name="redirect" value="reservas.php">
+                  <button class="btn-cancel" type="submit"><i class="fas fa-times"></i> Cancelar reserva</button>
+                </form>
+              </div>
+            <?php endif; ?>
+          </div>
+        </article>
+    <?php
+}
+
+$reservasAtivas    = array_filter($reservas, fn($r) => in_array($r['status'], ['pendente', 'aprovada'], true));
+$reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['rejeitada', 'expirada', 'cancelada', 'retirada'], true));
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -52,7 +167,10 @@ if ($stmt_notif) {
   <link rel="stylesheet" href="../assets/css/reservas.css">
   <link rel="stylesheet" href="../assets/css/student_unified.css">
   <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
+  <link rel="stylesheet" href="../assets/css/ui_alerts.css">
+  <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
+  <script src="../assets/js/ui_alerts.js"></script>
   <script src="../assets/js/dashboard_aluno.js" defer></script>
   <script src="../assets/js/notificacoes_aluno.js" defer></script>
   <script src="../assets/js/reservas.js" defer></script>
@@ -112,7 +230,6 @@ if ($stmt_notif) {
           <span id="logout-text">Sair</span>
         </a>
 
-        <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
         <div class="notification-container">
           <button class="notification-btn" id="notification-btn" title="Notificações">
             <i class="fas fa-bell"></i>
@@ -130,30 +247,61 @@ if ($stmt_notif) {
       </div>
     </header>
 
+    <form id="cancel-reserva-form" method="POST" action="../api/aluno_reservas.php" class="hidden-form">
+      <input type="hidden" name="action" value="cancel">
+      <input type="hidden" name="id" id="cancel-reserva-id" value="">
+      <input type="hidden" name="redirect" value="reservas.php">
+    </form>
+
     <main class="container reservas-main">
       <div class="reservas-header">
         <h1 id="reservas-title">Minhas Reservas</h1>
         <p id="reservas-subtitle">Acompanhe suas reservas ativas e histórico</p>
       </div>
 
-      <div class="reservas-tabs">
-        <button class="tab-btn active" data-tab="active" id="tab-active">
-          <i class="fas fa-hourglass-half"></i>
-          <span id="tab-active-label">Ativas</span>
-          <span class="tab-badge" id="active-count">0</span>
-        </button>
-        <button class="tab-btn" data-tab="history" id="tab-history">
-          <i class="fas fa-history"></i>
-          <span id="tab-history-label">Histórico</span>
-        </button>
+      <div class="reservas-toolbar">
+        <div class="reservas-tabs" role="tablist" aria-label="Reservas">
+          <button class="tab-btn active" data-tab="active" id="tab-active" role="tab" aria-selected="true" aria-controls="reservas-active-list">
+            <i class="fas fa-hourglass-half"></i>
+            <span id="tab-active-label">Ativas</span>
+            <span class="tab-badge" id="active-count"><?= count($reservasAtivas) ?></span>
+          </button>
+          <button class="tab-btn" data-tab="history" id="tab-history" role="tab" aria-selected="false" tabindex="-1" aria-controls="reservas-history-list">
+            <i class="fas fa-history"></i>
+            <span id="tab-history-label">Histórico</span>
+            <span class="tab-badge" id="history-count"><?= count($reservasHistorico) ?></span>
+          </button>
+        </div>
+
+        <div class="view-toggle" id="view-toggle" role="group" aria-label="Modo de visualização">
+          <button type="button" class="view-btn" data-view="grid" id="view-grid-btn" aria-pressed="true" title="Ver em grade">
+            <i class="fas fa-th-large"></i><span id="view-grid-label">Grade</span>
+          </button>
+          <button type="button" class="view-btn" data-view="list" id="view-list-btn" aria-pressed="false" title="Ver em lista">
+            <i class="fas fa-list"></i><span id="view-list-label">Lista</span>
+          </button>
+        </div>
       </div>
 
-      <div class="reservas-list" id="reservas-active-list"></div>
-      <div class="reservas-list" id="reservas-history-list" style="display: none;"></div>
+      <div class="reservas-list" id="reservas-active-list" data-view="grid" role="tabpanel" aria-labelledby="tab-active">
+        <?php foreach ($reservasAtivas as $reserva) renderReservaCard($reserva); ?>
+      </div>
+      <div class="reservas-list" id="reservas-history-list" data-view="grid" role="tabpanel" aria-labelledby="tab-history" style="display: none;">
+        <?php foreach ($reservasHistorico as $reserva) renderReservaCard($reserva); ?>
+      </div>
+      <script>
+        (function () {
+          var v = 'grid';
+          try { if (localStorage.getItem('reservas_view') === 'list') v = 'list'; } catch (e) {}
+          document.getElementById('reservas-active-list').dataset.view = v;
+          document.getElementById('reservas-history-list').dataset.view = v;
+        })();
+      </script>
 
       <div class="reservas-empty" id="reservas-empty" style="display: none;">
         <i class="fas fa-clock"></i>
         <p id="empty-message">Nenhuma reserva encontrada</p>
+        <a href="catalogo.php" class="btn-explore" id="empty-cta"><i class="fas fa-search"></i> <span id="empty-cta-label">Explorar catálogo</span></a>
       </div>
     </main>
   </div>
@@ -187,6 +335,7 @@ if ($stmt_notif) {
   </div>
 
   <script>
+    window.reservasData = <?= json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
 </body>

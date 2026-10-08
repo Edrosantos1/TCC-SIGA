@@ -113,6 +113,10 @@ document.addEventListener("DOMContentLoaded", () => {
       errorLoginEmailEmpty: "Por favor, preencha seu email.",
       errorLoginPasswordEmpty: "Por favor, preencha sua senha.",
       errorLoginFailed: "Email ou senha incorretos. Tente novamente.",
+      errorUserNotFound: "Não encontramos nenhuma conta com esse email.",
+      errorWrongPassword: "Senha incorreta. Tente novamente.",
+      errorEmailInUse: "Este email já está cadastrado. Tente fazer login.",
+      errorGeneric: "Algo deu errado. Tente novamente.",
       modalSerieTitle: "Quase lá!",
       modalSerieDesc: "Escolha sua série para concluir o cadastro.",
       modalSerieConfirm: "Confirmar",
@@ -165,6 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
       errorLoginEmailEmpty: "Please fill in your email.",
       errorLoginPasswordEmpty: "Please fill in your password.",
       errorLoginFailed: "Incorrect email or password. Please try again.",
+      errorUserNotFound: "We couldn't find an account with this email.",
+      errorWrongPassword: "Incorrect password. Please try again.",
+      errorEmailInUse: "This email is already registered. Try signing in.",
+      errorGeneric: "Something went wrong. Please try again.",
       modalSerieTitle: "Almost there!",
       modalSerieDesc: "Choose your grade to finish signing up.",
       modalSerieConfirm: "Confirm",
@@ -217,6 +225,10 @@ document.addEventListener("DOMContentLoaded", () => {
       errorLoginEmailEmpty: "Por favor, complete su correo electrónico.",
       errorLoginPasswordEmpty: "Por favor, complete su contraseña.",
       errorLoginFailed: "Correo o contraseña incorrectos. Intente de nuevo.",
+      errorUserNotFound: "No encontramos ninguna cuenta con este correo.",
+      errorWrongPassword: "Contraseña incorrecta. Intente de nuevo.",
+      errorEmailInUse: "Este correo ya está registrado. Intente iniciar sesión.",
+      errorGeneric: "Algo salió mal. Intente de nuevo.",
       modalSerieTitle: "¡Ya casi!",
       modalSerieDesc: "Elige tu grado para terminar tu registro.",
       modalSerieConfirm: "Confirmar",
@@ -388,7 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ── Função para atualizar toda a interface conforme o idioma ──
-  function aplicarIdioma(lang) {
+  function aplicarIdioma(lang, limpar = true) {
     idiomaAtual = lang;
     const t = translations[lang];
 
@@ -457,15 +469,44 @@ document.addEventListener("DOMContentLoaded", () => {
     applyRequirementLabels();
     if (regPassword && regPassword.value) updateRequirements(regPassword.value);
 
-    clearMessages();
+    if (limpar) clearMessages();
+  }
+
+  // ── Exibe mensagem de erro (com ícone) numa caixa .error-message / .reg-error-message ──
+  function setBoxMessage(box, texto) {
+    if (!box) return;
+    box.innerHTML = '';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-circle-exclamation';
+    icon.setAttribute('aria-hidden', 'true');
+    const span = document.createElement('span');
+    span.className = 'msg-text';
+    span.textContent = texto;          // textContent: nada de HTML vindo da URL
+    box.appendChild(icon);
+    box.appendChild(span);
+    box.setAttribute('role', 'alert');
+    box.style.display = 'flex';
+  }
+
+  // ── Códigos conhecidos do backend → texto traduzido (qualquer outro texto é exibido como veio) ──
+  function resolverMensagemServidor(msg) {
+    const t = translations[idiomaAtual];
+    const mapa = {
+      credenciais_invalidas: t.errorLoginFailed,
+      email_nao_encontrado: t.errorUserNotFound,
+      senha_incorreta: t.errorWrongPassword,
+      email_em_uso: t.errorEmailInUse,
+    };
+    return mapa[msg] || msg || t.errorGeneric;
   }
 
   function clearMessages() {
-    const errorMsg = document.querySelector(".error-message");
-    const regErrorMsg = document.querySelector(".reg-error-message");
+    const errorMsg = document.querySelector(".sign-in .error-message");
+    const regErrorMsg = document.querySelector(".sign-up .reg-error-message");
     if (errorMsg) errorMsg.style.display = "none";
     if (regErrorMsg) regErrorMsg.style.display = "none";
     if (confirmErrorDiv) confirmErrorDiv.style.display = "none";
+    [loginEmail, loginPassword].forEach(i => i && i.classList.remove('input-error'));
   }
 
   // ── Limpa todas as mensagens de erro (gerais + por campo) ──
@@ -732,10 +773,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorDiv = isActive ?
       document.querySelector('.sign-up .reg-error-message') :
       document.querySelector('.sign-in .error-message');
-    if (errorDiv) {
-      errorDiv.textContent = mensagem;
-      errorDiv.style.display = 'block';
-    }
+    setBoxMessage(errorDiv, mensagem);
   }
 
   // ── Callback do Google (recebe o ID token) ──
@@ -750,34 +788,17 @@ document.addEventListener("DOMContentLoaded", () => {
     enviarTokenParaServidor(token);
   }
 
-  // ── Envia o ID token para o backend, que valida com o Google ──
+  // ── Envia o ID token ao backend por formulário normal ──
   function enviarTokenParaServidor(token) {
     limparErros();
-    const form = new FormData();
-    form.append('google_token', token);
-
-    fetch('./google_auth.php', {
-      method: 'POST',
-      body: form
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.sucesso) {
-          console.log("✅ Autenticação bem-sucedida:", data.mensagem);
-          if (data.precisa_serie) {
-            abrirModalSerie();
-          } else {
-            window.location.href = 'dashboard_aluno.php';
-          }
-        } else {
-          console.error("❌ Erro no servidor:", data.mensagem);
-          mostrarErroGoogle(data.mensagem || 'Erro ao autenticar com Google.');
-        }
-      })
-      .catch(erro => {
-        console.error("❌ Erro na requisição:", erro);
-        mostrarErroGoogle('Erro ao conectar com o servidor. Tente novamente.');
-      });
+    const tokenInput = document.getElementById('google-token');
+    const form = document.getElementById('form-google');
+    if (!tokenInput || !form) {
+      mostrarErroGoogle('Não foi possível preparar a autenticação.');
+      return;
+    }
+    tokenInput.value = token;
+    form.submit();
   }
 
   // ── Botões de série do modal (6º, 7º, 8º... 1º-3º EM) ──
@@ -826,49 +847,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       return;
     }
-
     if (modalSerieError) modalSerieError.style.display = 'none';
-    if (btnConfirmarSerieGoogle) {
-      btnConfirmarSerieGoogle.disabled = true;
-      btnConfirmarSerieGoogle.classList.remove('ready');
-      btnConfirmarSerieGoogle.classList.add('loading');
-    }
-
-    const form = new FormData();
-    form.append('serie', serie);
-
-    fetch('./completar_serie.php', {
-      method: 'POST',
-      body: form
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.sucesso) {
-          window.location.href = 'dashboard_aluno.php';
-        } else {
-          if (modalSerieError) {
-            modalSerieError.textContent = data.mensagem || 'Erro ao salvar a série.';
-            modalSerieError.style.display = 'block';
-          }
-          if (btnConfirmarSerieGoogle) {
-            btnConfirmarSerieGoogle.disabled = false;
-            btnConfirmarSerieGoogle.classList.remove('loading');
-            btnConfirmarSerieGoogle.classList.add('ready');
-          }
-        }
-      })
-      .catch(erro => {
-        console.error("❌ Erro ao salvar série:", erro);
-        if (modalSerieError) {
-          modalSerieError.textContent = 'Erro ao conectar com o servidor. Tente novamente.';
-          modalSerieError.style.display = 'block';
-        }
-        if (btnConfirmarSerieGoogle) {
-          btnConfirmarSerieGoogle.disabled = false;
-          btnConfirmarSerieGoogle.classList.remove('loading');
-          btnConfirmarSerieGoogle.classList.add('ready');
-        }
-      });
   }
 
   if (btnConfirmarSerieGoogle) {
@@ -971,6 +950,44 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // ============================================================
+  //  ERRO VINDO DO SERVIDOR (?error=...&type=register)
+  // ============================================================
+  function mostrarErroDoServidor() {
+    const err = window.SERVER_ERROR;
+    if (!err || !err.msg) return;
+    const texto = resolverMensagemServidor(err.msg);
+
+    if (err.register) {
+      container.classList.add('active');
+      document.querySelector('.auth-header')?.classList.add('dark-theme');
+      setBoxMessage(document.querySelector('.sign-up .reg-error-message'), texto);
+    } else {
+      setBoxMessage(document.querySelector('.sign-in .error-message'), texto);
+      // Realça os campos conforme o tipo de erro
+      const soSenha = (err.msg === 'senha_incorreta');
+      const soEmail = (err.msg === 'email_nao_encontrado');
+      if (loginEmail && !soSenha) loginEmail.classList.add('input-error');
+      if (loginPassword && !soEmail) loginPassword.classList.add('input-error');
+      (soSenha ? loginPassword : loginEmail)?.focus();
+    }
+    // Evita reaparecer o erro ao recarregar (F5)
+    if (window.history && history.replaceState) {
+      history.replaceState(null, '', location.pathname);
+    }
+  }
+
+  // Digitou de novo? some o erro geral do login
+  [loginEmail, loginPassword].forEach(inp => {
+    if (!inp) return;
+    inp.addEventListener('input', () => {
+      const box = document.querySelector('.sign-in .error-message');
+      if (box) box.style.display = 'none';
+      if (loginEmail) loginEmail.classList.remove('input-error');
+      if (loginPassword) loginPassword.classList.remove('input-error');
+    });
+  });
+
   function handleCaps(input, warning) {
     if (!input || !warning) return;
     input.addEventListener("keyup", (e) => {
@@ -983,7 +1000,8 @@ document.addEventListener("DOMContentLoaded", () => {
   handleCaps(loginPassword, capsWarningLogin);
   handleCaps(regPassword, capsWarningReg);
 
-  aplicarIdioma("pt");
+  aplicarIdioma("pt", false);
+  mostrarErroDoServidor();
 
   const btnLang = document.querySelector(".language-button");
   const flagImg = document.getElementById("current-flag");

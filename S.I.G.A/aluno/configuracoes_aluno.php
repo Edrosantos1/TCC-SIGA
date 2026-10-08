@@ -21,20 +21,76 @@ if ($row = $stmt->get_result()->fetch_assoc()) {
 }
 $stmt->close();
 
-// Carregar configurações do aluno
-$configuracoes = carregar_configuracoes_aluno($usuario_id, $conn);
-
-// Processar formulário
+// Processar formulário (valida e grava; depois redireciona para evitar reenvio)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
-    salvar_configuracoes_aluno($usuario_id, $_POST, $conn);
-    $_SESSION['msg_sucesso'] = 'Preferências salvas com sucesso!';
+    try {
+        $ok = salvar_configuracoes_aluno($usuario_id, $_POST, $conn);
+    } catch (Throwable $e) {
+        error_log('Erro ao salvar preferências do aluno: ' . $e->getMessage());
+        $ok = false;
+    }
+
+    if ($ok) {
+        $_SESSION['msg_sucesso'] = 'Preferências salvas com sucesso!';
+    } else {
+        $_SESSION['msg_erro'] = 'Não foi possível salvar suas preferências. Tente novamente.';
+    }
     header('Location: configuracoes_aluno.php');
     exit;
 }
 
+// Carregar configurações do aluno
+$configuracoes = carregar_configuracoes_aluno($usuario_id, $conn);
+
 // Mensagens flash
 $msg_sucesso = $_SESSION['msg_sucesso'] ?? null;
-unset($_SESSION['msg_sucesso']);
+$msg_erro    = $_SESSION['msg_erro'] ?? null;
+unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
+
+// Grupos de opções (cada um vira um card; o valor salvo é a chave de 'opcoes')
+$grupos = [
+    'tamanho_fonte' => [
+        'titulo' => 'Tamanho da Fonte',
+        'icone'  => 'fa-font',
+        'desc'   => 'Altere o tamanho do texto em todo o sistema',
+        'opcoes' => [
+            'pequeno' => ['Pequeno', '<i class="fas fa-font" style="font-size: 12px;"></i>'],
+            'medio'   => ['Médio',   '<i class="fas fa-font" style="font-size: 16px;"></i>'],
+            'grande'  => ['Grande',  '<i class="fas fa-font" style="font-size: 22px;"></i>'],
+        ],
+    ],
+    'tema' => [
+        'titulo' => 'Tema',
+        'icone'  => 'fa-palette',
+        'desc'   => 'Escolha o tema visual do sistema',
+        'opcoes' => [
+            'claro'          => ['Claro',          '<i class="fas fa-sun"></i>'],
+            'escuro'         => ['Escuro',         '<i class="fas fa-moon"></i>'],
+            'alto_contraste' => ['Alto Contraste', '<i class="fas fa-circle-half-stroke"></i>'],
+        ],
+    ],
+    'daltonismo' => [
+        'titulo' => 'Daltonismo',
+        'icone'  => 'fa-eye',
+        'desc'   => 'Ajuste as cores para facilitar a diferença entre tons confundidos',
+        'opcoes' => [
+            'normal'       => ['Normal',       '<i class="fas fa-eye"></i>'],
+            'protanopia'   => ['Protanopia',   '<span class="emoji" aria-hidden="true">🔴</span>'],
+            'deuteranopia' => ['Deuteranopia', '<span class="emoji" aria-hidden="true">🟢</span>'],
+            'tritanopia'   => ['Tritanopia',   '<span class="emoji" aria-hidden="true">🔵</span>'],
+        ],
+    ],
+    'espacamento' => [
+        'titulo' => 'Espaçamento',
+        'icone'  => 'fa-arrows-alt-h',
+        'desc'   => 'Ajuste a densidade da informação na tela',
+        'opcoes' => [
+            'compacto'    => ['Compacto',    '<i class="fas fa-compress-arrows-alt"></i>'],
+            'normal'      => ['Normal',      '<i class="fas fa-arrows-alt-h"></i>'],
+            'confortavel' => ['Confortável', '<i class="fas fa-expand-arrows-alt"></i>'],
+        ],
+    ],
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -47,6 +103,7 @@ unset($_SESSION['msg_sucesso']);
     <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
     <link rel="stylesheet" href="../assets/css/student_unified.css">
     <link rel="stylesheet" href="../assets/css/configuracoes_aluno.css?v=<?= time() ?>">
+    <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
     <script src="../assets/js/configuracoes_aluno.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
@@ -91,121 +148,44 @@ unset($_SESSION['msg_sucesso']);
             <div class="config-container">
                 <div class="config-header">
                     <h1><i class="fas fa-sliders-h"></i> Minhas Preferências</h1>
-                    <p>Ajuste a aparência e acessibilidade do sistema</p>
+                    <p>Ajuste a aparência e acessibilidade do sistema. As mudanças aparecem na hora; clique em salvar para mantê-las.</p>
                 </div>
 
                 <?php if ($msg_sucesso): ?>
-                    <div class="flash-message flash-success">
+                    <div class="flash-message flash-success" role="status">
                         <i class="fas fa-check-circle"></i>
                         <?= htmlspecialchars($msg_sucesso) ?>
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="">
-                    <!-- Tamanho da Fonte -->
-                    <div class="config-card">
-                        <h3><i class="fas fa-font"></i> Tamanho da Fonte</h3>
-                        <p class="desc">Altere o tamanho da fonte em todo o sistema</p>
-                        <div class="form-group">
-                            <div class="opcoes-grid">
-                                <label class="opcao-card <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'pequeno' ? 'active' : '' ?>">
-                                    <input type="radio" name="tamanho_fonte" value="pequeno" <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'pequeno' ? 'checked' : '' ?>>
-                                    <i class="fas fa-font" style="font-size: 12px;"></i>
-                                    <span>Pequeno</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'medio' ? 'active' : '' ?>">
-                                    <input type="radio" name="tamanho_fonte" value="medio" <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'medio' ? 'checked' : '' ?>>
-                                    <i class="fas fa-font" style="font-size: 16px;"></i>
-                                    <span>Médio</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'grande' ? 'active' : '' ?>">
-                                    <input type="radio" name="tamanho_fonte" value="grande" <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'grande' ? 'checked' : '' ?>>
-                                    <i class="fas fa-font" style="font-size: 22px;"></i>
-                                    <span>Grande</span>
-                                </label>
-                            </div>
-                        </div>
+                <?php if ($msg_erro): ?>
+                    <div class="flash-message flash-error" role="alert">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <?= htmlspecialchars($msg_erro) ?>
                     </div>
+                <?php endif; ?>
 
-                    <!-- Tema -->
-                    <div class="config-card">
-                        <h3><i class="fas fa-palette"></i> Tema</h3>
-                        <p class="desc">Escolha o tema visual do sistema</p>
-                        <div class="form-group">
-                            <div class="opcoes-grid">
-                                <label class="opcao-card <?= ($configuracoes['tema'] ?? 'claro') === 'claro' ? 'active' : '' ?>">
-                                    <input type="radio" name="tema" value="claro" <?= ($configuracoes['tema'] ?? 'claro') === 'claro' ? 'checked' : '' ?>>
-                                    <i class="fas fa-sun"></i>
-                                    <span>Claro</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['tema'] ?? 'claro') === 'escuro' ? 'active' : '' ?>">
-                                    <input type="radio" name="tema" value="escuro" <?= ($configuracoes['tema'] ?? 'claro') === 'escuro' ? 'checked' : '' ?>>
-                                    <i class="fas fa-moon"></i>
-                                    <span>Escuro</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['tema'] ?? 'claro') === 'alto_contraste' ? 'active' : '' ?>">
-                                    <input type="radio" name="tema" value="alto_contraste" <?= ($configuracoes['tema'] ?? 'claro') === 'alto_contraste' ? 'checked' : '' ?>>
-                                    <i class="fas fa-circle" style="color: #000; border: 2px solid #fff; background: #fff;"></i>
-                                    <span>Alto Contraste</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+                <form method="POST" action="" id="formPreferencias">
 
-                    <!-- Daltonismo -->
-                    <div class="config-card">
-                        <h3><i class="fas fa-eye"></i> Daltonismo</h3>
-                        <p class="desc">Ajuste as cores para diferentes tipos de daltonismo</p>
-                        <div class="form-group">
-                            <div class="opcoes-grid">
-                                <label class="opcao-card <?= ($configuracoes['daltonismo'] ?? 'normal') === 'normal' ? 'active' : '' ?>">
-                                    <input type="radio" name="daltonismo" value="normal" <?= ($configuracoes['daltonismo'] ?? 'normal') === 'normal' ? 'checked' : '' ?>>
-                                    <i class="fas fa-eye"></i>
-                                    <span>Normal</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['daltonismo'] ?? 'normal') === 'protanopia' ? 'active' : '' ?>">
-                                    <input type="radio" name="daltonismo" value="protanopia" <?= ($configuracoes['daltonismo'] ?? 'normal') === 'protanopia' ? 'checked' : '' ?>>
-                                    <span style="color: #ff6b6b;">🔴</span>
-                                    <span>Protanopia</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['daltonismo'] ?? 'normal') === 'deuteranopia' ? 'active' : '' ?>">
-                                    <input type="radio" name="daltonismo" value="deuteranopia" <?= ($configuracoes['daltonismo'] ?? 'normal') === 'deuteranopia' ? 'checked' : '' ?>>
-                                    <span style="color: #51cf66;">🟢</span>
-                                    <span>Deuteranopia</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['daltonismo'] ?? 'normal') === 'tritanopia' ? 'active' : '' ?>">
-                                    <input type="radio" name="daltonismo" value="tritanopia" <?= ($configuracoes['daltonismo'] ?? 'normal') === 'tritanopia' ? 'checked' : '' ?>>
-                                    <span style="color: #4dabf7;">🔵</span>
-                                    <span>Tritanopia</span>
-                                </label>
+                    <?php foreach ($grupos as $campo => $grupo): ?>
+                        <?php $atual = $configuracoes[$campo]; ?>
+                        <div class="config-card" role="radiogroup" aria-label="<?= htmlspecialchars($grupo['titulo']) ?>">
+                            <h3><i class="fas <?= $grupo['icone'] ?>"></i> <?= htmlspecialchars($grupo['titulo']) ?></h3>
+                            <p class="desc"><?= htmlspecialchars($grupo['desc']) ?></p>
+                            <div class="form-group">
+                                <div class="opcoes-grid">
+                                    <?php foreach ($grupo['opcoes'] as $valor => [$rotulo, $icone]): ?>
+                                        <?php $marcado = ($atual === $valor); ?>
+                                        <label class="opcao-card <?= $marcado ? 'active' : '' ?>">
+                                            <input type="radio" name="<?= $campo ?>" value="<?= $valor ?>" <?= $marcado ? 'checked' : '' ?>>
+                                            <?= $icone ?>
+                                            <span><?= htmlspecialchars($rotulo) ?></span>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Espaçamento -->
-                    <div class="config-card">
-                        <h3><i class="fas fa-arrows-alt-h"></i> Espaçamento</h3>
-                        <p class="desc">Ajuste a densidade da informação na tela</p>
-                        <div class="form-group">
-                            <div class="opcoes-grid">
-                                <label class="opcao-card <?= ($configuracoes['espacamento'] ?? 'normal') === 'compacto' ? 'active' : '' ?>">
-                                    <input type="radio" name="espacamento" value="compacto" <?= ($configuracoes['espacamento'] ?? 'normal') === 'compacto' ? 'checked' : '' ?>>
-                                    <i class="fas fa-compress-arrows-alt"></i>
-                                    <span>Compacto</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['espacamento'] ?? 'normal') === 'normal' ? 'active' : '' ?>">
-                                    <input type="radio" name="espacamento" value="normal" <?= ($configuracoes['espacamento'] ?? 'normal') === 'normal' ? 'checked' : '' ?>>
-                                    <i class="fas fa-arrows-alt-h"></i>
-                                    <span>Normal</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['espacamento'] ?? 'normal') === 'confortavel' ? 'active' : '' ?>">
-                                    <input type="radio" name="espacamento" value="confortavel" <?= ($configuracoes['espacamento'] ?? 'normal') === 'confortavel' ? 'checked' : '' ?>>
-                                    <i class="fas fa-expand-arrows-alt"></i>
-                                    <span>Confortável</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
 
                     <!-- Reduzir Animações -->
                     <div class="config-card">
@@ -213,16 +193,24 @@ unset($_SESSION['msg_sucesso']);
                         <p class="desc">Reduza ou desative animações para melhor performance e acessibilidade</p>
                         <div class="form-group">
                             <label class="toggle-switch">
-                                <input type="checkbox" name="reduzir_animacoes" value="1" <?= ($configuracoes['reduzir_animacoes'] ?? '0') == '1' ? 'checked' : '' ?>>
+                                <input type="checkbox" name="reduzir_animacoes" value="1" <?= $configuracoes['reduzir_animacoes'] === '1' ? 'checked' : '' ?>>
                                 <span class="slider"></span>
                                 <span class="toggle-label">Reduzir animações</span>
                             </label>
                         </div>
                     </div>
 
-                    <button type="submit" name="salvar" class="btn-salvar">
-                        <i class="fas fa-save"></i> Salvar Preferências
-                    </button>
+                    <div class="config-actions">
+                        <div class="aviso-nao-salvo" id="avisoNaoSalvo" hidden>
+                            <i class="fas fa-info-circle"></i> Você tem alterações que ainda não foram salvas.
+                        </div>
+                        <button type="submit" name="salvar" class="btn-salvar">
+                            <i class="fas fa-save"></i> Salvar Preferências
+                        </button>
+                        <button type="button" class="btn-restaurar" id="btnRestaurar">
+                            <i class="fas fa-undo"></i> Restaurar padrão
+                        </button>
+                    </div>
                 </form>
             </div>
         </main>

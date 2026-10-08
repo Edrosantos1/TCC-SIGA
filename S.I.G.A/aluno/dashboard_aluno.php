@@ -82,6 +82,15 @@ if ($res_tccs) {
     $tccs = $res_tccs->fetch_all(MYSQLI_ASSOC);
 }
 
+$reservas_ativas = [];
+$stmt_reservas = $conn->prepare(
+    "SELECT id_reserva, id_catalogo, status FROM reservas WHERE id_aluno = ? AND status IN ('pendente', 'aprovada')"
+);
+$stmt_reservas->bind_param('i', $usuario_id);
+$stmt_reservas->execute();
+$reservas_ativas = $stmt_reservas->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt_reservas->close();
+
 // 5. ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (ALUNO) ==========
 $notificacoes = array();
 $sql_notif = "
@@ -117,6 +126,7 @@ if ($stmt_notif) {
   <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
   <link rel="stylesheet" href="../assets/css/student_unified.css">
   <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
+  <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
   <script src="../assets/js/dashboard_aluno.js" defer></script>
   <script src="../assets/js/notificacoes_aluno.js" defer></script>
 
@@ -255,6 +265,11 @@ if ($stmt_notif) {
           <h4><i class="fas fa-bell"></i> Notificações</h4>
         </div>
         <div class="notification-list" id="notification-list-dropdown"></div>
+        <form id="mark-read-form" action="../api/aluno_notificacoes.php" method="POST" style="padding: 0 12px 12px;">
+          <input type="hidden" name="action" value="mark_all_read">
+          <input type="hidden" name="redirect" value="dashboard_aluno.php">
+          <button type="submit" class="btn-secondary" id="mark-read-btn">Marcar tudo como lido</button>
+        </form>
       </div>
 </div>
         </div>
@@ -413,10 +428,15 @@ if ($stmt_notif) {
               </button>
             </form>
 
-            <button id="tcc-reserve-btn">
-              <i class="fas fa-bookmark"></i>
-              <span id="tcc-reserve-text">Reservar</span>
-            </button>
+            <form action="../api/aluno_reservas.php" method="POST" id="form-tcc-reserva" style="display:inline-block;">
+              <input type="hidden" name="id_catalogo" id="tcc-reserva-item-id" value="">
+              <input type="hidden" name="tipo" value="tcc">
+              <input type="hidden" name="redirect" value="dashboard_aluno.php">
+              <button type="submit" id="tcc-reserve-btn">
+                <i class="fas fa-bookmark"></i>
+                <span id="tcc-reserve-text">Reservar</span>
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -426,6 +446,7 @@ if ($stmt_notif) {
   <script>
     window.favoritosPHP = <?= json_encode($meus_favoritos) ?>;
     window.tccsData = <?= json_encode($tccs) ?>;
+    window.reservasData = <?= json_encode($reservas_ativas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
 </body>

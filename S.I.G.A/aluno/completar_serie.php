@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/conexao.php';
-header('Content-Type: application/json');
 
 // ============================================================
 // Endpoint chamado depois do login/cadastro via Google, quando
@@ -10,8 +9,7 @@ header('Content-Type: application/json');
 // ============================================================
 
 if (!isset($_SESSION['usuario_id'])) {
-    http_response_code(401);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Você precisa estar logado.']);
+    header('Location: login_user.php?error=Você+precisa+estar+logado');
     exit;
 }
 
@@ -20,8 +18,7 @@ $serie = $_POST['serie'] ?? '';
 $seriesPermitidas = ['6º ano', '7º ano', '8º ano', '9º ano', '1º ano', '2º ano', '3º ano'];
 
 if (!in_array($serie, $seriesPermitidas, true)) {
-    http_response_code(400);
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Série inválida.']);
+    header('Location: login_user.php?error=S%C3%A9rie+inv%C3%A1lida');
     exit;
 }
 
@@ -54,9 +51,10 @@ try {
 
     $_SESSION['usuario_serie'] = $serie;
 
-    echo json_encode(['sucesso' => true, 'mensagem' => 'Série atualizada com sucesso.']);
+    header('Location: dashboard_aluno.php?mensagem=S%C3%A9rie+atualizada+com+sucesso');
+    exit;
 } catch (Exception $e) {
-    http_response_code(500);
     error_log("Erro no completar_serie.php: " . $e->getMessage());
-    echo json_encode(['sucesso' => false, 'mensagem' => 'Erro interno. Tente novamente.']);
+    header('Location: login_user.php?error=Erro+interno.+Tente+novamente');
+    exit;
 }
