@@ -21,6 +21,38 @@
     padding: 0 5px;
 }
 
+/* =============================================
+   CABEÇALHO DA PÁGINA (padrão das outras páginas)
+   ============================================= */
+.dashboard-main .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.dashboard-main .page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #0b4b9b;
+}
+.dashboard-main .page-header h1 i {
+    color: #e67e22;
+    font-size: 24px;
+}
+.dashboard-main .page-subtitle {
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #64748b;
+}
+
 /* ========== BLOCO DE COMPOSIÇÃO ========== */
 .compose-card {
     background: #ffffff;
@@ -253,9 +285,34 @@
 }
 
 .btn-enviar {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
     padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 14px;
+    font-weight: 600;
+    background: #0b4b9b;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.btn-enviar:hover:not(:disabled) {
+    background: #1a5aab;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(11, 75, 155, 0.25);
+}
+.btn-enviar:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(11, 75, 155, 0.2);
+}
+.btn-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* =============================================
@@ -507,6 +564,8 @@
 
 /* ========== RESPONSIVO ========== */
 @media (max-width: 640px) {
+    .dashboard-main .page-header h1 { font-size: 22px; }
+
     .compose-card,
     .historico-card {
         padding: 22px 20px;
@@ -554,6 +613,10 @@
 /* =============================================
    TEMA ESCURO
    ============================================= */
+body.tema-escuro .dashboard-main .page-header h1 { color: #ffffff; }
+body.tema-escuro .dashboard-main .page-header h1 i { color: #7ec8e3; }
+body.tema-escuro .dashboard-main .page-subtitle { color: #b0c0d0; }
+
 body.tema-escuro .compose-card,
 body.tema-escuro .historico-card {
     background: #1a2a4a;
@@ -626,6 +689,15 @@ body.tema-escuro #mensagem-textarea::placeholder { color: #6a7a8a; }
 
 body.tema-escuro .checkbox-envio { color: #b0c0d0; }
 
+body.tema-escuro .btn-enviar {
+    background: #1e6fd9;
+    color: #ffffff;
+}
+body.tema-escuro .btn-enviar:hover:not(:disabled) {
+    background: #2a7fe9;
+    box-shadow: 0 4px 12px rgba(30, 111, 217, 0.35);
+}
+
 body.tema-escuro .filtros-historico {
     background: #0f1a3a;
     border-color: #2a3a5e;
@@ -664,6 +736,10 @@ body.tema-escuro .historico-destinatarios { background: #0a2a4a; color: #6aaae0;
 /* =============================================
    TEMA ALTO CONTRASTE
    ============================================= */
+body.tema-alto_contraste .dashboard-main .page-header h1 { color: #ffffff; }
+body.tema-alto_contraste .dashboard-main .page-header h1 i { color: #ffaa44; }
+body.tema-alto_contraste .dashboard-main .page-subtitle { color: #cccccc; }
+
 body.tema-alto_contraste .compose-card,
 body.tema-alto_contraste .historico-card {
     background: #1a1a1a;
@@ -721,6 +797,15 @@ body.tema-alto_contraste #mensagem-textarea {
     background: #000000;
     border-color: #ffffff;
     color: #ffffff;
+}
+
+body.tema-alto_contraste .btn-enviar {
+    background: #ffffff;
+    color: #000000;
+    border: 2px solid #ffffff;
+}
+body.tema-alto_contraste .btn-enviar:hover:not(:disabled) {
+    background: #cccccc;
 }
 
 body.tema-alto_contraste .filtros-historico {

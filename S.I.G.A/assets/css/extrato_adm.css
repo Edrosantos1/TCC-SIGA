@@ -1,7 +1,6 @@
 /* ============================================
    extrato_adm.css – Extrato de Reservas (SiGA ITJ)
-   Tudo escopado em .extrato-page para não interferir
-   no dashboard_adm.css.
+   Padronizado com pendencias_adm / reservas_adm / catalogo_adm
    ============================================ */
 
 .extrato-page {
@@ -9,7 +8,6 @@
     --ex-primary-dark: #083a7a;
     --ex-primary-soft: #eaf4ff;
     --ex-accent: #e67e22;
-    --ex-accent-gold: #fbbf24;
     --ex-blue: #227de6;
     --ex-bg-hover: #f3f8ff;
     --ex-g50: #f8fafc;
@@ -33,96 +31,82 @@
 .extrato-page *::before,
 .extrato-page *::after { box-sizing: border-box; }
 
-/* ---------- CABEÇALHO (banner igual ao do dashboard) ---------- */
+/* ---------- CABEÇALHO (padrão das outras páginas) ---------- */
 .extrato-page .page-header {
-    position: relative;
-    overflow: hidden;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 16px;
-    margin-bottom: 28px;
-    padding: 28px 32px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #0b4b9b 0%, #1565c0 60%, #1976d2 100%);
-    color: #fff;
+    margin-bottom: 24px;
 }
-
-.extrato-page .page-header::before,
-.extrato-page .page-header::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-}
-
-.extrato-page .page-header::before {
-    right: -40px;
-    top: -40px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255, 255, 255, .06);
-}
-
-.extrato-page .page-header::after {
-    right: 60px;
-    bottom: -60px;
-    width: 160px;
-    height: 160px;
-    background: rgba(255, 255, 255, .04);
-}
-
-.extrato-page .page-header > * { position: relative; z-index: 1; }
 
 .extrato-page .page-header h1 {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     margin: 0;
-    font-size: 1.8rem;
+    font-size: 26px;
     font-weight: 700;
-    letter-spacing: -.3px;
-    color: #fff;
+    letter-spacing: -0.02em;
+    color: #0b4b9b;
 }
 
 .extrato-page .page-header h1 i {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .14);
-    color: var(--ex-accent-gold);
-    font-size: 20px;
+    color: #e67e22;
+    font-size: 24px;
+    width: auto;
+    height: auto;
+    background: none;
+    border-radius: 0;
 }
 
 .extrato-page .page-subtitle {
-    margin: 8px 0 0;
-    font-size: 15px;
-    color: #fff;
-    opacity: .85;
+    margin: 6px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #64748b;
 }
 
+/* Botão Imprimir (flat, igual aos outros botões secundários do sistema) */
 .extrato-page .btn-secundario {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
-    border: 1.5px solid rgba(255, 255, 255, .45);
+    border: 1.5px solid var(--ex-g200);
     border-radius: 10px;
-    background: rgba(255, 255, 255, .12);
-    color: #fff;
+    background: #ffffff;
+    color: var(--ex-g600);
     font: 600 14px/1 inherit;
     font-family: inherit;
     cursor: pointer;
-    transition: all .2s var(--ex-ease);
+    transition: background .2s var(--ex-ease),
+                border-color .2s var(--ex-ease),
+                color .2s var(--ex-ease),
+                transform .2s var(--ex-ease),
+                box-shadow .2s var(--ex-ease);
+}
+
+.extrato-page .btn-secundario i {
+    color: var(--ex-primary);
+    font-size: 14px;
+    transition: color .2s var(--ex-ease);
 }
 
 .extrato-page .btn-secundario:hover {
-    border-color: #fff;
-    background: #fff;
+    background: var(--ex-bg-hover);
+    border-color: #c0d5f0;
     color: var(--ex-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(11, 75, 155, 0.10);
+}
+
+.extrato-page .btn-secundario:hover i { color: var(--ex-primary); }
+
+.extrato-page .btn-secundario:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(11, 75, 155, 0.12);
 }
 
 /* ---------- FILTROS ---------- */
@@ -486,7 +470,7 @@
 .extrato-page .sem-resultados { animation: ex-fade-up .35s var(--ex-ease) both; }
 
 .extrato-page .filtros-extrato { animation-delay: .05s; }
-.extrato-page .barra-tabela    { animation-delay: .1s; }
+.extrato-page .barra-tabela    { animation-delay: .10s; }
 .extrato-page .table-wrapper   { animation-delay: .15s; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -503,9 +487,7 @@
 }
 
 @media (max-width: 768px) {
-    .extrato-page .page-header { padding: 22px 20px; }
     .extrato-page .page-header h1 { font-size: 22px; }
-    .extrato-page .page-header h1 i { width: 38px; height: 38px; font-size: 17px; }
     .extrato-page .busca-tabela { flex: 1 1 100%; }
 }
 
@@ -579,12 +561,11 @@
         box-shadow: none;
     }
 
-    .extrato-page .page-header { padding: 0; margin-bottom: 16px; background: none; color: #000; }
-    .extrato-page .page-header::before,
-    .extrato-page .page-header::after { display: none; }
-    .extrato-page .page-header h1,
+    .extrato-page .page-header { padding: 0; margin-bottom: 16px; }
+    .extrato-page .page-header h1 { color: #000; }
+    .extrato-page .page-header h1 i { color: #000; }
     .extrato-page .page-subtitle { color: #000; }
-    .extrato-page .page-header h1 i { background: none; color: #000; }
+
     .extrato-page .table-extrato thead th { position: static; }
     .extrato-page .table-extrato tbody tr:nth-child(even) { background: #fff; }
     .extrato-page .table-extrato tbody tr { break-inside: avoid; }

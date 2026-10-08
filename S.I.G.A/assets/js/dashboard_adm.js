@@ -1,17 +1,14 @@
 // =============================================
-// dashboard_adm.js — PESQUISA LOCAL
+// dashboard_adm.js — PESQUISA + BI
 // =============================================
 
-// ========== VARIÁVEIS GLOBAIS ==========
 let alunos = [];
 let notificacoes = [];
 
-// ========== COR ÚNICA PARA TODOS OS AVATARES ==========
 function getAvatarColor() {
     return '#0b4b9b';
 }
 
-// ========== FUNÇÕES AUXILIARES ==========
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -20,10 +17,10 @@ function escapeHtml(text) {
 }
 
 function formatarData(data) {
-    const d = new Date(data);  // <-- REMOVI O '+ "UTC"'
+    const d = new Date(data);
     const agora = new Date();
     const diff = Math.floor((agora - d) / 1000);
-    
+
     if (diff < 60) return 'Agora pouco';
     if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
     if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
@@ -50,10 +47,10 @@ function renderizarDropdownNotificacoes() {
         const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
         const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
         const label = isPendencia ? 'Pendência' : 'Aviso';
-        
+
         const totalAlunos = parseInt(notificacao.total_alunos, 10) || 0;
         const textoAlunos = totalAlunos === 1 ? '1 aluno' : totalAlunos + ' alunos';
-        
+
         return `
             <div class="notification-item">
                 <div class="notification-icon" style="color: ${corIcon};">
@@ -76,20 +73,13 @@ function renderizarDropdownNotificacoes() {
     }).join('');
 }
 
-// ========== ÍCONES COM COR DIFERENCIADA ==========
 function getStatusIcon(aluno) {
     const iconReserva = '<i class="fas fa-bookmark" style="color: #0b4b9b; font-size: 14px;" title="Possui reservas"></i>';
     const iconPendencia = '<i class="fas fa-exclamation-circle" style="color: #e67e22; font-size: 14px;" title="Possui empréstimos/pendências"></i>';
-    
-    if (aluno.tem_reservas && aluno.tem_emprestimos) {
-        return iconReserva + ' ' + iconPendencia;
-    }
-    if (aluno.tem_reservas) {
-        return iconReserva;
-    }
-    if (aluno.tem_emprestimos) {
-        return iconPendencia;
-    }
+
+    if (aluno.tem_reservas && aluno.tem_emprestimos) return iconReserva + ' ' + iconPendencia;
+    if (aluno.tem_reservas) return iconReserva;
+    if (aluno.tem_emprestimos) return iconPendencia;
     return '';
 }
 
@@ -110,7 +100,6 @@ function redirecionarAluno(aluno) {
     }
 }
 
-// ========== SIDEBAR ==========
 function initSidebar() {
     const sidebar = document.getElementById('sidebar');
     const collapseBtn = document.getElementById('collapseBtn');
@@ -120,13 +109,19 @@ function initSidebar() {
         sidebar.classList.add('collapsed');
     }
 
+    // Remove a flag anti-FOUC — a partir daqui o JS controla (com animação)
+    document.documentElement.classList.remove('sidebar-collapsed-init');
+
     collapseBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         localStorage.setItem('adm_sidebarCollapsed', sidebar.classList.contains('collapsed'));
+
+        // 🔄 Redimensiona os gráficos após a transição da sidebar (0.4s)
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 450);
     });
 }
-
-// ========== DATA/HORA ==========
 function renderDate() {
     const el = document.getElementById('welcome-date');
     if (!el) return;
@@ -135,7 +130,6 @@ function renderDate() {
     el.innerHTML = `${now.getDate()} de ${meses[now.getMonth()]}, ${now.getFullYear()}`;
 }
 
-// ========== PERFIL DROPDOWN ==========
 function initProfileDropdown() {
     const btn = document.getElementById('admin-profile-btn');
     const dropdown = document.getElementById('profile-dropdown');
@@ -155,7 +149,6 @@ function initProfileDropdown() {
     });
 }
 
-// ========== NOTIFICAÇÕES (SININHO) - SEM AJAX ==========
 function initNotifications() {
     const btn = document.getElementById('notification-btn');
     const dropdown = document.getElementById('notification-dropdown');
@@ -176,7 +169,6 @@ function initNotifications() {
     });
 }
 
-// ========== PESQUISA LOCAL ==========
 function initSearch() {
     const input = document.getElementById('search-input');
     const results = document.getElementById('search-results');
@@ -223,16 +215,9 @@ function initSearch() {
                     <div class="search-status-icon">${statusIcon}</div>
                 `;
 
-                div.addEventListener('click', () => {
-                    redirecionarAluno(aluno);
-                });
-
-                div.addEventListener('mouseenter', () => {
-                    div.style.background = '#f8f9fa';
-                });
-                div.addEventListener('mouseleave', () => {
-                    div.style.background = 'transparent';
-                });
+                div.addEventListener('click', () => redirecionarAluno(aluno));
+                div.addEventListener('mouseenter', () => { div.style.background = '#f8f9fa'; });
+                div.addEventListener('mouseleave', () => { div.style.background = 'transparent'; });
 
                 results.appendChild(div);
             });
@@ -256,13 +241,101 @@ function initSearch() {
     });
 }
 
+// ========== DASHBOARD BI — GRÁFICOS ==========
+function initBICharts() {
+    if (typeof ApexCharts === 'undefined') {
+        console.warn('⚠ ApexCharts não foi carregado.');
+        return;
+    }
+
+    const isDark    = document.body.classList.contains('tema-escuro');
+    const isContras = document.body.classList.contains('tema-alto_contraste');
+    const isDarkLike = isDark || isContras;
+
+    const foreColor = isDarkLike ? '#f0f0f0' : '#475569';
+    const gridColor = isDarkLike ? '#2a3a5e' : '#e5e9f0';
+    const chartTheme = isDarkLike ? 'dark' : 'light';
+
+    const labelsSegmento  = window.labelsSegmento  || [];
+    const valoresSegmento = window.valoresSegmento || [];
+    const labelsSerie     = window.labelsSerie     || [];
+    const valoresSerie    = window.valoresSerie    || [];
+
+    // ---------- DONUT ----------
+    const elDonut = document.querySelector('#chartDonut');
+    if (elDonut) {
+        const temDadosDonut = valoresSegmento.some(v => v > 0);
+
+        new ApexCharts(elDonut, {
+            chart: {
+                type: 'donut',
+                height: 240,
+                foreColor: foreColor,
+                events: {
+                    dataPointSelection: function(event, ctx, config) {
+                        const seg = ctx.w.globals.labels[config.dataPointIndex];
+                        if (seg && seg !== 'Outros' && seg !== 'Sem dados') {
+                            window.location.href = 'dashboard_adm.php?segmento=' + encodeURIComponent(seg);
+                        }
+                    }
+                }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '60%'
+                    }
+                }
+            },
+            series: temDadosDonut ? valoresSegmento : [1],
+            labels: temDadosDonut ? labelsSegmento : ['Sem dados'],
+            colors: temDadosDonut ? ['#0b4b9b', '#60a5fa', '#93c5fd'] : ['#cbd5e1'],
+            legend: {
+                position: 'bottom',
+                labels: { colors: foreColor }
+            },
+            dataLabels: { enabled: temDadosDonut },
+            tooltip: { theme: chartTheme }
+        }).render();
+    }
+
+    // ---------- BARRAS ----------
+    const elBarras = document.querySelector('#chartBarras');
+    if (elBarras) {
+        new ApexCharts(elBarras, {
+            chart: {
+                type: 'bar',
+                height: 240,
+                toolbar: { show: false },
+                foreColor: foreColor
+            },
+            series: [{ name: 'Pendências', data: valoresSerie }],
+            xaxis: {
+                categories: labelsSerie,
+                labels: { style: { colors: foreColor } }
+            },
+            yaxis: {
+                labels: { style: { colors: foreColor } }
+            },
+            grid: { borderColor: gridColor },
+            colors: ['#0b4b9b'],
+            plotOptions: {
+                bar: { borderRadius: 6, columnWidth: '50%' }
+            },
+            dataLabels: { enabled: true },
+            noData: { text: 'Sem dados', style: { color: foreColor } },
+            tooltip: { theme: chartTheme }
+        }).render();
+    }
+}
+
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof alunosData !== 'undefined') {
         alunos = alunosData;
         console.log(`📚 ${alunos.length} alunos carregados.`);
     }
-    
+
     if (typeof notificacoesData !== 'undefined') {
         notificacoes = notificacoesData;
         console.log(`🔔 ${notificacoes.length} notificações carregadas.`);
@@ -273,9 +346,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initProfileDropdown();
     initNotifications();
     initSearch();
-    
-    // Renderiza notificações ao carregar
     renderizarDropdownNotificacoes();
+    initBICharts();
 
-    console.log('✅ Dashboard com pesquisa local carregado.');
+    console.log('✅ Dashboard com pesquisa local + BI carregado.');
 });

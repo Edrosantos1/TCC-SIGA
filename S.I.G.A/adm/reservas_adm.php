@@ -14,6 +14,13 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 $filtro_aluno_id = isset($_GET['aluno_id']) ? intval($_GET['aluno_id']) : 0;
 $filtro_aluno_nome = '';
 
+// ========== FILTRO POR STATUS (vindo do dashboard) ==========
+$filtro_status = isset($_GET['filtro']) ? trim($_GET['filtro']) : 'todos';
+$filtros_validos_status = ['todos', 'pendente', 'aprovada', 'rejeitada', 'expirada', 'retirada'];
+if (!in_array($filtro_status, $filtros_validos_status, true)) {
+    $filtro_status = 'todos';
+}
+
 // ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
 if (isset($conn)) {
@@ -165,7 +172,7 @@ if ($db) {
 }
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-// Nome do aluno filtrado: busca no banco (o PHP já decodifica o $_GET, não usar urldecode de novo)
+// Nome do aluno filtrado
 if ($filtro_aluno_id > 0) {
     foreach ($alunos as $a) {
         if ((int)$a['id_aluno'] === $filtro_aluno_id) { $filtro_aluno_nome = $a['nome_aluno']; break; }
@@ -184,6 +191,15 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservas — SiGA ITJ Admin</title>
+
+       <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -307,27 +323,27 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <!-- FILTROS -->
             <div class="filtros-container">
                 <div class="filtros-tabs" id="filtros-tabs" role="tablist" aria-label="Filtrar por situação">
-                    <button type="button" class="filtro-tab active" data-status="todos" role="tab" aria-selected="true">
+                    <button type="button" class="filtro-tab <?= $filtro_status === 'todos' ? 'active' : '' ?>" data-status="todos" role="tab" aria-selected="<?= $filtro_status === 'todos' ? 'true' : 'false' ?>">
                         <i class="fas fa-list"></i> Todos
                         <span class="tab-badge" id="badge-todos"><?= $total_geral ?></span>
                     </button>
-                    <button type="button" class="filtro-tab" data-status="pendente" role="tab" aria-selected="false">
+                    <button type="button" class="filtro-tab <?= $filtro_status === 'pendente' ? 'active' : '' ?>" data-status="pendente" role="tab" aria-selected="<?= $filtro_status === 'pendente' ? 'true' : 'false' ?>">
                         <i class="fas fa-hourglass-half"></i> Pendentes
                         <span class="tab-badge pendente" id="badge-pendente"><?= $total_pendentes ?></span>
                     </button>
-                    <button type="button" class="filtro-tab" data-status="aprovada" role="tab" aria-selected="false">
+                    <button type="button" class="filtro-tab <?= $filtro_status === 'aprovada' ? 'active' : '' ?>" data-status="aprovada" role="tab" aria-selected="<?= $filtro_status === 'aprovada' ? 'true' : 'false' ?>">
                         <i class="fas fa-check-circle"></i> Aprovadas
                         <span class="tab-badge aprovada" id="badge-aprovada"><?= $total_aprovadas ?></span>
                     </button>
-                    <button type="button" class="filtro-tab" data-status="rejeitada" role="tab" aria-selected="false">
+                    <button type="button" class="filtro-tab <?= $filtro_status === 'rejeitada' ? 'active' : '' ?>" data-status="rejeitada" role="tab" aria-selected="<?= $filtro_status === 'rejeitada' ? 'true' : 'false' ?>">
                         <i class="fas fa-times-circle"></i> Rejeitadas
                         <span class="tab-badge rejeitada" id="badge-rejeitada"><?= $total_rejeitadas ?></span>
                     </button>
-                    <button type="button" class="filtro-tab" data-status="expirada" role="tab" aria-selected="false">
+                    <button type="button" class="filtro-tab <?= $filtro_status === 'expirada' ? 'active' : '' ?>" data-status="expirada" role="tab" aria-selected="<?= $filtro_status === 'expirada' ? 'true' : 'false' ?>">
                         <i class="fas fa-clock"></i> Expiradas
                         <span class="tab-badge expirada" id="badge-expirada"><?= $total_expiradas ?></span>
                     </button>
-                    <button type="button" class="filtro-tab" data-status="retirada" role="tab" aria-selected="false">
+                    <button type="button" class="filtro-tab <?= $filtro_status === 'retirada' ? 'active' : '' ?>" data-status="retirada" role="tab" aria-selected="<?= $filtro_status === 'retirada' ? 'true' : 'false' ?>">
                         <i class="fas fa-hand-holding-heart"></i> Retiradas
                         <span class="tab-badge retirada" id="badge-retirada"><?= $total_retiradas ?></span>
                     </button>
@@ -520,6 +536,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         const reservasData     = <?= $reservas_json ?>;
         const alunosData       = <?= $alunos_json ?>;
         const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        window.filtroInicialReservas = <?= json_encode($filtro_status) ?>;
     </script>
 
     <!-- SCRIPTS -->

@@ -9,10 +9,20 @@
         String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
     // ========== SIDEBAR ==========
+        // ========== SIDEBAR ==========
     function initSidebar() {
         const sidebar = document.getElementById('sidebar');
         const collapseBtn = document.getElementById('collapseBtn');
         if (!sidebar || !collapseBtn) return;
+
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                sidebar.classList.add('collapsed');
+            }
+        } catch (e) { /* storage indisponível */ }
+
+        // Remove a flag anti-FOUC — a partir daqui o JS controla (com animação)
+        document.documentElement.classList.remove('sidebar-collapsed-init');
 
         collapseBtn.addEventListener('click', () => {
             sidebar.classList.toggle('collapsed');
@@ -20,12 +30,6 @@
                 localStorage.setItem('adm_sidebarCollapsed', sidebar.classList.contains('collapsed'));
             } catch (e) { /* storage indisponível */ }
         });
-
-        try {
-            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
-                sidebar.classList.add('collapsed');
-            }
-        } catch (e) { /* storage indisponível */ }
     }
 
     // ========== TOP HEADER (igual ao do dashboard) ==========

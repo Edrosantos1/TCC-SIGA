@@ -25,7 +25,6 @@ if ($db) {
             if ($result_alunos) {
                 while ($row = $result_alunos->fetch_assoc()) {
                     $id = $row['id_aluno'];
-                    // Contar reservas
                     $reservas_sql = "SELECT COUNT(*) as total FROM reservas WHERE id_aluno = ? AND status IN ('pendente', 'aprovada')";
                     $reservas_stmt = $db->prepare($reservas_sql);
                     $tem_reservas = false;
@@ -36,7 +35,6 @@ if ($db) {
                         $tem_reservas = ($reservas_result->fetch_assoc()['total'] > 0);
                         $reservas_stmt->close();
                     }
-                    // Contar empréstimos
                     $emprestimos_sql = "SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')";
                     $emprestimos_stmt = $db->prepare($emprestimos_sql);
                     $tem_emprestimos = false;
@@ -80,7 +78,7 @@ if ($db) {
     }
 }
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO ==========
 $notificacoes = array();
 if ($db) {
     try {
@@ -113,6 +111,157 @@ if ($db) {
     }
 }
 
+// ============================================================
+// ========== DASHBOARD BI — KPIs E GRÁFICOS ==================
+// ============================================================
+
+$sqlSegmento = "
+  CASE 
+    WHEN a.serie_aluno IN ('6º ano','7º ano','8º ano','9º ano') THEN 'Ensino Fundamental II'
+    WHEN a.serie_aluno IN ('1º ano','2º ano','3º ano')          THEN 'Ensino Médio'
+    ELSE 'Outros'
+  END
+";
+
+$segmento_filtro = isset($_GET['segmento']) ? trim($_GET['segmento']) : '';
+$whereSeg = '';
+$bind_tipos   = '';
+$bind_valores = [];
+
+if ($segmento_filtro !== '') {
+    $whereSeg     = " AND ($sqlSegmento) = ? ";
+    $bind_tipos   = 's';
+    $bind_valores = [$segmento_filtro];
+}
+
+$pendencias = $emprestimosAtivos = $reservasNovas = $atrasados = 0;
+$porSegmento = [];
+$porSerie    = [];
+
+if ($db) {
+    try {
+        // -------- KPI 1: Pendências Totais --------
+        $sql = "SELECT COUNT(*) AS total
+                FROM emprestimos e
+                JOIN login_aluno a ON a.id_aluno = e.id_aluno
+                WHERE e.status IN ('emprestado','atrasado') $whereSeg";
+        if ($db instanceof mysqli) {
+            $stmt = $db->prepare($sql);
+            if ($stmt) {
+                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->execute();
+                $pendencias = (int) $stmt->get_result()->fetch_assoc()['total'];
+                $stmt->close();
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($bind_valores);
+            $pendencias = (int) $stmt->fetchColumn();
+        }
+
+        // -------- KPI 2: Empréstimos Ativos --------
+        $sql = "SELECT COUNT(*) AS total
+                FROM emprestimos e
+                JOIN login_aluno a ON a.id_aluno = e.id_aluno
+                WHERE e.status = 'emprestado' $whereSeg";
+        if ($db instanceof mysqli) {
+            $stmt = $db->prepare($sql);
+            if ($stmt) {
+                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->execute();
+                $emprestimosAtivos = (int) $stmt->get_result()->fetch_assoc()['total'];
+                $stmt->close();
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($bind_valores);
+            $emprestimosAtivos = (int) $stmt->fetchColumn();
+        }
+
+        // -------- KPI 3: Reservas Novas --------
+        $sql = "SELECT COUNT(*) AS total
+                FROM reservas r
+                JOIN login_aluno a ON a.id_aluno = r.id_aluno
+                WHERE r.status = 'pendente' $whereSeg";
+        if ($db instanceof mysqli) {
+            $stmt = $db->prepare($sql);
+            if ($stmt) {
+                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->execute();
+                $reservasNovas = (int) $stmt->get_result()->fetch_assoc()['total'];
+                $stmt->close();
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($bind_valores);
+            $reservasNovas = (int) $stmt->fetchColumn();
+        }
+
+        // -------- KPI 4: Atrasados --------
+        $sql = "SELECT COUNT(*) AS total
+                FROM emprestimos e
+                JOIN login_aluno a ON a.id_aluno = e.id_aluno
+                WHERE e.status = 'atrasado' $whereSeg";
+        if ($db instanceof mysqli) {
+            $stmt = $db->prepare($sql);
+            if ($stmt) {
+                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->execute();
+                $atrasados = (int) $stmt->get_result()->fetch_assoc()['total'];
+                $stmt->close();
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($bind_valores);
+            $atrasados = (int) $stmt->fetchColumn();
+        }
+
+        // -------- GRÁFICO 1: Pendências por Segmento --------
+        $sql = "SELECT ($sqlSegmento) AS segmento, COUNT(*) AS total
+                FROM emprestimos e
+                JOIN login_aluno a ON a.id_aluno = e.id_aluno
+                WHERE e.status IN ('emprestado','atrasado')
+                GROUP BY segmento ORDER BY segmento";
+        if ($db instanceof mysqli) {
+            $r = $db->query($sql);
+            if ($r) $porSegmento = $r->fetch_all(MYSQLI_ASSOC);
+        } elseif ($db instanceof PDO) {
+            $porSegmento = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // -------- GRÁFICO 2: Pendências por Série --------
+        $sql = "SELECT a.serie_aluno AS serie, COUNT(*) AS total
+                FROM emprestimos e
+                JOIN login_aluno a ON a.id_aluno = e.id_aluno
+                WHERE e.status IN ('emprestado','atrasado') $whereSeg
+                GROUP BY a.serie_aluno
+                ORDER BY FIELD(a.serie_aluno,
+                  '6º ano','7º ano','8º ano','9º ano',
+                  '1º ano','2º ano','3º ano')";
+        if ($db instanceof mysqli) {
+            $stmt = $db->prepare($sql);
+            if ($stmt) {
+                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->execute();
+                $porSerie = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+                $stmt->close();
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($bind_valores);
+            $porSerie = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+    } catch (Exception $e) {
+        error_log('Dashboard BI: ' . $e->getMessage());
+    }
+}
+
+$labelsSegmento  = array_column($porSegmento, 'segmento');
+$valoresSegmento = array_map('intval', array_column($porSegmento, 'total'));
+$labelsSerie     = array_column($porSerie, 'serie');
+$valoresSerie    = array_map('intval', array_column($porSerie, 'total'));
+
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
 <!DOCTYPE html>
@@ -122,9 +271,19 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin — SiGA ITJ</title>
 
+        <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="../assets/js/dashboard_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="<?= $config_classes ?>">
@@ -164,7 +323,6 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
             </div>
 
             <div class="header-right">
-                <!-- PERFIL DO ADMIN -->
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar">
                         <i class="fas fa-user-shield"></i>
@@ -176,7 +334,6 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                     <i class="fas fa-chevron-down admin-chevron"></i>
                 </div>
 
-                <!-- DROPDOWN PERFIL -->
                 <div class="profile-dropdown" id="profile-dropdown">
                     <a href="perfil_adm.php"><i class="fas fa-user-cog"></i> Meu Perfil</a>
                     <a href="configuracoes_adm.php"><i class="fas fa-sliders-h"></i> Configurações</a>
@@ -184,7 +341,6 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
 
-                <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
@@ -211,9 +367,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                         <div class="notification-header">
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
-                        <div class="notification-list" id="notification-list-dropdown">
-                            <!-- Preenchido via JS -->
-                        </div>
+                        <div class="notification-list" id="notification-list-dropdown"></div>
                     </div>
                 </div>
             </div>
@@ -226,21 +380,86 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
             <section class="welcome-section">
                 <div class="welcome-text">
                     <h1>Bem-vinda, <span id="welcome-name"><?= htmlspecialchars($nome_bibliotecaria) ?></span>!</h1>
-                    <p>Aqui você pode pesquisar alunos cadastrados no sistema.</p>
+                    <p>Aqui está o panorama do sistema em tempo real.</p>
                 </div>
-                <div class="welcome-date" id="welcome-date">
-                    <!-- Data preenchida via JS -->
-                </div>
+                <div class="welcome-date" id="welcome-date"></div>
             </section>
+
+            <!-- AVISO DE FILTRO ATIVO -->
+            <?php if ($segmento_filtro !== ''): ?>
+              <div class="bi-filtro-alert">
+                <span>Filtrando por segmento: <strong><?= htmlspecialchars($segmento_filtro) ?></strong></span>
+                <a href="dashboard_adm.php">✕ Limpar filtro</a>
+              </div>
+            <?php endif; ?>
+
+            <!-- KPIs -->
+            <section class="stats-grid">
+                <a href="pendencias_adm.php" class="stat-card-link">
+                    <div class="stat-card stat-orange">
+                        <i class="fas fa-exclamation-circle stat-icon"></i>
+                        <div class="stat-info">
+                            <span class="stat-number"><?= $pendencias ?></span>
+                            <span class="stat-label">Pendências Totais</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="pendencias_adm.php?filtro=emprestado" class="stat-card-link">
+                    <div class="stat-card stat-blue">
+                        <i class="fas fa-book-open stat-icon"></i>
+                        <div class="stat-info">
+                            <span class="stat-number"><?= $emprestimosAtivos ?></span>
+                            <span class="stat-label">Empréstimos Ativos</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="reservas_adm.php?filtro=pendente" class="stat-card-link">
+                    <div class="stat-card stat-teal">
+                        <i class="fas fa-bookmark stat-icon"></i>
+                        <div class="stat-info">
+                            <span class="stat-number"><?= $reservasNovas ?></span>
+                            <span class="stat-label">Reservas Novas</span>
+                        </div>
+                    </div>
+                </a>
+                <a href="pendencias_adm.php?filtro=atrasado" class="stat-card-link">
+                    <div class="stat-card stat-red">
+                        <i class="fas fa-exclamation-triangle stat-icon"></i>
+                        <div class="stat-info">
+                            <span class="stat-number"><?= $atrasados ?></span>
+                            <span class="stat-label">Empréstimos Atrasados</span>
+                        </div>
+                    </div>
+                </a>
+            </section>
+
+            <!-- GRÁFICOS -->
+            <div class="bi-charts-row">
+                <div class="card-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-pie"></i> Pendências por Segmento</h2>
+                    </div>
+                    <div id="chartDonut"></div>
+                </div>
+                <div class="card-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-bar"></i> Pendências por Série</h2>
+                    </div>
+                    <div id="chartBarras"></div>
+                </div>
+            </div>
+
         </main>
     </div>
 
     <script>
-        // ========== DADOS DOS ALUNOS INJETADOS ==========
         const alunosData = <?= $alunos_json ?>;
-        
-        // ========== DADOS DAS NOTIFICAÇÕES ==========
         const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        window.labelsSegmento  = <?= json_encode($labelsSegmento,  JSON_UNESCAPED_UNICODE) ?>;
+        window.valoresSegmento = <?= json_encode($valoresSegmento) ?>;
+        window.labelsSerie     = <?= json_encode($labelsSerie,     JSON_UNESCAPED_UNICODE) ?>;
+        window.valoresSerie    = <?= json_encode($valoresSerie) ?>;
     </script>
 
 </body>

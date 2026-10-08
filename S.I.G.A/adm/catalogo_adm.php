@@ -24,7 +24,6 @@ function e($s) {
     return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 }
 
-/** SELECT genérico (mysqli ou PDO). Inteiros PHP viram 'i', o resto 's'. */
 function db_all($db, $sql, $params = []) {
     if ($db instanceof mysqli) {
         $stmt = $db->prepare($sql);
@@ -48,7 +47,6 @@ function db_all($db, $sql, $params = []) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/** INSERT/UPDATE/DELETE. Retorna o nº de linhas afetadas. */
 function db_exec($db, $sql, $params = []) {
     if ($db instanceof mysqli) {
         $stmt = $db->prepare($sql);
@@ -104,7 +102,6 @@ function url_cat($filtros, $over = []) {
     return 'catalogo_adm.php' . ($q ? '?' . http_build_query($q) : '');
 }
 
-/** Acrescenta ?v=<data de modificação> para o navegador não usar CSS/JS antigo em cache. */
 function asset_v($rel) {
     $f = __DIR__ . '/' . $rel;
     return $rel . (file_exists($f) ? '?v=' . filemtime($f) : '?v=' . time());
@@ -112,7 +109,6 @@ function asset_v($rel) {
 
 const TIPOS_VALIDOS = ['livro', 'revista', 'tcc'];
 
-// SELECT base: traz também empréstimos/reservas ativos de cada item
 $selBase = "SELECT c.*,
     (SELECT COUNT(*) FROM emprestimos e WHERE e.id_catalogo = c.id_catalogo AND e.status IN ('emprestado','atrasado')) AS emp_ativos,
     (SELECT COUNT(*) FROM reservas r WHERE r.id_catalogo = c.id_catalogo AND r.status IN ('pendente','aprovada')) AS res_ativas
@@ -155,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // --- EXCLUIR ---
         if ($acao === 'excluir') {
             $id = (int)($_POST['id'] ?? 0);
             $rows = $id > 0 ? db_all($db, $selBase . ' WHERE c.id_catalogo = ?', [$id]) : [];
@@ -176,7 +171,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // --- DESTAQUE (alternar) ---
         if ($acao === 'destaque') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id > 0) {
@@ -187,7 +181,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // --- CADASTRAR / EDITAR ---
         if ($acao === 'salvar') {
             $d = [
                 'edit_id'        => (int)($_POST['edit_id'] ?? 0),
@@ -245,7 +238,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ' . $voltar);
                 exit;
             }
-            // com erro: não redireciona, reabre o modal com os dados digitados
             $formData = $d;
         }
     } catch (Exception $ex) {
@@ -280,7 +272,7 @@ if ($F['tipo'] !== '') {
 }
 if ($F['busca'] !== '') {
     $where .= ' AND (c.titulo LIKE ? OR c.autor LIKE ? OR c.isbn LIKE ?)';
-    $termo = '%' . addcslashes($F['busca'], '%_\\') . '%';
+    $termo = addcslashes($F['busca'], '%_\\') . '%';
     array_push($params, $termo, $termo, $termo);
 }
 if ($F['destaque'] === '1') {
@@ -310,7 +302,6 @@ foreach ($itens as $k => $it) {
     $jsItens[$itens[$k]['id_catalogo']] = $itens[$k];
 }
 
-// Deep link antigo: catalogo_adm.php?action=edit&id=123 → abre o modal preenchido
 $abrirEdicao = 0;
 if (($_GET['action'] ?? '') === 'edit' && (int)($_GET['id'] ?? 0) > 0) {
     $rows = db_all($db, $selBase . ' WHERE c.id_catalogo = ?', [(int)$_GET['id']]);
@@ -359,10 +350,20 @@ $catalogoData = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo — SiGA ITJ</title>
+        <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="<?= e(asset_v('../assets/css/dashboard_adm.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_v('../assets/css/catalogo_adm.css')) ?>">
+</head>
 </head>
 <body class="<?= e($config_classes) ?>">
 
@@ -394,13 +395,7 @@ $catalogoData = [
 
         <!-- TOP HEADER -->
         <header class="top-header">
-            <div class="search-container cat-header-search">
-                <form method="GET" action="catalogo_adm.php" role="search">
-                    <?php if ($F['tipo'] !== ''): ?><input type="hidden" name="tipo" value="<?= e($F['tipo']) ?>"><?php endif; ?>
-                    <input type="search" name="busca" placeholder="Buscar por título, autor ou ISBN..." value="<?= e($F['busca']) ?>" aria-label="Buscar no catálogo">
-                    <button type="submit" aria-label="Buscar"><i class="fas fa-search"></i></button>
-                </form>
-            </div>
+            <div class="cat-header-spacer" aria-hidden="true"></div>
             <div class="header-right">
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
@@ -441,12 +436,14 @@ $catalogoData = [
         <main class="dashboard-main">
 
             <!-- CABEÇALHO DA PÁGINA -->
-            <div class="catalogo-actions">
-                <div class="page-title">
-                    <h2>Catálogo</h2>
-                    <p><?= $totalGeral ?> <?= $totalGeral === 1 ? 'item cadastrado' : 'itens cadastrados' ?> no acervo</p>
+            <div class="page-header">
+                <div>
+                    <h1><i class="fas fa-book"></i> Catálogo</h1>
+                    <p class="page-subtitle">
+                        <?= $totalGeral ?> <?= $totalGeral === 1 ? 'item cadastrado' : 'itens cadastrados' ?> no acervo.
+                    </p>
                 </div>
-                <div class="left">
+                <div class="page-actions">
                     <button type="button" class="btn-cadastrar" id="btn-novo-item"><i class="fas fa-plus"></i> Novo item</button>
                     <form method="POST" action="importar_google_books.php">
                         <button type="submit" name="importar" class="btn-import" onclick="return confirm('Importar livros da Google Books? Isso pode demorar alguns segundos.')">

@@ -14,6 +14,13 @@ $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 $filtro_aluno_id = isset($_GET['aluno_id']) ? intval($_GET['aluno_id']) : 0;
 $filtro_aluno_nome = '';
 
+// ========== FILTRO POR STATUS (vindo do dashboard) ==========
+$filtro_status = isset($_GET['filtro']) ? trim($_GET['filtro']) : 'todos';
+$filtros_validos_status = ['todos', 'atrasado', 'hoje', 'emprestado'];
+if (!in_array($filtro_status, $filtros_validos_status, true)) {
+    $filtro_status = 'todos';
+}
+
 // ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
 if (isset($conn)) {
@@ -97,11 +104,11 @@ foreach ($pendencias as &$p) {
     }
 
     if ($p['status'] === 'atrasado') {
-        $p['dias_restantes'] = $dias_diff; // negativo
+        $p['dias_restantes'] = $dias_diff;
         $p['dias_atraso'] = abs($dias_diff);
         $total_atrasados++;
     } else {
-        $p['dias_restantes'] = $dias_diff; // positivo ou 0
+        $p['dias_restantes'] = $dias_diff;
         $p['dias_atraso'] = 0;
         $total_no_prazo++;
         if ($dias_diff === 0) $total_vence_hoje++;
@@ -128,7 +135,7 @@ if ($db) {
 }
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-// Nome do aluno filtrado: busca no banco (o PHP já decodifica o $_GET, não usar urldecode de novo)
+// Nome do aluno filtrado
 if ($filtro_aluno_id > 0) {
     foreach ($alunos as $a) {
         if ((int)$a['id_aluno'] === $filtro_aluno_id) { $filtro_aluno_nome = $a['nome_aluno']; break; }
@@ -147,6 +154,15 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendências — SiGA ITJ Admin</title>
+
+        <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -251,19 +267,19 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <!-- FILTROS -->
             <div class="filtros-container">
                 <div class="filtros-tabs" id="filtros-tabs" role="tablist" aria-label="Filtrar por situação">
-                    <button class="filtro-tab active" data-status="todos" role="tab" aria-selected="true">
+                    <button class="filtro-tab <?= $filtro_status === 'todos' ? 'active' : '' ?>" data-status="todos" role="tab" aria-selected="<?= $filtro_status === 'todos' ? 'true' : 'false' ?>">
                         <i class="fas fa-list"></i> Todos
                         <span class="tab-badge" id="badge-todos"><?= $total_geral ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="atrasado" role="tab" aria-selected="false">
+                    <button class="filtro-tab <?= $filtro_status === 'atrasado' ? 'active' : '' ?>" data-status="atrasado" role="tab" aria-selected="<?= $filtro_status === 'atrasado' ? 'true' : 'false' ?>">
                         <i class="fas fa-exclamation-triangle"></i> Atrasados
                         <span class="tab-badge atrasado" id="badge-atrasado"><?= $total_atrasados ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="hoje" role="tab" aria-selected="false">
+                    <button class="filtro-tab <?= $filtro_status === 'hoje' ? 'active' : '' ?>" data-status="hoje" role="tab" aria-selected="<?= $filtro_status === 'hoje' ? 'true' : 'false' ?>">
                         <i class="fas fa-hourglass-half"></i> Vence hoje
                         <span class="tab-badge hoje" id="badge-hoje"><?= $total_vence_hoje ?></span>
                     </button>
-                    <button class="filtro-tab" data-status="emprestado" role="tab" aria-selected="false">
+                    <button class="filtro-tab <?= $filtro_status === 'emprestado' ? 'active' : '' ?>" data-status="emprestado" role="tab" aria-selected="<?= $filtro_status === 'emprestado' ? 'true' : 'false' ?>">
                         <i class="fas fa-clock"></i> No Prazo
                         <span class="tab-badge emprestado" id="badge-emprestado"><?= $total_no_prazo ?></span>
                     </button>
@@ -385,6 +401,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     const msgSucesso       = <?= json_encode($msg_sucesso, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     const msgErro          = <?= json_encode($msg_erro, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    window.filtroInicialPendencias = <?= json_encode($filtro_status) ?>;
 </script>
 
 </body>

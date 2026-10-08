@@ -211,11 +211,21 @@ $total_atrasados = $total_atrasados ?? 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extrato de Reservas – SiGA ITJ</title>
+       <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
     <link rel="stylesheet" href="../assets/css/extrato_adm.css?v=<?= time() ?>">
     <script src="../assets/js/extrato_adm.js?v=<?= time() ?>" defer></script>
+</head>
 </head>
 <body>
         <aside class="sidebar" id="sidebar" aria-label="Menu principal">

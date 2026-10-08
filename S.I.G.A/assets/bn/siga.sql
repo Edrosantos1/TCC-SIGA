@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Tempo de geração: 30/09/2026 às 17:41
+-- Host: localhost
+-- Tempo de geração: 08/10/2026 às 16:26
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -154,7 +154,7 @@ CREATE TABLE `configuracoes` (
 --
 
 INSERT INTO `configuracoes` (`id`, `chave`, `valor`, `descricao`, `atualizado_em`) VALUES
-(1, 'ultimo_arquivamento', '2026-09-02', 'Data do último arquivamento mensal de reservas', '2026-09-02 14:09:01');
+(1, 'ultimo_arquivamento', '2026-10-08', 'Data do último arquivamento mensal de reservas', '2026-10-08 12:51:19');
 
 -- --------------------------------------------------------
 
@@ -212,7 +212,53 @@ INSERT INTO `emprestimos` (`id_emprestimo`, `id_aluno`, `id_catalogo`, `titulo_i
 (5, 2, 47, 'A poética do recorte', '2026-09-30 10:34:46', '2026-10-09', 'devolvido', 0, NULL),
 (6, 1, 47, 'A poética do recorte', '2026-09-30 12:32:29', '2026-10-09', 'devolvido', 0, NULL),
 (7, 1, 54, 'A primeira aula', '2026-09-30 12:34:10', '2026-10-09', 'devolvido', 0, NULL),
-(8, 1, 115, 'A Escrita da Cidade', '2026-09-30 12:35:13', '2026-10-09', 'emprestado', 0, NULL);
+(8, 1, 115, 'A Escrita da Cidade', '2026-09-30 12:35:13', '2026-10-09', 'emprestado', 0, NULL),
+(9, 100, 132, 'História da Literatura Brasileira', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(10, 100, 134, 'Senhora', '2026-10-06 10:09:34', '2026-10-13', 'emprestado', 0, NULL),
+(11, 101, 135, 'Insônia', '2026-09-23 10:09:34', '2026-09-30', 'atrasado', 0, NULL),
+(12, 102, 136, 'Presença da literatura brasileira', '2026-09-26 10:09:34', '2026-10-03', 'atrasado', 0, NULL),
+(13, 103, 137, 'Breves estudos de literatura brasileira', '2026-08-29 10:09:34', '2026-09-05', 'devolvido', 0, NULL),
+(14, 104, 138, 'Representação literária do indígena', '2026-10-07 10:09:34', '2026-10-14', 'emprestado', 0, NULL),
+(15, 104, 139, 'Estudos de literatura brasileira', '2026-10-04 10:09:34', '2026-10-11', 'emprestado', 0, NULL),
+(16, 105, 140, 'O negro na literatura brasileira', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(17, 106, 141, 'The Cambridge History', '2026-09-18 10:09:34', '2026-09-25', 'atrasado', 0, NULL),
+(18, 107, 142, 'Tempos da literatura brasileira', '2026-09-13 10:09:34', '2026-09-20', 'atrasado', 0, NULL),
+(19, 107, 143, 'Literatura brasileira contemporânea', '2026-08-19 10:09:34', '2026-08-26', 'devolvido', 0, NULL),
+(20, 108, 144, 'O romance histórico', '2026-10-06 10:09:34', '2026-10-13', 'emprestado', 0, NULL),
+(21, 109, 145, 'Brasil Na América Latina', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(22, 110, 146, 'Catalog of the Latin American', '2026-10-07 10:09:34', '2026-10-14', 'emprestado', 0, NULL),
+(23, 111, 147, 'Estudos de cultura e literatura', '2026-09-20 10:09:34', '2026-09-27', 'atrasado', 0, NULL),
+(24, 111, 148, 'Origens da literatura brasileira', '2026-09-28 10:09:34', '2026-10-05', 'atrasado', 0, NULL),
+(25, 110, 149, 'Literatura brasileira ...', '2026-08-09 10:09:34', '2026-08-16', 'devolvido', 0, NULL),
+(26, 112, 150, 'Bending the Rules', '2026-10-06 10:09:34', '2026-10-13', 'emprestado', 0, NULL),
+(27, 113, 151, 'Revista da Academia Brasileira', '2026-10-04 10:09:34', '2026-10-11', 'emprestado', 0, NULL),
+(28, 114, 152, 'Antologia escolar', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(29, 115, 153, 'Brazilian Literature', '2026-09-16 10:09:34', '2026-09-23', 'atrasado', 0, NULL),
+(30, 115, 154, 'História da Literatura - Vol III', '2026-09-24 10:09:34', '2026-10-01', 'atrasado', 0, NULL),
+(31, 113, 155, 'Escritos de literatura brasileira', '2026-08-24 10:09:34', '2026-08-31', 'devolvido', 0, NULL),
+(32, 116, 156, 'Catalog', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(33, 117, 157, 'Por uma história da literatura', '2026-10-06 10:09:34', '2026-10-13', 'emprestado', 0, NULL),
+(34, 118, 158, 'Dictionary Catalog', '2026-10-07 10:09:34', '2026-10-14', 'emprestado', 0, NULL),
+(35, 119, 159, 'Listening to the People\'s Voice', '2026-10-04 10:09:34', '2026-10-11', 'emprestado', 0, NULL),
+(36, 120, 160, 'Brazil', '2026-09-22 10:09:34', '2026-09-29', 'atrasado', 0, NULL),
+(37, 120, 161, 'Vultos e livros', '2026-09-08 10:09:34', '2026-09-15', 'atrasado', 0, NULL),
+(38, 116, 162, 'A Current Bibliography', '2026-08-14 10:09:34', '2026-08-21', 'devolvido', 0, NULL),
+(39, 121, 163, 'MLA International Bibliography', '2026-10-06 10:09:34', '2026-10-13', 'emprestado', 0, NULL),
+(40, 122, 164, 'Monographic Series', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(41, 123, 165, 'Cassell\'s Encyclopædia', '2026-10-07 10:09:34', '2026-10-14', 'emprestado', 0, NULL),
+(42, 124, 166, 'Veja', '2026-10-04 10:09:34', '2026-10-11', 'emprestado', 0, NULL),
+(43, 125, 167, 'Pequena historia da literatura', '2026-09-19 10:09:34', '2026-09-26', 'atrasado', 0, NULL),
+(44, 125, 168, 'Charts of Brazilian Literature', '2026-09-27 10:09:34', '2026-10-04', 'atrasado', 0, NULL),
+(45, 124, 169, 'Luso-Braz. Rev', '2026-07-30 10:09:34', '2026-08-06', 'devolvido', 0, NULL),
+(46, 126, 170, 'Science & Society', '2026-10-06 10:09:34', '2026-10-13', 'emprestado', 0, NULL),
+(47, 126, 171, 'Library of Congress Catalogs', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(48, 127, 172, 'Cassell\'s Encyclopædia of World Lit', '2026-10-07 10:09:34', '2026-10-14', 'emprestado', 0, NULL),
+(49, 128, 173, 'Tornar-se outro', '2026-10-04 10:09:34', '2026-10-11', 'emprestado', 0, NULL),
+(50, 129, 174, 'Ariano Suassuna\'s A Pedra Do Reino', '2026-10-05 10:09:34', '2026-10-12', 'emprestado', 0, NULL),
+(51, 130, 175, 'Subject Index of Modern Works', '2026-09-17 10:09:34', '2026-09-24', 'atrasado', 0, NULL),
+(52, 131, 176, 'História da literatura brasileira', '2026-09-25 10:09:34', '2026-10-02', 'atrasado', 0, NULL),
+(53, 129, 177, 'Sobre os ombros de gigantes', '2026-08-04 10:09:34', '2026-08-11', 'devolvido', 0, NULL),
+(54, 104, 180, 'Obras completas de Castro Alves', '2026-10-08 11:21:23', '2026-10-19', 'emprestado', 0, NULL);
 
 --
 -- Acionadores `emprestimos`
@@ -277,7 +323,21 @@ INSERT INTO `extrato_reservas` (`id_extrato`, `id_reserva_original`, `id_aluno`,
 (11, 11, 1, 59, 'A Ficção da Página: Seleção de Ensaios sobre a Literatura Brasileira', NULL, '2026-09-02 09:42:25', '2026-09-09', '', '2026-09-02 14:09:00', '2026-09'),
 (12, 12, 1, 59, 'A Ficção da Página: Seleção de Ensaios sobre a Literatura Brasileira', NULL, '2026-09-02 09:49:31', '2026-09-09', 'rejeitada', '2026-09-02 14:09:00', '2026-09'),
 (13, 13, 1, 115, 'A Escrita da Cidade', NULL, '2026-09-02 09:49:32', '2026-09-09', 'rejeitada', '2026-09-02 14:09:01', '2026-09'),
-(14, 14, 1, 102, 'A Maquina Performatica', NULL, '2026-09-02 09:49:33', '2026-09-09', 'retirada', '2026-09-02 14:09:01', '2026-09');
+(14, 14, 1, 102, 'A Maquina Performatica', NULL, '2026-09-02 09:49:33', '2026-09-09', 'retirada', '2026-09-02 14:09:01', '2026-09'),
+(15, 15, 2, 70, 'A Academia brasileira de letras', 'livro', '2026-09-28 08:10:14', '2026-10-05', 'aprovada', '2026-10-08 12:51:19', '2026-10'),
+(16, 16, 2, 115, 'A Escrita da Cidade', 'livro', '2026-09-28 08:10:16', '2026-10-05', 'aprovada', '2026-10-08 12:51:19', '2026-10'),
+(17, 17, 2, 59, 'A Ficção da Página: Seleção de Ensaios sobre a Literatura Brasileira', 'livro', '2026-09-28 08:12:10', '2026-10-05', 'retirada', '2026-10-08 12:51:19', '2026-10'),
+(18, 18, 2, 2, 'A Literatura brasileira', 'livro', '2026-09-28 08:12:11', '2026-10-05', 'rejeitada', '2026-10-08 12:51:19', '2026-10'),
+(19, 19, 2, 102, 'A Maquina Performatica', 'livro', '2026-09-28 08:12:15', '2026-10-05', 'rejeitada', '2026-10-08 12:51:19', '2026-10'),
+(20, 20, 2, 65, 'A nova literatura', 'livro', '2026-09-28 08:12:16', '2026-10-05', 'rejeitada', '2026-10-08 12:51:19', '2026-10'),
+(21, 21, 2, 47, 'A poética do recorte', 'livro', '2026-09-28 08:12:22', '2026-10-05', 'retirada', '2026-10-08 12:51:19', '2026-10'),
+(22, 22, 2, 54, 'A primeira aula', 'livro', '2026-09-28 08:12:23', '2026-10-05', 'retirada', '2026-10-08 12:51:19', '2026-10'),
+(23, 23, 1, 70, 'A Academia brasileira de letras', 'livro', '2026-09-30 12:30:22', '2026-10-07', 'cancelada', '2026-10-08 12:51:19', '2026-10'),
+(24, 24, 1, 115, 'A Escrita da Cidade', 'livro', '2026-09-30 12:30:23', '2026-10-07', 'retirada', '2026-10-08 12:51:19', '2026-10'),
+(25, 25, 1, 2, 'A Literatura brasileira', 'livro', '2026-09-30 12:30:25', '2026-10-07', 'rejeitada', '2026-10-08 12:51:19', '2026-10'),
+(26, 26, 1, 65, 'A nova literatura', 'livro', '2026-09-30 12:30:28', '2026-10-07', 'rejeitada', '2026-10-08 12:51:19', '2026-10'),
+(27, 27, 1, 47, 'A poética do recorte', 'livro', '2026-09-30 12:30:29', '2026-10-07', 'retirada', '2026-10-08 12:51:19', '2026-10'),
+(28, 28, 1, 54, 'A primeira aula', 'livro', '2026-09-30 12:30:30', '2026-10-07', 'retirada', '2026-10-08 12:51:19', '2026-10');
 
 -- --------------------------------------------------------
 
@@ -349,7 +409,39 @@ CREATE TABLE `login_aluno` (
 
 INSERT INTO `login_aluno` (`id_aluno`, `nome_aluno`, `serie_aluno`, `email_aluno`, `senha_aluno`, `relembrar_token`, `token_expiracao`) VALUES
 (1, 'Ricardo Menezes Lourenco Araujo', '3º ano', 'ricardomenezeslourencoaraujo@aluno.itj.g12.br', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
-(2, 'Pedro Santos Schweitzer', '3º ano', 'pedrosantosschweitzer@aluno.itj.g12.br', '$2y$10$adz.RRTbCqz4X89grJfIOODYeofcbUwoCghUnjBdJLOkVk16alDeC', '14bd0f0393c5bb4a153acc1b6f309a3487ca490b78af652e67d63b89db53347e', '2026-10-28 13:17:20');
+(2, 'Pedro Santos Schweitzer', '3º ano', 'pedrosantosschweitzer@aluno.itj.g12.br', '$2y$10$adz.RRTbCqz4X89grJfIOODYeofcbUwoCghUnjBdJLOkVk16alDeC', '14bd0f0393c5bb4a153acc1b6f309a3487ca490b78af652e67d63b89db53347e', '2026-10-28 13:17:20'),
+(100, 'Ana Beatriz Silva', '6º ano', 'ana.beatriz@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(101, 'Bruno Carvalho', '6º ano', 'bruno.carvalho@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(102, 'Camila Rocha', '6º ano', 'camila.rocha@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(103, 'Daniel Pereira', '6º ano', 'daniel.pereira@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(104, 'Eduarda Lima', '7º ano', 'eduarda.lima@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(105, 'Felipe Santana', '7º ano', 'felipe.santana@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(106, 'Gabriela Costa', '7º ano', 'gabriela.costa@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(107, 'Henrique Alves', '7º ano', 'henrique.alves@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(108, 'Isabela Martins', '8º ano', 'isabela.martins@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(109, 'João Pedro Souza', '8º ano', 'joaopedro.souza@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(110, 'Larissa Ribeiro', '8º ano', 'larissa.ribeiro@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(111, 'Mateus Fernandes', '8º ano', 'mateus.fernandes@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(112, 'Natália Barbosa', '9º ano', 'natalia.barbosa@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(113, 'Otávio Nunes', '9º ano', 'otavio.nunes@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(114, 'Paula Cardoso', '9º ano', 'paula.cardoso@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(115, 'Rafael Moreira', '9º ano', 'rafael.moreira@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(116, 'Sabrina Correia', '1º ano', 'sabrina.correia@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(117, 'Thiago Moraes', '1º ano', 'thiago.moraes@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(118, 'Vanessa Pinto', '1º ano', 'vanessa.pinto@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(119, 'Wesley Teixeira', '1º ano', 'wesley.teixeira@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(120, 'Yasmin Duarte', '1º ano', 'yasmin.duarte@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(121, 'Alice Monteiro', '2º ano', 'alice.monteiro@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(122, 'Bernardo Farias', '2º ano', 'bernardo.farias@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(123, 'Carolina Lopes', '2º ano', 'carolina.lopes@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(124, 'Davi Machado', '2º ano', 'davi.machado@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(125, 'Elisa Castro', '2º ano', 'elisa.castro@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(126, 'Fernando Ramos', '3º ano', 'fernando.ramos@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(127, 'Giovanna Vieira', '3º ano', 'giovanna.vieira@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(128, 'Hugo Sales', '3º ano', 'hugo.sales@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(129, 'Ingrid Pacheco', '3º ano', 'ingrid.pacheco@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(130, 'Júlia Andrade', '3º ano', 'julia.andrade@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL),
+(131, 'Kevin Barros', '3º ano', 'kevin.barros@teste.siga', '$2y$10$dbfCtmqVlNHP7zhDG9hgo.ky941p5A1THXkH5OSL02Q905qwivSAe', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -389,20 +481,27 @@ CREATE TABLE `reservas` (
 --
 
 INSERT INTO `reservas` (`id_reserva`, `id_aluno`, `id_catalogo`, `titulo_item`, `data_reserva`, `data_limite`, `status`) VALUES
-(15, 2, 70, 'A Academia brasileira de letras', '2026-09-28 08:10:14', '2026-10-05', 'aprovada'),
-(16, 2, 115, 'A Escrita da Cidade', '2026-09-28 08:10:16', '2026-10-05', 'aprovada'),
-(17, 2, 59, 'A Ficção da Página: Seleção de Ensaios sobre a Literatura Brasileira', '2026-09-28 08:12:10', '2026-10-05', 'retirada'),
-(18, 2, 2, 'A Literatura brasileira', '2026-09-28 08:12:11', '2026-10-05', 'rejeitada'),
-(19, 2, 102, 'A Maquina Performatica', '2026-09-28 08:12:15', '2026-10-05', 'rejeitada'),
-(20, 2, 65, 'A nova literatura', '2026-09-28 08:12:16', '2026-10-05', 'rejeitada'),
-(21, 2, 47, 'A poética do recorte', '2026-09-28 08:12:22', '2026-10-05', 'retirada'),
-(22, 2, 54, 'A primeira aula', '2026-09-28 08:12:23', '2026-10-05', 'retirada'),
-(23, 1, 70, 'A Academia brasileira de letras', '2026-09-30 12:30:22', '2026-10-07', 'cancelada'),
-(24, 1, 115, 'A Escrita da Cidade', '2026-09-30 12:30:23', '2026-10-07', 'retirada'),
-(25, 1, 2, 'A Literatura brasileira', '2026-09-30 12:30:25', '2026-10-07', 'rejeitada'),
-(26, 1, 65, 'A nova literatura', '2026-09-30 12:30:28', '2026-10-07', 'rejeitada'),
-(27, 1, 47, 'A poética do recorte', '2026-09-30 12:30:29', '2026-10-07', 'retirada'),
-(28, 1, 54, 'A primeira aula', '2026-09-30 12:30:30', '2026-10-07', 'retirada');
+(29, 100, 178, 'Catalog of the Oliveira Lima Library', '2026-10-07 10:09:34', '2026-10-14', 'aprovada'),
+(30, 102, 179, 'Brazilian Art', '2026-10-06 10:09:34', '2026-10-13', 'pendente'),
+(31, 104, 180, 'Obras completas de Castro Alves', '2026-10-07 10:09:34', '2026-10-14', 'retirada'),
+(32, 108, 181, 'Poetas brasileros', '2026-10-05 10:09:34', '2026-10-12', 'pendente'),
+(33, 112, 182, 'Recent Brazilian Acquisitions', '2026-10-07 10:09:34', '2026-10-14', 'rejeitada'),
+(34, 116, 183, 'Introdução à literatura brasileira', '2026-10-06 10:09:34', '2026-10-13', 'pendente'),
+(35, 121, 184, 'The Hispanic American Historical Review', '2026-10-07 10:09:34', '2026-10-14', 'pendente'),
+(36, 126, 185, 'The National Union Catalog', '2026-10-06 10:09:34', '2026-10-13', 'pendente'),
+(37, 101, 186, 'Cassell\'s Encyclopaedia of Literature', '2026-10-03 10:09:34', '2026-10-10', 'aprovada'),
+(38, 105, 187, 'Brasil', '2026-10-04 10:09:34', '2026-10-11', 'aprovada'),
+(39, 109, 188, 'Dictionary Catalog of the Jesse', '2026-10-02 10:09:34', '2026-10-09', 'aprovada'),
+(40, 117, 189, 'Literatura Brasileira em Foco IX', '2026-10-03 10:09:34', '2026-10-10', 'aprovada'),
+(41, 127, 190, 'Duas dezenas de imortais', '2026-10-05 10:09:34', '2026-10-12', 'aprovada'),
+(42, 103, 191, 'Escritores são humanos', '2026-09-18 10:09:34', '2026-09-25', 'retirada'),
+(43, 113, 192, 'Espaços possíveis na literatura', '2026-09-16 10:09:34', '2026-09-23', 'retirada'),
+(44, 122, 193, 'Biographical Dictionaries', '2026-09-20 10:09:34', '2026-09-27', 'retirada'),
+(45, 128, 194, 'Literatura brasileira no exterior', '2026-09-13 10:09:34', '2026-09-20', 'retirada'),
+(46, 106, 195, 'Diálogos com a literatura brasileira', '2026-09-23 10:09:34', '2026-09-30', 'rejeitada'),
+(47, 118, 196, 'Subject Catalog', '2026-09-26 10:09:34', '2026-10-03', 'rejeitada'),
+(48, 110, 197, 'Literary Cultures of Latin America', '2026-09-28 10:09:34', '2026-10-05', 'cancelada'),
+(49, 130, 198, 'G.K. Hall Bibliographic Guide', '2026-09-08 10:09:34', '2026-09-15', 'expirada');
 
 --
 -- Acionadores `reservas`
@@ -521,13 +620,13 @@ ALTER TABLE `configuracoes_aluno`
 -- AUTO_INCREMENT de tabela `emprestimos`
 --
 ALTER TABLE `emprestimos`
-  MODIFY `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT de tabela `extrato_reservas`
 --
 ALTER TABLE `extrato_reservas`
-  MODIFY `id_extrato` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id_extrato` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT de tabela `favoritos`
@@ -545,7 +644,7 @@ ALTER TABLE `login_admin`
 -- AUTO_INCREMENT de tabela `login_aluno`
 --
 ALTER TABLE `login_aluno`
-  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- AUTO_INCREMENT de tabela `notificacoes`
@@ -557,7 +656,7 @@ ALTER TABLE `notificacoes`
 -- AUTO_INCREMENT de tabela `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- Restrições para tabelas despejadas

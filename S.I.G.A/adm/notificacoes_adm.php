@@ -121,26 +121,27 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notificações — SiGA ITJ Admin</title>
 
+    <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboard_adm.css?v=<?= time() ?>">
     <link rel="stylesheet" href="../assets/css/notificacoes_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/ui_alerts.css?v=<?= time() ?>">
 
     <script>
         const alunosData = <?= $alunos_json ?>;
         const notificacoesData = <?= json_encode($notificacoes_sininho) ?>;
     </script>
+    <script src="../assets/js/ui_alerts.js?v=<?= time() ?>"></script>
     <script src="../assets/js/notificacoes_adm.js?v=<?= time() ?>" defer></script>
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css?v=<?= time() ?>">
-<link rel="stylesheet" href="../assets/css/notificacoes_adm.css?v=<?= time() ?>">
-<link rel="stylesheet" href="../assets/css/ui_alerts.css?v=<?= time() ?>">   <!-- NOVO -->
-
-<script>
-    const alunosData = <?= $alunos_json ?>;
-    const notificacoesData = <?= json_encode($notificacoes_sininho) ?>;
-</script>
-<script src="../assets/js/ui_alerts.js?v=<?= time() ?>"></script>            <!-- NOVO: ANTES dos outros -->
-<script src="../assets/js/notificacoes_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="<?= $config_classes ?>">
 
@@ -213,13 +214,12 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
         <main class="dashboard-main">
 
-            <!-- ========== WELCOME ========== -->
-            <div class="welcome-section">
-                <div class="welcome-text">
-                    <h1><i class="fas fa-bullhorn"></i> Central de <span>Notificações</span></h1>
-                    <p>Envie avisos e comunicados para os alunos da biblioteca</p>
+            <!-- ========== CABEÇALHO DA PÁGINA (padrão das outras páginas) ========== -->
+            <div class="page-header">
+                <div>
+                    <h1><i class="fas fa-bullhorn"></i> Central de Notificações</h1>
+                    <p class="page-subtitle">Envie avisos e comunicados para os alunos da biblioteca</p>
                 </div>
-                <div class="welcome-date" id="welcome-date"></div>
             </div>
 
             <!-- ========== COMPOSIÇÃO ========== -->

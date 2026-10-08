@@ -722,3 +722,62 @@ body.cat-modal-aberto { overflow: hidden; }
     pointer-events: auto !important;
     z-index: 99999 !important;
 }
+/* =============================================
+   ESPAÇADOR DO HEADER (substitui a barra de busca)
+   ============================================= */
+.cat-header-spacer {
+    flex: 1;
+    max-width: 520px;
+    margin: 0 32px;
+    height: 1px;
+}
+
+/* =============================================
+   PAGE-ACTIONS — botões do cabeçalho (mesmo padrão das outras páginas)
+   ============================================= */
+.dashboard-main .page-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.dashboard-main .page-actions form { margin: 0; }
+
+/* =============================================
+   CATÁLOGO — Cabeçalho (idêntico ao de pendências)
+   ============================================= */
+.dashboard-main .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.dashboard-main .page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0b4b9b;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: -0.02em;
+}
+.dashboard-main .page-header h1 i {
+    color: #e67e22;
+}
+.dashboard-main .page-subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* Tema escuro */
+body.tema-escuro .dashboard-main .page-header h1 { color: #ffffff; }
+body.tema-escuro .dashboard-main .page-header h1 i { color: #7ec8e3; }
+body.tema-escuro .dashboard-main .page-subtitle { color: #b0c0d0; }
+
+/* Alto contraste */
+body.tema-alto_contraste .dashboard-main .page-header h1 { color: #ffffff; }
+body.tema-alto_contraste .dashboard-main .page-subtitle { color: #cccccc; }

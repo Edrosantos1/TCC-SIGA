@@ -1,6 +1,6 @@
 // ========== ESTADO GLOBAL ==========
 let pendencias = [];
-let filtroAtual = 'todos';
+let filtroAtual = (typeof window.filtroInicialPendencias !== 'undefined' && window.filtroInicialPendencias) ? window.filtroInicialPendencias : 'todos';
 let buscaAtual = '';
 let ordemAtual = 'recente';
 let notificacoes = [];
@@ -15,12 +15,10 @@ function escapeHtml(text) {
     return String(text).replace(/[&<>"']/g, c => HTML_ESC[c]);
 }
 
-// minúsculas + sem acento
 function normalizar(texto) {
     return String(texto ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
-// Devolve o texto já escapado, com os termos buscados dentro de <mark>
 function destacar(texto, termos) {
     const original = String(texto ?? '');
     if (!termos.length) return escapeHtml(original);
@@ -78,7 +76,6 @@ function formatarDataRelativa(data) {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Retorna { texto, classe } para o rótulo auxiliar da data
 function rotuloDias(p) {
     if (p.status === 'atrasado') {
         const d = p.dias_atraso || 0;
@@ -93,7 +90,7 @@ function rotuloDias(p) {
 
 const venceHoje = p => p.status !== 'atrasado' && p.dias_restantes === 0;
 
-// ========== NOTIFICAÇÕES (SININHO) ==========
+// ========== NOTIFICAÇÕES ==========
 function renderizarDropdownNotificacoes() {
     const lista = document.getElementById('notification-list-dropdown');
     if (!lista) return;
@@ -136,7 +133,7 @@ function renderizarDropdownNotificacoes() {
     }).join('');
 }
 
-// ========== RENDERIZAÇÃO PRINCIPAL ==========
+// ========== FILTRAR / ORDENAR ==========
 function filtrarEOrdenar() {
     let lista = [...pendencias];
 
@@ -169,6 +166,7 @@ function filtrarEOrdenar() {
     return { lista, termos };
 }
 
+// ========== RENDERIZAÇÃO ==========
 function renderizarPendencias() {
     const tbody = document.getElementById('pendencias-tbody');
     const tableWrapper = document.getElementById('table-wrapper');
@@ -297,7 +295,7 @@ function mostrarEmptyState() {
     emptyState.style.display = 'block';
 }
 
-// ========== MODAL DE DEVOLUÇÃO ==========
+// ========== MODAL DEVOLUÇÃO ==========
 function abrirModalDevolucao(item) {
     const overlay = document.getElementById('modal-devolucao');
     if (!overlay) return;
@@ -324,7 +322,7 @@ function abrirModalDevolucao(item) {
 
     overlay.hidden = false;
     document.body.classList.add('modal-aberto');
-    document.getElementById('modal-cancelar').focus(); // foco no "Cancelar": ação destrutiva não é o padrão
+    document.getElementById('modal-cancelar').focus();
 }
 
 function fecharModalDevolucao() {
@@ -393,7 +391,7 @@ function initModalDevolucao() {
     });
 }
 
-// ========== BADGES / CONTADORES ==========
+// ========== BADGES ==========
 function atualizarBadges() {
     const total = pendencias.length;
     const atrasados = pendencias.filter(p => p.status === 'atrasado').length;
@@ -420,7 +418,7 @@ function atualizarBadges() {
     if (navBadge) navBadge.style.display = atrasados > 0 ? '' : 'none';
 }
 
-// ========== FILTROS / BUSCA ==========
+// ========== FILTROS ==========
 function definirFiltro(status) {
     filtroAtual = status;
     document.querySelectorAll('.filtro-tab').forEach(t => {
@@ -544,17 +542,20 @@ function initSidebar() {
     const collapseBtn = document.getElementById('collapseBtn');
     if (!sidebar || !collapseBtn) return;
 
+    if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+
+    // Remove a flag anti-FOUC — a partir daqui o JS controla (com animação)
+    document.documentElement.classList.remove('sidebar-collapsed-init');
+
     collapseBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         localStorage.setItem('adm_sidebarCollapsed', sidebar.classList.contains('collapsed'));
     });
-
-    if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
-        sidebar.classList.add('collapsed');
-    }
 }
 
-// ========== PROFILE DROPDOWN ==========
+// ========== PROFILE ==========
 function initProfileDropdown() {
     const btn = document.getElementById('admin-profile-btn');
     const dropdown = document.getElementById('profile-dropdown');
@@ -641,6 +642,13 @@ document.addEventListener('DOMContentLoaded', function () {
     initFiltros();
     initOrdenacao();
     initModalDevolucao();
+
+    // Aplica estado visual das abas já no carregamento
+    document.querySelectorAll('.filtro-tab').forEach(t => {
+        const ativo = t.dataset.status === filtroAtual;
+        t.classList.toggle('active', ativo);
+        t.setAttribute('aria-selected', ativo ? 'true' : 'false');
+    });
 
     renderizarPendencias();
     renderizarDropdownNotificacoes();

@@ -1,6 +1,6 @@
 // ========== ESTADO GLOBAL ==========
 let reservas = [];
-let filtroAtual = 'todos';
+let filtroAtual = (typeof window.filtroInicialReservas !== 'undefined' && window.filtroInicialReservas) ? window.filtroInicialReservas : 'todos';
 let buscaAtual = '';
 let ordemAtual = 'recente';
 let notificacoes = [];
@@ -17,12 +17,10 @@ function escapeHtml(text) {
     return String(text).replace(/[&<>"']/g, c => HTML_ESC[c]);
 }
 
-// minúsculas + sem acento
 function normalizar(texto) {
     return String(texto ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
-// Devolve o texto já escapado, com os termos buscados dentro de <mark>
 function destacar(texto, termos) {
     const original = String(texto ?? '');
     if (!termos.length) return escapeHtml(original);
@@ -80,7 +78,6 @@ function formatarDataRelativa(data) {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Mantido por compatibilidade com outros scripts da página
 function formatarData(data) {
     return formatarDataRelativa(data);
 }
@@ -90,7 +87,6 @@ function capitalizar(texto) {
     return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
-// Dias entre hoje e a data limite (negativo = já passou). Compara só o dia, sem fuso.
 function diasAteLimite(dataStr) {
     if (!dataStr) return null;
     const [a, m, d] = String(dataStr).split(' ')[0].split('-').map(Number);
@@ -101,7 +97,6 @@ function diasAteLimite(dataStr) {
     return Math.round((limite - hoje) / 86400000);
 }
 
-// Rótulo auxiliar da data limite (só para reservas ainda em aberto)
 function rotuloPrazo(r) {
     if (!STATUS_ATIVOS.includes(r.status)) return null;
     const d = diasAteLimite(r.data_limite);
@@ -116,7 +111,7 @@ function rotuloPrazo(r) {
     return { texto: `Em ${d} dias`, classe: 'aux-ok' };
 }
 
-// ========== NOTIFICAÇÕES (SININHO) ==========
+// ========== NOTIFICAÇÕES ==========
 function renderizarDropdownNotificacoes() {
     const lista = document.getElementById('notification-list-dropdown');
     if (!lista) return;
@@ -186,7 +181,7 @@ function filtrarEOrdenar() {
     return { lista, termos };
 }
 
-// ========== RENDERIZAÇÃO PRINCIPAL ==========
+// ========== RENDERIZAÇÃO ==========
 function renderizarReservas() {
     const tbody = document.getElementById('reservas-tbody');
     const tableWrapper = document.getElementById('table-wrapper');
@@ -338,7 +333,7 @@ function mostrarEmptyState() {
     emptyState.style.display = 'block';
 }
 
-// ========== BADGES / CONTADORES ==========
+// ========== BADGES ==========
 function atualizarBadges() {
     const conta = s => reservas.filter(r => r.status === s).length;
 
@@ -411,7 +406,6 @@ function initAcoesMassa() {
         });
     }
 
-    // Em vez do confirm() do navegador, abre o modal; o envio acontece ao confirmar
     if (form) {
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -443,7 +437,7 @@ function initAcoesMassa() {
     atualizarBotoesMassa();
 }
 
-// ========== MODAL DE CONFIRMAÇÃO ==========
+// ========== MODAL CONFIRMAÇÃO ==========
 const ACOES_MODAL = {
     aprovar: {
         icone: 'fa-check',
@@ -526,7 +520,7 @@ function abrirModalConfirmacao(cfg) {
 
     overlay.hidden = false;
     document.body.classList.add('modal-aberto');
-    document.getElementById('cfm-cancelar').focus(); // foco no "Cancelar": confirmar não é o padrão
+    document.getElementById('cfm-cancelar').focus();
 }
 
 function fecharModalConfirmacao() {
@@ -566,7 +560,6 @@ function confirmarAcaoModal() {
     const { acao, massa, itens } = acaoPendente;
 
     if (massa) {
-        // Envia o formulário de seleção em massa com a ação escolhida
         const form = document.getElementById('formReservasMassa');
         form.querySelectorAll('input[type="hidden"][name="acao"]').forEach(i => i.remove());
         const hidden = document.createElement('input');
@@ -586,7 +579,6 @@ function confirmarAcaoModal() {
     }
 }
 
-// Funções globais mantidas (mesmos nomes e parâmetros de antes)
 window.confirmarAprovacao = function (id) {
     const r = reservas.find(x => String(x.id) === String(id));
     if (r) abrirModalConfirmacao({ acao: 'aprovar', itens: [r], massa: false });
@@ -624,13 +616,12 @@ function initModalConfirmacao() {
         }
     });
 
-    // Voltar pelo histórico do navegador não deve deixar o modal travado em "Enviando"
     window.addEventListener('pageshow', (e) => {
         if (e.persisted) fecharModalConfirmacao();
     });
 }
 
-// ========== CLIQUES NOS BOTÕES DE AÇÃO INDIVIDUAL ==========
+// ========== AÇÕES INDIVIDUAIS ==========
 function initAcoesReserva() {
     const tbody = document.getElementById('reservas-tbody');
     if (!tbody) return;
@@ -647,7 +638,7 @@ function initAcoesReserva() {
     });
 }
 
-// ========== FILTROS / BUSCA ==========
+// ========== FILTROS ==========
 function definirFiltro(status) {
     filtroAtual = status;
     document.querySelectorAll('.filtro-tab').forEach(t => {
@@ -712,12 +703,10 @@ function initFiltros() {
     const btnLimparVazio = document.getElementById('empty-limpar');
     if (btnLimparVazio) btnLimparVazio.addEventListener('click', limparFiltros);
 
-    // Atalho no estado vazio: reaproveita o botão "Nova Reserva Manual" do cabeçalho
     const btnNovaVazio = document.getElementById('empty-nova');
     const btnNovaTopo = document.getElementById('btn-nova-reserva');
     if (btnNovaVazio && btnNovaTopo) btnNovaVazio.addEventListener('click', () => btnNovaTopo.click());
 
-    // "/" foca a busca
     document.addEventListener('keydown', (e) => {
         const modal = document.getElementById('modal-confirmacao');
         const digitando = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
@@ -768,7 +757,7 @@ function initOrdenacao() {
     });
 }
 
-// ========== AVISO DE ARQUIVAMENTO ==========
+// ========== AVISO ==========
 function initAviso() {
     const aviso = document.getElementById('avisoArquivamento');
     const fechar = document.getElementById('fechar-aviso');
@@ -781,17 +770,20 @@ function initSidebar() {
     const collapseBtn = document.getElementById('collapseBtn');
     if (!sidebar || !collapseBtn) return;
 
+    if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+
+    // Remove a flag anti-FOUC — a partir daqui o JS controla (com animação)
+    document.documentElement.classList.remove('sidebar-collapsed-init');
+
     collapseBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         localStorage.setItem('adm_sidebarCollapsed', sidebar.classList.contains('collapsed'));
     });
-
-    if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
-        sidebar.classList.add('collapsed');
-    }
 }
 
-// ========== PROFILE DROPDOWN ==========
+// ========== PROFILE ==========
 function initProfileDropdown() {
     const btn = document.getElementById('admin-profile-btn');
     const dropdown = document.getElementById('profile-dropdown');
@@ -881,6 +873,13 @@ document.addEventListener('DOMContentLoaded', function () {
     initModalConfirmacao();
     initAcoesReserva();
     initAcoesMassa();
+
+    // Aplica estado visual das abas já no carregamento
+    document.querySelectorAll('.filtro-tab').forEach(t => {
+        const ativo = t.dataset.status === filtroAtual;
+        t.classList.toggle('active', ativo);
+        t.setAttribute('aria-selected', ativo ? 'true' : 'false');
+    });
 
     renderizarReservas();
     renderizarDropdownNotificacoes();

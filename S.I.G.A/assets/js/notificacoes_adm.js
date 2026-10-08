@@ -94,14 +94,17 @@ function initSidebar() {
     const collapseBtn = document.getElementById('collapseBtn');
     if (!sidebar || !collapseBtn) return;
 
+    if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+
+    // Remove a flag anti-FOUC — a partir daqui o JS controla (com animação)
+    document.documentElement.classList.remove('sidebar-collapsed-init');
+
     collapseBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         localStorage.setItem('adm_sidebarCollapsed', sidebar.classList.contains('collapsed'));
     });
-
-    if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
-        sidebar.classList.add('collapsed');
-    }
 }
 
 // ========== PERFIL DROPDOWN ==========
