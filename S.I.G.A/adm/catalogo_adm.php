@@ -332,6 +332,26 @@ try {
     $notificacoes_sininho = [];
 }
 
+// ========== ALUNOS PARA A BUSCA GLOBAL ==========
+$alunos = [];
+try {
+    $alunos = db_all($db, "
+        SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
+               EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+        FROM login_aluno a
+        ORDER BY a.nome_aluno ASC
+    ");
+    foreach ($alunos as &$a) {
+        $a['tem_reservas'] = (bool)$a['tem_reservas'];
+        $a['tem_emprestimos'] = (bool)$a['tem_emprestimos'];
+    }
+    unset($a);
+} catch (Exception $ex) {
+    $alunos = [];
+}
+$alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
 $iconesTipo = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'];
 $nomesTipo = ['livro' => 'Livro', 'revista' => 'Revista', 'tcc' => 'TCC'];
 
@@ -350,8 +370,8 @@ $catalogoData = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo — SiGA ITJ</title>
-        <script>
-        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+
+    <script>
         try {
             if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
                 document.documentElement.classList.add('sidebar-collapsed-init');
@@ -363,7 +383,6 @@ $catalogoData = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="<?= e(asset_v('../assets/css/dashboard_adm.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_v('../assets/css/catalogo_adm.css')) ?>">
-</head>
 </head>
 <body class="<?= e($config_classes) ?>">
 
@@ -395,7 +414,13 @@ $catalogoData = [
 
         <!-- TOP HEADER -->
         <header class="top-header">
-            <div class="cat-header-spacer" aria-hidden="true"></div>
+            <!-- BUSCA DE ALUNO -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" placeholder="Pesquisar por aluno..." autocomplete="off">
+                <div class="search-results-dropdown" id="search-results" style="display:none;"></div>
+            </div>
+
             <div class="header-right">
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
@@ -411,7 +436,6 @@ $catalogoData = [
                     <div class="dropdown-divider"></div>
                     <a href="logout_adm.php" class="logout-link"><i class="fas fa-sign-out-alt"></i> Sair</a>
                 </div>
-                <!-- ========== SININHO ========== -->
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
@@ -673,6 +697,7 @@ $catalogoData = [
     <div class="cat-toast-stack" id="cat-toast-stack" aria-live="polite" aria-atomic="false"></div>
 
     <script>
+        const alunosData = <?= $alunos_json ?>;
         const notificacoesData = <?= json_encode($notificacoes_sininho, $jsFlags) ?>;
         const catalogoData = <?= json_encode($catalogoData, $jsFlags) ?>;
     </script>

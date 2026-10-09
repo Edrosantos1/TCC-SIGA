@@ -21,11 +21,17 @@ elseif (isset($pdo)) $db = $pdo;
 $periodo_filtro = isset($_GET['periodo']) ? $_GET['periodo'] : 'semana';
 $ordenacao_filtro = isset($_GET['ordenacao']) ? $_GET['ordenacao'] : 'mais_recente';
 
-// ========== BUSCAR ALUNOS ==========
+// ========== BUSCAR ALUNOS (com status para o dropdown de busca global) ==========
 $alunos = array();
 if ($db) {
     try {
-        $queryAlunos = "SELECT id_aluno, nome_aluno, serie_aluno AS turma FROM login_aluno ORDER BY nome_aluno ASC";
+        $queryAlunos = "
+            SELECT a.id_aluno, a.nome_aluno, a.serie_aluno, a.serie_aluno AS turma,
+                   EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
+                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+            FROM login_aluno a
+            ORDER BY a.nome_aluno ASC
+        ";
         $resultAlunos = $db->query($queryAlunos);
         if ($resultAlunos) {
             if (method_exists($resultAlunos, 'fetch_all')) {
@@ -36,11 +42,16 @@ if ($db) {
                 }
             }
         }
+        foreach ($alunos as &$a) {
+            $a['tem_reservas'] = (bool)$a['tem_reservas'];
+            $a['tem_emprestimos'] = (bool)$a['tem_emprestimos'];
+        }
+        unset($a);
     } catch (Exception $e) {
         $alunos = array();
     }
 }
-$alunos_json = json_encode($alunos);
+$alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // ========== NOTIFICAÇÕES DO SININHO ==========
 $notificacoes_sininho = array();
@@ -137,10 +148,12 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="stylesheet" href="../assets/css/ui_alerts.css?v=<?= time() ?>">
 
     <script>
-        const alunosData = <?= $alunos_json ?>;
+        window.alunosBuscaData = <?= $alunos_json ?>;
+        const alunosData = window.alunosBuscaData;
         const notificacoesData = <?= json_encode($notificacoes_sininho) ?>;
     </script>
     <script src="../assets/js/ui_alerts.js?v=<?= time() ?>"></script>
+    <script src="../assets/js/busca_aluno_global.js?v=<?= time() ?>" defer></script>
     <script src="../assets/js/notificacoes_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="<?= $config_classes ?>">
@@ -178,7 +191,14 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <div class="main-content">
 
         <header class="top-header">
-            <div class="header-right" style="width: 100%; justify-content: flex-end;">
+            <!-- BUSCA GLOBAL DE ALUNO -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" placeholder="Pesquisar por aluno..." autocomplete="off">
+                <div class="search-results-dropdown" id="search-results" style="display:none;"></div>
+            </div>
+
+            <div class="header-right">
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
                     <div class="admin-info">
@@ -214,7 +234,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
         <main class="dashboard-main">
 
-            <!-- ========== CABEÇALHO DA PÁGINA (padrão das outras páginas) ========== -->
+            <!-- ========== CABEÇALHO DA PÁGINA ========== -->
             <div class="page-header">
                 <div>
                     <h1><i class="fas fa-bullhorn"></i> Central de Notificações</h1>

@@ -1104,3 +1104,34 @@ body.tema-alto_contraste .modal-header { background: #000; border-bottom-color: 
 body.tema-alto_contraste .modal-info-row { border-bottom-color: #666; }
 body.tema-alto_contraste .modal-aviso { background: #000; border-color: #fff; color: #fff; }
 body.tema-alto_contraste .btn-cancelar { background: #000; color: #fff; border-color: #fff; }
+.filtros-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.filtro-tabela-wrapper {
+    flex: 1 1 240px;
+    min-width: 160px;
+    max-width: 340px;
+}
+
+.btn-ordenacao {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+#ordenacao-label {
+    white-space: nowrap;
+}
+
+@media (max-width: 1200px) {
+    .filtros-acoes {
+        flex-wrap: wrap;
+    }
+    .filtro-tabela-wrapper {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+}

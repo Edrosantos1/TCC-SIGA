@@ -122,12 +122,14 @@ function initSidebar() {
         }, 450);
     });
 }
+
 function renderDate() {
-    const el = document.getElementById('welcome-date');
+    const el = document.getElementById('welcome-date-value');
     if (!el) return;
     const now = new Date();
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    el.innerHTML = `${now.getDate()} de ${meses[now.getMonth()]}, ${now.getFullYear()}`;
+    const dia = String(now.getDate()).padStart(2, '0');
+    const mes = String(now.getMonth() + 1).padStart(2, '0');
+    el.textContent = `${dia}/${mes}/${now.getFullYear()}`;
 }
 
 function initProfileDropdown() {

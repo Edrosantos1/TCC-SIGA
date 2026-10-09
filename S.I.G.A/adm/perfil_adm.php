@@ -24,7 +24,7 @@ if (!$db) {
     exit;
 }
 
-// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO (APENAS 5 MAIS RECENTES) ==========
+// ========== BUSCAR NOTIFICAÇÕES PARA O SININHO ==========
 $notificacoes = array();
 if ($db) {
     try {
@@ -49,13 +49,48 @@ if ($db) {
         } elseif ($db instanceof PDO) {
             $stmt = $db->query($sql);
             $notificacoes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $notificacoes = [];
         }
     } catch (Exception $e) {
         $notificacoes = [];
     }
 }
+
+// ========== BUSCAR ALUNOS PARA A BUSCA GLOBAL ==========
+$alunos = array();
+if ($db) {
+    try {
+        $sqlAlunos = "
+            SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
+                   EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
+                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+            FROM login_aluno a
+            ORDER BY a.nome_aluno ASC
+        ";
+        if ($db instanceof mysqli) {
+            $res = $db->query($sqlAlunos);
+            if ($res) {
+                while ($row = $res->fetch_assoc()) {
+                    $row['tem_reservas'] = (bool)$row['tem_reservas'];
+                    $row['tem_emprestimos'] = (bool)$row['tem_emprestimos'];
+                    $alunos[] = $row;
+                }
+            }
+        } elseif ($db instanceof PDO) {
+            $stmt = $db->query($sqlAlunos);
+            if ($stmt) {
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($rows as $row) {
+                    $row['tem_reservas'] = (bool)$row['tem_reservas'];
+                    $row['tem_emprestimos'] = (bool)$row['tem_emprestimos'];
+                    $alunos[] = $row;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        $alunos = array();
+    }
+}
+$alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // ========== BUSCAR DADOS DO ADMIN ==========
 $admin = array();
@@ -115,7 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($nova_senha !== $confirmar_senha) {
             $_SESSION['msg_erro'] = 'As senhas não coincidem.';
         } else {
-            // Verificar senha atual
             $senha_hash = null;
             if ($db instanceof mysqli) {
                 $stmt = $db->prepare("SELECT senha_adm FROM login_admin WHERE id_adm = ?");
@@ -132,7 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $senha_hash = $row['senha_adm'];
             }
             
-            // Verificar senha atual (suporte para '123' e hash)
             $senha_correta = false;
             if (password_verify($senha_atual, $senha_hash)) {
                 $senha_correta = true;
@@ -172,6 +205,15 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil — SiGA ITJ Admin</title>
+
+    <script>
+        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+        try {
+            if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-collapsed-init');
+            }
+        } catch (e) {}
+    </script>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -228,7 +270,14 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
         <!-- ========== TOP HEADER ========== -->
         <header class="top-header">
-            <div class="header-right" style="width: 100%; justify-content: flex-end;">
+            <!-- BUSCA DE ALUNO (copiada do dashboard) -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" placeholder="Pesquisar por aluno..." autocomplete="off">
+                <div class="search-results-dropdown" id="search-results" style="display:none;"></div>
+            </div>
+
+            <div class="header-right">
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar">
                         <i class="fas fa-user-shield"></i>
@@ -285,21 +334,29 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         <!-- ========== MAIN ========== -->
         <main class="dashboard-main">
             <div class="perfil-container">
-                <div class="perfil-header">
-                    <div class="perfil-avatar">
-                        <div class="avatar-grande">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <div class="perfil-info">
-                            <h1><?= htmlspecialchars($admin['nome_adm'] ?? 'Administrador') ?></h1>
-                            <p><i class="fas fa-envelope"></i> <?= htmlspecialchars($admin['email_adm'] ?? '') ?></p>
-                        </div>
+
+                <!-- PAGE HEADER -->
+                <div class="page-header">
+                    <div>
+                        <h1><i class="fas fa-user-shield"></i> Meu Perfil</h1>
+                        <p class="page-subtitle">
+                            Gerencie suas informações pessoais e credenciais de acesso.
+                        </p>
                     </div>
-                    <div class="perfil-stats">
-                        <div class="stat-item">
-                            <span class="numero"><?= date('d/m/Y') ?></span>
-                            <span class="label">Data de hoje</span>
-                        </div>
+                </div>
+
+                <!-- CARTÃO DE RESUMO -->
+                <div class="perfil-resumo">
+                    <div class="perfil-avatar-grande">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="perfil-resumo-info">
+                        <strong><?= htmlspecialchars($admin['nome_adm'] ?? 'Administrador') ?></strong>
+                        <span><i class="fas fa-envelope"></i> <?= htmlspecialchars($admin['email_adm'] ?? '') ?></span>
+                    </div>
+                    <div class="perfil-resumo-data">
+                        <span class="label">Hoje</span>
+                        <strong id="perfil-data-hoje"><?= date('d/m/Y') ?></strong>
                     </div>
                 </div>
 
@@ -379,7 +436,8 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     </div>
 
     <script>
-        // ========== DADOS DAS NOTIFICAÇÕES ==========
+        // ========== DADOS ==========
+        const alunosData = <?= $alunos_json ?>;
         const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     </script>
 

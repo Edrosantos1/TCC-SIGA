@@ -119,18 +119,35 @@ unset($p);
 $total_geral = count($pendencias);
 $pendencias_json = json_encode($pendencias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
-// ========== ALUNOS ==========
+// ========== ALUNOS (para filtro + busca global com status) ==========
 $alunos = array();
 if ($db) {
-    $sql_alunos = "SELECT id_aluno, nome_aluno, serie_aluno FROM login_aluno ORDER BY nome_aluno";
+    $sql_alunos = "
+        SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
+               EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+        FROM login_aluno a
+        ORDER BY a.nome_aluno
+    ";
     if ($db instanceof mysqli) {
         $result_alunos = $db->query($sql_alunos);
         if ($result_alunos) {
-            while ($row = $result_alunos->fetch_assoc()) $alunos[] = $row;
+            while ($row = $result_alunos->fetch_assoc()) {
+                $row['tem_reservas'] = (bool)$row['tem_reservas'];
+                $row['tem_emprestimos'] = (bool)$row['tem_emprestimos'];
+                $alunos[] = $row;
+            }
         }
     } elseif ($db instanceof PDO) {
         $stmt = $db->query($sql_alunos);
-        if ($stmt) $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($stmt) {
+            $alunos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($alunos as &$a) {
+                $a['tem_reservas'] = (bool)$a['tem_reservas'];
+                $a['tem_emprestimos'] = (bool)$a['tem_emprestimos'];
+            }
+            unset($a);
+        }
     }
 }
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
@@ -155,8 +172,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendências — SiGA ITJ Admin</title>
 
-        <script>
-        // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
+    <script>
         try {
             if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
                 document.documentElement.classList.add('sidebar-collapsed-init');
@@ -203,9 +219,11 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
         <!-- TOP HEADER -->
         <header class="top-header">
+            <!-- BUSCA GLOBAL DE ALUNO -->
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" placeholder="Pesquisar por aluno ou livro…  ( / )" autocomplete="off" aria-label="Pesquisar por aluno ou livro">
+                <input type="text" id="search-input" placeholder="Pesquisar por aluno..." autocomplete="off">
+                <div class="search-results-dropdown" id="search-results" style="display:none;"></div>
             </div>
 
             <div class="header-right">
@@ -286,7 +304,11 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                 </div>
 
                 <div class="filtros-acoes">
-                    <span class="resultado-info" id="resultado-info" aria-live="polite"></span>
+                    <!-- FILTRO DA TABELA -->
+                    <div class="filtro-tabela-wrapper">
+                        <i class="fas fa-filter"></i>
+                        <input type="search" id="filtro-tabela" placeholder="Filtrar por aluno ou material..." autocomplete="off" aria-label="Filtrar empréstimos da tabela">
+                    </div>
 
                     <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
                         <span><i class="fas fa-search"></i> "<strong id="busca-termo"></strong>"</span>

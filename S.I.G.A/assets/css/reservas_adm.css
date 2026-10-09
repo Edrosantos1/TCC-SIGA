@@ -1255,3 +1255,115 @@ body.tema-alto_contraste .busca-aluno-container input {
 }
 body.tema-alto_contraste .busca-aluno-container input::placeholder { color: #888888 !important; }
 body.tema-alto_contraste .busca-aluno-container .search-icon { color: #888888 !important; }
+/* =============================================
+   FILTRO DA TABELA (novo — dentro do card de filtros)
+   ============================================= */
+.filtro-tabela-wrapper {
+    position: relative;
+    flex: 1 1 240px;
+    min-width: 180px;
+    max-width: 320px;
+}
+
+.filtro-tabela-wrapper i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.filtro-tabela-wrapper input {
+    width: 100%;
+    padding: 8px 14px 8px 34px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    background: #f5f7fa;
+    transition: all 0.2s;
+    color: #1f1f1f;
+}
+
+.filtro-tabela-wrapper input:focus {
+    outline: none;
+    border-color: #0b4b9b;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(11, 75, 155, 0.08);
+}
+
+.filtro-tabela-wrapper input::placeholder {
+    color: #94a3b8;
+}
+
+/* Tema escuro */
+body.tema-escuro .filtro-tabela-wrapper input {
+    background: #0f1a3a;
+    border-color: #2a3a5e;
+    color: #f0f0f0;
+}
+body.tema-escuro .filtro-tabela-wrapper input:focus {
+    border-color: #4a8bc2;
+    background: #0f1a3a;
+}
+body.tema-escuro .filtro-tabela-wrapper i {
+    color: #6a7a8a;
+}
+
+/* Alto contraste */
+body.tema-alto_contraste .filtro-tabela-wrapper input {
+    background: #000;
+    border: 2px solid #fff;
+    color: #fff;
+}
+body.tema-alto_contraste .filtro-tabela-wrapper i {
+    color: #fff;
+}
+.filtros-container {
+    position: relative;
+    z-index: 20;
+}
+
+.reservas-list-container {
+    position: relative;
+    z-index: 1;
+}
+/* =============================================
+   AJUSTE: filtro + ordenação lado a lado
+   ============================================= */
+.filtros-acoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+}
+
+.filtro-tabela-wrapper {
+    flex: 0 1 240px;
+    min-width: 160px;
+    max-width: 240px;
+}
+
+/* Em telas médias: deixa empilhar de novo */
+@media (max-width: 1200px) {
+    .filtros-acoes {
+        flex-wrap: wrap;
+    }
+    .filtro-tabela-wrapper {
+        flex: 1 1 100%;
+        max-width: none;
+    }
+}
+/* =============================================
+   AJUSTE 2: botão de ordenação não pode quebrar linha
+   ============================================= */
+.btn-ordenacao {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+#ordenacao-label {
+    white-space: nowrap;
+}

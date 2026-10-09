@@ -7,6 +7,7 @@
 
 // ========== VARIÁVEIS ==========
 let notificacoes = [];
+let alunos = [];
 const itensCatalogo = (typeof catalogoData !== 'undefined' && catalogoData.itens) ? catalogoData.itens : {};
 let ultimoFoco = null;
 
@@ -28,6 +29,110 @@ function formatarData(data) {
     if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
     if (diff < 172800) return 'Ontem';
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+}
+
+// ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
+function getAvatarColor() {
+    return '#0b4b9b';
+}
+
+function getStatusIcon(aluno) {
+    const iconReserva = '<i class="fas fa-bookmark" style="color: #0b4b9b; font-size: 14px;" title="Possui reservas"></i>';
+    const iconPendencia = '<i class="fas fa-exclamation-circle" style="color: #e67e22; font-size: 14px;" title="Possui empréstimos/pendências"></i>';
+
+    if (aluno.tem_reservas && aluno.tem_emprestimos) return iconReserva + ' ' + iconPendencia;
+    if (aluno.tem_reservas) return iconReserva;
+    if (aluno.tem_emprestimos) return iconPendencia;
+    return '';
+}
+
+function redirecionarAluno(aluno) {
+    const id = aluno.id_aluno;
+    const nome = aluno.nome_aluno;
+    const temReservas = aluno.tem_reservas || false;
+    const temEmprestimos = aluno.tem_emprestimos || false;
+
+    if (temReservas && temEmprestimos) {
+        window.location.href = `perfil_aluno.php?id=${id}`;
+    } else if (temReservas) {
+        window.location.href = `reservas_adm.php?aluno_id=${id}`;
+    } else if (temEmprestimos) {
+        window.location.href = `pendencias_adm.php?aluno_id=${id}`;
+    } else {
+        alert(`O aluno ${nome} não possui reservas ou empréstimos ativos.`);
+    }
+}
+
+function initSearch() {
+    const input = document.getElementById('search-input');
+    const results = document.getElementById('search-results');
+    if (!input || !results) return;
+
+    let timeoutId;
+
+    input.addEventListener('input', function() {
+        const termo = this.value.trim();
+        if (termo.length < 1) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+            return;
+        }
+
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            const termoLower = termo.toLowerCase();
+            const resultados = alunos.filter(a =>
+                a.nome_aluno && a.nome_aluno.toLowerCase().startsWith(termoLower)
+            ).slice(0, 8);
+
+            if (resultados.length === 0) {
+                results.innerHTML = `<div class="search-empty"><i class="fas fa-search"></i> Nenhum aluno encontrado</div>`;
+                results.style.display = 'block';
+                return;
+            }
+
+            results.innerHTML = '';
+            resultados.forEach(aluno => {
+                const inicial = aluno.nome_aluno.trim().charAt(0).toUpperCase();
+                const cor = getAvatarColor();
+                const serie = aluno.serie_aluno || 'Aluno';
+                const statusIcon = getStatusIcon(aluno);
+
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.innerHTML = `
+                    <div class="search-avatar" style="background-color: ${cor};">${inicial}</div>
+                    <div class="search-info">
+                        <div class="search-name">${escapeHtml(aluno.nome_aluno)}</div>
+                        <div class="search-detail">${escapeHtml(serie)}</div>
+                    </div>
+                    <div class="search-status-icon">${statusIcon}</div>
+                `;
+
+                div.addEventListener('click', () => redirecionarAluno(aluno));
+                div.addEventListener('mouseenter', () => { div.style.background = '#f8f9fa'; });
+                div.addEventListener('mouseleave', () => { div.style.background = 'transparent'; });
+
+                results.appendChild(div);
+            });
+
+            results.style.display = 'block';
+        }, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            results.style.display = 'none';
+            results.innerHTML = '';
+        }
+    });
 }
 
 // ========== TOASTS ==========
@@ -100,7 +205,7 @@ function renderizarDropdownNotificacoes() {
     }).join('');
 }
 
-// ========== MODAIS (abrir/fechar com foco e ESC) ==========
+// ========== MODAIS ==========
 function abrirOverlay(overlay, focoInicial) {
     ultimoFoco = document.activeElement;
     overlay.classList.add('aberto');
@@ -186,7 +291,6 @@ function abrirModalEdicao(id = 0, dadosForm = null, erros = null) {
     mostrarErrosForm(erros);
 
     if (dadosForm) {
-        // reabertura após erro de validação no servidor
         id = parseInt(dadosForm.edit_id, 10) || 0;
         preencherForm(dadosForm);
     } else if (id === 0) {
@@ -238,7 +342,7 @@ function abrirModalExclusao(id) {
 
     document.getElementById('delete-id').value = id;
     document.getElementById('delete-text').innerHTML =
-        'Você está prestes a excluir <strong>“' + escapeHtml(item.titulo) + '”</strong>. Esta ação não pode ser desfeita.';
+        'Você está prestes a excluir <strong>"' + escapeHtml(item.titulo) + '"</strong>. Esta ação não pode ser desfeita.';
 
     const aviso = document.getElementById('delete-aviso');
     const confirmar = document.getElementById('delete-confirm');
@@ -267,22 +371,21 @@ function fecharModalExclusao() {
     if (overlay) fecharOverlay(overlay);
 }
 
-// compatibilidade com chamadas antigas
 function excluirItem(id) { abrirModalExclusao(id); }
 
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // Carregar notificações
     if (typeof notificacoesData !== 'undefined') {
         notificacoes = notificacoesData;
     }
+    if (typeof alunosData !== 'undefined') {
+        alunos = alunosData;
+    }
 
-    // Mensagem flash → toast
     if (typeof catalogoData !== 'undefined' && catalogoData.flash) {
         mostrarToast(catalogoData.flash.msg, catalogoData.flash.type);
     }
 
-    // Cliques: novo / editar / excluir (delegação — funciona em qualquer botão)
     document.addEventListener('click', function(e) {
         const novo = e.target.closest('#btn-novo-item, [data-acao="novo"]');
         if (novo) { abrirModalEdicao(0); return; }
@@ -293,14 +396,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const excluir = e.target.closest('[data-acao="excluir"]');
         if (excluir) { abrirModalExclusao(excluir.dataset.id); return; }
 
-        // clicar no card (fora dos botões/forms) abre a edição
         const card = e.target.closest('.catalogo-card');
         if (card && !e.target.closest('button, form, a')) {
             abrirModalEdicao(card.dataset.id);
         }
     });
 
-    // Enter/Espaço no card (teclado)
     document.addEventListener('keydown', function(e) {
         if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('catalogo-card')) {
             e.preventDefault();
@@ -308,7 +409,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Fechar modais: X, Cancelar, clique fora, ESC
     const bind = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
     bind('cat-modal-close', fecharModal);
     bind('cat-modal-cancel', fecharModal);
@@ -329,7 +429,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fecharOverlay(ov);
             return;
         }
-        // mantém o foco dentro do modal
         if (e.key === 'Tab') {
             const foc = Array.from(ov.querySelectorAll('button:not([disabled]), input:not([type=hidden]):not([disabled]), select, textarea, a[href]'))
                 .filter(el => el.offsetParent !== null);
@@ -340,14 +439,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Preview da capa
     const capaInput = document.getElementById('capa_url');
     if (capaInput) {
         let t;
         capaInput.addEventListener('input', () => { clearTimeout(t); t = setTimeout(atualizarPreviewCapa, 400); });
     }
 
-    // Validação leve + evita duplo clique ao salvar
     const form = document.getElementById('cat-modal-form');
     if (form) {
         form.addEventListener('submit', function(e) {
@@ -382,12 +479,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Filtros: ordenar/destaque aplicam na hora
     document.querySelectorAll('[data-autosubmit]').forEach(el => {
         el.addEventListener('change', () => document.getElementById('filtros-form').submit());
     });
 
-    // Reabrir modal: erro de validação do servidor ou link ?action=edit&id=
     if (typeof catalogoData !== 'undefined') {
         if (catalogoData.form) {
             abrirModalEdicao(0, catalogoData.form, catalogoData.erros);
@@ -414,9 +509,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // BUSCA DE ALUNO NO TOPO
+    initSearch();
 });
 
-// expõe para uso externo/compatibilidade
+// expõe para uso externo
 window.abrirModalEdicao = abrirModalEdicao;
 window.abrirModalExclusao = abrirModalExclusao;
 window.fecharModal = fecharModal;

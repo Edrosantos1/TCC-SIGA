@@ -525,11 +525,27 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 }
 
 .welcome-date {
-  text-align: right;
-  font-size: 13px;
-  opacity: 0.72;
-  line-height: 1.4;
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+  padding-left: 24px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.welcome-date-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.welcome-date strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fbbf24;
 }
 
 /* ========== STATS GRID ========== */
@@ -831,7 +847,14 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .dashboard-main { padding: 20px 16px 40px; }
   .welcome-section { flex-direction: column; gap: 12px; text-align: center; }
-  .welcome-date { text-align: center; }
+  .welcome-date {
+      align-items: center;
+      padding-left: 0;
+      border-left: none;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      width: 100%;
+  }
   .top-header { padding: 12px 16px; }
   .search-container { margin: 0 16px; }
   .admin-info { display: none; }
@@ -1996,6 +2019,7 @@ main.dashboard-main:not(.extrato-page) > *:nth-child(7) { animation-delay: .30s;
 @media print {
     main.dashboard-main > * { animation: none !important; }
 }
+
 /* =============================================
    ANTI-FOUC: estado inicial da sidebar recolhida
    (aplicado antes do CSS renderizar, sem animação)

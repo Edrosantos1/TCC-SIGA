@@ -1,5 +1,6 @@
 // ========== ESTADO GLOBAL ==========
 let reservas = [];
+let alunos = [];
 let filtroAtual = (typeof window.filtroInicialReservas !== 'undefined' && window.filtroInicialReservas) ? window.filtroInicialReservas : 'todos';
 let buscaAtual = '';
 let ordemAtual = 'recente';
@@ -78,9 +79,7 @@ function formatarDataRelativa(data) {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-function formatarData(data) {
-    return formatarDataRelativa(data);
-}
+function formatarData(data) { return formatarDataRelativa(data); }
 
 function capitalizar(texto) {
     const t = String(texto ?? '');
@@ -109,6 +108,108 @@ function rotuloPrazo(r) {
     if (d === 1) return { texto: 'Amanhã', classe: 'aux-proximo' };
     if (d <= 3)  return { texto: `Em ${d} dias`, classe: 'aux-proximo' };
     return { texto: `Em ${d} dias`, classe: 'aux-ok' };
+}
+
+// ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
+function getAvatarColor() { return '#0b4b9b'; }
+
+function getStatusIcon(aluno) {
+    const iconReserva = '<i class="fas fa-bookmark" style="color: #0b4b9b; font-size: 14px;" title="Possui reservas"></i>';
+    const iconPendencia = '<i class="fas fa-exclamation-circle" style="color: #e67e22; font-size: 14px;" title="Possui empréstimos/pendências"></i>';
+
+    if (aluno.tem_reservas && aluno.tem_emprestimos) return iconReserva + ' ' + iconPendencia;
+    if (aluno.tem_reservas) return iconReserva;
+    if (aluno.tem_emprestimos) return iconPendencia;
+    return '';
+}
+
+function redirecionarAluno(aluno) {
+    const id = aluno.id_aluno;
+    const nome = aluno.nome_aluno;
+    const temReservas = aluno.tem_reservas || false;
+    const temEmprestimos = aluno.tem_emprestimos || false;
+
+    if (temReservas && temEmprestimos) {
+        window.location.href = `perfil_aluno.php?id=${id}`;
+    } else if (temReservas) {
+        window.location.href = `reservas_adm.php?aluno_id=${id}`;
+    } else if (temEmprestimos) {
+        window.location.href = `pendencias_adm.php?aluno_id=${id}`;
+    } else {
+        alert(`O aluno ${nome} não possui reservas ou empréstimos ativos.`);
+    }
+}
+
+function initSearch() {
+    const input = document.getElementById('search-input');
+    const results = document.getElementById('search-results');
+    if (!input || !results) return;
+
+    let timeoutId;
+
+    input.addEventListener('input', function() {
+        const termo = this.value.trim();
+        if (termo.length < 1) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+            return;
+        }
+
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            const termoLower = termo.toLowerCase();
+            const resultados = alunos.filter(a =>
+                a.nome_aluno && a.nome_aluno.toLowerCase().startsWith(termoLower)
+            ).slice(0, 8);
+
+            if (resultados.length === 0) {
+                results.innerHTML = `<div class="search-empty"><i class="fas fa-search"></i> Nenhum aluno encontrado</div>`;
+                results.style.display = 'block';
+                return;
+            }
+
+            results.innerHTML = '';
+            resultados.forEach(aluno => {
+                const inicial = aluno.nome_aluno.trim().charAt(0).toUpperCase();
+                const cor = getAvatarColor();
+                const serie = aluno.serie_aluno || 'Aluno';
+                const statusIcon = getStatusIcon(aluno);
+
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.innerHTML = `
+                    <div class="search-avatar" style="background-color: ${cor};">${inicial}</div>
+                    <div class="search-info">
+                        <div class="search-name">${escapeHtml(aluno.nome_aluno)}</div>
+                        <div class="search-detail">${escapeHtml(serie)}</div>
+                    </div>
+                    <div class="search-status-icon">${statusIcon}</div>
+                `;
+
+                div.addEventListener('click', () => redirecionarAluno(aluno));
+                div.addEventListener('mouseenter', () => { div.style.background = '#f8f9fa'; });
+                div.addEventListener('mouseleave', () => { div.style.background = 'transparent'; });
+
+                results.appendChild(div);
+            });
+
+            results.style.display = 'block';
+        }, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            results.style.display = 'none';
+            results.innerHTML = '';
+        }
+    });
 }
 
 // ========== NOTIFICAÇÕES ==========
@@ -663,7 +764,7 @@ function definirBusca(termo) {
 }
 
 function limparFiltros() {
-    const input = document.getElementById('search-input');
+    const input = document.getElementById('filtro-tabela');
     if (input) input.value = '';
     buscaAtual = '';
     const buscaAtiva = document.getElementById('filtro-busca-ativa');
@@ -672,7 +773,8 @@ function limparFiltros() {
 }
 
 function initFiltros() {
-    const buscaInput = document.getElementById('search-input');
+    // A BUSCA DA TABELA agora usa #filtro-tabela (não mais #search-input)
+    const buscaInput = document.getElementById('filtro-tabela');
     const limparBusca = document.getElementById('limpar-busca');
 
     document.querySelectorAll('.filtro-tab').forEach(tab => {
@@ -707,6 +809,7 @@ function initFiltros() {
     const btnNovaTopo = document.getElementById('btn-nova-reserva');
     if (btnNovaVazio && btnNovaTopo) btnNovaVazio.addEventListener('click', () => btnNovaTopo.click());
 
+    // Atalho "/" foca o filtro da tabela
     document.addEventListener('keydown', (e) => {
         const modal = document.getElementById('modal-confirmacao');
         const digitando = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
@@ -774,7 +877,6 @@ function initSidebar() {
         sidebar.classList.add('collapsed');
     }
 
-    // Remove a flag anti-FOUC — a partir daqui o JS controla (com animação)
     document.documentElement.classList.remove('sidebar-collapsed-init');
 
     collapseBtn.addEventListener('click', () => {
@@ -862,6 +964,7 @@ function showToast(message, type = 'info') {
 // ========== INICIALIZAÇÃO ==========
 document.addEventListener('DOMContentLoaded', function () {
     if (typeof reservasData !== 'undefined') reservas = reservasData;
+    if (typeof alunosData !== 'undefined') alunos = alunosData;
     if (typeof notificacoesData !== 'undefined') notificacoes = notificacoesData;
 
     initSidebar();
@@ -873,8 +976,8 @@ document.addEventListener('DOMContentLoaded', function () {
     initModalConfirmacao();
     initAcoesReserva();
     initAcoesMassa();
+    initSearch();  // ← busca global de aluno no topo
 
-    // Aplica estado visual das abas já no carregamento
     document.querySelectorAll('.filtro-tab').forEach(t => {
         const ativo = t.dataset.status === filtroAtual;
         t.classList.toggle('active', ativo);

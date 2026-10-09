@@ -271,7 +271,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin — SiGA ITJ</title>
 
-        <script>
+    <script>
         // Evita o "pulo" da sidebar: aplica o estado antes do CSS renderizar
         try {
             if (localStorage.getItem('adm_sidebarCollapsed') === 'true') {
@@ -382,7 +382,10 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                     <h1>Bem-vinda, <span id="welcome-name"><?= htmlspecialchars($nome_bibliotecaria) ?></span>!</h1>
                     <p>Aqui está o panorama do sistema em tempo real.</p>
                 </div>
-                <div class="welcome-date" id="welcome-date"></div>
+                <div class="welcome-date">
+                    <span class="welcome-date-label">Hoje</span>
+                    <strong id="welcome-date-value"><?= date('d/m/Y') ?></strong>
+                </div>
             </section>
 
             <!-- AVISO DE FILTRO ATIVO -->

@@ -4,8 +4,9 @@
 
 // ========== VARIÁVEIS GLOBAIS ==========
 let notificacoes = [];
+let alunos = [];
 
-// ========== FUNÇÕES AUXILIARES PARA NOTIFICAÇÕES ==========
+// ========== FUNÇÕES AUXILIARES ==========
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -25,6 +26,111 @@ function formatarData(data) {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
 }
 
+// ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
+function getAvatarColor() {
+    return '#0b4b9b';
+}
+
+function getStatusIcon(aluno) {
+    const iconReserva = '<i class="fas fa-bookmark" style="color: #0b4b9b; font-size: 14px;" title="Possui reservas"></i>';
+    const iconPendencia = '<i class="fas fa-exclamation-circle" style="color: #e67e22; font-size: 14px;" title="Possui empréstimos/pendências"></i>';
+
+    if (aluno.tem_reservas && aluno.tem_emprestimos) return iconReserva + ' ' + iconPendencia;
+    if (aluno.tem_reservas) return iconReserva;
+    if (aluno.tem_emprestimos) return iconPendencia;
+    return '';
+}
+
+function redirecionarAluno(aluno) {
+    const id = aluno.id_aluno;
+    const nome = aluno.nome_aluno;
+    const temReservas = aluno.tem_reservas || false;
+    const temEmprestimos = aluno.tem_emprestimos || false;
+
+    if (temReservas && temEmprestimos) {
+        window.location.href = `perfil_aluno.php?id=${id}`;
+    } else if (temReservas) {
+        window.location.href = `reservas_adm.php?aluno_id=${id}`;
+    } else if (temEmprestimos) {
+        window.location.href = `pendencias_adm.php?aluno_id=${id}`;
+    } else {
+        alert(`O aluno ${nome} não possui reservas ou empréstimos ativos.`);
+    }
+}
+
+function initSearch() {
+    const input = document.getElementById('search-input');
+    const results = document.getElementById('search-results');
+    if (!input || !results) return;
+
+    let timeoutId;
+
+    input.addEventListener('input', function() {
+        const termo = this.value.trim();
+        if (termo.length < 1) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+            return;
+        }
+
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            const termoLower = termo.toLowerCase();
+            const resultados = alunos.filter(a =>
+                a.nome_aluno && a.nome_aluno.toLowerCase().startsWith(termoLower)
+            ).slice(0, 8);
+
+            if (resultados.length === 0) {
+                results.innerHTML = `<div class="search-empty"><i class="fas fa-search"></i> Nenhum aluno encontrado</div>`;
+                results.style.display = 'block';
+                return;
+            }
+
+            results.innerHTML = '';
+            resultados.forEach(aluno => {
+                const inicial = aluno.nome_aluno.trim().charAt(0).toUpperCase();
+                const cor = getAvatarColor();
+                const serie = aluno.serie_aluno || 'Aluno';
+                const statusIcon = getStatusIcon(aluno);
+
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.innerHTML = `
+                    <div class="search-avatar" style="background-color: ${cor};">${inicial}</div>
+                    <div class="search-info">
+                        <div class="search-name">${escapeHtml(aluno.nome_aluno)}</div>
+                        <div class="search-detail">${escapeHtml(serie)}</div>
+                    </div>
+                    <div class="search-status-icon">${statusIcon}</div>
+                `;
+
+                div.addEventListener('click', () => redirecionarAluno(aluno));
+                div.addEventListener('mouseenter', () => { div.style.background = '#f8f9fa'; });
+                div.addEventListener('mouseleave', () => { div.style.background = 'transparent'; });
+
+                results.appendChild(div);
+            });
+
+            results.style.display = 'block';
+        }, 200);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+            results.style.display = 'none';
+            results.innerHTML = '';
+        }
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            results.style.display = 'none';
+            results.innerHTML = '';
+        }
+    });
+}
+
+// ========== DROPDOWN DE NOTIFICAÇÕES ==========
 function renderizarDropdownNotificacoes() {
     const lista = document.getElementById('notification-list-dropdown');
     if (!lista) return;
@@ -72,10 +178,21 @@ function renderizarDropdownNotificacoes() {
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // ========== CARREGAR NOTIFICAÇÕES ==========
+    // ========== CARREGAR DADOS ==========
     if (typeof notificacoesData !== 'undefined') {
         notificacoes = notificacoesData;
-        console.log(`🔔 ${notificacoes.length} notificações carregadas.`);
+    }
+    if (typeof alunosData !== 'undefined') {
+        alunos = alunosData;
+    }
+
+    // ========== DATA DE HOJE ==========
+    const elData = document.getElementById('perfil-data-hoje');
+    if (elData) {
+        const now = new Date();
+        const dia = String(now.getDate()).padStart(2, '0');
+        const mes = String(now.getMonth() + 1).padStart(2, '0');
+        elData.textContent = `${dia}/${mes}/${now.getFullYear()}`;
     }
 
     // ========== OLHINHO PARA MOSTRAR/ESCONDER SENHA ==========
@@ -109,6 +226,8 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebar.classList.add('collapsed');
         }
 
+        document.documentElement.classList.remove('sidebar-collapsed-init');
+
         collapseBtn.addEventListener('click', function() {
             sidebar.classList.toggle('collapsed');
             localStorage.setItem('adm_sidebarCollapsed', sidebar.classList.contains('collapsed'));
@@ -134,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== NOTIFICAÇÕES (SININHO) - SEM AJAX ==========
+    // ========== NOTIFICAÇÕES (SININHO) ==========
     const notifBtn = document.getElementById('notification-btn');
     const notifDropdown = document.getElementById('notification-dropdown');
 
@@ -154,6 +273,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ========== BUSCA DE ALUNO ==========
+    initSearch();
+
     // ========== RENDERIZAR NOTIFICAÇÕES AO CARREGAR ==========
     renderizarDropdownNotificacoes();
 
@@ -172,5 +294,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-    console.log('✅ Perfil do Administrador carregado!');
 });
