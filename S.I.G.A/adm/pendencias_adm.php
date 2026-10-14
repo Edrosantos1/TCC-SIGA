@@ -305,9 +305,9 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
                 <div class="filtros-acoes">
                     <!-- FILTRO DA TABELA -->
-                    <div class="filtro-tabela-wrapper">
-                        <i class="fas fa-filter"></i>
-                        <input type="search" id="filtro-tabela" placeholder="Filtrar por aluno ou material..." autocomplete="off" aria-label="Filtrar empréstimos da tabela">
+                     <div class="filtro-tabela-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="search" id="filtro-tabela" placeholder="Buscar por aluno ou material..." autocomplete="off" aria-label="Buscar empréstimos">
                     </div>
 
                     <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">

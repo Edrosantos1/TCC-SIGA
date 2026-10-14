@@ -31,7 +31,7 @@ function formatarData(data) {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
 }
 
-// ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
+// ========== BUSCA DE ALUNO NO TOPO ==========
 function getAvatarColor() {
     return '#0b4b9b';
 }
@@ -132,6 +132,64 @@ function initSearch() {
             results.style.display = 'none';
             results.innerHTML = '';
         }
+    });
+}
+
+// ========== BUSCA AO VIVO (client-side) ==========
+function initBuscaAoVivo() {
+    const input = document.querySelector('input[name="busca"]');
+    const grid = document.querySelector('.catalogo-grid');
+    if (!input || !grid) return;
+
+    const cards = Array.from(grid.querySelectorAll('.catalogo-card'));
+    if (!cards.length) return;
+
+    function norm(s) {
+        return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    }
+
+    // Guarda o texto de cada card pra não recalcular toda hora
+    const indice = new Map();
+    cards.forEach(card => {
+        const titulo = card.querySelector('h4')?.textContent || '';
+        const autor  = card.querySelector('.autor')?.textContent || '';
+        indice.set(card, norm(`${titulo} ${autor}`));
+    });
+
+    // Aviso "nada encontrado"
+    const aviso = document.createElement('div');
+    aviso.className = 'catalogo-sem-resultado';
+    aviso.style.display = 'none';
+    aviso.innerHTML = `
+        <i class="fas fa-search"></i>
+        <p>Nenhum item <strong>nesta página</strong> corresponde à busca.</p>
+        <small>Pressione <kbd>Enter</kbd> para buscar em todo o catálogo.</small>
+    `;
+    grid.parentNode.insertBefore(aviso, grid.nextSibling);
+
+    let timer;
+    function filtrar() {
+        const termo = norm(input.value);
+        let visiveis = 0;
+
+        cards.forEach(card => {
+            const texto = indice.get(card);
+            const ok = !termo || texto.includes(termo);
+            card.style.display = ok ? '' : 'none';
+            if (ok) visiveis++;
+        });
+
+        aviso.style.display = (visiveis === 0 && termo) ? 'block' : 'none';
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(filtrar, 150);
+    });
+
+    // Ao clicar no "X" do input type=search
+    input.addEventListener('search', function () {
+        if (!this.value) filtrar();
     });
 }
 
@@ -512,6 +570,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // BUSCA DE ALUNO NO TOPO
     initSearch();
+
+    // BUSCA AO VIVO NO CATÁLOGO
+    initBuscaAoVivo();
 });
 
 // expõe para uso externo

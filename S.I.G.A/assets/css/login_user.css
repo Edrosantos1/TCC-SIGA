@@ -332,7 +332,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     position: absolute; 
     top: 0; 
     height: 100%; 
-    transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
+    transition: all var(--troca-duracao) cubic-bezier(0.77, 0, 0.175, 1); 
 }
 .sign-in { left: 0; width: 50%; z-index: 2; }
 .container.active .sign-in { transform: translateX(100%); opacity: 0; z-index: 1; }
@@ -352,7 +352,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     width: 50%; 
     height: 100%; 
     overflow: hidden; 
-    transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
+    transition: all var(--troca-duracao) cubic-bezier(0.77, 0, 0.175, 1); 
     z-index: 1000;
     /* Isola o contexto de empilhamento e evita scroll por foco */
     isolation: isolate;
@@ -373,7 +373,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     height: 100%;
     width: 200%;
     transform: translateX(0);
-    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    transition: transform var(--troca-duracao) cubic-bezier(0.77, 0, 0.175, 1);
     min-height: 100vh; 
     display: block;
     /* Promove para camada própria — evita repaint do background ao receber foco */
@@ -395,7 +395,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     text-align: center; 
     top: 0; 
     transform: translateX(0); 
-    transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
+    transition: all var(--troca-duracao) cubic-bezier(0.77, 0, 0.175, 1); 
 }
 
 .toggle-panel p { 
@@ -1474,4 +1474,381 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 
 @media (max-width: 480px) {
   .password-requirements { grid-template-columns: 1fr; padding: 10px 12px; gap: 6px; }
+}
+
+/* ============================================================
+   CONTROLES DO TOPO (modo escuro + idioma)
+   ============================================================ */
+.top-controls {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.top-controls .language-wrapper {
+  position: relative;
+  top: auto;
+  right: auto;
+}
+
+/* Tokens do tema (mesmos valores da página inicial) */
+:root {
+  /* Duração da animação de troca entre login e registro */
+  --troca-duracao: 0.5s;
+  /* Duração da troca claro/escuro */
+  --tema-duracao: 0.12s;
+  --t-line: #d3daf5;
+  --t-surface: #ffffff;
+  --t-surface-2: #e9edff;
+  --t-ink: #0a1233;
+  --t-accent: #0035ff;
+  --t-gold: #ffad00;
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  --t-line: #28357f;
+  --t-surface: #111a42;
+  --t-surface-2: #17215a;
+  --t-ink: #eef1ff;
+  --t-accent: #8fa6ff;
+  color-scheme: dark;
+}
+
+/* Botão de tema (igual ao da página inicial) */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--t-line);
+  background: var(--t-surface);
+  color: var(--t-accent);
+  font-size: 16px;
+  cursor: pointer;
+  appearance: none;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+.theme-toggle:hover { border-color: var(--t-gold); transform: rotate(-12deg); }
+.theme-toggle .icon-sun { display: none; color: var(--t-gold); }
+html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+/* Botão de idioma no mesmo padrão (pílula, mesma altura do botão de tema) */
+.top-controls .language-button {
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--t-line);
+  background: var(--t-surface);
+  color: var(--t-ink);
+  font-size: 14px;
+  line-height: 1;
+  backdrop-filter: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.top-controls .language-button:hover {
+  background: var(--t-surface);
+  border-color: var(--t-gold);
+  box-shadow: none;
+}
+.top-controls .language-button svg { stroke: var(--t-accent); }
+.top-controls .language-list {
+  background: var(--t-surface);
+  border: 1px solid var(--t-line);
+  box-shadow: 0 12px 28px rgba(10, 18, 51, 0.25);
+  backdrop-filter: none;
+}
+.top-controls .language-list li { color: var(--t-ink); }
+.top-controls .language-list li:hover { background: var(--t-surface-2); }
+
+/* Campos do login (claro): mesmo padrão do select, em vez do estilo padrão do navegador */
+.sign-in .input-group input {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1.5px solid #e2e8f0;
+}
+
+/* ============================================================
+   MONITORES / DESKTOP (≥ 769px)
+   - conteúdo do formulário com largura máxima e centralizado
+   - rolagem interna quando a altura da tela é pequena
+   ============================================================ */
+@media (min-width: 769px) {
+  .container form {
+    --form-max: 460px;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-block: 84px 32px;
+    padding-inline: max(48px, calc((100% - var(--form-max)) / 2));
+    scrollbar-width: thin;
+  }
+  /* centraliza na vertical e, se faltar espaço, deixa rolar sem cortar o topo */
+  .container form::before,
+  .container form::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    margin-block: auto;
+  }
+
+  .toggle-panel p { max-width: 440px; }
+}
+
+/* Notebooks / monitores com pouca altura (ex.: 1366×768) */
+@media (min-width: 769px) and (max-height: 820px) {
+  .container form { padding-block: 72px 20px; }
+  .dot-title { font-size: 28px; margin-bottom: 12px; }
+  .input-group { margin: 6px 0; }
+  .input-group input,
+  .input-group select { padding-top: 12px; padding-bottom: 12px; }
+  .options-group { margin-top: 10px; }
+  .buttons-layout { margin-top: 16px; }
+  .google-login-container { margin-top: 8px; }
+  .btn-primary { padding: 12px 0; }
+  .password-requirements { padding: 8px 12px; gap: 5px 10px; margin-bottom: 10px; }
+  .strength-indicator { margin-bottom: 8px; }
+  .auth-header { top: 22px; }
+}
+@media (min-width: 769px) and (max-height: 680px) {
+  .container form { padding-block: 64px 14px; }
+  .dot-title { font-size: 24px; margin-bottom: 8px; }
+  .input-group { margin: 4px 0; }
+  .input-group input,
+  .input-group select { padding-top: 10px; padding-bottom: 10px; font-size: 13px; }
+  .req-item { font-size: 11px; }
+}
+
+/* Monitores Full HD e maiores (≥ 1600px) */
+@media (min-width: 1600px) {
+  .container form { --form-max: 520px; }
+  .dot-title { font-size: 38px; margin-bottom: 24px; }
+  .input-group { margin: 12px 0; }
+  .input-group input,
+  .input-group select {
+    padding: 18px 50px 18px 22px;
+    font-size: 16px;
+    border-radius: 18px;
+  }
+  .input-group .icon-input,
+  .input-group .toggle-eye { margin-left: -50px; font-size: 1.2rem; }
+  .options-group { font-size: 15px; margin-top: 18px; }
+  .caps-warning { font-size: 14px !important; }
+  .buttons-layout { margin-top: 30px; }
+  .btn-primary { font-size: 16px; padding: 17px 0; border-radius: 30px; }
+  .google-login-btn { max-width: 340px; font-size: 16px; padding: 15px 24px; }
+  .req-item,
+  .password-requirements .req-item { font-size: 13px; }
+  .error-message, .reg-error-message { font-size: 14px; }
+
+  .toggle-panel { padding: 0 60px; }
+  .toggle-panel h1 { font-size: 44px; line-height: 1.15; }
+  .toggle-panel p { font-size: 17px; line-height: 28px; max-width: 480px; }
+  .btn-secondary { font-size: 14px; padding: 14px 52px; }
+
+  .auth-header { top: 40px; left: 56px; gap: 10px; }
+  .auth-header .brand-logo { font-size: 24px; }
+  .auth-header .back-arrow { width: 42px; height: 42px; font-size: 24px; }
+  .top-controls { top: 32px; right: 32px; }
+  .top-controls .language-button { height: 48px; font-size: 15px; padding: 0 18px; }
+  .theme-toggle { width: 48px; height: 48px; font-size: 18px; }
+}
+
+/* Monitores 2K / 4K (≥ 2200px) */
+@media (min-width: 2200px) {
+  .container form { --form-max: 620px; }
+  .dot-title { font-size: 48px; margin-bottom: 30px; }
+  .input-group input,
+  .input-group select {
+    padding: 22px 58px 22px 26px;
+    font-size: 19px;
+    border-radius: 22px;
+  }
+  .input-group .icon-input,
+  .input-group .toggle-eye { margin-left: -58px; font-size: 1.4rem; width: 24px; }
+  .options-group { font-size: 18px; }
+  .btn-primary { font-size: 19px; padding: 21px 0; border-radius: 36px; }
+  .google-login-btn { max-width: 400px; font-size: 19px; padding: 18px 28px; }
+  .google-login-btn i { font-size: 22px; }
+  .req-item,
+  .password-requirements .req-item { font-size: 15px; }
+  .error-message, .reg-error-message { font-size: 16px; }
+
+  .toggle-panel h1 { font-size: 56px; }
+  .toggle-panel p { font-size: 20px; line-height: 32px; max-width: 560px; }
+  .btn-secondary { font-size: 16px; padding: 16px 60px; }
+
+  .auth-header { top: 52px; left: 72px; }
+  .auth-header .brand-logo { font-size: 28px; }
+  .top-controls { top: 44px; right: 44px; }
+  .top-controls .language-button { height: 56px; font-size: 17px; padding: 0 22px; }
+  .theme-toggle { width: 56px; height: 56px; font-size: 21px; }
+}
+
+/* ============================================================
+   MOBILE – controles do topo
+   ============================================================ */
+@media (max-width: 768px) {
+  .top-controls {
+    position: relative;
+    top: auto;
+    right: auto;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+  }
+  .top-controls .language-wrapper { margin-bottom: 0; }
+}
+
+/* ============================================================
+   MODO ESCURO  (html[data-theme="dark"])
+   Lado do login passa de branco para azul-grafite; o registro
+   (que já é escuro) é mantido.
+   ============================================================ */
+html[data-theme="dark"] { color-scheme: dark; }
+
+html[data-theme="dark"] body {
+  background: linear-gradient(to right, #080d26 50%, #021a3a 50%);
+}
+@media (max-width: 768px) {
+  html[data-theme="dark"] body { background: #050818; }
+}
+
+/* Cabeçalho (seta + logo) */
+html[data-theme="dark"] .auth-header,
+html[data-theme="dark"] .auth-header a { color: #eef1ff; }
+html[data-theme="dark"] .auth-header .back-arrow:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* Formulário de login */
+html[data-theme="dark"] .sign-in form {
+  background-color: #080d26;
+  background-image: none;
+  color: #eef1ff;
+}
+html[data-theme="dark"] .sign-in .dot-title { color: #eef1ff; }
+html[data-theme="dark"] .sign-in form > span,
+html[data-theme="dark"] .sign-in .options-group label { color: #a8b3e3; }
+
+html[data-theme="dark"] .sign-in .input-group input {
+  background-color: #111a42;
+  color: #eef1ff;
+  border-color: #28357f;
+}
+html[data-theme="dark"] .sign-in .input-group input::placeholder { color: #8590c4; }
+html[data-theme="dark"] .sign-in .input-group input:focus {
+  background-color: #17215a;
+  color: #ffffff;
+  border-color: #2d88ff;
+  box-shadow: 0 0 0 3px rgba(45, 136, 255, 0.3);
+}
+html[data-theme="dark"] .sign-in .input-group input.input-error {
+  background-color: rgba(244, 67, 54, 0.12);
+}
+html[data-theme="dark"] .sign-in .icon-input,
+html[data-theme="dark"] .sign-in .toggle-eye { color: #8590c4; }
+html[data-theme="dark"] .sign-in .input-group .toggle-eye:hover { color: #eef1ff; }
+html[data-theme="dark"] .sign-in .input-group input:focus ~ .toggle-eye,
+html[data-theme="dark"] .sign-in .input-group input:focus + .icon-input { color: #8fa6ff; }
+html[data-theme="dark"] .input-group input.input-error ~ .toggle-eye,
+html[data-theme="dark"] .input-group input.input-error + .icon-input { color: #f44336 !important; }
+
+html[data-theme="dark"] .sign-in .caps-warning { color: #8fa6ff; }
+html[data-theme="dark"] .options-group a { color: #8fa6ff; }
+html[data-theme="dark"] .options-group a:hover { color: #b4c3ff; }
+
+html[data-theme="dark"] .sign-in .error-message {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  border-color: rgba(239, 68, 68, 0.35);
+  border-left-color: #ef4444;
+}
+html[data-theme="dark"] .field-error,
+html[data-theme="dark"] .input-group .error-message,
+html[data-theme="dark"] .input-group #confirm-error { color: #ff7a70; }
+
+html[data-theme="dark"] .sign-in .google-login-btn {
+  background: #111a42;
+  color: #eef1ff;
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+html[data-theme="dark"] .sign-in .google-login-btn:hover {
+  background: #17215a;
+  border-color: rgba(90, 162, 255, 0.5);
+}
+
+/* Registro: já é escuro; só escurece um pouco mais para combinar */
+html[data-theme="dark"] .sign-up form { background-color: #03132b; }
+
+/* Modal "completar série" */
+html[data-theme="dark"] #modalSerieGoogle {
+  --ink: #eef1ff;
+  --paper: #080d26;
+  --teal-light: rgba(44, 177, 163, 0.16);
+  --error: #ff8a8e;
+  --line: #28357f;
+}
+html[data-theme="dark"] #modalSerieGoogle.modal-overlay { background: rgba(2, 6, 18, 0.72); }
+html[data-theme="dark"] #modalSerieGoogle .modal-box::before { background-color: #28357f; }
+html[data-theme="dark"] #modalSerieGoogle .modal-box p { color: #a8b3e3; }
+html[data-theme="dark"] #modalSerieGoogle .group-label { color: #8590c4; }
+html[data-theme="dark"] #modalSerieGoogle .grade { background: #111a42; }
+html[data-theme="dark"] #modalSerieGoogle .grade.selected {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #062a26;
+  box-shadow: 0 6px 14px rgba(44, 177, 163, 0.3);
+}
+html[data-theme="dark"] #modalSerieGoogle .reg-error-message { background: rgba(229, 72, 77, 0.15); }
+html[data-theme="dark"] #modalSerieGoogle .btn-primary { background: #28357f; color: #a8b3e3; }
+html[data-theme="dark"] #modalSerieGoogle .btn-primary.ready { background: var(--teal); color: #062a26; }
+html[data-theme="dark"] #modalSerieGoogle .btn-primary.loading { background: #26998D; color: #fff; }
+
+
+/* ============================================================
+   TROCA DE TEMA RÁPIDA E UNIFORME
+   Enquanto o tema muda, qualquer transição existente (que era 0.2s~0.3s,
+   cada elemento com um tempo) passa a durar o mesmo tempo curto.
+   ============================================================ */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition-duration: var(--tema-duracao) !important;
+  transition-delay: 0s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.theme-switching *,
+  html.theme-switching *::before,
+  html.theme-switching *::after { transition-duration: 0s !important; }
+}
+
+
+/* ============================================================
+   TROCA LOGIN <-> REGISTRO SEM SOBREPOSIÇÃO (desktop)
+   Antes os dois formulários faziam crossfade ao mesmo tempo (um aparecia
+   por cima do outro) e o z-index era animado junto. Agora o que sai some
+   rápido e o que entra só aparece depois, e o z-index troca na hora.
+   ============================================================ */
+@media (min-width: 769px) {
+  /* entrando: espera a saída terminar e então aparece */
+  .sign-in,
+  .container.active .sign-up {
+    transition:
+      transform var(--troca-duracao) cubic-bezier(0.77, 0, 0.175, 1),
+      opacity calc(var(--troca-duracao) * 0.5) ease calc(var(--troca-duracao) * 0.4);
+  }
+  /* saindo: some rápido */
+  .container.active .sign-in,
+  .sign-up {
+    transition:
+      transform var(--troca-duracao) cubic-bezier(0.77, 0, 0.175, 1),
+      opacity calc(var(--troca-duracao) * 0.4) ease;
+  }
 }

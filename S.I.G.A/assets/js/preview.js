@@ -1,6 +1,7 @@
 // ===================== TRADUÇÕES COMPLETAS =====================
 const translations = {
   pt: {
+    page_title: "Acesso - SIGA ITJ",
     title: "Seja muito bem-vindo ao SIGA",
     subtitle: "Acesse livros, materiais e recursos educacionais em um só lugar.",
     stat_materials: "+500 materiais",
@@ -9,25 +10,33 @@ const translations = {
     btn_admin: "Sou Administrador",
     nav_about: "Sobre o SIGA",
     nav_contact: "Fale com a Secretaria",
+    theme_label: "Tema escuro",
+    lang_label: "Selecionar idioma",
+    whatsapp_label: "Fale conosco no WhatsApp",
     footer_copyright: "© 2026 SIGA. Todos os direitos reservados.",
     footer_support: "Suporte",
     footer_terms: "Termos de Uso",
     footer_privacy: "Política de Privacidade",
-    sobre_title: "O que é o <span>SIGA</span>?",
+    modal_close: "Fechar",
+    support_body: "Fale com a equipe do SIGA:\nE-mail: suporte@SIGAitj.com\nWhatsApp: (11) 91234-5678",
+    terms_body: "Este é um ambiente acadêmico. O uso indevido implica em sanções disciplinares.",
+    privacy_body: "Seus dados são utilizados apenas para fins institucionais e não são compartilhados.",
+    sobre_title: "O que é o SIGA?",
     sobre_subtitle: "Conheça um pouco do nosso trabalho e propósito",
-     sobre_p1: "O <strong>SIGA</strong> (Sistema Gerenciador de Alunos e Acervos) é uma plataforma digital de gerenciamento de bibliotecas escolares, criado com a missão de tornar o gerenciamento e uso da biblioteca mais prático e organizado para administradores e alunos por meio da tecnologia.",
+    sobre_p1: "O <strong>SIGA</strong> (Sistema Gerenciador de Alunos e Acervos) é uma plataforma digital de gerenciamento de bibliotecas escolares, criado com a missão de tornar o gerenciamento e uso da biblioteca mais prático e organizado para administradores e alunos por meio da tecnologia.",
     sobre_p2: "Com uma grande variedade de acervos, o SIGA atende alunos, professores e funcionários, centralizando livros didáticos, artigos científicos, cadernos de TCCs, periódicos e outros recursos educacionais. Tudo isso com acesso de 24 horas por dia, de qualquer dispositivo.",
     sobre_p3: "Além da praticidade, nossa plataforma prioriza a organização e a facilidade de uso: é possível pesquisar por categorias, autores e títulos, renovar empréstimos online, e utilizar diversas funcionalidades que facilitam o gerenciamento da biblioteca. Tudo isso de forma simples, rápida e acessível. O SIGA é mais do que um sistema digital – é um portal para o conhecimento, projetado para inspirar e apoiar a jornada acadêmica de cada usuário. <strong>O conhecimento não pode esperar, e com o SIGA está sempre ao seu alcance.</strong>",
     passos_title: "Comece em 3 passos",
     passos_subtitle: "Simples, rápido e gratuito para alunos",
-    passo1_title: "1. Cadastre-se",
+    passo1_title: "Cadastre-se",
     passo1_desc: "Crie sua conta gratuita usando seu email institucional.",
-    passo2_title: "2. Encontre",
+    passo2_title: "Encontre",
     passo2_desc: "Pesquise entre centenas de livros e materiais didáticos.",
-    passo3_title: "3. Acesse",
+    passo3_title: "Acesse",
     passo3_desc: "Faça reservas, realize empréstimos e aproveite!"
   },
   en: {
+    page_title: "Access - SIGA ITJ",
     title: "Welcome to SIGA",
     subtitle: "Access books, materials and educational resources in one place.",
     stat_materials: "+500 materials",
@@ -36,25 +45,33 @@ const translations = {
     btn_admin: "I'm an Administrator",
     nav_about: "About SIGA",
     nav_contact: "Contact the Office",
+    theme_label: "Dark theme",
+    lang_label: "Select language",
+    whatsapp_label: "Chat with us on WhatsApp",
     footer_copyright: "© 2026 SIGA. All rights reserved.",
     footer_support: "Support",
     footer_terms: "Terms of Use",
     footer_privacy: "Privacy Policy",
-    sobre_title: "What is <span>SIGA</span>?",
+    modal_close: "Close",
+    support_body: "Talk to the SIGA team:\nEmail: suporte@SIGAitj.com\nWhatsApp: (11) 91234-5678",
+    terms_body: "This is an academic environment. Misuse may result in disciplinary sanctions.",
+    privacy_body: "Your data is used only for institutional purposes and is never shared.",
+    sobre_title: "What is SIGA?",
     sobre_subtitle: "Learn a little about our work and purpose",
     sobre_p1: "<strong>SIGA</strong> (Student and Collection Management System) is a digital platform for school library management, created with the mission of making library management and use more practical and organized for administrators and students through technology.",
     sobre_p2: "With a wide variety of collections, SIGA serves students, teachers and staff by centralizing textbooks, scientific articles, undergraduate thesis papers, journals and other educational resources. All of this is available 24 hours a day from any device.",
     sobre_p3: "In addition to practicality, our platform prioritizes organization and ease of use: users can search by categories, authors and titles, renew loans online, and access several features that simplify library management. Everything is designed to be simple, fast and accessible. SIGA is more than just a digital system—it is a gateway to knowledge, designed to inspire and support every user's academic journey. <strong>Knowledge cannot wait, and with SIGA it is always within your reach.</strong>",
-    passos_title: "Start in <span>3 steps</span>",
+    passos_title: "Start in 3 steps",
     passos_subtitle: "Simple, fast and free for students",
-    passo1_title: "1. Sign up",
+    passo1_title: "Sign up",
     passo1_desc: "Create your free account using your institutional email.",
-    passo2_title: "2. Find",
+    passo2_title: "Find",
     passo2_desc: "Search among hundreds of books and teaching materials.",
-    passo3_title: "3. Access",
+    passo3_title: "Access",
     passo3_desc: "Reserve books, borrow materials, and enjoy!"
   },
   es: {
+    page_title: "Acceso - SIGA ITJ",
     title: "Bienvenido a SIGA",
     subtitle: "Accede a libros, materiales y recursos educativos en un solo lugar.",
     stat_materials: "+500 materiales",
@@ -63,119 +80,116 @@ const translations = {
     btn_admin: "Soy Administrador",
     nav_about: "Sobre el SIGA",
     nav_contact: "Contactar con la Secretaría",
+    theme_label: "Tema oscuro",
+    lang_label: "Seleccionar idioma",
+    whatsapp_label: "Escríbenos por WhatsApp",
     footer_copyright: "© 2026 SIGA. Todos los derechos reservados.",
     footer_support: "Soporte",
     footer_terms: "Términos de Uso",
     footer_privacy: "Política de Privacidad",
-    sobre_title: "¿Qué es <span>SIGA</span>?",
+    modal_close: "Cerrar",
+    support_body: "Habla con el equipo de SIGA:\nCorreo: suporte@SIGAitj.com\nWhatsApp: (11) 91234-5678",
+    terms_body: "Este es un entorno académico. El uso indebido implica sanciones disciplinarias.",
+    privacy_body: "Tus datos se utilizan solo con fines institucionales y no se comparten.",
+    sobre_title: "¿Qué es SIGA?",
     sobre_subtitle: "Conoce un poco de nuestro trabajo y propósito",
     sobre_p1: "<strong>SIGA</strong> (Sistema de Gestión de Alumnos y Acervos) es una plataforma digital de gestión de bibliotecas escolares, creada con la misión de hacer que la administración y el uso de la biblioteca sean más prácticos y organizados para administradores y estudiantes mediante la tecnología.",
     sobre_p2: "Con una amplia variedad de colecciones, SIGA atiende a estudiantes, profesores y personal, centralizando libros de texto, artículos científicos, trabajos de fin de curso (TCC), revistas y otros recursos educativos. Todo ello con acceso las 24 horas del día desde cualquier dispositivo.",
     sobre_p3: "Además de la practicidad, nuestra plataforma prioriza la organización y la facilidad de uso: es posible buscar por categorías, autores y títulos, renovar préstamos en línea y utilizar diversas funciones que facilitan la gestión de la biblioteca. Todo ello de forma sencilla, rápida y accesible. SIGA es más que un sistema digital: es un portal al conocimiento, diseñado para inspirar y apoyar la trayectoria académica de cada usuario. <strong>El conocimiento no puede esperar, y con SIGA siempre está a tu alcance.</strong>",
-    passos_title: "Comienza en <span>3 pasos</span>",
+    passos_title: "Comienza en 3 pasos",
     passos_subtitle: "Sencillo, rápido y gratuito para alumnos",
-    passo1_title: "1. Regístrate",
+    passo1_title: "Regístrate",
     passo1_desc: "Crea tu cuenta gratuita usando tu correo institucional.",
-    passo2_title: "2. Encuentra",
+    passo2_title: "Encuentra",
     passo2_desc: "Busca entre cientos de libros y materiales didácticos.",
-    passo3_title: "3. Accede",
+    passo3_title: "Accede",
     passo3_desc: "¡Reserva libros, realiza préstamos y disfrútalo!"
+  }
+};
+
+const HTML_LANG = { pt: "pt-BR", en: "en", es: "es" };
+const KEY_LANG = "siga-lang";
+const KEY_THEME = "siga-theme";
+
+// localStorage com proteção (navegação privada / bloqueio de cookies)
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignora */ }
   }
 };
 
 // ===================== INICIALIZAÇÃO =====================
 document.addEventListener("DOMContentLoaded", () => {
+  const root = document.documentElement;
   const wrapper = document.querySelector(".language-wrapper");
   const button = document.querySelector(".language-button");
   const items = document.querySelectorAll(".language-list li");
   const mainFlag = button.querySelector(".flag");
   const langSpan = button.querySelector("span");
+  const themeBtn = document.getElementById("theme_toggle");
 
-  // Função que aplica o idioma em todos os elementos
+  let currentLang = "pt";
+
+  // ───────────── IDIOMA ─────────────
   function applyLanguage(lang) {
     const t = translations[lang];
     if (!t) return;
+    currentLang = lang;
 
-    // Elementos principais
-    document.getElementById("title").textContent = t.title;
-    document.getElementById("subtitle").textContent = t.subtitle;
-    document.getElementById("stat_materials").textContent = t.stat_materials;
-    document.getElementById("stat_access").textContent = t.stat_access;
-    document.getElementById("btn_student").textContent = t.btn_student;
-    document.getElementById("btn_admin").textContent = t.btn_admin;
-    document.getElementById("nav_about").textContent = t.nav_about;
-    document.getElementById("nav_contact").textContent = t.nav_contact;
-    document.getElementById("footer_copyright").textContent = t.footer_copyright;
-    document.getElementById("footer_support").textContent = t.footer_support;
-    document.getElementById("footer_terms").textContent = t.footer_terms;
-    document.getElementById("footer_privacy").textContent = t.footer_privacy;
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n];
+    });
+    document.querySelectorAll("[data-i18n-html]").forEach(el => {
+      if (t[el.dataset.i18nHtml] !== undefined) el.innerHTML = t[el.dataset.i18nHtml];
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(el => {
+      if (t[el.dataset.i18nAria] !== undefined) el.setAttribute("aria-label", t[el.dataset.i18nAria]);
+    });
 
-    // Seção Sobre
-    document.getElementById("sobre_title").innerHTML = t.sobre_title;
-    document.getElementById("sobre_subtitle").textContent = t.sobre_subtitle;
-    document.getElementById("sobre_p1").innerHTML = t.sobre_p1;
-    document.getElementById("sobre_p2").innerHTML = t.sobre_p2;
-    document.getElementById("sobre_p3").innerHTML = t.sobre_p3;
+    document.title = t.page_title;
+    root.lang = HTML_LANG[lang];
 
-    // Seção 3 passos
-    document.getElementById("passos_title").innerHTML = t.passos_title;
-    document.getElementById("passos_subtitle").textContent = t.passos_subtitle;
-    document.getElementById("passo1_title").textContent = t.passo1_title;
-    document.getElementById("passo1_desc").textContent = t.passo1_desc;
-    document.getElementById("passo2_title").textContent = t.passo2_title;
-    document.getElementById("passo2_desc").textContent = t.passo2_desc;
-    document.getElementById("passo3_title").textContent = t.passo3_title;
-    document.getElementById("passo3_desc").textContent = t.passo3_desc;
+    // Atualiza o botão de idioma e a opção marcada
+    items.forEach(li => {
+      const selected = li.dataset.lang === lang;
+      li.setAttribute("aria-selected", selected ? "true" : "false");
+      if (selected) {
+        const flag = li.querySelector(".flag");
+        mainFlag.src = flag.src;
+        mainFlag.alt = flag.alt;
+      }
+    });
+    langSpan.textContent = lang.toUpperCase();
   }
 
-  // ── Gerencia abertura/fechamento do dropdown com acessibilidade ──
+  // ── Dropdown de idioma com acessibilidade por teclado ──
   function openMenu() {
     wrapper.classList.add("open");
     button.setAttribute("aria-expanded", "true");
-    // Habilita Tab nos itens somente quando o menu está aberto
     items.forEach(li => li.setAttribute("tabindex", "0"));
-    // Foca o primeiro item ao abrir pelo teclado
     items[0] && items[0].focus();
   }
 
   function closeMenu(returnFocus = false) {
     wrapper.classList.remove("open");
     button.setAttribute("aria-expanded", "false");
-    // Remove os itens do fluxo de Tab quando o menu está fechado
     items.forEach(li => li.setAttribute("tabindex", "-1"));
     if (returnFocus) button.focus();
   }
 
-  // Estado inicial: menu fechado, itens fora do Tab
-  button.setAttribute("aria-expanded", "false");
-  button.setAttribute("aria-haspopup", "listbox");
-  items.forEach(li => {
-    li.setAttribute("tabindex", "-1");
-    li.setAttribute("role", "option");
-  });
-
-  // Clique no botão
   button.addEventListener("click", (e) => {
     e.stopPropagation();
     wrapper.classList.contains("open") ? closeMenu(true) : openMenu();
   });
 
-  // Enter / Space abre o menu quando o botão está focado
   button.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      wrapper.classList.contains("open") ? closeMenu(true) : openMenu();
-    } else if (e.key === "Escape") {
-      closeMenu(true);
-    }
+    if (e.key === "Escape") closeMenu(true);
   });
 
-  // Fechar ao clicar fora
   document.addEventListener("click", (e) => {
     if (!wrapper.contains(e.target)) closeMenu();
   });
 
-  // Trocar idioma ao clicar ou pressionar Enter/Space nas opções
   items.forEach((item, index) => {
     item.addEventListener("click", () => selectLanguage(item));
 
@@ -187,52 +201,70 @@ document.addEventListener("DOMContentLoaded", () => {
         closeMenu(true);
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
-        const next = items[index + 1] || items[0];
-        next.focus();
+        (items[index + 1] || items[0]).focus();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        const prev = items[index - 1] || items[items.length - 1];
-        prev.focus();
+        (items[index - 1] || items[items.length - 1]).focus();
       } else if (e.key === "Tab") {
-        // Fecha o menu apenas se sair do último item (Shift+Tab no primeiro também fecha)
         const isLast = index === items.length - 1;
         const isFirst = index === 0;
-        if ((!e.shiftKey && isLast) || (e.shiftKey && isFirst)) {
-          closeMenu();
-        }
+        if ((!e.shiftKey && isLast) || (e.shiftKey && isFirst)) closeMenu();
       }
     });
   });
 
   function selectLanguage(item) {
     const lang = item.dataset.lang;
-    const clickedFlag = item.querySelector(".flag").src;
-    const clickedAlt = item.querySelector(".flag").alt;
-
-    langSpan.textContent = lang.toUpperCase();
-    mainFlag.src = clickedFlag;
-    mainFlag.alt = "Bandeira " + clickedAlt;
-
     applyLanguage(lang);
+    store.set(KEY_LANG, lang);
     closeMenu(true);
   }
 
-  // Idioma inicial: português
-  applyLanguage("pt");
+  // ───────────── TEMA ESCURO ─────────────
+  function setTheme(theme, save = true) {
+    root.setAttribute("data-theme", theme);
+    themeBtn.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    if (save) store.set(KEY_THEME, theme);
+  }
 
-  // ===================== EVENTOS DOS LINKS DO FOOTER =====================
-  document.getElementById("footer_support").addEventListener("click", (e) => {
-    e.preventDefault();
-    alert("💬 Suporte SIGA: suporte@SIGAitj.com\nWhatsApp: (11) 91234-5678");
+  themeBtn.addEventListener("click", () => {
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
   });
 
-  document.getElementById("footer_terms").addEventListener("click", (e) => {
-    e.preventDefault();
-    alert("📄 Termos de Uso: Este é um ambiente acadêmico. O uso indevido implica em sanções disciplinares.");
+  // Estado inicial (o <head> já aplicou o tema; aqui só sincronizamos o botão)
+  setTheme(root.getAttribute("data-theme") === "dark" ? "dark" : "light", false);
+
+  // Se a pessoa nunca escolheu manualmente, acompanha mudanças do sistema
+  if (window.matchMedia) {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const onSystemChange = (e) => {
+      if (!store.get(KEY_THEME)) setTheme(e.matches ? "dark" : "light", false);
+    };
+    mq.addEventListener ? mq.addEventListener("change", onSystemChange) : mq.addListener(onSystemChange);
+  }
+
+  // ───────────── RODAPÉ: janela de informações ─────────────
+  const dialog = document.getElementById("info_dialog");
+  const dialogTitle = document.getElementById("info_title");
+  const dialogBody = document.getElementById("info_body");
+
+  document.querySelectorAll("[data-dialog]").forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const name = link.dataset.dialog; // support | terms | privacy
+      const t = translations[currentLang];
+      dialogTitle.textContent = t["footer_" + name];
+      dialogBody.textContent = t[name + "_body"];
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+    });
   });
 
-  document.getElementById("footer_privacy").addEventListener("click", (e) => {
-    e.preventDefault();
-    alert("🔒 Política de Privacidade: Seus dados são utilizados apenas para fins institucionais e não são compartilhados.");
-  });
+  document.getElementById("info_close").addEventListener("click", () => dialog.close());
+  // Clicar fora da janela também fecha
+  dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+
+  // ───────────── IDIOMA INICIAL ─────────────
+  const saved = store.get(KEY_LANG);
+  applyLanguage(translations[saved] ? saved : "pt");
 });

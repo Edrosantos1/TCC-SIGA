@@ -110,7 +110,7 @@ function rotuloPrazo(r) {
     return { texto: `Em ${d} dias`, classe: 'aux-ok' };
 }
 
-// ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
+// ========== BUSCA DE ALUNO NO TOPO ==========
 function getAvatarColor() { return '#0b4b9b'; }
 
 function getStatusIcon(aluno) {
@@ -264,7 +264,7 @@ function filtrarEOrdenar() {
     const termos = normalizar(buscaAtual).split(/\s+/).filter(Boolean);
     if (termos.length) {
         lista = lista.filter(r => {
-            const alvo = normalizar(`${r.aluno} ${r.material}`);
+            const alvo = normalizar(r.aluno || '');
             return termos.every(t => alvo.includes(t));
         });
     }
@@ -370,12 +370,12 @@ function renderizarReservas() {
                     <div class="aluno-info">
                         <span class="aluno-avatar" aria-hidden="true">${escapeHtml(inicial)}</span>
                         <div class="aluno-texto">
-                            <span class="aluno-nome" title="${escapeHtml(r.aluno)}">${destacar(r.aluno, termos)}</span>
+                            <span class="aluno-nome" title="${escapeHtml(r.aluno)}">${escapeHtml(r.aluno)}</span>
                             ${serie}
                         </div>
                     </div>
                 </td>
-                <td class="material-nome" data-label="Material">${destacar(r.material, termos)}</td>
+                <td class="material-nome" data-label="Material">${escapeHtml(r.material)}</td>
                 <td class="text-center" data-label="Tipo"><span class="tipo-badge">${escapeHtml(r.tipo || 'Livro')}</span></td>
                 <td class="col-data" data-label="Reserva">
                     <div class="data-cell"><span class="data-principal">${dataRes}</span></div>
@@ -752,14 +752,6 @@ function definirFiltro(status) {
 
 function definirBusca(termo) {
     buscaAtual = termo;
-    const buscaAtiva = document.getElementById('filtro-busca-ativa');
-    const buscaTermo = document.getElementById('busca-termo');
-    if (termo) {
-        if (buscaTermo) buscaTermo.textContent = termo;
-        if (buscaAtiva) buscaAtiva.style.display = 'flex';
-    } else if (buscaAtiva) {
-        buscaAtiva.style.display = 'none';
-    }
     renderizarReservas();
 }
 
@@ -767,15 +759,11 @@ function limparFiltros() {
     const input = document.getElementById('filtro-tabela');
     if (input) input.value = '';
     buscaAtual = '';
-    const buscaAtiva = document.getElementById('filtro-busca-ativa');
-    if (buscaAtiva) buscaAtiva.style.display = 'none';
     definirFiltro('todos');
 }
 
 function initFiltros() {
-    // A BUSCA DA TABELA agora usa #filtro-tabela (não mais #search-input)
     const buscaInput = document.getElementById('filtro-tabela');
-    const limparBusca = document.getElementById('limpar-busca');
 
     document.querySelectorAll('.filtro-tab').forEach(tab => {
         tab.addEventListener('click', () => definirFiltro(tab.dataset.status));
@@ -785,20 +773,13 @@ function initFiltros() {
     if (buscaInput) {
         buscaInput.addEventListener('input', function () {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => definirBusca(this.value.trim()), 200);
+            timeoutId = setTimeout(() => definirBusca(this.value.trim()), 120);
         });
         buscaInput.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && this.value) {
                 this.value = '';
                 definirBusca('');
             }
-        });
-    }
-
-    if (limparBusca) {
-        limparBusca.addEventListener('click', function () {
-            if (buscaInput) { buscaInput.value = ''; buscaInput.focus(); }
-            definirBusca('');
         });
     }
 
@@ -809,7 +790,6 @@ function initFiltros() {
     const btnNovaTopo = document.getElementById('btn-nova-reserva');
     if (btnNovaVazio && btnNovaTopo) btnNovaVazio.addEventListener('click', () => btnNovaTopo.click());
 
-    // Atalho "/" foca o filtro da tabela
     document.addEventListener('keydown', (e) => {
         const modal = document.getElementById('modal-confirmacao');
         const digitando = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
@@ -976,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initModalConfirmacao();
     initAcoesReserva();
     initAcoesMassa();
-    initSearch();  // ← busca global de aluno no topo
+    initSearch();
 
     document.querySelectorAll('.filtro-tab').forEach(t => {
         const ativo = t.dataset.status === filtroAtual;

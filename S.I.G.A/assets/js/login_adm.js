@@ -1,146 +1,158 @@
-document.addEventListener("DOMContentLoaded", () => {
+// ==================== TRADUÇÕES ====================
+const translations = {
+  pt: {
+    page_title: "Login Administrador · SiGA ITJ",
+    titleLogin: "Login Admin",
+    phEmail: "Email",
+    phPassword: "Senha",
+    btnLogin: "Entrar",
+    msgCaps: "Caps Lock ativado!",
+    panelTitle: "Painel Administrativo",
+    panelDesc: "Gerencie sua biblioteca com praticidade.",
+    back_label: "Voltar para página inicial",
+    theme_label: "Tema escuro",
+    lang_label: "Selecionar idioma",
+    show_password: "Mostrar senha",
+    hide_password: "Ocultar senha"
+  },
+  en: {
+    page_title: "Administrator Login · SiGA ITJ",
+    titleLogin: "Admin Login",
+    phEmail: "Email",
+    phPassword: "Password",
+    btnLogin: "Sign In",
+    msgCaps: "Caps Lock is on!",
+    panelTitle: "Admin Panel",
+    panelDesc: "Manage your library with practicality.",
+    back_label: "Back to home page",
+    theme_label: "Dark theme",
+    lang_label: "Select language",
+    show_password: "Show password",
+    hide_password: "Hide password"
+  },
+  es: {
+    page_title: "Acceso de Administrador · SiGA ITJ",
+    titleLogin: "Login Admin",
+    phEmail: "Correo electrónico",
+    phPassword: "Contraseña",
+    btnLogin: "Entrar",
+    msgCaps: "¡Bloq Mayús activado!",
+    panelTitle: "Panel de Administración",
+    panelDesc: "Gestiona tu biblioteca con practicidad.",
+    back_label: "Volver a la página de inicio",
+    theme_label: "Tema oscuro",
+    lang_label: "Seleccionar idioma",
+    show_password: "Mostrar contraseña",
+    hide_password: "Ocultar contraseña"
+  }
+};
 
-  // Referências
+const HTML_LANG = { pt: "pt-BR", en: "en", es: "es" };
+const KEY_LANG = "siga-lang";        // mesma chave da página inicial
+const KEY_LANG_OLD = "idiomaAdmin";  // chave antiga (continua sendo lida)
+const KEY_THEME = "siga-theme";
+
+// localStorage com proteção (navegação privada / bloqueio de cookies)
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignora */ } }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const root = document.documentElement;
+
+  // Idioma
   const wrapper = document.querySelector(".language-wrapper");
   const langBtn = document.querySelector(".language-button");
   const langItems = document.querySelectorAll(".language-list li");
   const currentFlag = document.getElementById("current-flag");
   const currentLangText = document.getElementById("current-lang-text");
 
+  // Formulário
   const emailInput = document.getElementById("admin-email");
   const passwordInput = document.getElementById("admin-password");
   const capsWarning = document.getElementById("caps_warning_admin");
   const formLogin = document.getElementById("form-login-adm");
   const errorMessageDiv = document.getElementById("error-message");
+  const submitBtn = document.getElementById("btn-submit-login");
+  const eyeBtn = document.getElementById("toggleAdminPassword");
+  const eyeIcon = eyeBtn.querySelector("i");
+  const themeBtn = document.getElementById("theme_toggle");
 
-  // ==================== TRADUÇÕES ====================
   let idiomaAtual = "pt";
 
-  const translations = {
-    pt: { 
-      flag: "../assets/Imagens/br.png", 
-      titleLogin: "Login Admin", 
-      phEmail: "Email", 
-      phPassword: "Senha", 
-      btnLogin: "Entrar", 
-      linkForgot: "Esqueceu a senha?", 
-      msgCaps: "Caps Lock ativado!", 
-      panelTitle: "Painel Administrativo", 
-      panelDesc: "Gerencie sua biblioteca com praticidade.",
-      errorLogin: "E-mail ou senha inválidos",
-      errorEmpty: "Preencha o e-mail e a senha" 
-    },
-    en: { 
-      flag: "../assets/Imagens/us.png", 
-      titleLogin: "Admin Login", 
-      phEmail: "Email", 
-      phPassword: "Password", 
-      btnLogin: "Sign In", 
-      linkForgot: "Forgot Password?", 
-      msgCaps: "Caps Lock is on!", 
-      panelTitle: "Admin Panel", 
-      panelDesc: "Manages your library with practicality.",
-      errorLogin: "Invalid email or password",
-      errorEmpty: "Please fill in email and password" 
-    },
-    es: { 
-      flag: "../assets/Imagens/es.png", 
-      titleLogin: "Login Admin", 
-      phEmail: "Correo electrónico", 
-      phPassword: "Contraseña", 
-      btnLogin: "Entrar", 
-      linkForgot: "¿Olvidaste tu contraseña?", 
-      msgCaps: "¡Bloq Mayús activado!", 
-      panelTitle: "Panel de Administración", 
-      panelDesc: "Gestiona tu biblioteca con practicidad.",
-      errorLogin: "Correo o contraseña inválidos",
-      errorEmpty: "Por favor complete el correo y la contraseña" 
-    }
-  };
-
-  // Salvar e carregar idioma
-  function saveLanguage(lang) {
-    localStorage.setItem('idiomaAdmin', lang);
-  }
-
-  function loadSavedLanguage() {
-    const savedLang = localStorage.getItem('idiomaAdmin');
-    if (savedLang && translations[savedLang]) {
-      idiomaAtual = savedLang;
-      currentFlag.src = translations[savedLang].flag;
-      currentLangText.textContent = savedLang.toUpperCase();
-      applyLanguage(savedLang);
-    }
+  // ───────────── IDIOMA ─────────────
+  function updateEye() {
+    const t = translations[idiomaAtual];
+    const visible = passwordInput.type === "text";
+    eyeBtn.setAttribute("aria-label", visible ? t.hide_password : t.show_password);
+    eyeBtn.setAttribute("aria-pressed", visible ? "true" : "false");
+    eyeIcon.classList.toggle("fa-eye", !visible);
+    eyeIcon.classList.toggle("fa-eye-slash", visible);
   }
 
   function applyLanguage(lang) {
     const t = translations[lang];
     if (!t) return;
+    idiomaAtual = lang;
 
-    document.querySelector(".dot-title").textContent = t.titleLogin;
-    emailInput.placeholder = t.phEmail;
-    passwordInput.placeholder = t.phPassword;
-    document.getElementById("btn-submit-login").textContent = t.btnLogin;
-    document.querySelector(".options-group a").textContent = t.linkForgot;
-    capsWarning.textContent = t.msgCaps;
-    document.getElementById("panel-title").textContent = t.panelTitle;
-    document.getElementById("panel-desc").textContent = t.panelDesc;
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      if (t[el.dataset.i18n] !== undefined) el.textContent = t[el.dataset.i18n];
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+      if (t[el.dataset.i18nPh] !== undefined) el.placeholder = t[el.dataset.i18nPh];
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(el => {
+      if (t[el.dataset.i18nAria] !== undefined) el.setAttribute("aria-label", t[el.dataset.i18nAria]);
+    });
+
+    document.title = t.page_title;
+    root.lang = HTML_LANG[lang];
+
+    langItems.forEach(li => {
+      const selected = li.dataset.lang === lang;
+      li.setAttribute("aria-selected", selected ? "true" : "false");
+      if (selected) {
+        const flag = li.querySelector(".flag");
+        currentFlag.src = flag.src;
+        currentFlag.alt = flag.alt;
+      }
+    });
+    currentLangText.textContent = lang.toUpperCase();
+    updateEye();
   }
 
-  loadSavedLanguage();
-
-  // ── Gerencia abertura/fechamento do dropdown com acessibilidade ──
+  // ── Dropdown de idioma com acessibilidade por teclado ──
   function openMenu() {
-    wrapper.classList.add("active");
+    wrapper.classList.add("open");
     langBtn.setAttribute("aria-expanded", "true");
-    // Habilita Tab nos itens somente quando o menu está aberto
     langItems.forEach(li => li.setAttribute("tabindex", "0"));
-    // Foca o primeiro item ao abrir pelo teclado
     langItems[0] && langItems[0].focus();
   }
 
   function closeMenu(returnFocus = false) {
-    wrapper.classList.remove("active");
+    wrapper.classList.remove("open");
     langBtn.setAttribute("aria-expanded", "false");
-    // Remove os itens do fluxo de Tab quando o menu está fechado
     langItems.forEach(li => li.setAttribute("tabindex", "-1"));
     if (returnFocus) langBtn.focus();
   }
 
-  // Estado inicial: menu fechado, itens fora do Tab
-  langBtn.setAttribute("aria-expanded", "false");
-  langBtn.setAttribute("aria-haspopup", "listbox");
-  langItems.forEach(li => {
-    li.setAttribute("tabindex", "-1");
-    li.setAttribute("role", "option");
-  });
-
-  // Clique no botão
   langBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    wrapper.classList.contains("active") ? closeMenu(true) : openMenu();
+    wrapper.classList.contains("open") ? closeMenu(true) : openMenu();
   });
 
-  // Enter / Space abre o menu; Escape fecha
   langBtn.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      wrapper.classList.contains("active") ? closeMenu(true) : openMenu();
-    } else if (e.key === "Escape") {
-      closeMenu(true);
-    }
+    if (e.key === "Escape") closeMenu(true);
   });
 
-  // Fechar ao clicar fora
   document.addEventListener("click", (e) => {
     if (!wrapper.contains(e.target)) closeMenu();
   });
 
   langItems.forEach((item, index) => {
-    // Seleção por clique
     item.addEventListener("click", () => selectLang(item));
 
-    // Seleção e navegação por teclado
     item.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -149,19 +161,14 @@ document.addEventListener("DOMContentLoaded", () => {
         closeMenu(true);
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
-        const next = langItems[index + 1] || langItems[0];
-        next.focus();
+        (langItems[index + 1] || langItems[0]).focus();
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        const prev = langItems[index - 1] || langItems[langItems.length - 1];
-        prev.focus();
+        (langItems[index - 1] || langItems[langItems.length - 1]).focus();
       } else if (e.key === "Tab") {
-        // Fecha o menu apenas se sair do último item (Shift+Tab no primeiro também fecha)
         const isLast = index === langItems.length - 1;
         const isFirst = index === 0;
-        if ((!e.shiftKey && isLast) || (e.shiftKey && isFirst)) {
-          closeMenu();
-        }
+        if ((!e.shiftKey && isLast) || (e.shiftKey && isFirst)) closeMenu();
       }
     });
   });
@@ -169,49 +176,51 @@ document.addEventListener("DOMContentLoaded", () => {
   function selectLang(item) {
     const lang = item.dataset.lang;
     if (lang && translations[lang]) {
-      idiomaAtual = lang;
-      currentFlag.src = translations[lang].flag;
-      currentLangText.textContent = lang.toUpperCase();
       applyLanguage(lang);
-      saveLanguage(lang);
+      store.set(KEY_LANG, lang);
     }
     closeMenu(true);
   }
 
-  // Limpar URL
-  function cleanUrl() {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('erro')) {
-      url.searchParams.delete('erro');
-      window.history.replaceState({}, '', url);
-    }
+  // ───────────── TEMA ESCURO ─────────────
+  function setTheme(theme, save = true) {
+    root.setAttribute("data-theme", theme);
+    themeBtn.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+    if (save) store.set(KEY_THEME, theme);
   }
-  cleanUrl();
 
-  // Olho da senha
-  function setupToggle(toggleId, inputId) {
-    const toggle = document.getElementById(toggleId);
-    const input = document.getElementById(inputId);
-    if (!toggle || !input) return;
-    toggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      const isPassword = input.type === "password";
-      input.type = isPassword ? "text" : "password";
-      toggle.classList.toggle("fa-eye", isPassword);
-      toggle.classList.toggle("fa-eye-slash", !isPassword);
-    });
-  }
-  setupToggle("toggleAdminPassword", "admin-password");
-
-  // Caps Lock
-  passwordInput.addEventListener("keyup", (e) => {
-    capsWarning.style.display = e.getModifierState("CapsLock") ? "block" : "none";
-  });
-  passwordInput.addEventListener("focusout", () => {
-    capsWarning.style.display = "none";
+  themeBtn.addEventListener("click", () => {
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
   });
 
-  // Navegação com Enter
+  // O <head> já aplicou o tema; aqui só sincronizamos o botão
+  setTheme(root.getAttribute("data-theme") === "dark" ? "dark" : "light", false);
+
+  // ───────────── LIMPAR ?erro= DA URL ─────────────
+  const url = new URL(window.location.href);
+  if (url.searchParams.has("erro")) {
+    url.searchParams.delete("erro");
+    window.history.replaceState({}, "", url);
+  }
+
+  // ───────────── OLHO DA SENHA ─────────────
+  eyeBtn.addEventListener("click", () => {
+    passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    updateEye();
+    passwordInput.focus();
+  });
+
+  // ───────────── CAPS LOCK ─────────────
+  function checkCaps(e) {
+    capsWarning.hidden = !(e.getModifierState && e.getModifierState("CapsLock"));
+  }
+  passwordInput.addEventListener("keydown", checkCaps);
+  passwordInput.addEventListener("keyup", checkCaps);
+  passwordInput.addEventListener("focusout", () => { capsWarning.hidden = true; });
+
+  // ───────────── ENTER ─────────────
+  // No e-mail, Enter leva para a senha. Na senha, o Enter nativo envia o
+  // formulário (já respeitando a validação dos campos obrigatórios).
   emailInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -219,27 +228,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  passwordInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      formLogin.submit();
-    }
-  });
-
-  // Esconder erro ao digitar
+  // ───────────── ESCONDER ERRO AO DIGITAR ─────────────
   if (errorMessageDiv) {
     [emailInput, passwordInput].forEach(campo => {
-      campo.addEventListener("focus", () => errorMessageDiv.style.display = "none");
-      campo.addEventListener("input", () => errorMessageDiv.style.display = "none");
+      campo.addEventListener("focus", () => { errorMessageDiv.style.display = "none"; });
+      campo.addEventListener("input", () => { errorMessageDiv.style.display = "none"; });
     });
   }
 
-  // Loading no botão
+  // ───────────── LOADING NO BOTÃO ─────────────
   formLogin.addEventListener("submit", () => {
-    const btn = document.getElementById("btn-submit-login");
-    const textoOriginal = btn.textContent;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + textoOriginal;
-    btn.disabled = true;
+    const textoOriginal = submitBtn.textContent;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> ' + textoOriginal;
+    submitBtn.disabled = true;
   });
 
+  // Se a pessoa voltar pelo botão "voltar" do navegador, destrava o botão
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = translations[idiomaAtual].btnLogin;
+    }
+  });
+
+  // ───────────── IDIOMA INICIAL ─────────────
+  const saved = store.get(KEY_LANG) || store.get(KEY_LANG_OLD);
+  applyLanguage(translations[saved] ? saved : "pt");
 });

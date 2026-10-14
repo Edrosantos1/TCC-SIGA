@@ -1,151 +1,185 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>Acesso - SIGA ITJ</title>
+
+  <!-- Aplica o tema salvo (ou o do sistema) ANTES de renderizar, evitando "piscar" branco -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("siga-theme");
+        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="assets/css/preview.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100..900&family=Roboto:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/preview.css">
 </head>
-<body>
+<body id="inicio">
 
   <!-- BOTÃO WHATSAPP -->
-  <a href="https://wa.me/5511912345678" class="whatsapp-float" target="_blank" aria-label="Fale conosco no WhatsApp" tabindex="7">
-    <i class="fab fa-whatsapp"></i>
+  <a href="https://wa.me/5511912345678" class="whatsapp-float" target="_blank" rel="noopener"
+     data-i18n-aria="whatsapp_label" aria-label="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp" aria-hidden="true"></i>
   </a>
 
-  <header class="top-header">
-    <div class="logo">
-      <i class="fas fa-book-reader"></i>
-      <span><strong>SIGA ITJ</strong></span>
-    </div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#inicio" class="logo" aria-label="SIGA ITJ">
+        <i class="fas fa-book-reader" aria-hidden="true"></i>
+        <span><strong>SIGA ITJ</strong></span>
+      </a>
 
-    <nav class="nav-links">
-      <a href="#sobre" id="nav_about" tabindex="3">Sobre o SIGA</a>
-      <a href="https://wa.me/5511912345678" target="_blank" id="nav_contact" tabindex="4">Fale com a Secretaria</a>
-    </nav>
-    
-    <div class="language-wrapper">
-      <button class="language-button" aria-label="Selecionar idioma" aria-expanded="false" aria-haspopup="listbox" tabindex="6">
-        <img src="assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
-        <span>PT</span>
-        <svg viewBox="0 0 24 24">
-          <path d="M7 10l5 5 5-5"/>
-        </svg>
-      </button>
+      <nav class="nav-links" aria-label="Principal">
+        <a href="#sobre" data-i18n="nav_about">Sobre o SIGA</a>
+        <a href="https://wa.me/5511912345678" target="_blank" rel="noopener" data-i18n="nav_contact">Fale com a Secretaria</a>
+      </nav>
 
-      <ul class="language-list" role="listbox">
-        <li data-lang="pt" tabindex="-1" role="option">
-          <img src="assets/Imagens/br.png" class="flag" alt="Português"> Português
-        </li>
-        <li data-lang="en" tabindex="-1" role="option">
-          <img src="assets/Imagens/us.png" class="flag" alt="English"> English
-        </li>
-        <li data-lang="es" tabindex="-1" role="option">
-          <img src="assets/Imagens/es.png" class="flag" alt="Español"> Español
-        </li>
-      </ul>
+      <div class="header-actions">
+        <!-- BOTÃO DE TEMA ESCURO -->
+        <button type="button" class="theme-toggle" id="theme_toggle" aria-pressed="false"
+                data-i18n-aria="theme_label" aria-label="Tema escuro">
+          <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+          <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+        </button>
+
+        <div class="language-wrapper">
+          <button type="button" class="language-button" data-i18n-aria="lang_label"
+                  aria-label="Selecionar idioma" aria-expanded="false" aria-haspopup="listbox">
+            <img src="assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
+            <span>PT</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
+          </button>
+
+          <ul class="language-list" role="listbox">
+            <li data-lang="pt" tabindex="-1" role="option" aria-selected="true">
+              <img src="assets/Imagens/br.png" class="flag" alt="Português"> Português
+            </li>
+            <li data-lang="en" tabindex="-1" role="option" aria-selected="false">
+              <img src="assets/Imagens/us.png" class="flag" alt="English"> English
+            </li>
+            <li data-lang="es" tabindex="-1" role="option" aria-selected="false">
+              <img src="assets/Imagens/es.png" class="flag" alt="Español"> Español
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </header>
 
-  <main class="hero-container">
-    <div class="hero-content">
-      <h1 id="title">Bem vindo ao SIGA</h1>
-      <p id="subtitle">Acesse livros, materiais e recursos educacionais em um só lugar.</p>
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h1 data-i18n="title">Seja muito bem-vindo ao SIGA</h1>
+        <p class="hero-sub" data-i18n="subtitle">Acesse livros, materiais e recursos educacionais em um só lugar.</p>
 
-      <div class="stats">
-        <span id="stat_materials">+500 materiais</span>
-        <span>•</span>
-        <span id="stat_access">Acesso ilimitado</span>
-      </div>
-      
-      <div class="profiles">
-        <a href="aluno/redirecionar_user.php" class="profile-btn student-btn" tabindex="1">
-          <i class="fas fa-user-graduate"></i>
-          <span id="btn_student">Sou Aluno</span>
-        </a>
-        <a href="adm/login_adm.php" class="profile-btn admin-btn" tabindex="2">
-          <i class="fas fa-user-shield"></i>
-          <span id="btn_admin">Sou Administrador</span>
-        </a>
-      </div>
-    </div>
+        <ul class="stats">
+          <li><i class="fas fa-book" aria-hidden="true"></i><span data-i18n="stat_materials">+500 materiais</span></li>
+          <li><i class="fas fa-infinity" aria-hidden="true"></i><span data-i18n="stat_access">Acesso ilimitado</span></li>
+        </ul>
 
-    <div class="hero-image">
-      <img src="assets/Imagens/garota.jpg" class="humano" alt="Estudante sorrindo segurando cadernos">
-      <div class="floating-icon icon-1"><i class="fas fa-bookmark"></i></div>
-      <div class="floating-icon icon-2"><i class="fas fa-book-open"></i></div>
-    </div>
+        <div class="profiles">
+          <a href="aluno/redirecionar_user.php" class="profile-btn student-btn">
+            <i class="fas fa-user-graduate" aria-hidden="true"></i>
+            <span data-i18n="btn_student">Sou Aluno</span>
+          </a>
+          <a href="adm/login_adm.php" class="profile-btn admin-btn">
+            <i class="fas fa-user-shield" aria-hidden="true"></i>
+            <span data-i18n="btn_admin">Sou Administrador</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <img src="assets/Imagens/garota.jpg" class="humano" alt="Estudante sorrindo segurando cadernos">
+        <div class="floating-icon icon-1" aria-hidden="true"><i class="fas fa-bookmark"></i></div>
+        <div class="floating-icon icon-2" aria-hidden="true"><i class="fas fa-book-open"></i></div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO SOBRE -->
+    <section class="about-siga" id="sobre" aria-labelledby="sobre_title">
+      <div class="about-inner">
+        <div class="section-header">
+          <h2 id="sobre_title" data-i18n="sobre_title">O que é o SIGA?</h2>
+          <p data-i18n="sobre_subtitle">Conheça um pouco do nosso trabalho e propósito</p>
+        </div>
+
+        <div class="about-content">
+          <div class="about-text">
+            <p data-i18n-html="sobre_p1">
+              O <strong>SIGA</strong> (Sistema Gerenciador de Alunos e Acervos) é uma plataforma digital de gerenciamento de bibliotecas escolares, criado com a missão de tornar o gerenciamento e uso da biblioteca mais prático e organizado para administradores e alunos por meio da tecnologia.
+            </p>
+            <p data-i18n-html="sobre_p2">
+              Com uma grande variedade de acervos, o SIGA atende alunos, professores e funcionários, centralizando livros didáticos, artigos científicos, cadernos de TCCs, periódicos e outros recursos educacionais. Tudo isso com acesso de 24 horas por dia, de qualquer dispositivo.
+            </p>
+            <p data-i18n-html="sobre_p3">
+              Além da praticidade, nossa plataforma prioriza a organização e a facilidade de uso: é possível pesquisar por categorias, autores e títulos, renovar empréstimos online, e utilizar diversas funcionalidades que facilitam o gerenciamento da biblioteca. Tudo isso de forma simples, rápida e acessível. O SIGA é mais do que um sistema digital – é um portal para o conhecimento, projetado para inspirar e apoiar a jornada acadêmica de cada usuário. <strong>O conhecimento não pode esperar, e com o SIGA está sempre ao seu alcance.</strong>
+            </p>
+          </div>
+
+          <div class="about-image">
+            <img src="assets/Imagens/bibliotecaria_usando_siga.png"
+                 alt="Aluno de costas usando o SiGA ITJ num notebook na biblioteca" class="about-img" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="how-it-works" aria-labelledby="passos_title">
+      <div class="how-inner">
+        <div class="section-header">
+          <h2 id="passos_title" data-i18n="passos_title">Comece em 3 passos</h2>
+          <p data-i18n="passos_subtitle">Simples, rápido e gratuito para alunos</p>
+        </div>
+
+        <ol class="steps-container">
+          <li class="step-card">
+            <div class="step-icon"><i class="fas fa-user-plus" aria-hidden="true"></i></div>
+            <h3 data-i18n="passo1_title">Cadastre-se</h3>
+            <p data-i18n="passo1_desc">Crie sua conta gratuita usando seu email institucional.</p>
+          </li>
+          <li class="step-card">
+            <div class="step-icon"><i class="fas fa-search" aria-hidden="true"></i></div>
+            <h3 data-i18n="passo2_title">Encontre</h3>
+            <p data-i18n="passo2_desc">Pesquise entre centenas de livros e materiais didáticos.</p>
+          </li>
+          <li class="step-card">
+            <div class="step-icon"><i class="fas fa-book-open" aria-hidden="true"></i></div>
+            <h3 data-i18n="passo3_title">Acesse</h3>
+            <p data-i18n="passo3_desc">Faça reservas, realize empréstimos e aproveite!</p>
+          </li>
+        </ol>
+      </div>
+    </section>
   </main>
-
-  <!-- SEÇÃO SOBRE -->
-  <section class="about-siga">
-    <div id="sobre" class="section-header">
-      <h2 id="sobre_title">O que é a <span>SIGA</span>?</h2>
-      <p id="sobre_subtitle">Conheça um pouco do nosso trabalho e propósito</p>
-    </div>
-    <div class="about-content">
-      <div class="about-text">
-        <p id="sobre_p1">
-          O <strong>SIGA</strong> (Sistema Integrado de Gestão de Acervo) é a plataforma digital de gerenciamento de bibliotecas escolares. 
-          Nossa missão é democratizar o acesso ao conhecimento, oferecendo um ambiente virtual completo para consulta e empréstimos
-          de materiais acadêmicos.
-        </p>
-        <p id="sobre_p2">
-          Com um acervo em constante crescimento, o SIGA atende alunos, professores e funcionários, centralizando livros didáticos, 
-          artigos científicos, periódicos e outros recursos educacionais. Tudo isso com acesso ilimitado, 24 horas por dia, 
-          de qualquer dispositivo.
-        </p>
-        <p id="sobre_p3">
-          Além da praticidade, nossa plataforma prioriza a organização e a inclusão: é possível pesquisar por categorias, 
-          autores e títulos, renovar empréstimos online, tudo isso na palma da sua mão. O SIGA é mais do que uma biblioteca digital – é um portal para o conhecimento,
-          projetado para inspirar e apoiar a jornada acadêmica de cada usuário.
-          <strong>O conhecimento não pode esperar e com o SIGA, está sempre ao seu alcance.</strong>
-        </p>
-      </div>
-      <div class="about-image">
-        <img src="assets/Imagens/bibliotecaria_usando_siga.png" alt="Aluno de costas usando o SiGA ITJ num notebook na biblioteca" class="about-img">
-      </div>
-    </div>
-  </section>
-
-  <section class="how-it-works">
-    <div class="section-header">
-      <h2 id="passos_title">Comece em 3 passos</h2>
-      <p id="passos_subtitle">Simples, rápido e gratuito para alunos</p>
-    </div>
-    <div class="steps-container">
-      <div class="step-card">
-        <div class="step-icon"><i class="fas fa-user-plus"></i></div>
-        <h3 id="passo1_title">1. Cadastre-se</h3>
-        <p id="passo1_desc">Crie sua conta gratuita usando seu email institucional.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon"><i class="fas fa-search"></i></div>
-        <h3 id="passo2_title">2. Encontre</h3>
-        <p id="passo2_desc">Pesquise entre centenas de livros e materiais didáticos.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-icon"><i class="fas fa-book-open"></i></div>
-        <h3 id="passo3_title">3. Acesse</h3>
-        <p id="passo3_desc">Leia online ou faça download para estudar onde quiser.</p>
-      </div>
-    </div>
-  </section>
 
   <footer class="main-footer">
     <div class="footer-content">
-      <p id="footer_copyright">&copy; 2026 SIGA ITJ. Todos os direitos reservados.</p>
+      <p data-i18n="footer_copyright">&copy; 2026 SIGA. Todos os direitos reservados.</p>
       <div class="footer-links">
-        <a href="#" id="footer_support" tabindex="8"><strong>Suporte</strong></a>
-        <a href="#" id="footer_terms" tabindex="9">Termos de Uso</a>
-        <a href="#" id="footer_privacy" tabindex="10">Política de Privacidade</a>
+        <a href="#" data-dialog="support" data-i18n="footer_support">Suporte</a>
+        <a href="#" data-dialog="terms" data-i18n="footer_terms">Termos de Uso</a>
+        <a href="#" data-dialog="privacy" data-i18n="footer_privacy">Política de Privacidade</a>
       </div>
     </div>
   </footer>
+
+  <!-- Janela de informações (substitui os alert() do rodapé) -->
+  <dialog id="info_dialog" aria-labelledby="info_title">
+    <h2 id="info_title"></h2>
+    <p id="info_body"></p>
+    <button type="button" class="dialog-close" id="info_close" data-i18n="modal_close">Fechar</button>
+  </dialog>
 
   <script src="assets/js/preview.js"></script>
 </body>

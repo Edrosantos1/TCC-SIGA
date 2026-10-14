@@ -91,7 +91,7 @@ function rotuloDias(p) {
 
 const venceHoje = p => p.status !== 'atrasado' && p.dias_restantes === 0;
 
-// ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
+// ========== BUSCA DE ALUNO NO TOPO ==========
 function getAvatarColor() { return '#0b4b9b'; }
 
 function getStatusIcon(aluno) {
@@ -246,7 +246,7 @@ function filtrarEOrdenar() {
     const termos = normalizar(buscaAtual).split(/\s+/).filter(Boolean);
     if (termos.length) {
         lista = lista.filter(p => {
-            const alvo = normalizar(`${p.aluno} ${p.material}`);
+            const alvo = normalizar(p.aluno || '');
             return termos.every(t => alvo.includes(t));
         });
     }
@@ -333,12 +333,12 @@ function renderizarPendencias() {
                     <div class="aluno-info">
                         <span class="aluno-avatar" aria-hidden="true">${escapeHtml(inicial)}</span>
                         <div class="aluno-texto">
-                            <span class="aluno-nome" title="${escapeHtml(p.aluno)}">${destacar(p.aluno, termos)}</span>
+                            <span class="aluno-nome" title="${escapeHtml(p.aluno)}">${escapeHtml(p.aluno)}</span>
                             ${serie}
                         </div>
                     </div>
                 </td>
-                <td class="material-nome" data-label="Material">${destacar(p.material, termos)}</td>
+                <td class="material-nome" data-label="Material">${escapeHtml(p.material)}</td>
                 <td class="text-center" data-label="Tipo"><span class="tipo-badge">${escapeHtml(p.tipo || 'Livro')}</span></td>
                 <td class="col-data" data-label="Empréstimo">
                     <div class="data-cell">
@@ -529,14 +529,6 @@ function definirFiltro(status) {
 
 function definirBusca(termo) {
     buscaAtual = termo;
-    const buscaAtiva = document.getElementById('filtro-busca-ativa');
-    const buscaTermo = document.getElementById('busca-termo');
-    if (termo) {
-        if (buscaTermo) buscaTermo.textContent = termo;
-        if (buscaAtiva) buscaAtiva.style.display = 'flex';
-    } else if (buscaAtiva) {
-        buscaAtiva.style.display = 'none';
-    }
     renderizarPendencias();
 }
 
@@ -544,15 +536,11 @@ function limparFiltros() {
     const input = document.getElementById('filtro-tabela');
     if (input) input.value = '';
     buscaAtual = '';
-    const buscaAtiva = document.getElementById('filtro-busca-ativa');
-    if (buscaAtiva) buscaAtiva.style.display = 'none';
     definirFiltro('todos');
 }
 
 function initFiltros() {
-    // A BUSCA DA TABELA agora usa #filtro-tabela (não mais #search-input)
     const buscaInput = document.getElementById('filtro-tabela');
-    const limparBusca = document.getElementById('limpar-busca');
 
     document.querySelectorAll('.filtro-tab').forEach(tab => {
         tab.addEventListener('click', () => definirFiltro(tab.dataset.status));
@@ -562,20 +550,13 @@ function initFiltros() {
     if (buscaInput) {
         buscaInput.addEventListener('input', function () {
             clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => definirBusca(this.value.trim()), 200);
+            timeoutId = setTimeout(() => definirBusca(this.value.trim()), 120);
         });
         buscaInput.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && this.value) {
                 this.value = '';
                 definirBusca('');
             }
-        });
-    }
-
-    if (limparBusca) {
-        limparBusca.addEventListener('click', function () {
-            if (buscaInput) { buscaInput.value = ''; buscaInput.focus(); }
-            definirBusca('');
         });
     }
 
@@ -741,7 +722,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initFiltros();
     initOrdenacao();
     initModalDevolucao();
-    initSearch();  // ← busca global de aluno no topo
+    initSearch();
 
     document.querySelectorAll('.filtro-tab').forEach(t => {
         const ativo = t.dataset.status === filtroAtual;

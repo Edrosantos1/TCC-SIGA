@@ -469,6 +469,8 @@ document.addEventListener("DOMContentLoaded", () => {
     applyRequirementLabels();
     if (regPassword && regPassword.value) updateRequirements(regPassword.value);
 
+    atualizarRotuloTema();
+
     if (limpar) clearMessages();
   }
 
@@ -888,12 +890,41 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================================
   //  TOGGLE LOGIN / REGISTRO + IDIOMA + UI DIVERSA
   // ============================================================
+  // Durante a troca login <-> registro o foco sai do campo (clique no botão do painel
+  // e depois o formulário que sai fica "inert"). Isso disparava a validação por "blur"
+  // (erro vermelho aparecendo e lista de requisitos sumindo) bem na hora da animação.
+  // Enquanto a troca acontece, ignoramos esses blur.
+  let trocandoForm = false;
+  let trocaTimer = null;
+  document.addEventListener('blur', (e) => {
+    if (trocandoForm && e.target.closest && e.target.closest('form')) e.stopImmediatePropagation();
+  }, true);
+
+  function iniciarTroca() {
+    trocandoForm = true;
+    clearTimeout(trocaTimer);
+    const dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--troca-duracao')) || 0.35;
+    trocaTimer = setTimeout(() => {
+      trocandoForm = false;
+      // a lista de requisitos só deve aparecer com o campo de senha em foco
+      document.getElementById('password-requirements')?.classList.remove('visible');
+    }, dur * 1000 + 150);
+  }
+
+  // O foco sai do campo no mousedown (antes do click), então a proteção começa aqui
+  ['register', 'login'].forEach(id => {
+    document.getElementById(id).addEventListener('mousedown', iniciarTroca);
+    document.getElementById(id).addEventListener('touchstart', iniciarTroca, { passive: true });
+  });
+
   document.getElementById('register').addEventListener('click', () => {
+    iniciarTroca();
     container.classList.add("active");
     document.querySelector('.auth-header')?.classList.add('dark-theme');
     clearMessages();
   });
   document.getElementById('login').addEventListener('click', () => {
+    iniciarTroca();
     container.classList.remove("active");
     document.querySelector('.auth-header')?.classList.remove('dark-theme');
     clearMessages();
@@ -999,6 +1030,58 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   handleCaps(loginPassword, capsWarningLogin);
   handleCaps(regPassword, capsWarningReg);
+
+  // ============================================================
+  //  MODO ESCURO (botão #theme_toggle) – preferência salva no navegador
+  // ============================================================
+  const themeBtn = document.getElementById('theme_toggle');
+  const KEY_THEME = 'siga-theme';
+  const themeLabels = { pt: 'Tema escuro', en: 'Dark theme', es: 'Tema oscuro' };
+
+  // localStorage com proteção (navegação privada / bloqueio de cookies)
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* ignora */ }
+    }
+  };
+
+  function atualizarRotuloTema() {
+    if (!themeBtn) return;
+    themeBtn.setAttribute('aria-label', themeLabels[idiomaAtual] || themeLabels.pt);
+  }
+
+  let temaTimer = null;
+  function setTheme(theme, save = true, animar = true) {
+    const root = document.documentElement;
+    if (animar) {
+      // Durante a troca, todas as transições ficam curtas e uniformes (ver .theme-switching no CSS)
+      root.classList.add('theme-switching');
+      clearTimeout(temaTimer);
+      temaTimer = setTimeout(() => root.classList.remove('theme-switching'), 250);
+    }
+    root.setAttribute('data-theme', theme);
+    if (themeBtn) themeBtn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    if (save) store.set(KEY_THEME, theme);
+  }
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+      const atual = document.documentElement.getAttribute('data-theme');
+      setTheme(atual === 'dark' ? 'light' : 'dark');
+    });
+    // O <head> já aplicou o tema; aqui só sincronizamos o botão
+    setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light', false, false);
+  }
+
+  // Se a pessoa nunca escolheu manualmente, acompanha mudanças do sistema
+  if (window.matchMedia) {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onSystemChange = (e) => {
+      if (!store.get(KEY_THEME)) setTheme(e.matches ? 'dark' : 'light', false);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onSystemChange);
+    else if (mq.addListener) mq.addListener(onSystemChange);
+  }
 
   aplicarIdioma("pt", false);
   mostrarErroDoServidor();

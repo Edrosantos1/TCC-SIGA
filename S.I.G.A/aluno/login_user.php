@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login / Registro - SIGA ITJ</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="darkreader-lock">
+  <!-- Aplica o tema salvo (ou o do sistema) ANTES de renderizar, evitando "piscar" branco -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("siga-theme");
+        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    })();
+  </script>
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- CSS -->
-  <link rel="stylesheet" href="../assets/css/login_user.css">
+  <link rel="stylesheet" href="../assets/css/login_user.css?v=<?= @filemtime(__DIR__ . '/../assets/css/login_user.css') ?: time() ?>">
   <!-- JS -->
-  <script src="../assets/js/login_user.js" defer></script>
+  <script src="../assets/js/login_user.js?v=<?= @filemtime(__DIR__ . '/../assets/js/login_user.js') ?: time() ?>" defer></script>
 </head>
 <body>
   <form id="form-google" action="google_auth.php" method="POST" class="hidden-form">
@@ -17,6 +29,14 @@
   </form>
 
   <div class="full-background">
+
+    <!-- CONTROLES DO TOPO: modo escuro + idioma -->
+    <div class="top-controls">
+    <!-- BOTÃO DE TEMA ESCURO -->
+    <button type="button" class="theme-toggle" id="theme_toggle" aria-pressed="false" aria-label="Tema escuro">
+      <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+      <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+    </button>
 
     <!-- SELETOR DE IDIOMA -->
     <div class="language-wrapper">
@@ -39,6 +59,7 @@
         </li>
       </ul>
     </div>
+    </div><!-- /top-controls -->
 
     <!-- CABEÇALHO FIXO COMPARTILHADO -->
     <div class="auth-header">
