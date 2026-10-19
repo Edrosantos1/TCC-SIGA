@@ -6,7 +6,7 @@ let alunos = [];
 let notificacoes = [];
 
 function getAvatarColor() {
-    return '#0b4b9b';
+    return '#0035ff';
 }
 
 function escapeHtml(text) {
@@ -44,7 +44,7 @@ function renderizarDropdownNotificacoes() {
 
     lista.innerHTML = notificacoes.slice(0, 10).map(notificacao => {
         const isPendencia = notificacao.tipo === 'pendencia';
-        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const corIcon = isPendencia ? '#e67e22' : '#0035ff';
         const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
         const label = isPendencia ? 'Pendência' : 'Aviso';
 
@@ -74,7 +74,7 @@ function renderizarDropdownNotificacoes() {
 }
 
 function getStatusIcon(aluno) {
-    const iconReserva = '<i class="fas fa-bookmark" style="color: #0b4b9b; font-size: 14px;" title="Possui reservas"></i>';
+    const iconReserva = '<i class="fas fa-bookmark" style="color: #0035ff; font-size: 14px;" title="Possui reservas"></i>';
     const iconPendencia = '<i class="fas fa-exclamation-circle" style="color: #e67e22; font-size: 14px;" title="Possui empréstimos/pendências"></i>';
 
     if (aluno.tem_reservas && aluno.tem_emprestimos) return iconReserva + ' ' + iconPendencia;
@@ -291,7 +291,7 @@ function initBICharts() {
             },
             series: temDadosDonut ? valoresSegmento : [1],
             labels: temDadosDonut ? labelsSegmento : ['Sem dados'],
-            colors: temDadosDonut ? ['#0b4b9b', '#60a5fa', '#93c5fd'] : ['#cbd5e1'],
+            colors: temDadosDonut ? ['#0035ff', '#60a5fa', '#93c5fd'] : ['#cbd5e1'],
             legend: {
                 position: 'bottom',
                 labels: { colors: foreColor }
@@ -320,7 +320,7 @@ function initBICharts() {
                 labels: { style: { colors: foreColor } }
             },
             grid: { borderColor: gridColor },
-            colors: ['#0b4b9b'],
+            colors: ['#0035ff'],
             plotOptions: {
                 bar: { borderRadius: 6, columnWidth: '50%' }
             },

@@ -113,10 +113,6 @@ unset($_SESSION['flash_admin_login_error']);
 
           <p class="caps-warning" id="caps_warning_admin">Caps Lock ativado!</p>
 
-          <div class="options-group">
-            <a href="recuperar_senha_adm.php">Esqueceu a senha?</a>
-          </div>
-
           <div class="buttons-layout">
             <button type="submit" class="btn-primary" id="btn-submit-login">Entrar</button>
           </div>

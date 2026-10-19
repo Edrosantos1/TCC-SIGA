@@ -41,7 +41,7 @@ function renderizarDropdownNotificacoes() {
 
     lista.innerHTML = notificacoes.slice(0, 10).map(notificacao => {
         const isPendencia = notificacao.tipo === 'pendencia';
-        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const corIcon = isPendencia ? '#e67e22' : '#0035ff';
         const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
         const label = isPendencia ? 'Pendência' : 'Aviso';
         

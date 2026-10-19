@@ -208,8 +208,8 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const isPassword = input.type === "password";
       input.type = isPassword ? "text" : "password";
-      toggle.classList.toggle("fa-eye", isPassword);
-      toggle.classList.toggle("fa-eye-slash", !isPassword);
+      toggle.classList.toggle("fa-eye", !isPassword);
+      toggle.classList.toggle("fa-eye-slash", isPassword);
     });
   }
   setupToggle("toggleAdminPassword", "admin-password");

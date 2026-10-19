@@ -4,11 +4,11 @@
    ============================================ */
 
 .extrato-page {
-    --ex-primary: #0b4b9b;
+    --ex-primary: var(--siga-azul);
     --ex-primary-dark: #083a7a;
     --ex-primary-soft: #eaf4ff;
     --ex-accent: #e67e22;
-    --ex-blue: #227de6;
+    --ex-blue: var(--siga-azul-claro);
     --ex-bg-hover: #f3f8ff;
     --ex-g50: #f8fafc;
     --ex-g100: #f1f5f9;
@@ -23,7 +23,7 @@
     --ex-shadow-sm: 0 4px 16px rgba(0, 0, 0, .06);
     --ex-shadow-md: 0 10px 28px rgba(0, 0, 0, .10);
     --ex-ease: cubic-bezier(.4, 0, .2, 1);
-    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-family: var(--siga-font);
     color: var(--ex-g700);
 }
 
@@ -49,7 +49,7 @@
     font-size: 26px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #0b4b9b;
+    color: var(--siga-azul);
 }
 
 .extrato-page .page-header h1 i {
@@ -99,14 +99,14 @@
     border-color: #c0d5f0;
     color: var(--ex-primary);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(11, 75, 155, 0.10);
+    box-shadow: 0 4px 12px rgba(0, 53, 255, 0.10);
 }
 
 .extrato-page .btn-secundario:hover i { color: var(--ex-primary); }
 
 .extrato-page .btn-secundario:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(11, 75, 155, 0.12);
+    box-shadow: 0 2px 6px rgba(0, 53, 255, 0.12);
 }
 
 /* ---------- FILTROS ---------- */
@@ -192,13 +192,13 @@
     font-family: inherit;
     white-space: nowrap;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(11, 75, 155, .25);
+    box-shadow: 0 2px 8px rgba(0, 53, 255, .25);
     transition: transform .2s var(--ex-ease), box-shadow .2s var(--ex-ease), opacity .2s;
 }
 
 .extrato-page .btn-filtrar:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(11, 75, 155, .32);
+    box-shadow: 0 6px 18px rgba(0, 53, 255, .32);
 }
 
 .extrato-page .btn-filtrar:active { transform: scale(.97); }
@@ -253,7 +253,7 @@
     transition: background .2s;
 }
 
-.extrato-page .chip a:hover { background: rgba(11, 75, 155, .18); }
+.extrato-page .chip a:hover { background: rgba(0, 53, 255, .18); }
 
 /* ---------- BARRA: TOTAL + BUSCA ---------- */
 .extrato-page .barra-tabela {
@@ -321,7 +321,7 @@
 .extrato-page .busca-tabela input:focus-visible {
     outline: none;
     border-color: var(--ex-primary);
-    box-shadow: 0 0 0 4px rgba(11, 75, 155, .14);
+    box-shadow: 0 0 0 4px rgba(0, 53, 255, .14);
 }
 
 /* ---------- TABELA ---------- */
@@ -416,7 +416,7 @@
 .extrato-page .status-aprovada   { background: #eafaf1; color: #1e8449; }
 .extrato-page .status-rejeitada  { background: #fef0ef; color: #c0392b; }
 .extrato-page .status-expirada   { background: #f1f5f9; color: #64748b; }
-.extrato-page .status-retirada   { background: #eaf4ff; color: #0b4b9b; }
+.extrato-page .status-retirada   { background: #eaf4ff; color: var(--siga-azul); }
 .extrato-page .status-cancelada  { background: #fef9e7; color: #b7950b; }
 .extrato-page .status-indefinido { background: #fff; color: var(--ex-g500); border: 1px dashed var(--ex-g300); }
 

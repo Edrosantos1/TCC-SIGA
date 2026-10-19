@@ -90,7 +90,7 @@
 
         lista.innerHTML = notificacoes.slice(0, 10).map((n) => {
             const pendencia = n.tipo === 'pendencia';
-            const cor = pendencia ? '#e67e22' : '#0b4b9b';
+            const cor = pendencia ? '#e67e22' : '#0035ff';
             const icone = pendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
             const rotulo = pendencia ? 'Pendência' : 'Aviso';
             const total = parseInt(n.total_alunos, 10) || 0;
@@ -132,7 +132,7 @@
     }
 
     function iconesStatusAluno(a) {
-        const reserva = '<i class="fas fa-bookmark" style="color:#0b4b9b;font-size:14px;" title="Possui reservas"></i>';
+        const reserva = '<i class="fas fa-bookmark" style="color:#0035ff;font-size:14px;" title="Possui reservas"></i>';
         const pendencia = '<i class="fas fa-exclamation-circle" style="color:#e67e22;font-size:14px;" title="Possui empréstimos/pendências"></i>';
         if (a.tem_reservas && a.tem_emprestimos) return reserva + ' ' + pendencia;
         if (a.tem_reservas) return reserva;
@@ -177,7 +177,7 @@
                     const item = document.createElement('div');
                     item.className = 'search-result-item';
                     item.innerHTML = `
-                        <div class="search-avatar" style="background-color:#0b4b9b;">${escapeHtml(a.nome_aluno.trim().charAt(0).toUpperCase())}</div>
+                        <div class="search-avatar" style="background-color:#0035ff;">${escapeHtml(a.nome_aluno.trim().charAt(0).toUpperCase())}</div>
                         <div class="search-info">
                             <div class="search-name">${escapeHtml(a.nome_aluno)}</div>
                             <div class="search-detail">${escapeHtml(a.serie_aluno || 'Aluno')}</div>

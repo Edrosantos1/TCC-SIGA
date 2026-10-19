@@ -31,7 +31,7 @@ $completarSerieGoogle = isset($_SESSION['usuario_id'])
   <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- CSS -->
-  <link rel="stylesheet" href="../../assets/css/aluno/login_usuario.css">
+  <link rel="stylesheet" href="../../assets/css/aluno/login_usuario.css?v=<?= filemtime(__DIR__ . '/../../assets/css/aluno/login_usuario.css') ?>">
   <!-- JS -->
   <script src="../../assets/js/aluno/login_usuario.js" defer></script>
 </head>

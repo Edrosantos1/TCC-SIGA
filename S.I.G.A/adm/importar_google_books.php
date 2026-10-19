@@ -262,6 +262,6 @@ echo "<p><strong>Capas com falha:</strong> $capasFalhas</p>";
 $_SESSION['flash_message'] = "Importação concluída: $inseridos livros inseridos, $ignorados duplicatas. Capas: $capasBaixadas baixadas, $capasFalhas falhas.";
 $_SESSION['flash_type'] = 'success';
 
-echo "<p style='margin-top:20px;'><a href='catalogo_adm.php' style='display:inline-block; padding:12px 30px; background:#0b4b9b; color:white; text-decoration:none; border-radius:8px; font-weight:600;'>📚 Voltar ao Catálogo</a></p>";
+echo "<p style='margin-top:20px;'><a href='catalogo_adm.php' style='display:inline-block; padding:12px 30px; background:#0035ff; color:white; text-decoration:none; border-radius:8px; font-weight:600;'>📚 Voltar ao Catálogo</a></p>";
 exit;
 ?>

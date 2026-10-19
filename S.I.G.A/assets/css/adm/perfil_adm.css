@@ -26,7 +26,7 @@
     font-size: 26px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: #0b4b9b;
+    color: var(--siga-azul);
 }
 
 .perfil-container .page-header h1 i {
@@ -46,12 +46,12 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    background: #0b4b9b;
+    background: var(--siga-azul);
     border-radius: 16px;
     padding: 22px 28px;
     margin-bottom: 28px;
     color: #ffffff;
-    box-shadow: 0 6px 20px rgba(11, 75, 155, 0.15);
+    box-shadow: 0 6px 20px rgba(0, 53, 255, 0.15);
 }
 
 .perfil-avatar-grande {
@@ -174,7 +174,7 @@
 .perfil-card h3 {
     font-size: 17px;
     font-weight: 600;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     margin: 0 0 22px 0;
     padding-bottom: 14px;
     border-bottom: 1px solid #f0f4fd;
@@ -206,7 +206,7 @@
     border: 1.5px solid #e2e8f0;
     border-radius: 10px;
     font-size: 14px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--siga-font);
     transition: all 0.3s;
     background: #fafcff;
     color: #1f1f1f;
@@ -214,16 +214,16 @@
 
 .perfil-card .form-group input:focus {
     outline: none;
-    border-color: #0b4b9b;
+    border-color: var(--siga-azul);
     background: #fff;
-    box-shadow: 0 0 0 4px rgba(11, 75, 155, 0.07);
+    box-shadow: 0 0 0 4px rgba(0, 53, 255, 0.07);
 }
 
 .btn-primary {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -239,7 +239,7 @@
 .btn-primary:hover {
     background: #0a3d7a;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(11, 75, 155, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 53, 255, 0.25);
 }
 
 /* ========== OLHINHO DA SENHA ========== */
@@ -253,7 +253,7 @@
     border: 1.5px solid #e2e8f0;
     border-radius: 10px;
     font-size: 14px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--siga-font);
     transition: all 0.3s;
     background: #fafcff;
     color: #1f1f1f;
@@ -261,9 +261,9 @@
 
 .senha-container input:focus {
     outline: none;
-    border-color: #0b4b9b;
+    border-color: var(--siga-azul);
     background: #fff;
-    box-shadow: 0 0 0 4px rgba(11, 75, 155, 0.07);
+    box-shadow: 0 0 0 4px rgba(0, 53, 255, 0.07);
 }
 
 .toggle-senha {
@@ -284,7 +284,7 @@
 }
 
 .toggle-senha:hover {
-    color: #0b4b9b;
+    color: var(--siga-azul);
 }
 
 /* ========== RESPONSIVO ========== */

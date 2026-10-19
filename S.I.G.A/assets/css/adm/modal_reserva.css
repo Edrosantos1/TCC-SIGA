@@ -66,7 +66,7 @@
 .modal-header h2 {
     font-size: 20px;
     font-weight: 700;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -141,9 +141,9 @@
 }
 
 .busca-aluno-container input:focus {
-    border-color: #0b4b9b;
+    border-color: var(--siga-azul);
     outline: none;
-    box-shadow: 0 0 0 4px rgba(11, 75, 155, 0.1);
+    box-shadow: 0 0 0 4px rgba(0, 53, 255, 0.1);
     background: white;
 }
 
@@ -286,7 +286,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: white;
     display: flex;
     align-items: center;
@@ -341,9 +341,9 @@
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #0b4b9b;
+    border-color: var(--siga-azul);
     outline: none;
-    box-shadow: 0 0 0 4px rgba(11, 75, 155, 0.1);
+    box-shadow: 0 0 0 4px rgba(0, 53, 255, 0.1);
     background: white;
 }
 
@@ -384,7 +384,7 @@
 }
 
 .btn-modal-save {
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: white;
     display: inline-flex;
     align-items: center;
@@ -394,7 +394,7 @@
 .btn-modal-save:hover:not(:disabled) {
     background: #0a3d7a;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(11, 75, 155, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 53, 255, 0.3);
 }
 
 .btn-modal-save:disabled {
@@ -462,7 +462,7 @@
     border-left: 5px solid #3498db;
     animation: slideIn 0.3s ease;
     transition: opacity 0.3s;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--siga-font);
     font-size: 0.95rem;
 }
 

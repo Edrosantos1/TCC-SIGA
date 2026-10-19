@@ -3,7 +3,7 @@
    ============================================= */
 
 :root {
-    --cat-azul: #0b4b9b;
+    --cat-azul: var(--siga-azul);
     --cat-azul-hover: #1a5aab;
     --cat-azul-claro: #f0f4fd;
     --cat-verde: #27ae60;
@@ -16,7 +16,7 @@
 body.cat-modal-aberto { overflow: hidden; }
 
 :focus-visible {
-    outline: 3px solid rgba(11, 75, 155, 0.35);
+    outline: 3px solid rgba(0, 53, 255, 0.35);
     outline-offset: 2px;
 }
 
@@ -41,7 +41,7 @@ body.cat-modal-aberto { overflow: hidden; }
 .cat-header-search input:focus {
     outline: none;
     border-color: var(--cat-azul);
-    box-shadow: 0 0 0 3px rgba(11,75,155,0.1);
+    box-shadow: 0 0 0 3px rgba(0, 53, 255,0.1);
 }
 .cat-header-search button {
     position: absolute;
@@ -102,7 +102,7 @@ body.cat-modal-aberto { overflow: hidden; }
     transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 .btn-import { background: var(--cat-azul); }
-.btn-import:hover { background: var(--cat-azul-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(11,75,155,0.25); }
+.btn-import:hover { background: var(--cat-azul-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 53, 255,0.25); }
 .btn-cadastrar { background: var(--cat-verde); }
 .btn-cadastrar:hover { background: #2ecc71; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(39,174,96,0.3); }
 .btn-import i, .btn-cadastrar i { margin-right: 6px; }
@@ -487,7 +487,7 @@ body.cat-modal-aberto { overflow: hidden; }
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 14px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--siga-font);
     transition: border-color 0.2s;
 }
 .cat-form-group textarea { resize: vertical; }
@@ -496,7 +496,7 @@ body.cat-modal-aberto { overflow: hidden; }
 .cat-form-group textarea:focus {
     outline: none;
     border-color: var(--cat-azul);
-    box-shadow: 0 0 0 3px rgba(11,75,155,0.1);
+    box-shadow: 0 0 0 3px rgba(0, 53, 255,0.1);
 }
 .check-label {
     display: inline-flex !important;
@@ -665,7 +665,7 @@ body.cat-modal-aberto { overflow: hidden; }
 .btn-import-empty:hover {
     background: var(--cat-azul-hover);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(11,75,155,0.3);
+    box-shadow: 0 4px 12px rgba(0, 53, 255,0.3);
 }
 .btn-import-empty i { margin-right: 8px; }
 .empty-hint {
@@ -757,7 +757,7 @@ body.cat-modal-aberto { overflow: hidden; }
 .dashboard-main .page-header h1 {
     font-size: 26px;
     font-weight: 700;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     display: flex;
     align-items: center;
     gap: 12px;

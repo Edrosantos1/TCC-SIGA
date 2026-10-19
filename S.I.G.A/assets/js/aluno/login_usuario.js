@@ -919,8 +919,8 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const isPassword = input.type === "password";
       input.type = isPassword ? "text" : "password";
-      toggle.classList.toggle("fa-eye", isPassword);
-      toggle.classList.toggle("fa-eye-slash", !isPassword);
+      toggle.classList.toggle("fa-eye", !isPassword);
+      toggle.classList.toggle("fa-eye-slash", isPassword);
       input.focus(); // Garante que o input mantenha o foco
     });
   }

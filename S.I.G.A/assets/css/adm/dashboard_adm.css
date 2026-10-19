@@ -1,9 +1,24 @@
 /* =============================================
    dashboard_adm.css — SiGA ITJ Admin
-   Paleta: azul royal (#0b4b9b) + âmbar admin (#e67e22)
+  Paleta: azul royal (#0035ff), dourado (#ffad00) e turquesa (#17c8cc)
    ============================================= */
 
 /* ========== RESET & BASE ========== */
+:root {
+  --siga-azul: #0035ff;
+  --siga-azul-escuro: #0024a8;
+  --siga-azul-claro: #5276ff;
+  --siga-dourado: #ffad00;
+  --siga-turquesa: #17c8cc;
+  --siga-fundo: #f5f7ff;
+  --siga-superficie: #ffffff;
+  --siga-superficie-2: #e9edff;
+  --siga-texto: #0a1233;
+  --siga-muted: #475079;
+  --siga-borda: #d3daf5;
+  --siga-font: 'Montserrat', 'Segoe UI', sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -14,13 +29,13 @@ html, body {
   max-width: 100%;
 }
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #eef2f9;
-  color: #1f1f1f;
+  font-family: var(--siga-font);
+  background-color: var(--siga-fundo);
+  color: var(--siga-texto);
   line-height: 1.5;
 }
 a:focus-visible, button:focus-visible {
-  outline: 3px solid #e67e22;
+  outline: 3px solid var(--siga-dourado);
   outline-offset: 2px;
 }
 a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
@@ -30,7 +45,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 /* ========== SIDEBAR ========== */
 .sidebar {
   width: 240px;
-  background: #ffffff;
+  background: var(--siga-superficie);
   padding: 20px 0;
   position: fixed;
   height: 100vh;
@@ -61,11 +76,11 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   gap: 12px;
   font-size: 24px;
   font-weight: 700;
-  color: #0b4b9b;
+  color: var(--siga-azul);
   white-space: nowrap;
 }
 .sidebar-logo i {
-  color: #0b4b9b;
+  color: var(--siga-azul);
 }
 .sidebar.collapsed .sidebar-logo span {
   display: none;
@@ -98,13 +113,13 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   flex-shrink: 0;
 }
 .collapse-icon:hover {
-  background: #ecf9ff;
+  background: var(--siga-superficie-2);
 }
 .collapse-icon span {
   display: block;
   width: 20px;
   height: 2px;
-  background: #2277e6;
+  background: var(--siga-azul-claro);
   border-radius: 2px;
   position: absolute;
   left: 50%;
@@ -140,7 +155,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   padding: 13px 20px;
   margin: 4px 8px;
   border-radius: 12px;
-  color: #1f1f1f;
+  color: var(--siga-texto);
   text-decoration: none;
   font-size: 15px;
   font-weight: 500;
@@ -165,23 +180,23 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   display: inline-block;
 }
 .nav-item:hover {
-  background-color: #f3f8ff;
-  color: #2277e6;
+  background-color: var(--siga-superficie-2);
+  color: var(--siga-azul);
 }
 .nav-item.active {
-  background: linear-gradient(135deg, #ecf7ff, #d5edfd);
-  color: #2277e6;
+  background: var(--siga-superficie-2);
+  color: var(--siga-azul);
   font-weight: 600;
   border: 1px solid #ffffff00;
 }
 .nav-item:hover i,
 .nav-item.active i {
   opacity: 1;
-  color: #2277e6;
+  color: var(--siga-azul);
 }
 .nav-divider {
   height: 1px;
-  background: #f0f0f0;
+  background: var(--siga-borda);
   margin: 10px 20px;
 }
 .nav-logout {
@@ -235,7 +250,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 
 /* ========== TOP HEADER ========== */
 .top-header {
-  background: #ffffff;
+  background: var(--siga-superficie);
   padding: 16px 32px;
   display: flex;
   align-items: center;
@@ -262,17 +277,17 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 .search-container input {
   width: 100%;
   padding: 12px 20px 12px 48px;
-  border: 1.5px solid #e5e5e5;
+  border: 1.5px solid var(--siga-borda);
   border-radius: 12px;
   font-size: 15px;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--siga-font);
   transition: all 0.3s;
-  background: #fafbff;
+  background: var(--siga-fundo);
 }
 .search-container input:focus {
   outline: none;
-  border-color: #227de6;
-  box-shadow: 0 0 0 4px rgba(34, 125, 230, 0.062);
+  border-color: var(--siga-azul);
+  box-shadow: 0 0 0 4px rgba(0, 53, 255, 0.08);
   background: #fff;
 }
 .search-icon {
@@ -308,7 +323,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 }
 .search-result-item:last-child { border-bottom: none; }
 .search-result-item:hover { background: #f3f8ff; }
-.search-result-item i { color: #229ee6; width: 20px; text-align: center; }
+.search-result-item i { color: var(--siga-azul); width: 20px; text-align: center; }
 .search-result-tag {
   font-size: 10px;
   font-weight: 600;
@@ -316,7 +331,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   border-radius: 20px;
   margin-left: auto;
 }
-.tag-aluno { background: #eaf4ff; color: #0b4b9b; }
+.tag-aluno { background: #eaf4ff; color: var(--siga-azul); }
 .tag-livro { background: #fff4ec; color: #d35400; }
 
 .header-right {
@@ -343,7 +358,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 .admin-avatar {
   width: 38px;
   height: 38px;
-  background: linear-gradient(135deg, #2294ff, #116fda);
+  background: linear-gradient(135deg, var(--siga-azul), var(--siga-azul-escuro));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -359,14 +374,14 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 }
 .admin-label {
   font-size: 10px;
-  color: #116fda;
+  color: var(--siga-azul);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .admin-name {
   font-size: 14px;
-  color: #1f1f1f;
+  color: var(--siga-texto);
   font-weight: 600;
 }
 .admin-chevron {
@@ -402,9 +417,9 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   font-size: 14px;
   transition: background 0.15s;
 }
-.profile-dropdown a:hover { background: #f4fafd; color: #2287e6; }
-.profile-dropdown a i { width: 18px; text-align: center; color: #2287e6; }
-.dropdown-divider { height: 1px; background: #f0f0f0; margin: 4px 0; }
+.profile-dropdown a:hover { background: var(--siga-superficie-2); color: var(--siga-azul); }
+.profile-dropdown a i { width: 18px; text-align: center; color: var(--siga-azul); }
+.dropdown-divider { height: 1px; background: var(--siga-borda); margin: 4px 0; }
 .logout-link { color: #c0392b !important; }
 .logout-link i { color: #c0392b !important; }
 .logout-link:hover { background: #fff0ef !important; }
@@ -417,7 +432,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   background: none;
   border: none;
   font-size: 22px;
-  color: #555;
+  color: var(--siga-texto);
   cursor: pointer;
   position: relative;
   padding: 8px;
@@ -425,8 +440,8 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   transition: background 0.2s, color 0.2s;
 }
 .notification-btn:hover {
-  background: #fff8f3;
-  color: #2287e6;
+  background: var(--siga-superficie-2);
+  color: var(--siga-azul);
 }
 .notification-dropdown {
   position: absolute;
@@ -447,20 +462,20 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: #fff8f3;
-  border-bottom: 1px solid #fde8d5;
+  background: var(--siga-superficie-2);
+  border-bottom: 1px solid var(--siga-borda);
 }
 .notification-header h4 {
   font-size: 15px;
   font-weight: 600;
-  color: #0e659e;
+  color: var(--siga-azul-escuro);
   margin: 0;
 }
 .mark-read-btn {
   background: none;
   border: none;
   font-size: 12px;
-  color: #1f7cd3;
+  color: var(--siga-azul);
   cursor: pointer;
   font-weight: 500;
   padding: 4px 8px;
@@ -472,7 +487,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 .notification-view-all {
   display: block;
   padding: 13px 18px;
-  color: #0b4b9b;
+  color: var(--siga-azul);
   background: #fff;
   border-top: 1px solid #e8edf3;
   font-size: 13px;
@@ -519,7 +534,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   justify-content: space-between;
   margin-bottom: 28px;
   padding: 22px 28px;
-  background: #0b4b9b;
+  background: var(--siga-azul);
   border-radius: 16px;
   color: white;
 }
@@ -597,7 +612,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   height: 100%;
   border-radius: 16px 0 0 16px;
 }
-.stat-blue::before  { background: #0b4b9b; }
+.stat-blue::before  { background: var(--siga-azul); }
 .stat-orange::before { background: #e67e22; }
 .stat-teal::before  { background: #17c8cc; }
 .stat-green::before { background: #27ae60; }
@@ -607,7 +622,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   font-size: 28px;
   opacity: 0.9;
 }
-.stat-blue  .stat-icon { color: #0b4b9b; }
+.stat-blue  .stat-icon { color: var(--siga-azul); }
 .stat-orange .stat-icon { color: #e67e22; }
 .stat-teal  .stat-icon { color: #17c8cc; }
 .stat-green .stat-icon { color: #27ae60; }
@@ -665,7 +680,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 .section-header h2 {
   font-size: 17px;
   font-weight: 600;
-  color: #0b4b9b;
+  color: var(--siga-azul);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -777,7 +792,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 }
 .pendencia-atrasado { background: #fee5e5; color: #c0392b; }
 .pendencia-multa    { background: #fef9e7; color: #b7950b; }
-.pendencia-reserva  { background: #eaf4ff; color: #0b4b9b; }
+.pendencia-reserva  { background: #eaf4ff; color: var(--siga-azul); }
 
 .pendencia-info {
   flex: 1;
@@ -835,7 +850,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   flex-shrink: 0;
   margin-top: 2px;
 }
-.dot-emprestimo  { background: #eaf4ff; color: #0b4b9b; }
+.dot-emprestimo  { background: #eaf4ff; color: var(--siga-azul); }
 .dot-devolucao   { background: #eafaf1; color: #27ae60; }
 .dot-reserva     { background: #fff4ec; color: #e67e22; }
 .dot-alerta      { background: #fee5e5; color: #c0392b; }
@@ -848,7 +863,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
   font-weight: 500;
   color: #1f1f1f;
 }
-.timeline-action strong { color: #0b4b9b; }
+.timeline-action strong { color: var(--siga-azul); }
 .timeline-time {
   font-size: 12px;
   color: #94a3b8;
@@ -894,7 +909,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
 }
 .notification-item .notification-icon {
     font-size: 18px;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     width: 32px;
     text-align: center;
     flex-shrink: 0;
@@ -910,7 +925,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     line-height: 1.5;
 }
 .notification-item .notification-message strong {
-    color: #0b4b9b;
+    color: var(--siga-azul);
 }
 .notification-item .notification-footer {
     display: flex;
@@ -924,7 +939,7 @@ a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
     background: #eaf4ff;
     padding: 2px 10px;
     border-radius: 12px;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     font-weight: 600;
 }
 .notification-dropdown {
@@ -993,7 +1008,7 @@ body.tema-escuro .btn-rejeitar:hover {
 body.tema-escuro .sem-acao { color: #6a7a8a !important; }
 
 body.tema-escuro .aluno-avatar {
-    background: #0b4b9b !important;
+    background: var(--siga-azul) !important;
     color: #ffffff !important;
 }
 body.tema-escuro .aluno-nome { color: #f0f0f0 !important; }
@@ -1141,7 +1156,7 @@ body.tema-escuro .filtro-tab:hover {
     color: #ffffff;
 }
 body.tema-escuro .filtro-tab.active {
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: #ffffff;
 }
 body.tema-escuro .filtro-tab .tab-badge { color: #b0b0b0; }
@@ -1162,7 +1177,7 @@ body.tema-escuro .ordenacao-dropdown {
 body.tema-escuro .ordenacao-item { color: #d0d0d0; }
 body.tema-escuro .ordenacao-item:hover { background: #1a3a5a; }
 body.tema-escuro .ordenacao-item.active {
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: #ffffff;
 }
 body.tema-escuro .ordenacao-item.active i { color: #ffffff; }
@@ -1199,7 +1214,7 @@ body.tema-escuro .status-devolvido {
 }
 
 body.tema-escuro .btn-primary {
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: #ffffff;
 }
 body.tema-escuro .btn-primary:hover {
@@ -1708,7 +1723,7 @@ body.tema-alto_contraste .busca-aluno-container .search-icon { color: #888888 !i
     border: 2px solid #e5e9f0;
     border-radius: 16px;
     font-size: 15px;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--siga-font);
     background: #fafcff;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
@@ -1716,9 +1731,9 @@ body.tema-alto_contraste .busca-aluno-container .search-icon { color: #888888 !i
 }
 .search-container input:focus {
     outline: none;
-    border-color: #0b4b9b;
+    border-color: var(--siga-azul);
     background: #ffffff;
-    box-shadow: 0 0 0 4px rgba(11, 75, 155, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 0 0 4px rgba(0, 53, 255, 0.08), 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 .search-container input::placeholder {
     color: #a0aec0;
@@ -1734,7 +1749,7 @@ body.tema-alto_contraste .busca-aluno-container .search-icon { color: #888888 !i
     font-size: 20px;
     transition: color 0.3s;
 }
-.search-container input:focus + .search-icon { color: #0b4b9b; }
+.search-container input:focus + .search-icon { color: var(--siga-azul); }
 
 .search-results-dropdown {
     position: absolute;
@@ -1864,7 +1879,7 @@ body.tema-alto_contraste .busca-aluno-container .search-icon { color: #888888 !i
     justify-content: center;
 }
 .search-status-icon i { font-size: 15px; }
-.search-status-icon i.fa-bookmark { color: #0b4b9b; }
+.search-status-icon i.fa-bookmark { color: var(--siga-azul); }
 .search-status-icon i.fa-exclamation-circle { color: #e67e22; }
 
 /* Container das notificações */
@@ -2150,9 +2165,9 @@ body.tema-escuro .notification-dropdown .notification-destinatarios {
     background: #22345c;
     color: #7ec8e3;
 }
-/* cores fixas colocadas pelo JS (style="color:#0b4b9b"): azul-escuro some no fundo escuro */
-body.tema-escuro .notification-dropdown .notification-icon[style*="#0b4b9b"],
-body.tema-escuro .notification-dropdown strong[style*="#0b4b9b"] { color: #7ec8e3 !important; }
+/* cores fixas colocadas pelo JS (style="color:var(--siga-azul)"): azul-escuro some no fundo escuro */
+body.tema-escuro .notification-dropdown .notification-icon[style*="var(--siga-azul)"],
+body.tema-escuro .notification-dropdown strong[style*="var(--siga-azul)"] { color: #7ec8e3 !important; }
 body.tema-escuro .notification-dropdown .notification-view-all {
     background: #16233f;
     color: #7ec8e3;
@@ -2212,8 +2227,8 @@ body.tema-alto_contraste .notification-dropdown .notification-destinatarios {
     color: #ffffff;
     border: 1px solid #ffffff;
 }
-body.tema-alto_contraste .notification-dropdown .notification-icon[style*="#0b4b9b"],
-body.tema-alto_contraste .notification-dropdown strong[style*="#0b4b9b"] { color: #ffd54f !important; }
+body.tema-alto_contraste .notification-dropdown .notification-icon[style*="var(--siga-azul)"],
+body.tema-alto_contraste .notification-dropdown strong[style*="var(--siga-azul)"] { color: #ffd54f !important; }
 body.tema-alto_contraste .notification-dropdown .notification-view-all {
     background: #000000;
     color: #ffffff;
@@ -2228,8 +2243,8 @@ body.tema-alto_contraste .notification-dropdown .notification-view-all:focus-vis
 body.tema-alto_contraste .notification-dropdown .empty-notifications { color: #dddddd; }
 
 /* ---------- Ícones de reserva/pendência com cor fixa no JS ---------- */
-body.tema-escuro i[style*="color: #0b4b9b"], body.tema-escuro i[style*="color:#0b4b9b"] { color: #7ec8e3 !important; }
-body.tema-alto_contraste i[style*="color: #0b4b9b"], body.tema-alto_contraste i[style*="color:#0b4b9b"] { color: #ffd54f !important; }
+body.tema-escuro i[style*="color: var(--siga-azul)"], body.tema-escuro i[style*="color:var(--siga-azul)"] { color: #7ec8e3 !important; }
+body.tema-alto_contraste i[style*="color: var(--siga-azul)"], body.tema-alto_contraste i[style*="color:var(--siga-azul)"] { color: #ffd54f !important; }
 
 }
 

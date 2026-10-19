@@ -43,11 +43,11 @@ function atualizarBadge(total) {
 
 // ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
 function getAvatarColor() {
-    return '#0b4b9b';
+    return '#0035ff';
 }
 
 function getStatusIcon(aluno) {
-    const iconReserva = '<i class="fas fa-bookmark" style="color: #0b4b9b; font-size: 14px;" title="Possui reservas"></i>';
+    const iconReserva = '<i class="fas fa-bookmark" style="color: #0035ff; font-size: 14px;" title="Possui reservas"></i>';
     const iconPendencia = '<i class="fas fa-exclamation-circle" style="color: #e67e22; font-size: 14px;" title="Possui empréstimos/pendências"></i>';
 
     if (aluno.tem_reservas && aluno.tem_emprestimos) return iconReserva + ' ' + iconPendencia;
@@ -162,7 +162,7 @@ function renderizarDropdownNotificacoes() {
 
     lista.innerHTML = notificacoesHeader.slice(0, 10).map(notificacao => {
         const isPendencia = notificacao.tipo === 'pendencia';
-        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
+        const corIcon = isPendencia ? '#e67e22' : '#0035ff';
         const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
         const label = isPendencia ? 'Pendência' : 'Aviso';
 

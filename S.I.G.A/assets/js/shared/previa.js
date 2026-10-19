@@ -26,14 +26,14 @@ const translations = {
     sobre_p1: "O <strong>SIGA</strong> (Sistema Integrado de Gestão de Acervo) é uma plataforma digital para gerenciamento de bibliotecas escolares, criada para tornar o acesso ao acervo e a organização de empréstimos mais práticos para alunos e administradores.",
     sobre_p2: "O SIGA atende alunos, professores e funcionários, reunindo livros didáticos, artigos científicos, trabalhos acadêmicos, periódicos e outros recursos educacionais em um só lugar.",
     sobre_p3: "A plataforma permite pesquisar por títulos, autores e categorias, acompanhar empréstimos e fazer reservas. O objetivo é apoiar a jornada acadêmica com um acesso simples e organizado ao acervo.",
-    passos_title: "Comece em 3 passos",
-    passos_subtitle: "Simples, rápido e gratuito para alunos",
-    passo1_title: "Cadastre-se",
-    passo1_desc: "Crie sua conta gratuita usando seu email institucional.",
-    passo2_title: "Encontre",
-    passo2_desc: "Pesquise entre centenas de livros e materiais didáticos.",
-    passo3_title: "Acesse",
-    passo3_desc: "Faça reservas, realize empréstimos e aproveite!"
+    sec_title: "Fale com a secretaria",
+    sec_subtitle: "Precisa de ajuda com cadastro, acesso ou dúvidas? Estamos por aqui.",
+    sec1_title: "Pessoalmente",
+    sec1_desc: "Vá até a secretaria da escola no horário de atendimento.",
+    sec2_title: "Canais oficiais",
+    sec2_desc: "Entre em contato por e-mail ou telefone institucional.",
+    sec3_title: "Como podemos ajudar",
+    sec3_desc: "Cadastro, recuperação de acesso, reservas e outras dúvidas."
   },
   en: {
     page_title: "Access - SIGA ITJ",
@@ -61,14 +61,14 @@ const translations = {
     sobre_p1: "<strong>SIGA</strong> (Integrated Collection Management System) is a digital platform for school library management, created to make access to the collection and loan management more practical for students and administrators.",
     sobre_p2: "SIGA serves students, teachers and staff, bringing together textbooks, scientific articles, academic papers, periodicals and other educational resources in one place.",
     sobre_p3: "The platform lets users search by title, author and category, track loans and make reservations. Its goal is to support academic work with simple, organized access to the collection.",
-    passos_title: "Start in 3 steps",
-    passos_subtitle: "Simple, fast and free for students",
-    passo1_title: "Sign up",
-    passo1_desc: "Create your free account using your institutional email.",
-    passo2_title: "Find",
-    passo2_desc: "Search among hundreds of books and teaching materials.",
-    passo3_title: "Access",
-    passo3_desc: "Reserve books, borrow materials, and enjoy!"
+    sec_title: "Contact the school office",
+    sec_subtitle: "Need help with sign-up, access or questions? We're here for you.",
+    sec1_title: "In person",
+    sec1_desc: "Visit the school office during service hours.",
+    sec2_title: "Official channels",
+    sec2_desc: "Get in touch by institutional email or phone.",
+    sec3_title: "How we can help",
+    sec3_desc: "Registration, access recovery, reservations and other questions."
   },
   es: {
     page_title: "Acceso - SIGA ITJ",
@@ -96,14 +96,14 @@ const translations = {
     sobre_p1: "<strong>SIGA</strong> (Sistema Integrado de Gestión de Acervos) es una plataforma digital para la gestión de bibliotecas escolares, creada para facilitar el acceso al acervo y la organización de préstamos para alumnos y administradores.",
     sobre_p2: "SIGA atiende a alumnos, profesores y personal, reuniendo libros de texto, artículos científicos, trabajos académicos, revistas y otros recursos educativos en un solo lugar.",
     sobre_p3: "La plataforma permite buscar por título, autor y categoría, consultar préstamos y hacer reservas. Su objetivo es apoyar la vida académica con un acceso sencillo y organizado al acervo.",
-    passos_title: "Comienza en 3 pasos",
-    passos_subtitle: "Sencillo, rápido y gratuito para alumnos",
-    passo1_title: "Regístrate",
-    passo1_desc: "Crea tu cuenta gratuita usando tu correo institucional.",
-    passo2_title: "Encuentra",
-    passo2_desc: "Busca entre cientos de libros y materiales didácticos.",
-    passo3_title: "Accede",
-    passo3_desc: "¡Reserva libros, realiza préstamos y disfrútalo!"
+    sec_title: "Habla con la secretaría",
+    sec_subtitle: "¿Necesitas ayuda con el registro, el acceso o tus dudas? Estamos para ayudarte.",
+    sec1_title: "En persona",
+    sec1_desc: "Acude a la secretaría de la escuela en el horario de atención.",
+    sec2_title: "Canales oficiales",
+    sec2_desc: "Comunícate por correo o teléfono institucional.",
+    sec3_title: "Cómo podemos ayudarte",
+    sec3_desc: "Registro, recuperación de acceso, reservas y otras dudas."
   }
 };
 

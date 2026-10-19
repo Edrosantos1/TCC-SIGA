@@ -14,7 +14,7 @@
 .config-header h1 {
     font-size: 26px;
     font-weight: 700;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -39,7 +39,7 @@
 .config-card h3 {
     font-size: 16px;
     font-weight: 600;
-    color: #0b4b9b;
+    color: var(--siga-azul);
     margin-bottom: 2px;
     display: flex;
     align-items: center;
@@ -83,10 +83,10 @@
 }
 
 .opcao-card.active {
-    border-color: #0b4b9b;
+    border-color: var(--siga-azul);
     background: #eaf4ff;
-    color: #0b4b9b;
-    box-shadow: 0 0 0 3px rgba(11, 75, 155, 0.1);
+    color: var(--siga-azul);
+    box-shadow: 0 0 0 3px rgba(0, 53, 255, 0.1);
 }
 
 .opcao-card input[type="radio"] {
@@ -141,7 +141,7 @@
 }
 
 .toggle-switch input:checked + .slider {
-    background: #0b4b9b;
+    background: var(--siga-azul);
 }
 
 .toggle-switch input:checked + .slider::before {
@@ -160,7 +160,7 @@
     gap: 10px;
     width: 100%;
     padding: 14px;
-    background: #0b4b9b;
+    background: var(--siga-azul);
     color: #ffffff;
     border: none;
     border-radius: 12px;
@@ -168,13 +168,13 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--siga-font);
 }
 
 .btn-salvar:hover {
     background: #0a3d7a;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(11, 75, 155, 0.25);
+    box-shadow: 0 6px 20px rgba(0, 53, 255, 0.25);
 }
 
 .config-actions {
@@ -211,7 +211,7 @@
     background: transparent;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
-    font: 600 14px 'Inter', sans-serif;
+    font: 600 14px var(--siga-font);
     cursor: pointer;
     transition: all 0.3s;
 }
