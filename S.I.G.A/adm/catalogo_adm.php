@@ -390,7 +390,7 @@ $catalogoData = [
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
-                <span>SiGA ITJ</span>
+                <span>SIGA ITJ</span>
             </div>
             <button class="collapse-icon" id="collapseBtn" title="Recolher menu" aria-label="Recolher menu">
                 <span></span><span></span>
@@ -421,6 +421,7 @@ $catalogoData = [
             </div>
 
             <div class="header-right">
+                <?php require __DIR__ . '/../includes/admin_appearance_controls.php'; ?>
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar"><i class="fas fa-user-shield"></i></div>
                     <div class="admin-info">

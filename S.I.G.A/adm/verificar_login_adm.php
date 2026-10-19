@@ -32,6 +32,18 @@ if (!is_string($config_classes)) {
     $config_classes = '';
 }
 
+function aplicarTemaAdminCookie($classes) {
+    $tema = $_COOKIE['siga_admin_appearance'] ?? null;
+    if (!in_array($tema, ['claro', 'escuro', 'alto_contraste'], true)) {
+        return $classes;
+    }
+
+    $classes = preg_replace('/\btema-(?:claro|escuro|alto_contraste)\b/', '', $classes);
+    return trim($classes . ' tema-' . $tema);
+}
+
+$config_classes = aplicarTemaAdminCookie($config_classes);
+
 // Disponibilizar globalmente
 $GLOBALS['config_classes'] = $config_classes;
 

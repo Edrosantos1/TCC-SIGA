@@ -118,3 +118,65 @@ body.reduzir-animacoes *::after {
     transition: none !important;
     scroll-behavior: auto !important;
 }
+
+.admin-appearance-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    order: 2;
+    flex-shrink: 0;
+}
+
+.admin-appearance-button {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 1px solid #d3daf5;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #0035ff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.admin-appearance-button:hover {
+    border-color: #ffad00;
+    transform: rotate(-12deg);
+}
+
+.admin-appearance-button:focus-visible {
+    outline: 3px solid #ffad00;
+    outline-offset: 3px;
+}
+
+.admin-appearance-button .icon-sun { display: none; color: #ffad00; }
+body.tema-escuro .admin-appearance-button[data-admin-appearance="escuro"] .icon-moon { display: none; }
+body.tema-escuro .admin-appearance-button[data-admin-appearance="escuro"] .icon-sun { display: block; }
+
+body.tema-escuro .admin-appearance-button {
+    background: #111a42;
+    border-color: #28357f;
+    color: #8fa6ff;
+}
+
+body.tema-escuro .admin-appearance-button:hover {
+    border-color: #ffad00;
+}
+
+body.tema-alto_contraste .admin-appearance-button {
+    background: #000000;
+    border: 1px solid #ffffff;
+    color: #ffffff !important;
+}
+
+body.tema-alto_contraste .admin-appearance-button[aria-pressed="true"] {
+    background: #ffffff;
+    color: #000000 !important;
+}
+
+body.tema-alto_contraste .admin-appearance-button[aria-pressed="true"] i {
+    color: #000000 !important;
+}

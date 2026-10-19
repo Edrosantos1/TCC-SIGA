@@ -190,13 +190,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const btnRestaurar = document.getElementById('btnRestaurar');
         const preferenciaClasses = {
             tamanho_fonte: 'fonte-',
-            tema: 'tema-',
             daltonismo: 'daltonismo-',
             espacamento: 'espacamento-'
         };
         const padroes = {
             tamanho_fonte: 'medio',
-            tema: 'claro',
             daltonismo: 'normal',
             espacamento: 'normal',
             reduzir_animacoes: false

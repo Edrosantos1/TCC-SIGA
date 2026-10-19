@@ -294,7 +294,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
-                <span>SiGA ITJ</span>
+                <span>SIGA ITJ</span>
             </div>
             <button class="collapse-icon" id="collapseBtn" title="Recolher menu" aria-label="Recolher menu">
                 <span></span><span></span>
@@ -324,6 +324,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
             </div>
 
             <div class="header-right">
+                <?php require __DIR__ . '/../includes/admin_appearance_controls.php'; ?>
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar">
                         <i class="fas fa-user-shield"></i>

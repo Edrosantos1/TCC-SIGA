@@ -177,13 +177,11 @@ if ($db instanceof mysqli) {
 // Use os mesmos valores permitidos pela tela do aluno.
 $opcoesPermitidas = [
     'tamanho_fonte' => ['pequeno', 'medio', 'grande'],
-    'tema' => ['claro', 'escuro', 'alto_contraste'],
     'daltonismo' => ['normal', 'protanopia', 'deuteranopia', 'tritanopia'],
     'espacamento' => ['compacto', 'normal', 'confortavel'],
 ];
 $valoresPadrao = [
     'tamanho_fonte' => 'medio',
-    'tema' => 'claro',
     'daltonismo' => 'normal',
     'espacamento' => 'normal',
     'reduzir_animacoes' => '0',
@@ -196,6 +194,9 @@ foreach ($valoresPadrao as $campo => $padrao) {
     }
 }
 $config_classes = function_exists('aplicarConfiguracoes') ? aplicarConfiguracoes() : $config_classes;
+if (function_exists('aplicarTemaAdminCookie')) {
+    $config_classes = aplicarTemaAdminCookie($config_classes);
+}
 
 // ========== PROCESSAR FORMULÁRIO ==========
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
@@ -304,7 +305,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fas fa-book-reader"></i>
-                <span>SiGA ITJ</span>
+                <span>SIGA ITJ</span>
             </div>
             <button class="collapse-icon" id="collapseBtn" title="Recolher menu" aria-label="Recolher menu">
                 <span></span><span></span>
@@ -334,6 +335,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             </div>
 
             <div class="header-right">
+                <?php require __DIR__ . '/../includes/admin_appearance_controls.php'; ?>
                 <div class="admin-profile" id="admin-profile-btn">
                     <div class="admin-avatar">
                         <i class="fas fa-user-shield"></i>
@@ -378,7 +380,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <div class="config-container">
                 <div class="config-header">
                     <h1><i class="fas fa-sliders-h"></i> Preferências do Sistema</h1>
-                    <p>Ajuste a aparência e acessibilidade do painel administrativo</p>
+                    <p>Ajuste a visualização e acessibilidade do painel administrativo</p>
                 </div>
 
                 <!-- ========== MENSAGENS FLASH ========== -->
@@ -416,31 +418,6 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                                     <input type="radio" name="tamanho_fonte" value="grande" <?= ($configuracoes['tamanho_fonte'] ?? 'medio') === 'grande' ? 'checked' : '' ?>>
                                     <i class="fas fa-font" style="font-size: 22px;"></i>
                                     <span>Grande</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ========== TEMA ========== -->
-                    <div class="config-card">
-                        <h3><i class="fas fa-palette"></i> Tema</h3>
-                        <p class="desc">Escolha o tema visual do sistema</p>
-                        <div class="form-group">
-                            <div class="opcoes-grid">
-                                <label class="opcao-card <?= ($configuracoes['tema'] ?? 'claro') === 'claro' ? 'active' : '' ?>">
-                                    <input type="radio" name="tema" value="claro" <?= ($configuracoes['tema'] ?? 'claro') === 'claro' ? 'checked' : '' ?>>
-                                    <i class="fas fa-sun"></i>
-                                    <span>Claro</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['tema'] ?? 'claro') === 'escuro' ? 'active' : '' ?>">
-                                    <input type="radio" name="tema" value="escuro" <?= ($configuracoes['tema'] ?? 'claro') === 'escuro' ? 'checked' : '' ?>>
-                                    <i class="fas fa-moon"></i>
-                                    <span>Escuro</span>
-                                </label>
-                                <label class="opcao-card <?= ($configuracoes['tema'] ?? 'claro') === 'alto_contraste' ? 'active' : '' ?>">
-                                    <input type="radio" name="tema" value="alto_contraste" <?= ($configuracoes['tema'] ?? 'claro') === 'alto_contraste' ? 'checked' : '' ?>>
-                                    <i class="fas fa-circle" style="color: #000; border: 2px solid #fff; background: #fff;"></i>
-                                    <span>Alto Contraste</span>
                                 </label>
                             </div>
                         </div>

@@ -128,6 +128,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentLang = "pt";
 
+  document.querySelectorAll('.site-header a[href^="#"]').forEach(link => {
+    link.addEventListener("click", (event) => {
+      const target = document.getElementById(link.getAttribute("href").slice(1));
+      if (!target) return;
+      event.preventDefault();
+      target.scrollIntoView({ behavior: "smooth" });
+    });
+  });
+
   // ───────────── IDIOMA ─────────────
   function applyLanguage(lang) {
     const t = translations[lang];
