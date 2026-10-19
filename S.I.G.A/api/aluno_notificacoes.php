@@ -19,6 +19,13 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = (int) $_SESSION['usuario_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $csrf = isset($input['csrf']) && is_string($input['csrf']) ? $input['csrf'] : null;
+    if (!csrf_validar($csrf)) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Token CSRF inválido. Recarregue a página e tente novamente.']);
+        exit;
+    }
+
     if (($input['action'] ?? '') !== 'mark_all_read') {
         http_response_code(400);
         echo json_encode(['error' => 'Ação inválida']);
@@ -28,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param('i', $usuario_id);
     $stmt->execute();
     if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
-        header('Location: dashboard_aluno.php?mensagem=Notificacoes+marcadas+como+lidas');
+        header('Location: ../aluno/painel.php?mensagem=Notificacoes+marcadas+como+lidas');
         exit;
     }
     echo json_encode(['success' => true]);
@@ -55,7 +62,7 @@ echo json_encode($notificationsData);
     [
         'id' => 1,
         'type' => 'overdue',
-        'params' => ['book' => 'Introdução à Programação com Python', 'days' => 3],
+        'params' => ['book' => 'Introdução Ã  Programação com Python', 'days' => 3],
         'date' => date('Y-m-d H:i:s', strtotime('-2 days')),
         'read' => false,
     ],

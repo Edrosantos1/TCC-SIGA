@@ -1,0 +1,35 @@
+html[data-tema="escuro"] .main-content .loans-main .loans-view-toggle,
+html[data-tema="escuro"] .main-content .catalog-main .fav-view-toggle {
+    background: var(--aluno-surface) !important;
+    border: 1px solid var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .main-content .loans-main .loans-view-toggle > button:not(.active):not([aria-pressed="true"]),
+html[data-tema="escuro"] .main-content .catalog-main .fav-view-toggle > button:not(.active):not([aria-pressed="true"]) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: transparent !important;
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .main-content .loans-main .loans-view-toggle > button:not(.active):not([aria-pressed="true"]) :is(span, i),
+html[data-tema="escuro"] .main-content .catalog-main .fav-view-toggle > button:not(.active):not([aria-pressed="true"]) :is(span, i) {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .main-content .loans-main .loans-view-toggle > button:is(.active, [aria-pressed="true"]),
+html[data-tema="escuro"] .main-content .catalog-main .fav-view-toggle > button:is(.active, [aria-pressed="true"]) {
+    background: var(--aluno-action-bg) !important;
+    border-color: var(--aluno-action-bg) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content .loans-main .loans-view-toggle > button:is(.active, [aria-pressed="true"]) :is(span, i),
+html[data-tema="escuro"] .main-content .catalog-main .fav-view-toggle > button:is(.active, [aria-pressed="true"]) :is(span, i) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content .loans-main .loans-view-toggle > button:focus-visible,
+html[data-tema="escuro"] .main-content .catalog-main .fav-view-toggle > button:focus-visible {
+    outline: 2px solid var(--aluno-primary) !important;
+    outline-offset: 2px;
+}

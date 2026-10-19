@@ -1,0 +1,1594 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(to right, #ffffff 50%, #021a3a 50%);
+}
+
+
+/* Acessibilidade */
+a:focus-visible, button:focus-visible {
+  outline: 3px solid #17c8cc;
+  outline-offset: 2px;
+}
+a:focus:not(:focus-visible), button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.full-background {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.full-background::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  filter: blur(150px);
+  opacity: 0.2;
+  top: -100px;
+  left: -100px;
+}
+
+.container {
+    background-color: #ffffff00;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Glass effect */
+.sign-in form {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.85);
+}
+.sign-up form {
+  backdrop-filter: blur(20px);
+  background: rgba(2,26,58,0.8);
+}
+
+/* ---------- CABEÇALHO FIXO COMPARTILHADO ---------- */
+.auth-header {
+  position: absolute;
+  top: 30px;
+  left: 40px;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-header .back-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.375rem;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.auth-header .back-arrow:hover {
+  background-color: rgba(45, 136, 255, 0.1);
+  color: #2d88ff;
+}
+
+.auth-header .brand-logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  line-height: 1;
+  transition: transform 0.1s ease;
+}
+.auth-header .brand-logo:hover {
+  transform: scale(1.05);
+}
+
+.icon-logo{
+  width: 20px;
+  height: 20px;
+  color: #2d88ff;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Cores padrão (login - claro) */
+.auth-header,
+.auth-header a {
+  color: #333333;
+}
+
+/* Tema escuro (registro ativo) */
+.auth-header.dark-theme,
+.auth-header.dark-theme a {
+  color: #ffffff;
+}
+
+.auth-header.dark-theme .back-arrow:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* ---------- FORMULÁRIOS ---------- */
+.container form {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 60px;
+    height: 100%;
+    text-align: left;
+}
+
+.dot-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+.dot-title::after {
+    content: '.';
+    color: #2d88ff;
+}
+
+/* Parágrafos com mais respiro e elegância */
+.toggle-panel p,
+.sign-up form > span {
+    opacity: 0.85;
+}
+
+/* Tema Branco (Login) */
+.sign-in form { background-color: #ffffff; color: #333333; }
+.sign-in .dot-title { color: #111111; }
+.sign-in form > span, .options-group label { 
+    cursor: pointer; 
+    color: #555; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.options-group input[type="checkbox"] { margin: 0; cursor: pointer; }
+.sign-in .input-group input:focus { background-color: #ffffff; border-color: #2d88ff; box-shadow: 0 0 0 3px rgba(45,136,255,0.2);}
+.sign-in .input-group input::placeholder { color: #9ca3af; }
+.sign-in .icon-input, .sign-in .toggle-eye { color: #9ca3af; }
+.sign-in .toggle-eye:hover { color: #333333; }
+
+.sign-in .caps-warning {
+    color: #003f7a;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    display: none;
+}
+
+/* Tema Azul Deep (Registro) */
+.sign-up form { background-color: #021a3a; color: #ffffff; }
+.sign-up .dot-title { color: #ffffff; }
+.sign-up form > span { color: #b3cce6; font-size: 0.8125rem; margin-bottom: 25px; display: block;}
+
+.sign-up .input-group input { 
+    background-color: #041d40; 
+    color: #ffffff; 
+    border: 1.5px solid transparent; 
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+.sign-up .input-group input::placeholder { color: #7a9cc2; }
+.sign-up .icon-input { color: #7a9cc2; transition: color 0.3s; }
+
+.sign-up .input-group input:focus { 
+    background-color: #ffffff; 
+    color: #333333; 
+    border-color: #2d88ff; 
+    box-shadow: 0 0 0 3px rgba(45,136,255,0.2);
+    transform: scale(1.02);
+}
+.sign-up .input-group input:focus + .icon-input { color: #2d88ff; }
+.sign-up .input-group input:focus ~ .toggle-eye { color: #2d88ff; }
+
+.sign-up .caps-warning {
+    color: #ffffff;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    display: none;
+}
+
+/* ============================================= */
+/* CORREÇÃO PRINCIPAL - INPUT GROUP COM FLEXBOX */
+/* ============================================= */
+.input-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  position: relative;
+}
+
+.input-group input {
+  flex: 1 1 auto;
+  padding: 16px 45px 16px 20px;  /* espaço para o ícone à direita */
+  font-size: 0.875rem;
+  border-radius: 16px;
+  width: 100%;
+  outline: none;
+  transition: 0.3s, transform 0.2s ease;
+}
+
+/* Ícones (envelope, olho) - posicionamento flexível sem absolute */
+.input-group .icon-input,
+.input-group .toggle-eye {
+  margin-left: -45px;        /* puxa o ícone para dentro do input */
+  order: 2;                  /* garante que fique após o input, na mesma linha */
+  z-index: 2;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+}
+
+/* Ícone de envelope não clicável (apenas visual) */
+.input-group .icon-input {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Mensagem de erro: ocupa linha inteira abaixo do input + ícone */
+.input-group .error-message,
+.input-group #confirm-error {
+  flex: 0 0 100%;
+  order: 3;
+  margin-top: 5px;
+  color: #f44336;
+  font-size: 0.8rem;
+  display: block;
+}
+
+/* Para o tema claro (login) e escuro (registro) */
+.sign-in .input-group .toggle-eye:hover {
+  color: #333333;
+}
+.sign-up .input-group .toggle-eye:hover {
+  color: #2d88ff;
+}
+
+/* Efeito de clique no olho */
+.input-group .toggle-eye:active {
+  transform: scale(0.95);
+}
+
+/* ---------- FIM DA CORREÇÃO ---------- */
+
+/* Outros componentes */
+.options-group { display: flex; justify-content: space-between; width: 100%; margin-top: 15px; }
+
+/* Botões */
+.buttons-layout { margin-top: 25px; width: 100%; }
+.btn-primary { 
+    background: linear-gradient(135deg, #2d88ff, #1a73e8);
+    box-shadow: 0 10px 20px rgba(45,136,255,0.3);
+    color: #fff; 
+    font-size: 0.875rem; 
+    padding: 14px 0; 
+    width: 100%; 
+    border: none; 
+    border-radius: 25px; 
+    font-weight: 600; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+}
+.btn-primary:hover { 
+    background: linear-gradient(135deg, #1a73e8, #0f5bb5);
+    transform: translateY(-2px); 
+    box-shadow: 0 15px 30px rgba(45,136,255,0.4); 
+}
+.btn-secondary { 
+    background-color: transparent; 
+    color: #fff; 
+    font-size: 0.75rem; 
+    padding: 12px 40px; 
+    border: 2px solid #fff; 
+    border-radius: 25px; 
+    font-weight: 600; 
+    letter-spacing: 0.5px; 
+    text-transform: uppercase; 
+    margin-top: 15px; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+}
+.btn-secondary:hover { 
+    background-color: rgba(255, 255, 255, 0.2); 
+    transform: translateY(-2px);
+}
+
+/* Animação dos formulários */
+.form-container { 
+    position: absolute; 
+    top: 0; 
+    height: 100%; 
+    transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
+}
+.sign-in { left: 0; width: 50%; z-index: 2; }
+.container.active .sign-in { transform: translateX(100%); opacity: 0; z-index: 1; }
+.sign-up { left: 0; width: 50%; opacity: 0; z-index: 1; }
+.container.active .sign-up { transform: translateX(100%); opacity: 1; z-index: 5; }
+
+@keyframes move {
+    0%, 49.99% { opacity: 0; z-index: 1; }
+    50%, 100% { opacity: 1; z-index: 5; }
+}
+
+/* Painel lateral */
+.toggle-container { 
+    position: absolute; 
+    top: 0; 
+    left: 50%; 
+    width: 50%; 
+    height: 100%; 
+    overflow: hidden; 
+    transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
+    z-index: 1000;
+    /* Isola o contexto de empilhamento e evita scroll por foco */
+    isolation: isolate;
+    contain: layout style;
+}
+.container.active .toggle-container { transform: translateX(-100%); }
+
+.toggle {
+    background-image: 
+        linear-gradient(to bottom right, rgba(2,26,58,0.8), rgba(0,0,0,0.6)),
+        url('../../Imagens/fundo_alu.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #fff;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    min-height: 100vh; 
+    display: block;
+    /* Promove para camada própria — evita repaint do background ao receber foco */
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.container.active .toggle { transform: translateX(50%); }
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 145px;
+  z-index: 10000;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid #d3daf5;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #0035ff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+.theme-toggle:hover { border-color: #ffad00; transform: rotate(-12deg); }
+.theme-toggle .icon-sun { display: none; color: #ffad00; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+.theme-toggle:focus-visible { outline: 3px solid #ffad00; outline-offset: 3px; }
+
+[data-theme="dark"] .theme-toggle {
+  color: #8fa6ff;
+  background: #111a42;
+  border-color: #28357f;
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(to right, #080d26 50%, #111a42 50%);
+}
+[data-theme="dark"] .sign-in form {
+  background: #080d26;
+  color: #ffffff;
+}
+[data-theme="dark"] .sign-in .dot-title { color: #ffffff; }
+[data-theme="dark"] .sign-in .options-group,
+[data-theme="dark"] .sign-in .options-group label { color: #a8b3e3; }
+[data-theme="dark"] .sign-in .input-group input,
+[data-theme="dark"] .sign-in .input-group select {
+  color: #ffffff;
+  background: #17215a;
+  border-color: #6578c9;
+  color-scheme: dark;
+  caret-color: #ffad00;
+}
+[data-theme="dark"] .sign-in .input-group input::placeholder { color: #d4dcff; opacity: 1; }
+[data-theme="dark"] .sign-in .input-group input:focus,
+[data-theme="dark"] .sign-in .input-group select:focus {
+  color: #ffffff;
+  background: #080d26;
+  border-color: #ffad00;
+}
+[data-theme="dark"] .sign-in .input-group .icon-input,
+[data-theme="dark"] .sign-in .input-group .toggle-eye { color: #d4dcff; }
+[data-theme="dark"] .auth-header,
+[data-theme="dark"] .auth-header a { color: #ffffff; }
+[data-theme="dark"] .language-button,
+[data-theme="dark"] .language-list {
+  color: #ffffff;
+  background: #080d26;
+  border-color: #6578c9;
+}
+[data-theme="dark"] .language-button svg { stroke: #ffffff; }
+[data-theme="dark"] .language-list li { color: #ffffff; }
+[data-theme="dark"] .language-list li:hover { background: #17215a; }
+
+.sign-in .input-group input,
+.sign-in .input-group select {
+  color: #1f2937;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color-scheme: light;
+  caret-color: #0035ff;
+}
+
+.sign-up .input-group input,
+.sign-up .input-group select {
+  color-scheme: dark;
+  caret-color: #ffad00;
+}
+
+.sign-in .input-group input:-webkit-autofill,
+.sign-in .input-group input:-webkit-autofill:hover,
+.sign-in .input-group input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1f2937;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  caret-color: #0035ff;
+}
+
+.sign-up .input-group input:-webkit-autofill,
+.sign-up .input-group input:-webkit-autofill:hover,
+.sign-up .input-group input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px #041d40 inset;
+  caret-color: #ffad00;
+}
+
+html[data-theme="dark"] .sign-in .input-group input:-webkit-autofill,
+html[data-theme="dark"] .sign-in .input-group input:-webkit-autofill:hover,
+html[data-theme="dark"] .sign-in .input-group input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 1000px #17215a inset;
+  caret-color: #ffad00;
+}
+
+.toggle-panel { 
+    position: absolute; 
+    width: 50%; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    flex-direction: column; 
+    padding: 0 40px; 
+    text-align: center; 
+    top: 0; 
+    transform: translateX(0); 
+    transition: all 0.6s cubic-bezier(0.77, 0, 0.175, 1); 
+}
+
+.toggle-panel p { 
+    font-size: 0.875rem; 
+    line-height: 22px; 
+    margin: 20px 0; 
+    color: #e2e8f0; 
+    opacity: 0.9;
+}
+.toggle-left { transform: translateX(-200%); }
+.container.active .toggle-left { transform: translateX(0); }
+.toggle-right { right: 0; transform: translateX(0); }
+.container.active .toggle-right { transform: translateX(200%); }
+
+/* Seletor de idioma - visual mais clean */
+.language-wrapper {
+  position: absolute; 
+  top: 22px;
+  right: 20px;
+  z-index: 9999;
+}
+
+.language-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(4px);
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.08);
+  outline: none;
+  transition: 0.2s;
+  font-weight: 500;
+  line-height: 1.5;
+  appearance: none;
+}
+.language-button:hover { background: rgba(255,255,255,1); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+.flag {
+  width: 25px;
+  height: 20px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.language-button svg {
+  width: 14px;
+  height: 14px;
+  stroke: #333;
+  stroke-width: 2;
+  fill: none;
+  transition: transform 0.3s ease;
+  margin-left: 4px;
+}
+
+.language-list {
+  list-style: none;
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  padding: 8px 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px;
+  display: none;
+  min-width: 150px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+.language-list li {
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: #333;
+  transition: background 0.15s;
+}
+.language-list li:hover { background: #f4f6f9; }
+.language-wrapper.active .language-list { display: block; }
+.language-wrapper.active svg { transform: rotate(180deg); }
+
+/* Mensagens de erro com animação */
+.error-message, .reg-error-message {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-bottom: 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Transição suave para cores do cabeçalho */
+.auth-header,
+.auth-header a,
+.auth-header .brand-logo {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* ATRASO específico para o botão "SiGA ITJ" */
+.auth-header .brand-logo {
+  transition-delay: 0.1s;
+}
+
+.google-login-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+  padding: 13px 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+  color: #1f365d;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid rgba(45, 136, 255, 0.2);
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(2, 26, 58, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.google-login-btn i {
+  font-size: 1.125rem;
+  color: #2d88ff;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.google-login-btn:hover {
+  background: linear-gradient(135deg, #f6faff 0%, #eef6ff 100%);
+  border-color: rgba(45, 136, 255, 0.35);
+  box-shadow: 0 12px 24px rgba(45, 136, 255, 0.16);
+  transform: translateY(-2px);
+}
+
+.google-login-btn:hover i {
+  transform: scale(1.05);
+}
+
+.google-login-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(45, 136, 255, 0.12);
+}
+
+.google-login-btn:focus-visible {
+  outline: 2px solid #2d88ff;
+  outline-offset: 2px;
+}
+
+.sign-up .google-login-btn {
+  background: #ffffff;
+  color: #0f2444;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.sign-up .google-login-btn:hover {
+  background: #f7faff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22);
+}
+/* Estilo para o select de série */
+.input-group select {
+    flex: 1 1 auto;
+    padding: 16px 45px 16px 20px;
+    font-size: 0.875rem;
+    border-radius: 16px;
+    width: 100%;
+    outline: none;
+    transition: 0.3s, transform 0.2s ease;
+    appearance: none;
+    background-color: #041d40;
+    color: #ffffff;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+}
+
+/* Ícone personalizado para o select (seta para baixo) */
+.input-group select + .icon-input {
+    pointer-events: none;
+    font-size: 1rem;
+}
+
+/* Tema claro (login) - não tem select, mas por consistência */
+.sign-in .input-group select {
+    background-color: #ffffff;
+    color: #333333;
+    border-color: #e2e8f0;
+}
+.sign-in .input-group select:focus {
+    border-color: #2d88ff;
+    box-shadow: 0 0 0 3px rgba(45,136,255,0.2);
+}
+
+/* Tema escuro (registro) */
+.sign-up .input-group select {
+    background-color: #041d40;
+    color: #ffffff;
+}
+.sign-up .input-group select:focus {
+    background-color: #ffffff;
+    color: #333333;
+    border-color: #2d88ff;
+    transform: scale(1.02);
+}
+/* Cor do ícone do select quando em foco (tema escuro do registro) */
+.sign-up .input-group select:focus + .icon-input {
+    color: #2d88ff;
+}
+
+/* Cor do ícone do select quando em foco (tema claro do login, caso exista) */
+.sign-in .input-group select:focus + .icon-input {
+    color: #2d88ff;
+}
+/* ========== LINK ESQUECEU A SENHA - ESTILOSO ========== */
+.options-group a {
+  color: #2d88ff;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.options-group a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2d88ff, #1a73e8);
+  transition: width 0.3s ease;
+}
+
+.options-group a:hover {
+  color: #0f5bb5;
+}
+
+.options-group a:hover::after {
+  width: 100%;
+}
+
+/* ========== PASSWORD STRENGTH INDICATOR ========== */
+.strength-indicator {
+  width: 100%;
+  margin: -4px 0 12px 0;
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.4s ease;
+}
+
+.strength-label {
+  display: block;
+  font-size: 0.6875rem;
+  margin-top: 7px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  transition: color 0.4s ease;
+}
+
+/* ─── Barras preenchidas por nível ─── */
+.strength-indicator.level-1 .strength-bar:nth-child(-n+1) { background-color: #ef4444; }
+.strength-indicator.level-2 .strength-bar:nth-child(-n+2) { background-color: #f97316; }
+.strength-indicator.level-3 .strength-bar:nth-child(-n+3) { background-color: #17c8cc; }
+.strength-indicator.level-4 .strength-bar:nth-child(-n+4) { background-color: #22c55e; }
+
+/* ─── Cor do rótulo por nível ─── */
+.strength-indicator.level-1 .strength-label { color: #ef4444; }
+.strength-indicator.level-2 .strength-label { color: #f97316; }
+.strength-indicator.level-3 .strength-label { color: #17c8cc; }
+.strength-indicator.level-4 .strength-label { color: #22c55e; }
+
+/* ========== CHECKLIST DE REQUISITOS ========== */
+.password-requirements {
+  list-style: none;
+  width: 100%;
+  margin: 0 0 12px 0;
+  padding: 0;
+  display: none;                     /* mostrado via JS no focus */
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 14px;
+  animation: fadeIn 0.25s ease;
+}
+.password-requirements.visible {
+  display: grid;
+}
+
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.71875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.38);
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+.req-item.met {
+  color: #17c8cc;
+}
+
+.req-icon {
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.22);
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+.req-item.met .req-icon {
+  color: #17c8cc;
+  transform: scale(1.15);
+}
+/* ========== ERROS DE VALIDAÇÃO DE CAMPOS ========== */
+
+/* Estado de erro - outline vermelho */
+.input-group input.input-error,
+.input-group select.input-error {
+  border-color: #f44336 !important;
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.2) !important;
+}
+
+/* Mensagem de erro customizada do campo */
+.field-error {
+  flex: 0 0 100%;
+  order: 3;
+  margin-top: 5px;
+  color: #f44336;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: none;
+  animation: slideDownError 0.25s ease-out;
+}
+
+@keyframes slideDownError {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tema claro (Login) - campo com erro fica com fundo rosa suave */
+.sign-in .input-group input.input-error {
+  background-color: rgba(244, 67, 54, 0.04);
+}
+
+/* Tema escuro (Registro) - campo com erro fica com fundo vermelho suave */
+.sign-up .input-group input.input-error {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+/* Ícone de entrada com erro muda de cor */
+.input-group input.input-error + .icon-input,
+.input-group input.input-error ~ .icon-input {
+  color: #f44336 !important;
+}
+
+/* Toggle eye com cor de erro */
+.input-group input.input-error ~ .toggle-eye {
+  color: #f44336 !important;
+}
+
+.input-group input.input-error ~ .toggle-eye:hover {
+  color: #f44336 !important;
+}
+
+/* Select com erro */
+.input-group select.input-error {
+  border-color: #f44336 !important;
+}
+
+.sign-up .input-group select.input-error {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.sign-in .input-group select.input-error {
+  background-color: rgba(244, 67, 54, 0.04);
+}
+
+/* Ícone do select com erro */
+.input-group select.input-error + .icon-input {
+  color: #f44336 !important;
+}
+
+
+.sign-up .input-group input.input-error:focus {
+  color: #ffffff !important;
+}
+
+/* Placeholder também fica visível em branco */
+.sign-up .input-group input.input-error:focus::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Select com erro também mantém cor branca */
+.sign-up .input-group select.input-error:focus {
+  color: #ffffff !important;
+}
+
+.sign-up .input-group select.input-error {
+  background-color: rgba(244, 67, 54, 0.1) !important; 
+  color: #ffffff !important;
+}
+
+/* As opções ficam normais */
+.sign-up .input-group select.input-error option {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+
+#modalSerieGoogle {
+  --ink:#16213E;
+  --paper:#FAF6ED;
+  --teal:#2CB1A3;
+  --teal-light:#EAF7F5;
+  --amber:#F5A623;
+  --error:#E5484D;
+  --line:#E4DFD2;
+}
+ 
+#modalSerieGoogle.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 30, .55);
+  z-index: 10000;
+  display: none; /* alternado via JS para 'flex' quando abre */
+  align-items: center;
+  justify-content: center;
+}
+ 
+#modalSerieGoogle .modal-box {
+  position: relative;
+  background: var(--paper);
+  width: min(92vw, 420px);
+  border-radius: 18px;
+  padding: 36px 32px 28px 44px; /* espaço extra à esquerda pra perfuração */
+  box-shadow: 0 24px 60px rgba(10, 14, 30, .35);
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+}
+ 
+/* perfuração estilo caderno, elemento de assinatura do modal */
+#modalSerieGoogle .modal-box::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 22px;
+  background-image: radial-gradient(circle, var(--paper) 3.5px, transparent 3.6px);
+  background-size: 22px 26px;
+  background-position: 0 10px;
+  background-color: var(--ink);
+  box-shadow: inset -2px 0 0 var(--line);
+}
+ 
+#modalSerieGoogle .step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: .06em;
+  color: var(--teal);
+  background: var(--teal-light);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+#modalSerieGoogle .step .dots { display: flex; gap: 4px; }
+#modalSerieGoogle .step .dots span {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--teal); opacity: .3;
+}
+#modalSerieGoogle .step .dots span.active { opacity: 1; }
+ 
+#modalSerieGoogle .dot-title {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+#modalSerieGoogle .dot-title .cap { color: var(--amber); }
+ 
+#modalSerieGoogle .modal-box p {
+  margin: 0 0 22px;
+  color: #5B6270;
+  font-size: .92rem;
+  line-height: 1.5;
+}
+ 
+#modalSerieGoogle .group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #9AA0AC;
+  margin: 0 0 8px;
+}
+ 
+#modalSerieGoogle .grade-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 18px;
+}
+ 
+#modalSerieGoogle .grade {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: .15s ease;
+}
+#modalSerieGoogle .grade:hover { border-color: var(--teal); transform: translateY(-1px); }
+#modalSerieGoogle .grade:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+#modalSerieGoogle .grade.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(22, 33, 62, .25);
+}
+ 
+#modalSerieGoogle .reg-error-message {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: #FCEBEC;
+  color: var(--error);
+  font-size: .82rem;
+  padding: 8px 10px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+#modalSerieGoogle .reg-error-message.show { display: flex; }
+ 
+#modalSerieGoogle .btn-primary {
+  width: 100%;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fff;
+  background: #C9CDD3;
+  border: none;
+  border-radius: 10px;
+  padding: 13px 0;
+  cursor: not-allowed;
+  transition: .2s ease;
+}
+#modalSerieGoogle .btn-primary.ready { background: var(--teal); cursor: pointer; }
+#modalSerieGoogle .btn-primary.ready:hover { background: #26998D; }
+#modalSerieGoogle .btn-primary.loading { background: #26998D; cursor: progress; }
+ 
+#modalSerieGoogle .spinner {
+  width: 14px; height: 14px;
+  border: 2px solid #ffffff66;
+  border-top-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: -2px;
+  animation: modalSerieSpin .7s linear infinite;
+}
+@keyframes modalSerieSpin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+
+/* ─── TABLETS E TELAS MÉDIAS ─── */
+@media (max-width: 1024px) {
+  .container form {
+    padding: 0 40px;
+  }
+  .dot-title {
+    font-size: 1.75rem;
+  }
+  .toggle-panel {
+    padding: 0 30px;
+  }
+  .toggle-panel p {
+    font-size: 0.8125rem;
+    line-height: 20px;
+  }
+  .btn-secondary {
+    padding: 10px 30px;
+    font-size: 0.6875rem;
+  }
+}
+
+/* ─── MOBILE (≤ 768px) ─── */
+@media (max-width: 768px) {
+  /* Fundo da página */
+  html,
+  body {
+    overflow-x: clip;
+    background: #021a3a;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .full-background {
+    height: auto;
+    min-height: 100vh;
+    display: block;
+    padding: 20px 15px;
+  }
+
+  /* Container principal – layout em coluna */
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    min-height: 80vh;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+    background: transparent;
+  }
+
+  /* Remove posicionamento absoluto dos formulários */
+  .form-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+    opacity: 1 !important;
+    z-index: auto;
+    transition: none;
+    margin-bottom: 20px;
+  }
+
+  /* Exibe apenas o formulário ativo */
+  .sign-in {
+    display: block;
+    width: 100%;
+  }
+  .sign-up {
+    display: none;
+    width: 100%;
+  }
+  .container.active .sign-in {
+    display: none;
+  }
+  .container.active .sign-up {
+    display: block;
+  }
+
+  /* Ajuste dos formulários (cartões) */
+  .sign-in form,
+  .sign-up form {
+    padding: 30px 25px;
+    border-radius: 24px;
+    backdrop-filter: none;
+    background: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  }
+  .sign-up form {
+    background: #021a3a;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Cabeçalho fixo – reposicionado */
+  .auth-header {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-bottom: 20px;
+    padding: 0;
+    justify-content: flex-start;
+    color: #ffffff;
+  }
+  .auth-header a {
+    color: #ffffff;
+  }
+  .auth-header .back-arrow:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+
+  /* Seletor de idioma – reposicionado */
+  .language-wrapper {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-end;
+    z-index: 10;
+  }
+  .language-button {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+  }
+  .language-button svg {
+    stroke: #ffffff;
+  }
+  .language-list {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Toggle (painel lateral) transformado em barra de abas */
+  .toggle-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    transform: none !important;
+    z-index: 10;
+    isolation: auto;
+    contain: none;
+    margin: 10px 0 0;
+    order: -1; /* coloca acima dos formulários */
+  }
+  .toggle {
+    width: 100%;
+    left: 0;
+    height: auto;
+    min-height: auto;
+    transform: none !important;
+    background: transparent;
+    background-image: none;
+    will-change: auto;
+    backface-visibility: visible;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+    padding: 0;
+  }
+
+  /* Remove os painéis com textos, mantém apenas os botões */
+  .toggle-panel {
+    position: relative;
+    width: auto;
+    height: auto;
+    transform: none !important;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+  }
+  .toggle-panel h1,
+  .toggle-panel p {
+    display: none;
+  }
+  .toggle-panel .btn-secondary {
+    margin: 0;
+    padding: 12px 30px;
+    font-size: 0.8125rem;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    background: transparent;
+    border-radius: 30px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    width: auto;
+    min-width: 120px;
+  }
+  .toggle-panel .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  /* Botão ativo (destacar o formulário atual) */
+  .container:not(.active) .toggle-left .btn-secondary,
+  .container.active .toggle-right .btn-secondary {
+    background: #ffffff;
+    color: #021a3a;
+    border-color: #ffffff;
+  }
+
+  /* Ajuste dos elementos dentro dos formulários */
+  .input-group input,
+  .input-group select {
+    padding: 14px 45px 14px 18px;
+    font-size: 0.875rem;
+    border-radius: 14px;
+  }
+  .input-group .icon-input,
+  .input-group .toggle-eye {
+    margin-left: -40px;
+    font-size: 1rem;
+  }
+  .dot-title {
+    font-size: 1.625rem;
+    margin-bottom: 15px;
+  }
+  .options-group {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .btn-primary {
+    padding: 14px 0;
+    font-size: 0.875rem;
+    border-radius: 25px;
+  }
+  .google-login-btn {
+    padding: 12px 16px;
+    font-size: 0.8125rem;
+    max-width: 240px;
+  }
+  .password-requirements {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .req-item {
+    font-size: 0.6875rem;
+    white-space: normal;
+  }
+  .strength-indicator {
+    margin: -2px 0 10px 0;
+  }
+
+  /* Modal de série – responsivo */
+  #modalSerieGoogle .modal-box {
+    padding: 28px 20px 24px 30px;
+    width: 95vw;
+    border-radius: 16px;
+  }
+  #modalSerieGoogle .grade-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  #modalSerieGoogle .grade {
+    font-size: 0.9rem;
+    padding: 8px 0;
+  }
+}
+
+/* ─── SMARTPHONES PEQUENOS (≤ 480px) ─── */
+@media (max-width: 480px) {
+  .full-background {
+    padding: 10px;
+  }
+
+  .sign-in form,
+  .sign-up form {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+  .dot-title {
+    font-size: 1.375rem;
+  }
+  .auth-header .brand-logo {
+    font-size: 1.0625rem;
+  }
+  .auth-header .back-arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 1.125rem;
+  }
+  .input-group input,
+  .input-group select {
+    padding: 12px 38px 12px 14px;
+    font-size: 0.8125rem;
+  }
+  .input-group .icon-input,
+  .input-group .toggle-eye {
+    margin-left: -34px;
+    font-size: 0.9rem;
+  }
+  .btn-primary {
+    font-size: 0.8125rem;
+    padding: 12px 0;
+  }
+  .toggle-panel .btn-secondary {
+    padding: 10px 20px;
+    font-size: 0.75rem;
+    min-width: 90px;
+  }
+  .google-login-btn {
+    max-width: 200px;
+    padding: 10px 14px;
+    font-size: 0.75rem;
+  }
+  .google-login-btn i {
+    font-size: 1rem;
+  }
+
+  /* Ajuste do seletor de idioma */
+  .language-button {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+  .flag {
+    width: 20px;
+    height: 16px;
+  }
+  .language-button svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Modal */
+  #modalSerieGoogle .modal-box {
+    padding: 20px 14px 20px 22px;
+  }
+  #modalSerieGoogle .grade-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  #modalSerieGoogle .grade {
+    font-size: 0.8rem;
+    padding: 6px 0;
+  }
+  #modalSerieGoogle .dot-title {
+    font-size: 1.2rem;
+  }
+  #modalSerieGoogle .modal-box p {
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================================
+   MENSAGENS DE ERRO DO SERVIDOR (login / registro)
+   ============================================================ */
+.sign-in .error-message,
+.sign-up .reg-error-message {
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  animation: shakeError 0.4s ease, fadeIn 0.3s ease;
+}
+.sign-in .error-message > i,
+.sign-up .reg-error-message > i {
+  font-size: 0.9375rem;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+/* tema claro (login) */
+.sign-in .error-message {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-left: 4px solid #ef4444;
+}
+/* tema escuro (registro) */
+.sign-up .reg-error-message {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-left: 4px solid #ef4444;
+}
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sign-in .error-message, .sign-up .reg-error-message { animation: none; }
+}
+
+/* ============================================================
+   REQUISITOS DE SENHA – redesign (cartão compacto, tema escuro)
+   ============================================================ */
+.password-requirements {
+  width: 100%;
+  margin: 0 0 14px 0;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.password-requirements .req-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #7a9cc2;
+  white-space: normal;
+  transition: color 0.25s ease;
+}
+/* o texto precisa herdar a cor do item (antes era sobrescrito por ".sign-up span") */
+.password-requirements .req-item span {
+  display: inline;
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+  opacity: 1;
+}
+.password-requirements .req-icon {
+  width: 16px;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: #ef4444;
+  opacity: 0.85;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+.password-requirements .req-item.met { color: #e6f4ff; }
+.password-requirements .req-item.met .req-icon {
+  color: #22c55e;
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* barras de força (também eram afetadas por ".sign-up span") */
+.strength-indicator .strength-bar {
+  display: block;
+  margin: 0;
+  opacity: 1;
+}
+.strength-indicator .strength-label {
+  display: block;
+  margin: 6px 0 0 0;
+  font-size: 0.6875rem;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .password-requirements { grid-template-columns: 1fr; padding: 10px 12px; gap: 6px; }
+}

@@ -62,7 +62,7 @@ if ($db) {
         $sqlAlunos = "
             SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                    EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
             FROM login_aluno a
             ORDER BY a.nome_aluno ASC
         ";
@@ -112,6 +112,12 @@ if ($db) {
 
 // ========== PROCESSAR FORMULÁRIO ==========
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!csrf_validar()) {
+        $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
+        header('Location: perfil_adm.php');
+        exit;
+    }
+
     $acao = isset($_POST['acao']) ? $_POST['acao'] : '';
     
     // ========== ATUALIZAR NOME ==========
@@ -145,8 +151,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (empty($senha_atual) || empty($nova_senha) || empty($confirmar_senha)) {
             $_SESSION['msg_erro'] = 'Todos os campos de senha são obrigatórios.';
-        } elseif (strlen($nova_senha) < 3) {
-            $_SESSION['msg_erro'] = 'A nova senha deve ter pelo menos 3 caracteres.';
+        } elseif ($nova_senha === '') {
+            $_SESSION['msg_erro'] = 'A nova senha não pode ficar vazia.';
         } elseif ($nova_senha !== $confirmar_senha) {
             $_SESSION['msg_erro'] = 'As senhas não coincidem.';
         } else {
@@ -157,23 +163,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $row = $result->fetch_assoc();
-                $senha_hash = $row['senha_adm'];
+                $senha_hash = $row['senha_adm'] ?? null;
                 $stmt->close();
             } elseif ($db instanceof PDO) {
                 $stmt = $db->prepare("SELECT senha_adm FROM login_admin WHERE id_adm = ?");
                 $stmt->execute([$id_adm]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                $senha_hash = $row['senha_adm'];
+                $senha_hash = $row['senha_adm'] ?? null;
             }
             
-            $senha_correta = false;
-            if (password_verify($senha_atual, $senha_hash)) {
-                $senha_correta = true;
-            } elseif ($senha_atual === '123') {
-                $senha_correta = true;
-            }
-            
-            if (!$senha_correta) {
+            if (!is_string($senha_hash) || !password_verify($senha_atual, $senha_hash)) {
                 $_SESSION['msg_erro'] = 'Senha atual incorreta.';
             } else {
                 $nova_senha_hash = password_hash($nova_senha, PASSWORD_DEFAULT);
@@ -191,6 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         }
+
     }
 }
 
@@ -217,9 +217,11 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
-    <link rel="stylesheet" href="../assets/css/perfil_adm.css?v=<?= time() ?>">
-    <script src="../assets/js/perfil_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/adm/dashboard_adm.css">
+    <link rel="stylesheet" href="../assets/css/adm/perfil_adm.css?v=<?= time() ?>">
+    <script src="../assets/js/adm/perfil_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/adm/admin_temas_paginas.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
 </head>
 <body class="<?= $config_classes ?>">
     
@@ -326,6 +328,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                         <div class="notification-list" id="notification-list-dropdown">
                             <!-- Preenchido via JS -->
                         </div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>
@@ -378,6 +381,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <div class="perfil-card">
                         <h3><i class="fas fa-user-edit"></i> Editar Nome</h3>
                         <form method="POST" action="">
+                            <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                             <input type="hidden" name="acao" value="atualizar_nome">
                             <div class="form-group">
                                 <label for="nome_adm">Nome completo</label>
@@ -393,6 +397,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <div class="perfil-card">
                         <h3><i class="fas fa-key"></i> Alterar Senha</h3>
                         <form method="POST" action="">
+                            <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                             <input type="hidden" name="acao" value="alterar_senha">
                             
                             <div class="form-group">
@@ -408,7 +413,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <div class="form-group">
                                 <label for="nova_senha">Nova senha</label>
                                 <div class="senha-container">
-                                    <input type="password" id="nova_senha" name="nova_senha" placeholder="Mínimo 3 caracteres" required>
+                                    <input type="password" id="nova_senha" name="nova_senha" placeholder="Digite a nova senha" required>
                                     <button type="button" class="toggle-senha" title="Mostrar senha">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -430,6 +435,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             </button>
                         </form>
                     </div>
+
                 </div>
             </div>
         </main>

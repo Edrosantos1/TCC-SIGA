@@ -11,7 +11,9 @@
     (function () {
       try {
         var t = localStorage.getItem("siga-theme");
-        if (!t) t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        if (t !== "light" && t !== "dark") {
+          t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        }
         document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
     })();
@@ -21,15 +23,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/preview.css">
+  <link rel="stylesheet" href="assets/css/shared/previa.css">
 </head>
 <body id="inicio">
-
-  <!-- BOTÃO WHATSAPP -->
-  <a href="https://wa.me/5511912345678" class="whatsapp-float" target="_blank" rel="noopener"
-     data-i18n-aria="whatsapp_label" aria-label="Fale conosco no WhatsApp">
-    <i class="fab fa-whatsapp" aria-hidden="true"></i>
-  </a>
 
   <header class="site-header">
     <div class="header-inner">
@@ -40,7 +36,7 @@
 
       <nav class="nav-links" aria-label="Principal">
         <a href="#sobre" data-i18n="nav_about">Sobre o SIGA</a>
-        <a href="https://wa.me/5511912345678" target="_blank" rel="noopener" data-i18n="nav_contact">Fale com a Secretaria</a>
+        <a href="#contact-note" data-i18n="nav_contact">Contato institucional</a>
       </nav>
 
       <div class="header-actions">
@@ -87,7 +83,7 @@
         </ul>
 
         <div class="profiles">
-          <a href="aluno/redirecionar_user.php" class="profile-btn student-btn">
+          <a href="aluno/auth/redirecionar.php" class="profile-btn student-btn">
             <i class="fas fa-user-graduate" aria-hidden="true"></i>
             <span data-i18n="btn_student">Sou Aluno</span>
           </a>
@@ -116,18 +112,18 @@
         <div class="about-content">
           <div class="about-text">
             <p data-i18n-html="sobre_p1">
-              O <strong>SIGA</strong> (Sistema Gerenciador de Alunos e Acervos) é uma plataforma digital de gerenciamento de bibliotecas escolares, criado com a missão de tornar o gerenciamento e uso da biblioteca mais prático e organizado para administradores e alunos por meio da tecnologia.
+              O <strong>SIGA</strong> (Sistema Integrado de Gestão de Acervo) é uma plataforma digital para gerenciamento de bibliotecas escolares, criada para tornar o acesso ao acervo e a organização de empréstimos mais práticos para alunos e administradores.
             </p>
             <p data-i18n-html="sobre_p2">
-              Com uma grande variedade de acervos, o SIGA atende alunos, professores e funcionários, centralizando livros didáticos, artigos científicos, cadernos de TCCs, periódicos e outros recursos educacionais. Tudo isso com acesso de 24 horas por dia, de qualquer dispositivo.
+              O SIGA atende alunos, professores e funcionários, reunindo livros didáticos, artigos científicos, trabalhos acadêmicos, periódicos e outros recursos educacionais em um só lugar.
             </p>
             <p data-i18n-html="sobre_p3">
-              Além da praticidade, nossa plataforma prioriza a organização e a facilidade de uso: é possível pesquisar por categorias, autores e títulos, renovar empréstimos online, e utilizar diversas funcionalidades que facilitam o gerenciamento da biblioteca. Tudo isso de forma simples, rápida e acessível. O SIGA é mais do que um sistema digital – é um portal para o conhecimento, projetado para inspirar e apoiar a jornada acadêmica de cada usuário. <strong>O conhecimento não pode esperar, e com o SIGA está sempre ao seu alcance.</strong>
+              A plataforma permite pesquisar por títulos, autores e categorias, acompanhar empréstimos e fazer reservas. O objetivo é apoiar a jornada acadêmica com um acesso simples e organizado ao acervo.
             </p>
           </div>
 
           <div class="about-image">
-            <img src="assets/Imagens/bibliotecaria_usando_siga.png"
+            <img src="assets/Imagens/bibliotecaria_usando_siga.jpg"
                  alt="Aluno de costas usando o SiGA ITJ num notebook na biblioteca" class="about-img" loading="lazy">
           </div>
         </div>
@@ -166,6 +162,7 @@
   <footer class="main-footer">
     <div class="footer-content">
       <p data-i18n="footer_copyright">&copy; 2026 SIGA. Todos os direitos reservados.</p>
+      <p id="contact-note" data-i18n="contact_note">Para atendimento, utilize os canais institucionais da biblioteca.</p>
       <div class="footer-links">
         <a href="#" data-dialog="support" data-i18n="footer_support">Suporte</a>
         <a href="#" data-dialog="terms" data-i18n="footer_terms">Termos de Uso</a>
@@ -181,6 +178,7 @@
     <button type="button" class="dialog-close" id="info_close" data-i18n="modal_close">Fechar</button>
   </dialog>
 
-  <script src="assets/js/preview.js"></script>
+  <script src="assets/js/shared/previa.js"></script>
+  <script src="assets/js/shared/tema.js"></script>
 </body>
 </html>

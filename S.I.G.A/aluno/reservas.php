@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/verificar_login.php';
+require_once __DIR__ . '/auth/verificar_login.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login_user.php');
+    header('Location: auth/login.php');
     exit;
 }
 
@@ -111,7 +111,6 @@ function renderReservaCard(array $r): void {
         <article class="reserva-card is-<?= reservaEsc($status) ?>" data-id="<?= (int) $r['id_reserva'] ?>">
           <div class="reserva-cover-wrap">
             <?php if ($capa !== ''): ?>
-              <img class="reserva-cover-bg" src="<?= reservaEsc($capa) ?>" alt="" aria-hidden="true" loading="lazy">
               <img class="reserva-cover" src="<?= reservaEsc($capa) ?>" alt="" loading="lazy">
             <?php else: ?>
               <div class="reserva-cover-placeholder <?= $tipoCss ?>"><i class="fas <?= $tipoIcon ?>"></i><span><?= reservaEsc($titulo) ?></span></div>
@@ -139,9 +138,10 @@ function renderReservaCard(array $r): void {
             <?php if ($status === 'pendente'): ?>
               <div class="reserva-actions">
                 <form method="POST" action="../api/aluno_reservas.php" onsubmit="return confirm('Tem certeza que deseja cancelar esta reserva?');">
+                  <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                   <input type="hidden" name="action" value="cancel">
                   <input type="hidden" name="id" value="<?= (int) $r['id_reserva'] ?>">
-                  <input type="hidden" name="redirect" value="reservas.php">
+                  <input type="hidden" name="redirect" value="../aluno/reservas.php">
                   <button class="btn-cancel" type="submit"><i class="fas fa-times"></i> Cancelar reserva</button>
                 </form>
               </div>
@@ -159,21 +159,22 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
   <title>Minhas Reservas - SiGA ITJ</title>
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
-  <link rel="stylesheet" href="../assets/css/reservas.css">
-  <link rel="stylesheet" href="../assets/css/student_unified.css">
-  <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
-  <link rel="stylesheet" href="../assets/css/ui_alerts.css">
+  <link rel="stylesheet" href="../assets/css/aluno/painel_aluno.css">
+  <link rel="stylesheet" href="../assets/css/aluno/reservas.css?v=<?= time() ?>">
+  <link rel="stylesheet" href="../assets/css/aluno/aluno_unificado.css">
+  <link rel="stylesheet" href="../assets/css/aluno/notificacoes_aluno.css">
+  <link rel="stylesheet" href="../assets/css/shared/alertas_ui.css">
   <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
-  <script src="../assets/js/ui_alerts.js"></script>
-  <script src="../assets/js/dashboard_aluno.js" defer></script>
-  <script src="../assets/js/notificacoes_aluno.js" defer></script>
-  <script src="../assets/js/reservas.js" defer></script>
+  <script src="../assets/js/shared/alertas_ui.js"></script>
+  <script src="../assets/js/aluno/painel_aluno.js" defer></script>
+  <script src="../assets/js/aluno/notificacoes_aluno.js" defer></script>
+  <script src="../assets/js/aluno/reservas.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
 
@@ -189,13 +190,13 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
       </button>
     </div>
     <nav class="sidebar-nav">
-      <a href="dashboard_aluno.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+      <a href="painel.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
       <a href="catalogo.php" class="nav-item"><i class="fas fa-search"></i><span>Catálogo</span></a>
       <a href="favoritos.php" class="nav-item"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
-      <a href="meus_emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+      <a href="emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
       <a href="reservas.php" class="nav-item active"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
       <a href="historico.php" class="nav-item"><i class="fas fa-history"></i><span>Histórico</span></a>
-      <a href="configuracoes_aluno.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
+      <a href="configuracoes.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
     </nav>
   </aside>
 
@@ -225,7 +226,7 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
           <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
         </div>
 
-        <a href="logout_user.php" class="btn-logout" title="Sair">
+        <a href="auth/sair.php" class="btn-logout" title="Sair">
           <i class="fas fa-sign-out-alt"></i>
           <span id="logout-text">Sair</span>
         </a>
@@ -248,9 +249,10 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
     </header>
 
     <form id="cancel-reserva-form" method="POST" action="../api/aluno_reservas.php" class="hidden-form">
+      <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
       <input type="hidden" name="action" value="cancel">
       <input type="hidden" name="id" id="cancel-reserva-id" value="">
-      <input type="hidden" name="redirect" value="reservas.php">
+      <input type="hidden" name="redirect" value="../aluno/reservas.php">
     </form>
 
     <main class="container reservas-main">
@@ -340,3 +342,11 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+

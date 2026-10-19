@@ -51,6 +51,26 @@ function aplicarConfiguracoes() {
     }
 
     // Salvar na sessão
+    $opcoesPermitidas = [
+        'tamanho_fonte' => ['pequeno', 'medio', 'grande'],
+        'tema' => ['claro', 'escuro', 'alto_contraste'],
+        'daltonismo' => ['normal', 'protanopia', 'deuteranopia', 'tritanopia'],
+        'espacamento' => ['compacto', 'normal', 'confortavel'],
+    ];
+    foreach ($opcoesPermitidas as $chave => $opcoes) {
+        if (!in_array($configuracoes[$chave] ?? null, $opcoes, true)) {
+            $configuracoes[$chave] = [
+                'tamanho_fonte' => 'medio',
+                'tema' => 'claro',
+                'daltonismo' => 'normal',
+                'espacamento' => 'normal',
+            ][$chave];
+        }
+    }
+    if (!in_array($configuracoes['reduzir_animacoes'] ?? null, ['0', '1'], true)) {
+        $configuracoes['reduzir_animacoes'] = '0';
+    }
+
     $_SESSION['config'] = $configuracoes;
 
     // Montar classes
@@ -82,9 +102,6 @@ function aplicarConfiguracoes() {
     }
 
     $resultado = implode(' ', $classes);
-
-    // 🔥 DEBUG - Verificar no console
-    echo '<script>console.log("🔧 Configurações aplicadas:", "' . $resultado . '");</script>';
 
     return $resultado;
 }

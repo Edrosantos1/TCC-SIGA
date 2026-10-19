@@ -21,7 +21,11 @@ $historicoData = [];
 $sql = "SELECT e.id_emprestimo AS id, 'loan' AS type, e.id_catalogo AS itemId,
                e.titulo_item AS title, COALESCE(c.autor, '') AS author,
                c.ano_publicacao AS year, c.capa_url AS cover,
-               DATE(e.data_emprestimo) AS date, e.status,
+               DATE(e.data_emprestimo) AS date,
+               CASE
+                   WHEN e.status = 'emprestado' AND e.data_devolucao_prevista < CURDATE() THEN 'atrasado'
+                   ELSE e.status
+               END AS status,
                e.data_devolucao_prevista AS dueDate, NULL AS returnedAt,
                NULL AS reservedAt, NULL AS pickedUpAt
         FROM emprestimos e LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
@@ -46,7 +50,19 @@ $stmt->execute();
 $result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
     if ($row['type'] === 'loan') {
-        $row['status'] = $row['status'] === 'devolvido' ? 'returned' : ($row['status'] === 'atrasado' ? 'overdue' : 'pending');
+        if ($row['status'] === 'devolvido') {
+            $row['status'] = 'returned';
+        } elseif ($row['status'] === 'atrasado') {
+            $row['status'] = 'overdue';
+        } elseif ($row['status'] === 'devolucao_solicitada') {
+            $row['status'] = 'return_requested';
+        } elseif ($row['status'] === 'emprestado') {
+            $row['status'] = 'active';
+        } elseif ($row['status'] === 'retirado') {
+            $row['status'] = 'active';
+        } else {
+            $row['status'] = 'pending';
+        }
     } else {
         $row['status'] = $row['status'] === 'retirada' ? 'completed' : ($row['status'] === 'cancelada' ? 'cancelled' : $row['status']);
     }

@@ -148,7 +148,7 @@ if ($db) {
                    EXISTS(SELECT 1 FROM reservas r
                           WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente', 'aprovada')) AS tem_reservas,
                    EXISTS(SELECT 1 FROM emprestimos m
-                          WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado', 'atrasado')) AS tem_emprestimos
+                          WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado', 'atrasado', 'devolucao_solicitada')) AS tem_emprestimos
             FROM login_aluno a
             ORDER BY a.nome_aluno
         ");
@@ -222,12 +222,14 @@ $total_atrasados = $total_atrasados ?? 0;
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
-    <link rel="stylesheet" href="../assets/css/extrato_adm.css?v=<?= time() ?>">
-    <script src="../assets/js/extrato_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/adm/dashboard_adm.css">
+    <link rel="stylesheet" href="../assets/css/adm/extrato_adm.css?v=<?= time() ?>">
+    <script src="../assets/js/adm/extrato_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/adm/admin_temas_paginas.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
 </head>
 </head>
-<body>
+<body class="<?= htmlspecialchars($config_classes ?? '', ENT_QUOTES, 'UTF-8') ?>">
         <aside class="sidebar" id="sidebar" aria-label="Menu principal">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -287,6 +289,7 @@ $total_atrasados = $total_atrasados ?? 0;
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
                         <div class="notification-list" id="notification-list-dropdown"></div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>

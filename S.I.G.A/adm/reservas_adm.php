@@ -31,17 +31,6 @@ if (isset($conn)) {
     $db = $pdo;
 }
 
-// ============================================
-// ARQUIVAMENTO AUTOMÁTICO
-// ============================================
-if (file_exists(__DIR__ . '/executar_arquivamento.php')) {
-    if (!isset($_SESSION['_arquivamento_executado'])) {
-        $_SESSION['_arquivamento_executado'] = true;
-        $arquivou = include __DIR__ . '/executar_arquivamento.php';
-        unset($_SESSION['_arquivamento_executado']);
-    }
-}
-
 // ========== NOTIFICAÇÕES (sininho) ==========
 $notificacoes = array();
 if ($db) {
@@ -68,11 +57,6 @@ if ($db) {
     }
 }
 
-// ========== CANCELAR RESERVAS EXPIRADAS ==========
-if (file_exists(__DIR__ . '/cancelar_reservas_expiradas.php')) {
-    include_once __DIR__ . '/cancelar_reservas_expiradas.php';
-}
-
 // ========== EMPRÉSTIMOS ATRASADOS (selo do menu) ==========
 $total_atrasados = 0;
 if ($db) {
@@ -81,7 +65,7 @@ if ($db) {
             SELECT COUNT(*) AS total
             FROM emprestimos
             WHERE status = 'atrasado'
-               OR (status = 'emprestado' AND data_devolucao_prevista < '" . date('Y-m-d') . "')
+               OR (status IN ('emprestado', 'devolucao_solicitada') AND data_devolucao_prevista < '" . date('Y-m-d') . "')
         ";
         if ($db instanceof mysqli) {
             $res_atr = $db->query($sql_atrasados);
@@ -156,7 +140,7 @@ if ($db) {
     $sql_alunos = "
         SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
         FROM login_aluno a
         ORDER BY a.nome_aluno
     ";
@@ -201,6 +185,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <title>Reservas — SiGA ITJ Admin</title>
 
     <script>
@@ -215,9 +200,11 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
-    <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../assets/css/modal_reserva.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/dashboard_adm.css">
+    <link rel="stylesheet" href="../assets/css/adm/reservas_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/modal_reserva.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/admin_temas_paginas.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
 </head>
 <body class="<?= $config_classes ?>">
 
@@ -285,6 +272,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
                         <div class="notification-list" id="notification-list-dropdown"></div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>
@@ -311,9 +299,12 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <i class="fas fa-times"></i> Limpar Filtro
                         </a>
                     <?php endif; ?>
-                    <a href="executar_arquivamento.php" class="btn-arquivar">
-                        <i class="fas fa-archive"></i> Arquivar Agora
-                    </a>
+                    <form method="POST" action="executar_arquivamento.php">
+                        <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                        <button type="submit" class="btn-arquivar">
+                            <i class="fas fa-archive"></i> Arquivar Agora
+                        </button>
+                    </form>
                     <button type="button" class="btn-primary" id="btn-nova-reserva">
                         <i class="fas fa-plus"></i> Nova Reserva Manual
                     </button>
@@ -324,8 +315,8 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <div class="aviso-arquivamento" id="avisoArquivamento" role="note">
                 <i class="fas fa-info-circle"></i>
                 <span>
-                    <strong>Arquivamento mensal:</strong> as reservas com status diferente de <strong>"pendente"</strong>
-                    vão para o <a href="extrato_adm.php">Extrato</a> automaticamente, 1 mês após o último arquivamento.
+                    <strong>Arquivamento:</strong> use o botão "Arquivar Agora" para mover reservas finalizadas
+                    ao <a href="extrato_adm.php">Extrato</a>.
                 </span>
                 <button type="button" class="fechar-aviso" id="fechar-aviso" title="Fechar aviso" aria-label="Fechar aviso">
                     <i class="fas fa-times"></i>
@@ -362,10 +353,10 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                 </div>
 
                 <div class="filtros-acoes">
-                    
+                    <!-- FILTRO DA TABELA (novo lugar) -->
                     <div class="filtro-tabela-wrapper">
-                        <i class="fas fa-search"></i>
-                        <input type="search" id="filtro-tabela" placeholder="Buscar por aluno..." autocomplete="off" aria-label="Buscar reservas">
+                        <i class="fas fa-filter"></i>
+                        <input type="search" id="filtro-tabela" placeholder="Filtrar por aluno ou material..." autocomplete="off" aria-label="Filtrar reservas da tabela">
                     </div>
 
                     <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">
@@ -404,6 +395,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <div class="reservas-list-container">
                 <div class="reservas-table-wrapper" id="table-wrapper">
                     <form id="formReservasMassa" method="POST" action="atualizar_status_reserva.php">
+                        <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                         <div class="acoes-massa" role="toolbar" aria-label="Ações em massa">
                             <button type="submit" name="acao" value="aprovar" class="btn-acao-massa btn-aprovar-massa" disabled>
                                 <i class="fas fa-check"></i> Aprovar selecionados
@@ -482,11 +474,12 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         <div class="modal-reserva">
             <div class="modal-header">
                 <h2><i class="fas fa-plus-circle"></i> Nova Reserva Manual</h2>
-                <button class="modal-close" id="modalCloseBtn">
+                <button type="button" class="modal-close" id="modalCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="formNovaReserva" method="POST" action="salvar_reserva_manual.php">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Buscar Aluno <span class="required">*</span></label>
@@ -502,24 +495,19 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                                     <span class="matricula" id="alunoMatriculaSelecionada">Série: ---</span>
                                 </div>
                             </div>
-                            <button class="btn-remover" id="removerAluno"><i class="fas fa-times"></i></button>
+                            <button type="button" class="btn-remover" id="removerAluno"><i class="fas fa-times"></i></button>
                         </div>
                         <input type="hidden" id="idAlunoSelecionado" name="id_aluno" value="">
                     </div>
                     <div class="form-group">
-                        <label>Material <span class="required">*</span></label>
-                        <input type="text" name="material" id="materialReserva" placeholder="Ex: O Pequeno Príncipe, Física Vol. 1" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo de Material</label>
-                        <select name="tipo" id="tipoMaterial">
-                            <option value="Livro">📚 Livro</option>
-                            <option value="E-book">📱 E-book</option>
-                            <option value="Apostila">📄 Apostila</option>
-                            <option value="Periódico">📰 Periódico</option>
-                            <option value="CD/DVD">💿 CD/DVD</option>
-                            <option value="Outro">📦 Outro</option>
-                        </select>
+                        <label for="materialReserva">Material <span class="required">*</span></label>
+                        <div class="busca-material-container">
+                            <input type="text" name="material" id="materialReserva" placeholder="Digite o título, autor ou ISBN..." autocomplete="off" aria-autocomplete="list" aria-controls="materialSuggestions" required />
+                            <div class="material-suggestions" id="materialSuggestions" role="listbox" aria-label="Materiais disponíveis no catálogo"></div>
+                        </div>
+                        <input type="hidden" id="idCatalogoSelecionado" name="id_catalogo" value="">
+                        <input type="hidden" id="tipoMaterial" name="tipo" value="">
+                        <div class="helper-text">Selecione um material disponível no catálogo.</div>
                     </div>
                     <div class="form-group">
                         <label>Data Limite <span class="required">*</span></label>
@@ -552,8 +540,8 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
         window.filtroInicialReservas = <?= json_encode($filtro_status) ?>;
     </script>
 
-    <script src="../assets/js/reservas_adm.js?v=<?= time() ?>"></script>
-    <script src="../assets/js/modal_reserva.js?v=<?= time() ?>"></script>
+    <script src="../assets/js/adm/reservas_adm.js?v=<?= time() ?>"></script>
+    <script src="../assets/js/adm/modal_reserva.js?v=<?= time() ?>"></script>
 
 </body>
 </html>

@@ -4,7 +4,7 @@ require_once __DIR__ . '/verificar_login_adm.php';
 
 set_time_limit(0); // sem limite de tempo
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 $db = null;
 if (isset($conn)) $db = $conn;
@@ -15,8 +15,17 @@ if (!$db) {
     die('Erro de conexão.');
 }
 
-// ========== CONFIGURAÇÕES ==========
-$apiKey = 'AIzaSyDyeeGS6sl3jIX8n-eGoGKY4dtxNtpqeOw';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
+    http_response_code(403);
+    exit('Token CSRF inválido. Recarregue a página e tente novamente.');
+}
+
+// Configure GOOGLE_BOOKS_API_KEY no ambiente do PHP.
+$apiKey = getenv('GOOGLE_BOOKS_API_KEY');
+if ($apiKey === false || trim($apiKey) === '') {
+    http_response_code(500);
+    exit('Configure a chave GOOGLE_BOOKS_API_KEY para importar livros.');
+}
 $maxItens = 600; // meta
 $termos = [
     'literatura brasileira', 'romance', 'ficção científica', 'aventura',
@@ -56,7 +65,7 @@ function baixarCapa($url, $id) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 15);
         $conteudo = curl_exec($ch);
@@ -82,7 +91,7 @@ function buscarGoogleBooks($termo, $startIndex = 0, $max = 40, $tentativas = 3) 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

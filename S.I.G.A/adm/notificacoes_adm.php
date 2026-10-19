@@ -28,7 +28,7 @@ if ($db) {
         $queryAlunos = "
             SELECT a.id_aluno, a.nome_aluno, a.serie_aluno, a.serie_aluno AS turma,
                    EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
             FROM login_aluno a
             ORDER BY a.nome_aluno ASC
         ";
@@ -130,6 +130,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <title>Notificações — SiGA ITJ Admin</title>
 
     <script>
@@ -143,18 +144,18 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../assets/css/notificacoes_adm.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../assets/css/ui_alerts.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/dashboard_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/notificacoes_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/shared/alertas_ui.css?v=<?= time() ?>">
 
     <script>
         window.alunosBuscaData = <?= $alunos_json ?>;
         const alunosData = window.alunosBuscaData;
         const notificacoesData = <?= json_encode($notificacoes_sininho) ?>;
     </script>
-    <script src="../assets/js/ui_alerts.js?v=<?= time() ?>"></script>
-    <script src="../assets/js/busca_aluno_global.js?v=<?= time() ?>" defer></script>
-    <script src="../assets/js/notificacoes_adm.js?v=<?= time() ?>" defer></script>
+    <script src="../assets/js/shared/alertas_ui.js?v=<?= time() ?>"></script>
+    <script src="../assets/js/adm/notificacoes_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="<?= $config_classes ?>">
 
@@ -227,6 +228,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
                         <div class="notification-list" id="notification-list-dropdown"></div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>
@@ -245,6 +247,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
             <!-- ========== COMPOSIÇÃO ========== -->
             <div class="compose-card">
                 <form id="form-notificacao" method="POST" action="enviar_notificacao_adm.php" autocomplete="off">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
 
                     <div class="compose-section">
                         <label class="compose-label"><i class="fas fa-users"></i> Destinatário</label>

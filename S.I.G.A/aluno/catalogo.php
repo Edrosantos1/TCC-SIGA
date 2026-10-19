@@ -1,13 +1,21 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/verificar_login.php';
+require_once __DIR__ . '/auth/verificar_login.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login_user.php');
+    header('Location: auth/login.php');
     exit;
 }
 
 $usuario_id = $_SESSION['usuario_id'];
+
+// Mensagem de feedback guardada na sessão (flash): aparece uma vez e some,
+// sem poluir a URL. Gravada por alternar_favorito.php / api/aluno_reservas.php.
+$flashCatalogo = null;
+if (!empty($_SESSION['flash_catalogo'])) {
+    $flashCatalogo = $_SESSION['flash_catalogo'];
+    unset($_SESSION['flash_catalogo']);
+}
 $favoritosStmt = $conn->prepare('SELECT item_id, tipo_item FROM favoritos WHERE usuario_id = ?');
 $favoritosStmt->bind_param('i', $usuario_id);
 $favoritosStmt->execute();
@@ -135,6 +143,7 @@ foreach ($itens as $row) {
         'type'        => $row['tipo'],
         'year'        => $row['ano_publicacao'],
         'category'    => '',
+        'location'    => $row['localizacao'],
         'cover'       => $capa,
         'quantity'    => $row['quantidade'],
         'available'   => $row['quantidade'] > 0,
@@ -148,26 +157,28 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <title>Catálogo - SiGA ITJ</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
-    <link rel="stylesheet" href="../assets/css/catalogo.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../assets/css/student_unified.css">
-    <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
-    <link rel="stylesheet" href="../assets/css/ui_alerts.css">
+    <link rel="stylesheet" href="../assets/css/aluno/painel_aluno.css">
+    <link rel="stylesheet" href="../assets/css/aluno/catalogo.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/aluno/aluno_unificado.css">
+    <link rel="stylesheet" href="../assets/css/aluno/notificacoes_aluno.css">
+    <link rel="stylesheet" href="../assets/css/shared/alertas_ui.css">
     <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
-    <script src="../assets/js/ui_alerts.js"></script>
-    <script src="../assets/js/dashboard_aluno.js" defer></script>
-    <script src="../assets/js/notificacoes_aluno.js" defer></script>
+    <script src="../assets/js/shared/alertas_ui.js"></script>
+    <script src="../assets/js/aluno/painel_aluno.js" defer></script>
+    <script src="../assets/js/aluno/notificacoes_aluno.js" defer></script>
     <script>
         window.catalogData = <?= $catalogDataJson ?>;
         window.favoritosPHP = <?= json_encode($favoritos) ?>;
         window.reservasAtivas = <?= json_encode($reservasAtivas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+        window.flashMessage = <?= json_encode($flashCatalogo, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     </script>
-    <script src="../assets/js/catalogo.js?v=<?= time() ?>" defer></script>
+    <script src="../assets/js/aluno/catalogo.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
     <aside class="sidebar" id="sidebar">
@@ -176,13 +187,13 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
             <button class="collapse-icon" id="collapseBtn"><span></span><span></span></button>
         </div>
         <nav class="sidebar-nav">
-            <a href="dashboard_aluno.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+            <a href="painel.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
             <a href="catalogo.php" class="nav-item active"><i class="fas fa-search"></i><span>Catálogo</span></a>
             <a href="favoritos.php" class="nav-item"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
-            <a href="meus_emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+            <a href="emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
             <a href="reservas.php" class="nav-item"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
             <a href="historico.php" class="nav-item"><i class="fas fa-history"></i><span>Histórico</span></a>
-            <a href="configuracoes_aluno.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
+            <a href="configuracoes.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
         </nav>
     </aside>
 
@@ -205,7 +216,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                     <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
                     <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
                 </div>
-                <a href="logout_user.php" class="btn-logout" title="Sair"><i class="fas fa-sign-out-alt"></i><span id="logout-text">Sair</span></a>
+                <a href="auth/sair.php" class="btn-logout" title="Sair"><i class="fas fa-sign-out-alt"></i><span id="logout-text">Sair</span></a>
 
                 <div class="notification-container">
                     <button class="notification-btn" id="notification-btn" title="Notificações">
@@ -229,9 +240,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
             <!-- ========== HERO ========== -->
             <div class="catalog-hero">
                 <div class="catalog-hero-content">
-                    <h1 id="catalog-title">
-                        <i class="fas fa-compass"></i> Catálogo
-                    </h1>
+                    <h1 id="catalog-title">Catálogo</h1>
                     <p id="catalog-subtitle">Explore nosso acervo de livros, revistas e TCCs</p>
                 </div>
                 <div class="catalog-hero-stats">
@@ -244,6 +253,8 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
 
             <!-- ========== FILTROS ========== -->
             <form method="GET" action="catalogo.php" class="catalog-filters" id="catalog-filters">
+                <input type="hidden" name="tipo" value="<?= htmlspecialchars($filtroTipo) ?>" id="catalog-filter-type">
+                <button type="submit" hidden aria-hidden="true" tabindex="-1"></button>
                 <div class="filter-search">
                     <i class="fas fa-search"></i>
                     <input type="text"
@@ -254,16 +265,28 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                 </div>
 
                 <div class="filter-chips" role="group" aria-label="Filtrar por tipo">
-                    <button type="submit" name="tipo" value="" class="filter-chip <?= $filtroTipo === '' ? 'active' : '' ?>">
+                    <button type="submit" name="tipo" value=""
+                            class="filter-chip <?= $filtroTipo === '' ? 'active' : '' ?>"
+                            aria-pressed="<?= $filtroTipo === '' ? 'true' : 'false' ?>"
+                            <?= $filtroTipo === '' ? 'disabled' : '' ?>>
                         <i class="fas fa-layer-group"></i> Todos
                     </button>
-                    <button type="submit" name="tipo" value="livro" class="filter-chip <?= $filtroTipo === 'livro' ? 'active' : '' ?>">
+                    <button type="submit" name="tipo" value="livro"
+                            class="filter-chip <?= $filtroTipo === 'livro' ? 'active' : '' ?>"
+                            aria-pressed="<?= $filtroTipo === 'livro' ? 'true' : 'false' ?>"
+                            <?= $filtroTipo === 'livro' ? 'disabled' : '' ?>>
                         <i class="fas fa-book"></i> Livros
                     </button>
-                    <button type="submit" name="tipo" value="revista" class="filter-chip <?= $filtroTipo === 'revista' ? 'active' : '' ?>">
+                    <button type="submit" name="tipo" value="revista"
+                            class="filter-chip <?= $filtroTipo === 'revista' ? 'active' : '' ?>"
+                            aria-pressed="<?= $filtroTipo === 'revista' ? 'true' : 'false' ?>"
+                            <?= $filtroTipo === 'revista' ? 'disabled' : '' ?>>
                         <i class="fas fa-newspaper"></i> Revistas
                     </button>
-                    <button type="submit" name="tipo" value="tcc" class="filter-chip <?= $filtroTipo === 'tcc' ? 'active' : '' ?>">
+                    <button type="submit" name="tipo" value="tcc"
+                            class="filter-chip <?= $filtroTipo === 'tcc' ? 'active' : '' ?>"
+                            aria-pressed="<?= $filtroTipo === 'tcc' ? 'true' : 'false' ?>"
+                            <?= $filtroTipo === 'tcc' ? 'disabled' : '' ?>>
                         <i class="fas fa-graduation-cap"></i> TCCs
                     </button>
                 </div>
@@ -365,7 +388,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                     <p id="modal-author">Autor</p>
                     <div class="modal-meta">
                         <span id="modal-year"></span>
-                        <span id="modal-category"></span>
+                        <span id="modal-location"></span>
                     </div>
                     <p id="modal-type" style="display:none;"></p>
                     <p id="modal-description" class="modal-description">Descrição</p>

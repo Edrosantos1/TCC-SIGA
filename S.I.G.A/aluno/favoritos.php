@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/verificar_login.php';
+require_once __DIR__ . '/auth/verificar_login.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login_user.php');
+    header('Location: auth/login.php');
     exit;
 }
 
@@ -69,21 +69,23 @@ if ($stmt_notif) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
   <title>Meus Favoritos - SiGA ITJ</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
-  <link rel="stylesheet" href="../assets/css/catalogo.css">
-  <link rel="stylesheet" href="../assets/css/favoritos.css?v=<?= time() ?>">
-  <link rel="stylesheet" href="../assets/css/student_unified.css">
-  <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
-  <link rel="stylesheet" href="../assets/css/ui_alerts.css">
+  <link rel="stylesheet" href="../assets/css/aluno/painel_aluno.css">
+  <link rel="stylesheet" href="../assets/css/aluno/catalogo.css">
+  <link rel="stylesheet" href="../assets/css/aluno/favoritos.css?v=<?= time() ?>">
+  <link rel="stylesheet" href="../assets/css/aluno/aluno_unificado.css">
+  <link rel="stylesheet" href="../assets/css/aluno/notificacoes_aluno.css">
+  <link rel="stylesheet" href="../assets/css/shared/alertas_ui.css">
   <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
+  <link rel="stylesheet" href="../assets/css/aluno/controles_visualizacao_escuro.css?v=<?= time() ?>">
 
-  <script src="../assets/js/ui_alerts.js"></script>
-  <script src="../assets/js/dashboard_aluno.js" defer></script>
-  <script src="../assets/js/notificacoes_aluno.js" defer></script>
-  <script src="../assets/js/favoritos.js?v=<?= time() ?>" defer></script>
+  <script src="../assets/js/shared/alertas_ui.js"></script>
+  <script src="../assets/js/aluno/painel_aluno.js" defer></script>
+  <script src="../assets/js/aluno/notificacoes_aluno.js" defer></script>
+  <script src="../assets/js/aluno/favoritos.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
 
@@ -96,13 +98,13 @@ if ($stmt_notif) {
       </button>
     </div>
     <nav class="sidebar-nav">
-      <a href="dashboard_aluno.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+      <a href="painel.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
       <a href="catalogo.php" class="nav-item"><i class="fas fa-search"></i><span>Catálogo</span></a>
       <a href="favoritos.php" class="nav-item active"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
-      <a href="meus_emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+      <a href="emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
       <a href="reservas.php" class="nav-item"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
       <a href="historico.php" class="nav-item"><i class="fas fa-history"></i><span>Histórico</span></a>
-      <a href="configuracoes_aluno.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
+      <a href="configuracoes.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
     </nav>
   </aside>
 
@@ -132,7 +134,7 @@ if ($stmt_notif) {
           <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
         </div>
 
-        <a href="logout_user.php" class="btn-logout" title="Sair">
+        <a href="auth/sair.php" class="btn-logout" title="Sair">
           <i class="fas fa-sign-out-alt"></i>
           <span id="logout-text">Sair</span>
         </a>
@@ -158,9 +160,7 @@ if ($stmt_notif) {
       <!-- HERO -->
       <div class="fav-hero">
         <div class="fav-hero-content">
-          <h1 id="favoritos-title" data-i18n="page_title">
-            <i class="fas fa-heart"></i> Meus Favoritos
-          </h1>
+          <h1 id="favoritos-title" data-i18n="page_title">Meus Favoritos</h1>
           <p id="favoritos-subtitle" data-i18n="page_subtitle">Seus itens salvos para leitura ou reserva futura.</p>
         </div>
         <?php if ($totalFavoritos > 0): ?>
@@ -182,22 +182,22 @@ if ($stmt_notif) {
         </div>
 
         <div class="fav-chips" role="group" aria-label="Filtrar por tipo">
-          <button type="button" class="fav-chip active" data-filter="todos">
+          <button type="button" class="fav-chip active" data-filter="todos" aria-pressed="true" disabled>
             <i class="fas fa-layer-group"></i>
             <span class="chip-label" data-i18n="filter_all">Todos</span>
             <span class="chip-count"><?= $totalFavoritos ?></span>
           </button>
-          <button type="button" class="fav-chip" data-filter="livro">
+          <button type="button" class="fav-chip" data-filter="livro" aria-pressed="false">
             <i class="fas fa-book"></i>
             <span class="chip-label" data-i18n="filter_livro">Livros</span>
             <span class="chip-count"><?= $contagemTipos['livro'] ?></span>
           </button>
-          <button type="button" class="fav-chip" data-filter="revista">
+          <button type="button" class="fav-chip" data-filter="revista" aria-pressed="false">
             <i class="fas fa-newspaper"></i>
             <span class="chip-label" data-i18n="filter_revista">Revistas</span>
             <span class="chip-count"><?= $contagemTipos['revista'] ?></span>
           </button>
-          <button type="button" class="fav-chip" data-filter="tcc">
+          <button type="button" class="fav-chip" data-filter="tcc" aria-pressed="false">
             <i class="fas fa-graduation-cap"></i>
             <span class="chip-label" data-i18n="filter_tcc">TCCs</span>
             <span class="chip-count"><?= $contagemTipos['tcc'] ?></span>
@@ -217,10 +217,10 @@ if ($stmt_notif) {
 
           <div class="fav-view-toggle" role="group" aria-label="Modo de visualização">
             <button type="button" class="active" data-view="grid" data-i18n-title="view_grid" title="Ver em grade" aria-pressed="true">
-              <i class="fas fa-th-large"></i>
+              <i class="fas fa-th-large"></i><span data-i18n="view_grid_label">Grade</span>
             </button>
             <button type="button" data-view="list" data-i18n-title="view_list" title="Ver em lista" aria-pressed="false">
-              <i class="fas fa-list"></i>
+              <i class="fas fa-list"></i><span data-i18n="view_list_label">Lista</span>
             </button>
           </div>
         </div>
@@ -233,6 +233,10 @@ if ($stmt_notif) {
             <?php foreach ($favoritos as $fav):
                 $tipoLabel = ['livro' => 'Livro', 'revista' => 'Revista', 'tcc' => 'TCC'][$fav['tipo']] ?? 'Item';
                 $tipoIcone = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'][$fav['tipo']] ?? 'fa-book';
+                $capa = $fav['capa'];
+                if (!empty($capa) && strpos($capa, 'http') !== 0 && strpos($capa, '/') !== 0) {
+                    $capa = '../' . $capa;
+                }
             ?>
             <article class="catalogo-card favorito-card"
                  data-id="<?= $fav['item_id'] ?>"
@@ -246,16 +250,17 @@ if ($stmt_notif) {
               </span>
 
               <div class="card-capa">
-                 <?php if(!empty($fav['capa'])): ?>
-                  <img src="<?= htmlspecialchars($fav['capa']) ?>" alt="Capa de <?= htmlspecialchars($fav['titulo']) ?>" loading="lazy">
+                 <?php if(!empty($capa)): ?>
+                  <img src="<?= htmlspecialchars($capa) ?>" alt="Capa de <?= htmlspecialchars($fav['titulo']) ?>" loading="lazy">
                  <?php else: ?>
-                  <div class="capa-placeholder" style="background: <?= getCoverColor($fav['item_id']) ?>">
+                  <div class="capa-placeholder">
                         <i class="fas <?= $tipoIcone ?>"></i>
                         <span><?= htmlspecialchars($fav['titulo']) ?></span>
                     </div>
                  <?php endif; ?>
 
-                  <form action="toggle_favorito.php" method="POST" class="form-remover-favorito">
+                  <form action="alternar_favorito.php" method="POST" class="form-remover-favorito">
+                      <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                       <input type="hidden" name="item_id" value="<?= $fav['item_id'] ?>">
                       <input type="hidden" name="tipo_item" value="<?= htmlspecialchars($fav['tipo_item']) ?>">
                       <input type="hidden" name="redirect" value="favoritos.php">
@@ -309,16 +314,10 @@ if ($stmt_notif) {
   <script>
     window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
-
-  <?php
-  function getCoverColor($id) {
-      $colors = [
-          '#0b4b9b', '#17c8cc', '#6a11cb', '#f7971e', '#e91e63',
-          '#11998e', '#4568dc', '#c94b4b', '#134e5e', '#ff6b6b',
-          '#4ecdc4', '#45b7d1', '#f9ca24', '#6ab04c', '#eb4d4b'
-      ];
-      return $colors[$id % count($colors)];
-  }
-  ?>
 </body>
 </html>
+
+
+
+
+

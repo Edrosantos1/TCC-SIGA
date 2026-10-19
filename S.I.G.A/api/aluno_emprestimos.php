@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 
-// Ativa logs de erro para depuração (remova depois)
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
@@ -31,7 +30,10 @@ if ($method === 'GET') {
                 c.tipo AS type,
                 e.data_emprestimo AS loanDate,
                 e.data_devolucao_prevista AS dueDate,
-                e.status,
+                CASE
+                    WHEN e.status = 'emprestado' AND e.data_devolucao_prevista < CURDATE() THEN 'atrasado'
+                    ELSE e.status
+                END AS status,
                 e.renovado,
                 e.data_renovacao
             FROM emprestimos e
@@ -60,7 +62,9 @@ if ($method === 'GET') {
 
     while ($row = $result->fetch_assoc()) {
         // Mapeia status
-        if (in_array($row['status'], ['devolvido', 'finalizado'], true)) {
+        if ($row['status'] === 'devolucao_solicitada') {
+            $row['status'] = 'return_requested';
+        } elseif (in_array($row['status'], ['devolvido', 'finalizado'], true)) {
             $row['status'] = 'returned';
         } elseif ($row['status'] === 'atrasado') {
             $row['status'] = 'overdue';
@@ -92,20 +96,23 @@ if ($method === 'POST') {
     if (!$input) {
         $input = $_POST;
     }
+    if (!csrf_validar(isset($input['csrf']) && is_string($input['csrf']) ? $input['csrf'] : null)) {
+        jsonResponse(['error' => 'Token CSRF inválido. Recarregue a página e tente novamente.'], 403);
+    }
 
     $action = $input['action'] ?? '';
     $id = (int)($input['id'] ?? 0);
-    $redirect = isset($input['redirect']) ? $input['redirect'] : 'meus_emprestimos.php';
-
     if ($id <= 0) {
-        if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && !isset($input['ajax'])) {
-            header('Location: ' . $redirect . '?erro=ID+invalido');
-        }
         jsonResponse(['error' => 'ID inválido'], 400);
     }
 
     // Verifica se o empréstimo pertence ao aluno
-    $check = $db->prepare("SELECT id_emprestimo, status, renovado, data_devolucao_prevista FROM emprestimos WHERE id_emprestimo = ? AND id_aluno = ?");
+    $check = $db->prepare(
+        "SELECT id_emprestimo, status, renovado, data_devolucao_prevista,
+                (data_devolucao_prevista IS NULL OR data_devolucao_prevista < CURDATE()) AS vencido
+         FROM emprestimos
+         WHERE id_emprestimo = ? AND id_aluno = ?"
+    );
     $check->bind_param('ii', $id, $usuario_id);
     $check->execute();
     $loan = $check->get_result()->fetch_assoc();
@@ -118,39 +125,49 @@ if ($method === 'POST') {
         if ($loan['status'] !== 'emprestado') {
             jsonResponse(['error' => 'Apenas empréstimos ativos podem ser renovados'], 400);
         }
+        if ((bool)$loan['vencido']) {
+            jsonResponse(['error' => 'Empréstimos vencidos não podem ser renovados. Solicite a devolução à biblioteca.'], 400);
+        }
         if ($loan['renovado']) {
             jsonResponse(['error' => 'Este empréstimo já foi renovado'], 400);
         }
 
         $currentDue = $loan['data_devolucao_prevista'] ?? null;
-        $newDue = date('Y-m-d', strtotime(($currentDue ?: date('Y-m-d')) . ' +15 days'));
-        $update = $db->prepare("UPDATE emprestimos SET data_devolucao_prevista = ?, renovado = 1, data_renovacao = NOW() WHERE id_emprestimo = ?");
-        $update->bind_param('si', $newDue, $id);
+        $newDue = date('Y-m-d', strtotime($currentDue . ' +15 days'));
+        $update = $db->prepare("UPDATE emprestimos SET data_devolucao_prevista = ?, renovado = 1, data_renovacao = NOW() WHERE id_emprestimo = ? AND id_aluno = ? AND status = 'emprestado' AND renovado = 0 AND data_devolucao_prevista >= CURDATE()");
+        if (!$update) {
+            error_log("Erro ao preparar renovação: " . $db->error);
+            jsonResponse(['error' => 'Erro interno ao renovar o empréstimo'], 500);
+        }
+        $update->bind_param('sii', $newDue, $id, $usuario_id);
 
-        if ($update->execute()) {
-            if (isset($_SERVER['CONTENT_TYPE']) && !str_contains($_SERVER['CONTENT_TYPE'], 'application/json')) {
-                header('Location: ' . $redirect . '?mensagem=Empr%C3%A9stimo+renovado');
-                exit;
-            }
-            jsonResponse(['success' => true, 'message' => 'Renovado com sucesso', 'new_due' => $newDue]);
-        } else {
+        if (!$update->execute()) {
             error_log("Erro ao renovar: " . $update->error);
             jsonResponse(['error' => 'Erro ao renovar'], 500);
         }
-    } elseif ($action === 'return') {
-        $update = $db->prepare("UPDATE emprestimos SET status = 'devolvido' WHERE id_emprestimo = ?");
-        $update->bind_param('i', $id);
-
-        if ($update->execute()) {
-            if (isset($_SERVER['CONTENT_TYPE']) && !str_contains($_SERVER['CONTENT_TYPE'], 'application/json')) {
-                header('Location: ' . $redirect . '?mensagem=Item+devolvido');
-                exit;
-            }
-            jsonResponse(['success' => true, 'message' => 'Devolvido com sucesso']);
-        } else {
-            error_log("Erro ao devolver: " . $update->error);
-            jsonResponse(['error' => 'Erro ao devolver'], 500);
+        if ($update->affected_rows !== 1) {
+            jsonResponse(['error' => 'O empréstimo foi atualizado por outra operação. Recarregue a página.'], 409);
         }
+        jsonResponse(['success' => true, 'message' => 'Renovado com sucesso', 'new_due' => $newDue]);
+    } elseif ($action === 'return') {
+        if (!in_array($loan['status'], ['emprestado', 'atrasado'], true)) {
+            jsonResponse(['error' => 'Apenas empréstimos ativos podem solicitar devolução'], 400);
+        }
+        $update = $db->prepare("UPDATE emprestimos SET status = 'devolucao_solicitada' WHERE id_emprestimo = ? AND id_aluno = ? AND status IN ('emprestado', 'atrasado')");
+        if (!$update) {
+            error_log("Erro ao preparar solicitação de devolução: " . $db->error);
+            jsonResponse(['error' => 'Erro interno ao solicitar a devolução'], 500);
+        }
+        $update->bind_param('ii', $id, $usuario_id);
+
+        if (!$update->execute()) {
+            error_log("Erro ao solicitar devolução: " . $update->error);
+            jsonResponse(['error' => 'Erro ao solicitar a devolução'], 500);
+        }
+        if ($update->affected_rows !== 1) {
+            jsonResponse(['error' => 'O empréstimo foi atualizado por outra operação. Recarregue a página.'], 409);
+        }
+        jsonResponse(['success' => true, 'message' => 'Solicitação de devolução enviada. Aguarde a conferência da biblioteca.']);
     } else {
         jsonResponse(['error' => 'Ação inválida'], 400);
     }

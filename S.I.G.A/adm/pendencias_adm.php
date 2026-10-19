@@ -72,19 +72,36 @@ if ($db) {
             e.status
         FROM emprestimos e
         INNER JOIN login_aluno l ON e.id_aluno = l.id_aluno
-        WHERE e.status IN ('emprestado', 'atrasado')
+        WHERE e.status IN ('emprestado', 'atrasado', 'devolucao_solicitada')
     ";
+    $params = [];
     if ($filtro_aluno_id > 0) {
-        $query .= " AND e.id_aluno = " . intval($filtro_aluno_id);
+        $query .= " AND e.id_aluno = ?";
+        $params[] = $filtro_aluno_id;
     }
     $query .= " ORDER BY e.data_devolucao_prevista ASC";
 
     if ($db instanceof mysqli) {
-        $result = $db->query($query);
-        if ($result) $pendencias = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $db->prepare($query);
+        if (!$stmt) {
+            error_log('Falha ao preparar a consulta de pendências: ' . $db->error);
+        } else {
+            if ($params) {
+                $stmt->bind_param('i', $params[0]);
+            }
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result) $pendencias = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+        }
     } elseif ($db instanceof PDO) {
-        $stmt = $db->query($query);
-        if ($stmt) $pendencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $db->prepare($query);
+        if (!$stmt) {
+            error_log('Falha ao preparar a consulta de pendências.');
+        } else {
+            $stmt->execute($params);
+            $pendencias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 }
 
@@ -99,18 +116,21 @@ foreach ($pendencias as &$p) {
     $limite_ts = strtotime($p['data_limite']);
     $dias_diff = (int)floor(($limite_ts - $hoje_ts) / 86400);
 
-    if ($p['status'] !== 'devolvido' && $p['data_limite'] < $data_hoje) {
+    $p['atraso_pendente'] = $p['status'] === 'devolucao_solicitada' && $p['data_limite'] < $data_hoje;
+    if ($p['status'] !== 'devolucao_solicitada' && $p['status'] !== 'devolvido' && $p['data_limite'] < $data_hoje) {
         $p['status'] = 'atrasado';
     }
 
-    if ($p['status'] === 'atrasado') {
+    if ($p['status'] === 'atrasado' || $p['atraso_pendente']) {
         $p['dias_restantes'] = $dias_diff;
         $p['dias_atraso'] = abs($dias_diff);
         $total_atrasados++;
     } else {
         $p['dias_restantes'] = $dias_diff;
         $p['dias_atraso'] = 0;
-        $total_no_prazo++;
+        if ($p['status'] !== 'devolucao_solicitada') {
+            $total_no_prazo++;
+        }
         if ($dias_diff === 0) $total_vence_hoje++;
     }
 }
@@ -125,7 +145,7 @@ if ($db) {
     $sql_alunos = "
         SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
         FROM login_aluno a
         ORDER BY a.nome_aluno
     ";
@@ -170,6 +190,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <title>Pendências — SiGA ITJ Admin</title>
 
     <script>
@@ -184,10 +205,12 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
-    <link rel="stylesheet" href="../assets/css/reservas_adm.css?v=<?= time() ?>">
-    <link rel="stylesheet" href="../assets/css/pendencias_adm.css?v=<?= time() ?>">
-    <script src="../assets/js/pendencias_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/adm/dashboard_adm.css">
+    <link rel="stylesheet" href="../assets/css/adm/reservas_adm.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/pendencias_adm.css?v=<?= time() ?>">
+    <script src="../assets/js/adm/pendencias_adm.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="../assets/css/adm/admin_temas_paginas.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
 </head>
 <body class="<?= $config_classes ?>">
 
@@ -255,6 +278,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
                         <div class="notification-list" id="notification-list-dropdown"></div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>
@@ -305,9 +329,9 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
                 <div class="filtros-acoes">
                     <!-- FILTRO DA TABELA -->
-                     <div class="filtro-tabela-wrapper">
-                        <i class="fas fa-search"></i>
-                        <input type="search" id="filtro-tabela" placeholder="Buscar por aluno ou material..." autocomplete="off" aria-label="Buscar empréstimos">
+                    <div class="filtro-tabela-wrapper">
+                        <i class="fas fa-filter"></i>
+                        <input type="search" id="filtro-tabela" placeholder="Filtrar por aluno ou material..." autocomplete="off" aria-label="Filtrar empréstimos da tabela">
                     </div>
 
                     <div class="filtro-busca-ativa" id="filtro-busca-ativa" style="display: none;">

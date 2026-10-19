@@ -13,6 +13,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!csrf_validar()) {
+    $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
+    header('Location: notificacoes_adm.php');
+    exit;
+}
+
 // ========== PREVENIR ENVIO DUPLICADO POR TEMPO ==========
 if (isset($_SESSION['ultimo_envio']) && (time() - $_SESSION['ultimo_envio']) < 3) {
     $_SESSION['msg_erro'] = 'Aguarde alguns segundos antes de enviar novamente.';

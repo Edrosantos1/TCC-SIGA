@@ -1,10 +1,8 @@
 <?php
-// Desativa exibição de erros em produção (comente para depurar)
+require_once __DIR__ . '/../includes/config.php';
+
 ini_set('display_errors', 0);
 error_reporting(0);
-
-session_start();
-require_once __DIR__ . '/../includes/config.php';
 
 function jsonResponse($data, $status = 200) {
     http_response_code($status);
@@ -41,7 +39,11 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!$input) $input = $_POST;
-    $redirect = $input['redirect'] ?? 'reservas.php';
+    if (!csrf_validar(isset($input['csrf']) && is_string($input['csrf']) ? $input['csrf'] : null)) {
+        jsonResponse(['error' => 'Token CSRF inválido. Recarregue a página e tente novamente.'], 403);
+    }
+    $redirect = $input['redirect'] ?? '../aluno/reservas.php';
+    $redirectSeparator = strpos($redirect, '?') === false ? '?' : '&';
 
     // Ação de cancelamento
     if (isset($input['action']) && $input['action'] === 'cancel') {
@@ -65,7 +67,7 @@ if ($method === 'POST') {
         $update->bind_param('i', $id);
         if ($update->execute()) {
             if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
-                header('Location: ' . $redirect . '?mensagem=Reserva+cancelada');
+                header('Location: ' . $redirect . $redirectSeparator . http_build_query(['mensagem' => 'Reserva cancelada']));
                 exit;
             }
             jsonResponse(['success' => true, 'message' => 'Reserva cancelada']);
@@ -95,7 +97,7 @@ if ($method === 'POST') {
     $checkRes->execute();
     if ($checkRes->get_result()->num_rows > 0) {
         if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
-            header('Location: ' . $redirect . '?error=Você+já+possui+uma+reserva+ativa');
+            header('Location: ' . $redirect . $redirectSeparator . http_build_query(['error' => 'Você já possui uma reserva ativa']));
             exit;
         }
         jsonResponse(['error' => 'Você já possui uma reserva ativa para este item'], 409);
@@ -107,7 +109,7 @@ if ($method === 'POST') {
     $insert->bind_param('iiss', $usuario_id, $id_catalogo, $item['titulo'], $data_limite);
     if ($insert->execute()) {
         if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
-            header('Location: ' . $redirect . '?mensagem=Reserva+criada+com+sucesso');
+            header('Location: ' . $redirect . $redirectSeparator . http_build_query(['mensagem' => 'Reserva criada com sucesso']));
             exit;
         }
         jsonResponse(['success' => true, 'message' => 'Reserva criada com sucesso', 'id' => $insert->insert_id]);
@@ -119,6 +121,10 @@ if ($method === 'POST') {
 // ---------- DELETE: removido, agora usa POST com action=cancel ----------
 // Mantido apenas para compatibilidade (redireciona para POST)
 if ($method === 'DELETE') {
+    if (!csrf_validar()) {
+        jsonResponse(['error' => 'Token CSRF inválido. Recarregue a página e tente novamente.'], 403);
+    }
+
     // Lê o ID da query string
     $id = (int)($_GET['id'] ?? 0);
     // Simula uma requisição POST com action=cancel

@@ -1,9 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/verificar_login.php';
+require_once __DIR__ . '/auth/verificar_login.php';
 
 if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login_user.php');
+    header('Location: auth/login.php');
     exit;
 }
 
@@ -43,7 +43,15 @@ $historico = [];
 $stmt_historico = $conn->prepare(
     "SELECT e.id_emprestimo AS id, 'loan' AS tipo, e.id_catalogo, e.titulo_item AS titulo,
             c.autor, c.ano_publicacao AS ano, c.capa_url, DATE(e.data_emprestimo) AS data,
-            e.status, e.data_devolucao_prevista AS data_devolucao, NULL AS data_retirada
+            CASE
+                WHEN e.status = 'emprestado' AND e.data_devolucao_prevista < CURDATE() THEN 'overdue'
+                WHEN e.status = 'emprestado' THEN 'active'
+                WHEN e.status = 'atrasado' THEN 'overdue'
+                WHEN e.status = 'devolucao_solicitada' THEN 'return_requested'
+                WHEN e.status IN ('devolvido', 'finalizado') THEN 'returned'
+                ELSE 'pending'
+            END AS status,
+            e.data_devolucao_prevista AS data_devolucao, NULL AS data_retirada
      FROM emprestimos e LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
      WHERE e.id_aluno = ?
      UNION ALL
@@ -68,15 +76,15 @@ $stmt_historico->close();
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/dashboard_aluno.css">
-  <link rel="stylesheet" href="../assets/css/historico.css">
-  <link rel="stylesheet" href="../assets/css/student_unified.css">
-  <link rel="stylesheet" href="../assets/css/notificacoes_aluno.css">
+  <link rel="stylesheet" href="../assets/css/aluno/painel_aluno.css">
+  <link rel="stylesheet" href="../assets/css/aluno/historico.css">
+  <link rel="stylesheet" href="../assets/css/aluno/aluno_unificado.css">
+  <link rel="stylesheet" href="../assets/css/aluno/notificacoes_aluno.css">
   <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
 
-  <script src="../assets/js/dashboard_aluno.js" defer></script>
-  <script src="../assets/js/notificacoes_aluno.js" defer></script>
-  <script src="../assets/js/historico.js" defer></script>
+  <script src="../assets/js/aluno/painel_aluno.js" defer></script>
+  <script src="../assets/js/aluno/notificacoes_aluno.js" defer></script>
+  <script src="../assets/js/aluno/historico.js" defer></script>
 </head>
 <body>
 
@@ -92,13 +100,13 @@ $stmt_historico->close();
       </button>
     </div>
     <nav class="sidebar-nav">
-      <a href="dashboard_aluno.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+      <a href="painel.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
       <a href="catalogo.php" class="nav-item"><i class="fas fa-search"></i><span>Catálogo</span></a>
       <a href="favoritos.php" class="nav-item"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
-      <a href="meus_emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+      <a href="emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
       <a href="reservas.php" class="nav-item"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
       <a href="historico.php" class="nav-item active"><i class="fas fa-history"></i><span>Histórico</span></a>
-      <a href="configuracoes_aluno.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
+      <a href="configuracoes.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
     </nav>
   </aside>
 
@@ -128,7 +136,7 @@ $stmt_historico->close();
           <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
         </div>
 
-        <a href="logout_user.php" class="btn-logout" title="Sair">
+        <a href="auth/sair.php" class="btn-logout" title="Sair">
           <i class="fas fa-sign-out-alt"></i>
           <span id="logout-text">Sair</span>
         </a>
@@ -227,3 +235,14 @@ $stmt_historico->close();
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+

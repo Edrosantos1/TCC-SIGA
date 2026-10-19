@@ -1,0 +1,719 @@
+html[data-tema="escuro"] .dashboard-main .card-section,
+html[data-tema="escuro"] .dashboard-main .ranking-container {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .continue-card,
+html[data-tema="escuro"] .dashboard-main .ranking-item,
+html[data-tema="escuro"] .dashboard-main .ranking-sub small,
+html[data-tema="escuro"] .dashboard-main .tcc-cover-card.empty {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .catalog-main .catalog-filters,
+html[data-tema="escuro"] .catalog-main .fav-toolbar,
+html[data-tema="escuro"] .catalog-main .favorito-card,
+html[data-tema="escuro"] .catalog-main .filter-summary {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .catalog-main .catalogo-card:not(.favorito-card),
+html[data-tema="escuro"] .catalog-main .catalog-empty,
+html[data-tema="escuro"] .catalog-main .catalog-empty-inner,
+html[data-tema="escuro"] .catalog-main .fav-empty {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .loans-main .loans-tabs,
+html[data-tema="escuro"] .loans-main .loans-toolbar,
+html[data-tema="escuro"] .loans-main .loan-card {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .loans-main .loan-detail-item,
+html[data-tema="escuro"] .loans-main .loan-empty,
+html[data-tema="escuro"] .loans-main .loan-no-results {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .reservas-main .reserva-card {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .reservas-main .reserva-date,
+html[data-tema="escuro"] .reservas-main .reservas-empty {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .view-toggle {
+    background: var(--aluno-surface) !important;
+    border: 1px solid var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .view-toggle .view-btn:not([aria-pressed="true"]) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: transparent !important;
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .view-toggle .view-btn:not([aria-pressed="true"]) :is(span, i) {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .view-toggle .view-btn[aria-pressed="true"] {
+    background: var(--aluno-action-bg) !important;
+    border-color: var(--aluno-action-bg) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .view-toggle .view-btn[aria-pressed="true"] :is(span, i) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-main .fav-search input,
+    .catalog-main .fav-sort select,
+    .catalog-main .fav-chip:not(.active),
+    .loans-main .loans-search input,
+    .loans-main .loans-sort select,
+    .loans-main .loan-chip:not(.active),
+    .loans-main .tab-btn:not(.active)
+) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-main .fav-search input,
+    .catalog-main .fav-sort select,
+    .loans-main .loans-search input,
+    .loans-main .loans-sort select
+)::placeholder {
+    color: var(--aluno-muted) !important;
+    opacity: 1;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-main .fav-search input,
+    .catalog-main .fav-sort select,
+    .catalog-main .fav-chip:not(.active),
+    .loans-main .loans-search input,
+    .loans-main .loans-sort select,
+    .loans-main .loan-chip:not(.active),
+    .loans-main .tab-btn:not(.active)
+):is(:hover, :focus-visible) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .prazo-chip {
+    background: var(--aluno-surface) !important;
+    border: 1px solid var(--aluno-primary) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .reserva-body .reserva-date.is-soon .prazo-chip {
+    background: #4a3b11 !important;
+    border: 1px solid #facc15 !important;
+    color: #fde68a !important;
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+html[data-tema="escuro"] .main-content .reservas-main .reserva-body .reserva-date.is-urgent .prazo-chip {
+    background: #4a2028 !important;
+    border: 1px solid #fb7185 !important;
+    color: #fecdd3 !important;
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+html[data-tema="escuro"] .historico-main .historico-filters {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .historico-main .historico-item,
+html[data-tema="escuro"] .historico-main .historico-empty {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .config-container .config-card {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .config-container .opcao-card:not(.active) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .config-container .opcao-card:not(.active):hover {
+    border-color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .config-container .opcao-card.active {
+    background: var(--aluno-accent-gold) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .config-container .opcao-card.active :is(span, i) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay .modal-container,
+html[data-tema="escuro"] #item-modal-overlay .modal-content,
+html[data-tema="escuro"] #item-modal-overlay .modal-info {
+    background-color: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay .modal-info h2,
+html[data-tema="escuro"] #item-modal-overlay .modal-meta span {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay .modal-info > #modal-author,
+html[data-tema="escuro"] #item-modal-overlay .modal-description {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay .modal-description {
+    border-top-color: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay .modal-meta span,
+html[data-tema="escuro"] #item-modal-overlay .modal-type-badge {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay .modal-type-badge {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"][data-daltonismo]:not([data-daltonismo="normal"]) .config-container .opcao-card.active {
+    background: var(--aluno-access-primary) !important;
+    border-color: var(--aluno-access-primary) !important;
+    color: #ffffff !important;
+    outline: 2px solid var(--aluno-access-primary);
+    outline-offset: 2px;
+}
+
+html[data-tema="escuro"][data-daltonismo]:not([data-daltonismo="normal"]) .config-container .opcao-card.active :is(span, i) {
+    color: #ffffff !important;
+}
+
+html[data-tema] .sidebar,
+html[data-tema] .top-header,
+html[data-tema] .main-content :is(.card, .card-section, .ranking-container, .config-card, .catalog-filters, .fav-toolbar, .catalogo-card, .favorito-card, .loans-tabs, .loans-toolbar, .loan-card, .loan-detail-item, .reserva-card, .reserva-date, .historico-filters, .historico-item, .catalog-empty, .catalog-empty-inner, .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty, .continue-card, .ranking-item, .ranking-sub small, .tcc-cover-card.empty, .config-card .opcao-card:not(.active)) {
+    background-color: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema] .catalog-main .stat-pill,
+html[data-tema] .catalog-main .filter-summary,
+html[data-tema] .catalog-main .filter-chip:not(.active) {
+    background-color: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema] .catalog-main :is(.catalog-hero-content h1, .stat-pill-num, .filter-summary, .filter-summary i, .tipo-livro, .paginacao a) {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .catalog-main #catalog-title {
+    color: #ffffff !important;
+}
+
+html[data-tema] .catalog-main .btn-favorite:not(.favorited) {
+    background: var(--aluno-surface-raised) !important;
+    border: 1px solid var(--aluno-border) !important;
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="claro"] .catalog-main .btn-reserve:not(.reserved) {
+    background: #d8f6f5 !important;
+    border: 1px solid #a7e9e8 !important;
+    color: #00666b !important;
+}
+
+html[data-tema="escuro"] .catalog-main .btn-reserve:not(.reserved) {
+    background: #123c46 !important;
+    border: 1px solid #23606a !important;
+    color: #9be8e8 !important;
+}
+
+html[data-tema="escuro"] .catalog-main .btn-favorite.favorited {
+    background: var(--aluno-status-danger-bg) !important;
+    border: 1px solid var(--aluno-status-danger) !important;
+    color: var(--aluno-status-danger) !important;
+}
+
+html[data-tema="claro"] .catalog-main .btn-favorite.favorited {
+    background: #fff1f2 !important;
+    border: 1px solid #fecdd3 !important;
+    color: #be123c !important;
+}
+
+html[data-tema="alto_contraste"] .catalog-main .btn-reserve:not(.reserved) {
+    background: #0035ff !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema] .catalog-main .btn-reserve.reserved,
+html[data-tema] .catalog-main .modal-actions .btn-primary-action.reserved {
+    background: var(--aluno-status-active-bg) !important;
+    border-color: var(--aluno-status-active) !important;
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema] .catalog-main .btn-reserve.reserved:hover,
+html[data-tema] .catalog-main .modal-actions .btn-primary-action.reserved:hover {
+    background: var(--aluno-status-danger-bg) !important;
+    border-color: var(--aluno-status-danger) !important;
+    color: var(--aluno-status-danger) !important;
+}
+
+html[data-tema] .main-content :is(input, select, textarea),
+html[data-tema] .main-content :is(.search-input, .filter-search input, .fav-search input) {
+    background-color: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema] .main-content :is(input, select, textarea)::placeholder {
+    color: var(--aluno-muted) !important;
+    opacity: 1;
+}
+
+html[data-tema] .sidebar-logo,
+html[data-tema] .sidebar-logo i,
+html[data-tema] .sidebar .nav-item.active,
+html[data-tema] .sidebar .nav-item.active i,
+html[data-tema] .main-content :is(h1, h2, h3, .section-title, .search-icon),
+html[data-tema] .main-content :is(a, .filter-clear) {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema] .sidebar .nav-item.active {
+    background: var(--aluno-surface-raised) !important;
+    border-left: 3px solid var(--aluno-accent-gold) !important;
+}
+
+html[data-tema] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .nav-item.active, .tab-btn.active, .view-btn.active, .filter-chip.active, .config-container .opcao-card.active) {
+    background: var(--aluno-action-bg) !important;
+    border-color: var(--aluno-action-bg) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .tab-btn.active, .view-btn.active, .filter-chip.active, .config-container .opcao-card.active) :is(span, i, strong) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .filter-chip.active,
+    .fav-chip.active,
+    .loan-chip.active
+) {
+    background: var(--aluno-accent-gold) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: #071a33 !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .filter-chip.active,
+    .fav-chip.active,
+    .loan-chip.active
+) :is(span, i, strong) {
+    color: #071a33 !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.fav-chip.active, .loan-chip.active) .chip-count {
+    background: rgba(7, 26, 51, .16) !important;
+    color: #071a33 !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.filter-chip.active:disabled, .fav-chip.active:disabled, .loan-chip.active:disabled) {
+    cursor: default !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+html[data-tema="alto_contraste"] .sidebar,
+html[data-tema="alto_contraste"] .top-header,
+html[data-tema="alto_contraste"] .main-content :is(.card, .card-section, .ranking-container, .config-card, .catalog-filters, .fav-toolbar, .catalogo-card, .favorito-card, .loans-tabs, .loans-toolbar, .loan-card, .loan-detail-item, .reserva-card, .reserva-date, .historico-filters, .historico-item, .catalog-empty, .catalog-empty-inner, .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty, .continue-card, .ranking-item, .ranking-sub small, .tcc-cover-card.empty, .config-card .opcao-card:not(.active)) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .sidebar .nav-item.active,
+html[data-tema="alto_contraste"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .tab-btn.active, .view-btn.active, .filter-chip.active, .config-container .opcao-card.active) {
+    background: #0035ff !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+    outline: 2px solid #0035ff;
+    outline-offset: 2px;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .tab-btn.active, .view-btn.active, .filter-chip.active, .config-container .opcao-card.active) :is(span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(input, select, textarea) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) {
+    --aluno-primary: var(--aluno-access-primary);
+    --aluno-action-bg: var(--aluno-access-primary);
+    --aluno-action-text: #ffffff;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .sidebar .nav-item.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .opcao-card.active,
+    .btn-primary,
+    .btn-primary-action,
+    .btn-salvar,
+    .btn-explore,
+    .btn-continue,
+    .filter-chip.active,
+    .fav-chip.active,
+    .loan-chip.active,
+    .tab-btn.active,
+    .view-btn.active,
+    .view-btn[aria-pressed="true"],
+    .loans-view-toggle button.active,
+    .fav-view-toggle button.active,
+    .btn-reserve:not(.reserved)
+) {
+    background: var(--aluno-access-primary) !important;
+    border-color: var(--aluno-access-primary) !important;
+    color: #ffffff !important;
+    outline: 2px solid var(--aluno-access-primary);
+    outline-offset: 2px;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .opcao-card.active,
+    .btn-primary,
+    .btn-primary-action,
+    .btn-salvar,
+    .btn-explore,
+    .btn-continue,
+    .filter-chip.active,
+    .fav-chip.active,
+    .loan-chip.active,
+    .tab-btn.active,
+    .view-btn.active,
+    .view-btn[aria-pressed="true"],
+    .loans-view-toggle button.active,
+    .fav-view-toggle button.active,
+    .btn-reserve:not(.reserved)
+) :is(span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .btn-success,
+    .btn-pickup,
+    .btn-renew,
+    .btn-reserve.reserved
+) {
+    background: var(--aluno-access-success) !important;
+    border-color: var(--aluno-access-success) !important;
+    color: #ffffff !important;
+}
+
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .btn-danger,
+    .btn-cancel,
+    .btn-return,
+    .btn-remover-favorito,
+    .btn-favorite.favorited,
+    .btn-reserve.reserved:hover
+) {
+    background: var(--aluno-access-danger) !important;
+    border-color: var(--aluno-access-danger) !important;
+    color: #ffffff !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .loan-badge,
+    .loan-detail-status,
+    .reserva-status,
+    .historico-status,
+    .historico-badge,
+    .status-badge,
+    .item-type-badge,
+    .tipo-badge,
+    .fav-type-badge,
+    .badge-loan,
+    .badge-reservation
+) {
+    border: 2px solid currentColor !important;
+    font-weight: 700;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .tipo-badge,
+    .fav-type-badge,
+    .item-type-badge
+) {
+    background: transparent !important;
+    color: var(--aluno-access-primary) !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .loan-badge.status-active,
+    .loan-badge.status-emprestado,
+    .loan-badge.status-returned,
+    .loan-badge.status-devolvido,
+    .loan-badge.status-finalizado,
+    .loan-detail-status.status-active,
+    .loan-detail-status.status-emprestado,
+    .loan-detail-status.status-returned,
+    .loan-detail-status.status-devolvido,
+    .loan-detail-status.status-finalizado,
+    .reserva-status.status-approved,
+    .status-active,
+    .status-emprestado,
+    .status-returned,
+    .status-devolvido,
+    .status-completed,
+    .status-aprovada,
+    .status-retirada
+) {
+    background: var(--aluno-status-active-bg) !important;
+    border-color: var(--aluno-status-active) !important;
+    color: var(--aluno-status-active) !important;
+    border-style: double !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .loan-badge.status-overdue,
+    .loan-badge.status-atrasado,
+    .loan-badge.status-refused,
+    .loan-badge.status-recusado,
+    .loan-detail-status.status-overdue,
+    .loan-detail-status.status-atrasado,
+    .loan-detail-status.status-refused,
+    .loan-detail-status.status-recusado,
+    .reserva-status.status-rejected,
+    .reserva-status.status-cancelled,
+    .status-overdue,
+    .status-atrasado,
+    .status-refused,
+    .status-recusado,
+    .status-rejected,
+    .status-rejeitada,
+    .status-cancelled,
+    .status-cancelada,
+    .status-expired,
+    .status-expirada
+) {
+    background: var(--aluno-status-danger-bg) !important;
+    border-color: var(--aluno-status-danger) !important;
+    color: var(--aluno-status-danger) !important;
+    border-style: solid !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .loan-badge.status-pending,
+    .loan-badge.status-pendente,
+    .loan-badge.status-return_requested,
+    .loan-detail-status.status-pending,
+    .loan-detail-status.status-pendente,
+    .loan-detail-status.status-return_requested,
+    .reserva-status.status-pending,
+    .status-pending,
+    .status-pendente,
+    .status-return-requested,
+    .status-return_requested,
+    .status-devolucao_solicitada
+) {
+    background: var(--aluno-status-pending-bg) !important;
+    border-color: var(--aluno-status-pending) !important;
+    color: var(--aluno-status-pending) !important;
+    border-style: dashed !important;
+}
+
+html[data-tema="escuro"] {
+    --aluno-button-primary-bg: #ffad00;
+    --aluno-button-primary-text: #071a33;
+    --aluno-button-primary-hover: #ffc247;
+    --aluno-button-secondary-bg: #17215a;
+    --aluno-button-secondary-text: #eef1ff;
+    --aluno-button-secondary-border: var(--aluno-border);
+    --aluno-button-secondary-hover: #24366f;
+    --aluno-button-danger-bg: #4a2028;
+    --aluno-button-danger-text: #fecdd3;
+    --aluno-button-danger-border: #fb7185;
+    --aluno-button-danger-hover: #5c2933;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .btn-reserve:not(.reserved)) {
+    background: var(--aluno-button-primary-bg) !important;
+    border-color: var(--aluno-button-primary-bg) !important;
+    color: var(--aluno-button-primary-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-success, .btn-pickup, .btn-renew, .btn-reserve.reserved) {
+    background: var(--aluno-status-active-bg) !important;
+    border-color: var(--aluno-status-active) !important;
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-danger, .btn-cancel, .btn-return, .btn-remover-favorito, .btn-favorite.favorited) {
+    background: var(--aluno-button-danger-bg) !important;
+    border-color: var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-secondary, .btn-restaurar, .btn-favorite:not(.favorited), .filter-clear, .loan-clear-btn, .fav-clear-btn, .tab-btn:not(.active), .view-btn:not(.active):not([aria-pressed="true"]), .filter-chip:not(.active), .loans-main .loans-view-toggle > button:not(.active):not([aria-pressed="true"]), .catalog-main .fav-view-toggle > button:not(.active):not([aria-pressed="true"]), .reservas-main .view-toggle .view-btn:not(.active):not([aria-pressed="true"]), .modal-close, .modal-actions button:not(.btn-primary):not(.btn-primary-action):not(.btn-danger):not(.btn-success), .ui-alert-btn-cancel) {
+    background: var(--aluno-button-secondary-bg) !important;
+    border-color: var(--aluno-button-secondary-border) !important;
+    color: var(--aluno-button-secondary-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.tab-btn:is(.active, [aria-selected="true"]), .view-btn:is(.active, [aria-pressed="true"]), .filter-chip.active, .loans-main .loans-view-toggle > button:is(.active, [aria-pressed="true"]), .catalog-main .fav-view-toggle > button:is(.active, [aria-pressed="true"]), .reservas-main .view-toggle .view-btn:is(.active, [aria-pressed="true"])) {
+    background: var(--aluno-button-primary-bg) !important;
+    border-color: var(--aluno-button-primary-bg) !important;
+    color: var(--aluno-button-primary-text) !important;
+    box-shadow: 0 0 0 2px rgba(255, 173, 0, .28) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .btn-reserve:not(.reserved)):not(:disabled):is(:hover, :focus-visible) {
+    background: var(--aluno-button-primary-hover) !important;
+    border-color: var(--aluno-button-primary-hover) !important;
+    color: var(--aluno-button-primary-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-success, .btn-pickup, .btn-renew, .btn-reserve.reserved):not(:disabled):is(:hover, :focus-visible) {
+    background: #1f5135 !important;
+    border-color: #9be8bc !important;
+    color: #9be8bc !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-danger, .btn-cancel, .btn-return, .btn-remover-favorito, .btn-favorite.favorited):not(:disabled):is(:hover, :focus-visible) {
+    background: var(--aluno-button-danger-hover) !important;
+    border-color: var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-secondary, .btn-restaurar, .btn-favorite:not(.favorited), .filter-clear, .loan-clear-btn, .fav-clear-btn, .tab-btn:not(.active), .view-btn:not(.active):not([aria-pressed="true"]), .filter-chip:not(.active), .loans-main .loans-view-toggle > button:not(.active):not([aria-pressed="true"]), .catalog-main .fav-view-toggle > button:not(.active):not([aria-pressed="true"]), .reservas-main .view-toggle .view-btn:not(.active):not([aria-pressed="true"]), .modal-close, .modal-actions button:not(.btn-primary):not(.btn-primary-action):not(.btn-danger):not(.btn-success), .ui-alert-btn-cancel):not(:disabled):is(:hover, :focus-visible) {
+    background: var(--aluno-button-secondary-hover) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] :is(.main-content, .unsaved-dialog) :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .unsaved-dialog__button--save) :is(span, i, strong) {
+    color: var(--aluno-button-primary-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-success, .btn-pickup, .btn-renew, .btn-reserve.reserved) :is(span, i, strong) {
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] .unsaved-dialog__button--save {
+    background: var(--aluno-button-primary-bg) !important;
+    border-color: var(--aluno-button-primary-bg) !important;
+    color: var(--aluno-button-primary-text) !important;
+}
+
+html[data-tema="escuro"] .unsaved-dialog .unsaved-dialog__button--stay {
+    background: var(--aluno-button-secondary-bg) !important;
+    border-color: var(--aluno-button-secondary-border) !important;
+    color: var(--aluno-button-secondary-text) !important;
+}
+
+html[data-tema="escuro"] .unsaved-dialog .unsaved-dialog__button--stay:is(:hover, :focus-visible) {
+    background: var(--aluno-button-secondary-hover) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .unsaved-dialog .unsaved-dialog__button--discard {
+    background: var(--aluno-button-danger-bg) !important;
+    border-color: var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .unsaved-dialog .unsaved-dialog__button--discard:is(:hover, :focus-visible) {
+    background: var(--aluno-button-danger-hover) !important;
+    border-color: var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .top-header :is(.btn-logout, .notification-btn, .language-button) {
+    background: var(--aluno-button-secondary-bg) !important;
+    border-color: var(--aluno-button-secondary-border) !important;
+    color: var(--aluno-button-secondary-text) !important;
+}
+
+html[data-tema="escuro"] .top-header :is(.btn-logout, .notification-btn, .language-button):is(:hover, :focus-visible) {
+    background: var(--aluno-button-secondary-hover) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .btn-reserve:not(.reserved), .tab-btn:is(.active, [aria-selected="true"]), .view-btn:is(.active, [aria-pressed="true"]), .filter-chip.active, .loans-main .loans-view-toggle > button:is(.active, [aria-pressed="true"]), .catalog-main .fav-view-toggle > button:is(.active, [aria-pressed="true"]), .reservas-main .view-toggle .view-btn:is(.active, [aria-pressed="true"])) :is(span, i, strong) {
+    color: var(--aluno-button-primary-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-danger, .btn-cancel, .btn-return, .btn-remover-favorito, .btn-favorite.favorited) :is(span, i, strong) {
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.loans-main .loans-view-toggle > button:not(.active):not([aria-pressed="true"]), .catalog-main .fav-view-toggle > button:not(.active):not([aria-pressed="true"]), .reservas-main .view-toggle .view-btn:not(.active):not([aria-pressed="true"])) :is(span, i, strong) {
+    color: var(--aluno-button-secondary-text) !important;
+}

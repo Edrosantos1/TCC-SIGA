@@ -1,0 +1,120 @@
+/* Preferências de acessibilidade compartilhadas por todas as telas administrativas. */
+
+/* Paletas distinguíveis: azul/âmbar para deficiência vermelho-verde,
+   e verde/magenta para deficiência azul-amarelo. */
+body.daltonismo-protanopia,
+body.daltonismo-deuteranopia {
+    --cb-pending: #e69f00;
+    --cb-approved: #0072b2;
+    --cb-rejected: #9a3412;
+    --cb-overdue: #6a3d9a;
+    --cb-active: #332288;
+    --cb-returned: #007a5e;
+    --cb-neutral: #4b5563;
+    --cb-requested: #7a285b;
+    --cb-available: #0072b2;
+    --cb-positive-action: #0072b2;
+    --cb-negative-action: #9a3412;
+    --cb-pending-text: #1f2937;
+}
+
+body.daltonismo-tritanopia {
+    --cb-pending: #b45309;
+    --cb-approved: #166534;
+    --cb-rejected: #9d174d;
+    --cb-overdue: #7f1d1d;
+    --cb-active: #5b21b6;
+    --cb-returned: #065f46;
+    --cb-neutral: #374151;
+    --cb-requested: #7c2d12;
+    --cb-available: #166534;
+    --cb-positive-action: #166534;
+    --cb-negative-action: #9d174d;
+    --cb-pending-text: #ffffff;
+}
+
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-pendente, .tab-badge.pendente, .badge-pendente) {
+    background: var(--cb-pending) !important;
+    border-color: var(--cb-pending) !important;
+    color: var(--cb-pending-text) !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-aprovada, .tab-badge.aprovada) {
+    background: var(--cb-approved) !important;
+    border-color: var(--cb-approved) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-rejeitada, .tab-badge.rejeitada) {
+    background: var(--cb-rejected) !important;
+    border-color: var(--cb-rejected) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-atrasado, .tab-badge.atrasado, .badge-atrasado) {
+    background: var(--cb-overdue) !important;
+    border-color: var(--cb-overdue) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-emprestado, .tab-badge.emprestado) {
+    background: var(--cb-active) !important;
+    border-color: var(--cb-active) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-devolvido, .status-disponivel, .badge-disponivel:not(.badge-indisponivel)) {
+    background: var(--cb-returned) !important;
+    border-color: var(--cb-returned) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-retirada, .status-devolucao_solicitada) {
+    background: var(--cb-requested) !important;
+    border-color: var(--cb-requested) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.status-expirada, .status-cancelada, .status-indefinido, .tab-badge.cancelada, .tab-badge.expirada, .badge-indisponivel) {
+    background: var(--cb-neutral) !important;
+    border-color: var(--cb-neutral) !important;
+    color: #ffffff !important;
+}
+
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.btn-aprovar, .btn-aprovar-massa, .btn-devolver, .btn-retirar, .btn-cadastrar, .btn-confirmar, .btn-salvar, .btn-modal-save, .btn-enviar):not(:disabled) {
+    background: var(--cb-positive-action) !important;
+    border-color: var(--cb-positive-action) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.btn-aprovar, .btn-aprovar-massa, .btn-devolver, .btn-retirar, .btn-cadastrar, .btn-confirmar, .btn-salvar, .btn-modal-save, .btn-enviar):not(:disabled):is(:hover, :focus-visible) {
+    background: var(--cb-positive-action) !important;
+    border-color: var(--cb-positive-action) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.btn-rejeitar, .btn-rejeitar-massa, .btn-excluir, .btn-excluir-confirmar, .btn-remover):not(:disabled) {
+    background: var(--cb-negative-action) !important;
+    border-color: var(--cb-negative-action) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.btn-rejeitar, .btn-rejeitar-massa, .btn-excluir, .btn-excluir-confirmar, .btn-remover):not(:disabled):is(:hover, :focus-visible) {
+    background: var(--cb-negative-action) !important;
+    border-color: var(--cb-negative-action) !important;
+    color: #ffffff !important;
+}
+body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
+    :is(.tab-badge.aprovada, .tab-badge.pendente, .tab-badge.rejeitada, .tab-badge.cancelada, .tab-badge.expirada, .tab-badge.retirada, .tab-badge.atrasado, .tab-badge.emprestado) {
+    border: 1px solid currentColor !important;
+}
+
+body.reduzir-animacoes *,
+body.reduzir-animacoes *::before,
+body.reduzir-animacoes *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+}

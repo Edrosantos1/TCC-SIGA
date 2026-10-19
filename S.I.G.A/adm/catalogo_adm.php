@@ -110,7 +110,7 @@ function asset_v($rel) {
 const TIPOS_VALIDOS = ['livro', 'revista', 'tcc'];
 
 $selBase = "SELECT c.*,
-    (SELECT COUNT(*) FROM emprestimos e WHERE e.id_catalogo = c.id_catalogo AND e.status IN ('emprestado','atrasado')) AS emp_ativos,
+    (SELECT COUNT(*) FROM emprestimos e WHERE e.id_catalogo = c.id_catalogo AND e.status IN ('emprestado','atrasado','devolucao_solicitada')) AS emp_ativos,
     (SELECT COUNT(*) FROM reservas r WHERE r.id_catalogo = c.id_catalogo AND r.status IN ('pendente','aprovada')) AS res_ativas
     FROM catalogo c";
 
@@ -126,10 +126,7 @@ function preparar_item($it) {
 }
 
 // ========== CSRF ==========
-if (empty($_SESSION['csrf_catalogo'])) {
-    $_SESSION['csrf_catalogo'] = bin2hex(random_bytes(32));
-}
-$csrf = $_SESSION['csrf_catalogo'];
+$csrf = csrf_token();
 
 // ========== FILTROS (GET) ==========
 $F = filtros_from($_GET, TIPOS_VALIDOS);
@@ -144,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
     $voltar = url_cat($F);
 
-    if (!isset($_POST['csrf']) || !hash_equals($csrf, (string)$_POST['csrf'])) {
+    if (!csrf_validar()) {
         flash('Sessão expirada. Recarregue a página e tente novamente.', 'error');
         header('Location: ' . $voltar);
         exit;
@@ -338,7 +335,7 @@ try {
     $alunos = db_all($db, "
         SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
         FROM login_aluno a
         ORDER BY a.nome_aluno ASC
     ");
@@ -381,8 +378,10 @@ $catalogoData = [
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="<?= e(asset_v('../assets/css/dashboard_adm.css')) ?>">
-    <link rel="stylesheet" href="<?= e(asset_v('../assets/css/catalogo_adm.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_v('../assets/css/adm/dashboard_adm.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_v('../assets/css/adm/catalogo_adm.css')) ?>">
+    <link rel="stylesheet" href="../assets/css/adm/admin_temas_paginas.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
 </head>
 <body class="<?= e($config_classes) ?>">
 
@@ -451,6 +450,7 @@ $catalogoData = [
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
                         <div class="notification-list" id="notification-list-dropdown"></div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>
@@ -470,6 +470,7 @@ $catalogoData = [
                 <div class="page-actions">
                     <button type="button" class="btn-cadastrar" id="btn-novo-item"><i class="fas fa-plus"></i> Novo item</button>
                     <form method="POST" action="importar_google_books.php">
+                        <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
                         <button type="submit" name="importar" class="btn-import" onclick="return confirm('Importar livros da Google Books? Isso pode demorar alguns segundos.')">
                             <i class="fas fa-cloud-download-alt"></i> Importar livros
                         </button>
@@ -532,6 +533,7 @@ $catalogoData = [
                         <div class="empty-actions">
                             <button type="button" class="btn-cadastrar" data-acao="novo"><i class="fas fa-plus"></i> Cadastrar novo item</button>
                             <form method="POST" action="importar_google_books.php">
+                                <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
                                 <button type="submit" name="importar" class="btn-import-empty" onclick="return confirm('Importar livros da Google Books? Isso pode demorar alguns segundos.')">
                                     <i class="fas fa-cloud-download-alt"></i> Importar da Google Books
                                 </button>
@@ -701,7 +703,7 @@ $catalogoData = [
         const notificacoesData = <?= json_encode($notificacoes_sininho, $jsFlags) ?>;
         const catalogoData = <?= json_encode($catalogoData, $jsFlags) ?>;
     </script>
-    <script src="<?= e(asset_v('../assets/js/dashboard_adm.js')) ?>"></script>
-    <script src="<?= e(asset_v('../assets/js/catalogo_adm.js')) ?>"></script>
+    <script src="<?= e(asset_v('../assets/js/adm/dashboard_adm.js')) ?>"></script>
+    <script src="<?= e(asset_v('../assets/js/adm/catalogo_adm.js')) ?>"></script>
 </body>
 </html>

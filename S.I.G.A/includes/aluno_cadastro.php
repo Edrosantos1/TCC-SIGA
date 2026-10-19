@@ -2,6 +2,12 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/conexao.php';
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
+    $_SESSION['flash_login_error'] = ['msg' => 'Sessão expirada. Recarregue a página e tente novamente.', 'register' => true];
+    header('Location: ../aluno/auth/login.php');
+    exit;
+}
+
 /**
  * Função auxiliar para validar email
  */
@@ -15,9 +21,11 @@ function isValidEmail($email) {
  * CORREÇÃO: Adicionado ../aluno/ para sair da pasta includes
  */
 function redirectWithError($message, $type = 'login') {
-    $errorParam = urlencode($message);
-    $typeParam = ($type === 'register') ? 'register' : 'login';
-    header("Location: ../aluno/login_user.php?error={$errorParam}&type={$typeParam}");
+    $_SESSION['flash_login_error'] = [
+        'msg' => $message,
+        'register' => $type === 'register',
+    ];
+    header('Location: ../aluno/auth/login.php');
     exit;
 }
 
@@ -145,7 +153,7 @@ if ($stmt->execute()) {
     $_SESSION['usuario_serie'] = $serie;
     
     // CORREÇÃO: Adicionado ../aluno/ no redirecionamento de sucesso
-    header('Location: ../aluno/dashboard_aluno.php');
+    header('Location: ../aluno/painel.php');
     exit;
     
 } else {

@@ -35,7 +35,7 @@ if ($db) {
                         $tem_reservas = ($reservas_result->fetch_assoc()['total'] > 0);
                         $reservas_stmt->close();
                     }
-                    $emprestimos_sql = "SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')";
+                    $emprestimos_sql = "SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado', 'devolucao_solicitada')";
                     $emprestimos_stmt = $db->prepare($emprestimos_sql);
                     $tem_emprestimos = false;
                     if ($emprestimos_stmt) {
@@ -61,7 +61,7 @@ if ($db) {
                         $reservas_stmt->execute([$id]);
                         $tem_reservas = ($reservas_stmt->fetchColumn() > 0);
                     }
-                    $emprestimos_stmt = $db->prepare("SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')");
+                    $emprestimos_stmt = $db->prepare("SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado', 'devolucao_solicitada')");
                     $tem_emprestimos = false;
                     if ($emprestimos_stmt) {
                         $emprestimos_stmt->execute([$id]);
@@ -144,7 +144,7 @@ if ($db) {
         $sql = "SELECT COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','atrasado') $whereSeg";
+                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada') $whereSeg";
         if ($db instanceof mysqli) {
             $stmt = $db->prepare($sql);
             if ($stmt) {
@@ -163,7 +163,7 @@ if ($db) {
         $sql = "SELECT COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status = 'emprestado' $whereSeg";
+                WHERE e.status IN ('emprestado','devolucao_solicitada') $whereSeg";
         if ($db instanceof mysqli) {
             $stmt = $db->prepare($sql);
             if ($stmt) {
@@ -220,7 +220,7 @@ if ($db) {
         $sql = "SELECT ($sqlSegmento) AS segmento, COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','atrasado')
+                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada')
                 GROUP BY segmento ORDER BY segmento";
         if ($db instanceof mysqli) {
             $r = $db->query($sql);
@@ -233,7 +233,7 @@ if ($db) {
         $sql = "SELECT a.serie_aluno AS serie, COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','atrasado') $whereSeg
+                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada') $whereSeg
                 GROUP BY a.serie_aluno
                 ORDER BY FIELD(a.serie_aluno,
                   '6º ano','7º ano','8º ano','9º ano',
@@ -282,9 +282,10 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboard_adm.css">
+    <link rel="stylesheet" href="../assets/css/adm/dashboard_adm.css">
+    <link rel="stylesheet" href="../assets/css/adm/preferencias_adm.css?v=<?= time() ?>">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="../assets/js/dashboard_adm.js?v=<?= time() ?>" defer></script>
+    <script src="../assets/js/adm/dashboard_adm.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="<?= $config_classes ?>">
 
@@ -368,6 +369,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                             <h4><i class="fas fa-bell"></i> Últimas notificações</h4>
                         </div>
                         <div class="notification-list" id="notification-list-dropdown"></div>
+                        <a class="notification-view-all" href="notificacoes_adm.php">Ver todas as notificações</a>
                     </div>
                 </div>
             </div>

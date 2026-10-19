@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once __DIR__ . '/../includes/config.php';
 
 // Verifica se o admin está logado
@@ -7,11 +6,13 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
-// Aceita GET também (para links diretos)
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id']) && isset($_GET['acao'])) {
-    $_POST['id'] = $_GET['id'];
-    $_POST['acao'] = $_GET['acao'];
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
+    $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
+    header('Location: reservas_adm.php');
+    exit;
 }
+
 // Identifica a conexão
 $db = null;
 if (isset($conn)) $db = $conn;

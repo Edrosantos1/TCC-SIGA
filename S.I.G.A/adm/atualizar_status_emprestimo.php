@@ -7,6 +7,12 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
+    $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
+    header('Location: pendencias_adm.php');
+    exit;
+}
+
 $db = null;
 if (isset($conn)) $db = $conn;
 elseif (isset($conexao)) $db = $conexao;
@@ -28,21 +34,25 @@ if ($id_emprestimo <= 0) {
     exit;
 }
 
-if (!in_array($novo_status, ['devolvido', 'emprestado', 'atrasado'])) {
-    $_SESSION['msg_erro'] = 'Status inválido.';
+if ($novo_status !== 'devolvido') {
+    $_SESSION['msg_erro'] = 'A confirmação da devolução exige o status devolvido.';
     header('Location: pendencias_adm.php');
     exit;
 }
 
 // ========== ATUALIZAR ==========
-$stmt = $db->prepare("UPDATE emprestimos SET status = ? WHERE id_emprestimo = ?");
+$stmt = $db->prepare(
+    "UPDATE emprestimos SET status = 'devolvido'
+     WHERE id_emprestimo = ?
+       AND status IN ('emprestado', 'atrasado', 'devolucao_solicitada')"
+);
 if (!$stmt) {
     $_SESSION['msg_erro'] = 'Erro na preparação da consulta.';
     header('Location: pendencias_adm.php');
     exit;
 }
 
-$stmt->bind_param("si", $novo_status, $id_emprestimo);
+$stmt->bind_param("i", $id_emprestimo);
 
 if ($stmt->execute()) {
     $affected = $stmt->affected_rows;

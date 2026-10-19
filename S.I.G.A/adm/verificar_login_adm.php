@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Verificar login
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['admin_id']) && !isset($_SESSION['id_adm'])) {
     header('Location: login_adm.php');
     exit;
 }
@@ -35,6 +35,4 @@ if (!is_string($config_classes)) {
 // Disponibilizar globalmente
 $GLOBALS['config_classes'] = $config_classes;
 
-// 🔥 DEBUG - Verificar se está funcionando
-// echo '<!-- CONFIG CLASSES: ' . $config_classes . ' -->';
 ?>

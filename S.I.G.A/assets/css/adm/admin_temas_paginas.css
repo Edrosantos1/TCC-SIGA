@@ -1,0 +1,551 @@
+/* =============================================================
+   admin_temas_paginas.css  (GERADO)
+   Tema escuro e alto contraste para os componentes das páginas:
+   Catálogo, Configurações, Extrato, Pendências, Perfil (admin e
+   aluno), Reservas e modal de reserva.
+   Carregado POR ÚLTIMO em cada página. Só vale na tela (não imprime).
+   Gerado a partir das cores claras/escuras fixas de cada CSS de
+   página; regras de tema já escritas à mão foram respeitadas.
+   O prefixo :where() mantém a especificidade original de cada
+   seletor, então estados (.active, :checked, :hover) continuam
+   vencendo as regras-base.
+   ============================================================= */
+@media screen {
+body.tema-escuro { color-scheme: dark; }
+body.tema-alto_contraste { color-scheme: dark; }
+
+/* ---------- TEMA ESCURO ---------- */
+/* catalogo_adm */
+:where(body.tema-escuro) { --cat-texto: #f0f0f0; --cat-muted: #c0cad8; --cat-azul-claro: #1f2d51; }
+:where(body.tema-escuro) .cat-header-search input { border: 1px solid #2a3a5e; background: #162741; }
+:where(body.tema-escuro) .tipo-tabs a { background: #162741; }
+:where(body.tema-escuro) .filtro-busca i { color: #b5c0ce; }
+:where(body.tema-escuro) .filtros-container select { border: 1px solid #2a3a5e; background: #162741; }
+:where(body.tema-escuro) .filtros-container input[type="search"] { border: 1px solid #2a3a5e; background: #162741; }
+:where(body.tema-escuro) .filtros-container input[type="text"] { border: 1px solid #2a3a5e; background: #162741; }
+:where(body.tema-escuro) .btn-limpar { background: #2f3841; color: #f0f0f0; }
+:where(body.tema-escuro) .btn-limpar:hover { background: #1f3351; }
+:where(body.tema-escuro) .catalogo-card { background: #162741; }
+:where(body.tema-escuro) .catalogo-card:hover,
+:where(body.tema-escuro) .catalogo-card:focus-visible { background: #26436c; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45); outline: 1px solid #8bb8ed; }
+:where(body.tema-escuro) .btn-cadastrar:hover { background: #16834a; }
+:where(body.tema-escuro) .tipo-tabs a:hover:not(.active) { background: #263c5f; color: #c5dcff; border-color: #6b91c2; }
+:where(body.tema-escuro) .filtros-container .btn-filtrar:hover { background: #1a5aab; color: #ffffff; }
+:where(body.tema-escuro) .catalogo-card .card-info h4 { color: #f0f0f0; }
+:where(body.tema-escuro) .card-info .autor em { color: #b5c0ce; }
+:where(body.tema-escuro) .meta-ano { color: #b5c0ce; }
+:where(body.tema-escuro) .tipo-livro { background: #1f3451; color: #97abed; }
+:where(body.tema-escuro) .tipo-revista { background: #51471f; color: #f0b794; }
+:where(body.tema-escuro) .tipo-tcc { background: #1f5137; color: #94f0d6; }
+:where(body.tema-escuro) .btn-destaque:hover { background: #51461f; }
+:where(body.tema-escuro) .btn-editar:hover { background: #51471f; }
+:where(body.tema-escuro) .btn-excluir:hover { background: #51241f; }
+:where(body.tema-escuro) .paginacao a:hover:not(.active) { background: #1f3d51; }
+:where(body.tema-escuro) .paginacao .reticencias { color: #b5c0ce; }
+:where(body.tema-escuro) .cat-modal-container { background: #162741; }
+:where(body.tema-escuro) .cat-modal-close { color: #b5c0ce; }
+:where(body.tema-escuro) .form-erros { background: #51241f; border: 1px solid #2a3a5e; color: #ee9c96; }
+:where(body.tema-escuro) .cat-form-group input { border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .cat-form-group select { border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .cat-form-group textarea { border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .delete-icon { background: #51241f; }
+:where(body.tema-escuro) .delete-aviso { background: #51451f; color: #f0d894; }
+:where(body.tema-escuro) .cat-toast { background: #162741; }
+:where(body.tema-escuro) .cat-toast button { color: #b5c0ce; }
+:where(body.tema-escuro) .empty-state p { color: #b5c0ce; }
+:where(body.tema-escuro) .empty-hint { color: #b5c0ce !important; background: #1f2d51; }
+/* configuracoes_adm */
+:where(body.tema-escuro) .toggle-switch { color: #b6c0ce; }
+:where(body.tema-escuro) .toggle-switch .slider { background: #293747; }
+:where(body.tema-escuro) .aviso-nao-salvo { color: #f0b794; background: #51471f; }
+/* extrato_adm */
+:where(body.tema-escuro) .extrato-page {
+    --ex-primary: #8bbcff;
+    --ex-primary-dark: #b4d2ff;
+    --ex-primary-soft: #203a5e;
+    --ex-bg-hover: #29466d;
+    --ex-g100: #243a59;
+    --ex-g200: #405a7c;
+    --ex-g300: #607a9c;
+    --ex-g600: #d3deed;
+    --ex-g900: #f4f7fc;
+}
+:where(body.tema-escuro) .extrato-page .page-header h1 { color: #94bdf0; }
+:where(body.tema-escuro) .extrato-page .page-header h1 i { color: #f0bf94; }
+:where(body.tema-escuro) .extrato-page .page-subtitle { color: #b8c0cc; }
+:where(body.tema-escuro) .extrato-page .btn-secundario {
+    background: #243a59;
+    border-color: #496589;
+    color: #f0f5fc;
+}
+:where(body.tema-escuro) .extrato-page .btn-secundario i { color: #a9ceff; }
+:where(body.tema-escuro) .extrato-page .btn-secundario:hover,
+:where(body.tema-escuro) .extrato-page .btn-secundario:focus-visible {
+    background: #31547d;
+    border-color: #80b5f2;
+    color: #ffffff;
+}
+:where(body.tema-escuro) .extrato-page .btn-secundario:hover i,
+:where(body.tema-escuro) .extrato-page .btn-secundario:focus-visible i { color: #ffffff; }
+:where(body.tema-escuro) .extrato-page .btn-filtrar {
+    background: #2563ab;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+}
+:where(body.tema-escuro) .extrato-page .btn-filtrar:hover,
+:where(body.tema-escuro) .extrato-page .btn-filtrar:focus-visible {
+    background: #3479c7;
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
+}
+:where(body.tema-escuro) .extrato-page .btn-filtrar:disabled {
+    background: #405a7c;
+    color: #e3eaf3;
+}
+:where(body.tema-escuro) .extrato-page .btn-limpar {
+    background: #243a59;
+    color: #e3edfc;
+}
+:where(body.tema-escuro) .extrato-page .btn-limpar:hover,
+:where(body.tema-escuro) .extrato-page .btn-limpar:focus-visible {
+    background: #31547d;
+    color: #ffffff;
+}
+:where(body.tema-escuro) .extrato-page .filtros-extrato select {
+    background-color: #203653;
+    border-color: #496589;
+    color: #f4f7fc;
+}
+:where(body.tema-escuro) .extrato-page .filtros-extrato select:hover,
+:where(body.tema-escuro) .extrato-page .filtros-extrato select:focus-visible {
+    background-color: #29466d;
+    border-color: #80b5f2;
+    color: #ffffff;
+}
+:where(body.tema-escuro) .extrato-page .filtros-extrato select option {
+    background: #203653;
+    color: #f4f7fc;
+}
+:where(body.tema-escuro) .extrato-page .filtros-extrato { background: #162741; }
+:where(body.tema-escuro) .extrato-page .busca-tabela input { background: #162741; }
+:where(body.tema-escuro) .extrato-page .table-wrapper { background: #162741; }
+:where(body.tema-escuro) .extrato-page .table-extrato thead th { border-bottom: 2px solid #2a3a5e; background: #162741; }
+:where(body.tema-escuro) .extrato-page .table-extrato thead th[data-sort]:hover { background: #1f2d51; }
+:where(body.tema-escuro) .extrato-page .table-extrato td { border-bottom: 1px solid #2a3a5e; color: #f0f0f0; }
+:where(body.tema-escuro) .extrato-page .table-extrato td.col-material { color: #f0f0f0; }
+:where(body.tema-escuro) .extrato-page .table-extrato tbody tr:hover td { background: #51351f; }
+:where(body.tema-escuro) .extrato-page .status-pendente { background: #51341f; color: #f0b894; }
+:where(body.tema-escuro) .extrato-page .status-aprovada { background: #1f5135; color: #9be8bc; }
+:where(body.tema-escuro) .extrato-page .status-rejeitada { background: #51221f; color: #e9a29b; }
+:where(body.tema-escuro) .extrato-page .status-expirada { background: #22384f; color: #b8c0cc; }
+:where(body.tema-escuro) .extrato-page .status-retirada { background: #1f3751; color: #94bdf0; }
+:where(body.tema-escuro) .extrato-page .status-cancelada { background: #51461f; color: #f0de94; }
+:where(body.tema-escuro) .extrato-page .status-indefinido { background: #162741; }
+:where(body.tema-escuro) .extrato-page .sem-resultados { background: #162741; }
+:where(body.tema-escuro) .extrato-page .table-extrato tbody tr { background: #162741 !important; }
+/* pendencias_adm */
+:where(body.tema-escuro) .filtro-aluno-tag { background: #1f3751; color: #94bdf0; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .btn-limpar-filtro:hover { background: #51221f; color: #f09c94; border-color: #2a3a5e; }
+:where(body.tema-escuro) .stat-total { color: #94bdf0; }
+:where(body.tema-escuro) .stat-total .stat-icon { background: #1f3751; color: #94bdf0; }
+:where(body.tema-escuro) .stat-atraso { color: #f09c94; }
+:where(body.tema-escuro) .stat-atraso .stat-icon { background: #51221f; color: #f09c94; }
+:where(body.tema-escuro) .stat-atraso .stat-value { color: #e9a29b; }
+:where(body.tema-escuro) .stat-prazo { color: #9be9bc; }
+:where(body.tema-escuro) .stat-prazo .stat-icon { background: #1f5135; color: #9be9bc; }
+:where(body.tema-escuro) .stat-prazo .stat-value { color: #9be8bc; }
+:where(body.tema-escuro) .stat-hoje { color: #f0bf94; }
+:where(body.tema-escuro) .stat-hoje .stat-icon { background: #513e1f; color: #f0bf94; }
+:where(body.tema-escuro) .stat-hoje .stat-value { color: #f0c394; }
+:where(body.tema-escuro) .tab-badge { background: #22334e; color: #f0f0f0; }
+:where(body.tema-escuro) .tab-badge.atrasado { background: #51221f; color: #f09c94; }
+:where(body.tema-escuro) .tab-badge.emprestado { background: #1f5135; color: #9be9bc; }
+:where(body.tema-escuro) .btn-ordenacao:hover { border-color: #2a3a5e; }
+:where(body.tema-escuro) .ordenacao-item i { color: #b5c0ce; }
+:where(body.tema-escuro) .filtro-busca-ativa { background: #1f3651; color: #94bdf0; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .limpar-busca { color: #b8c0cc; background: #162741; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .limpar-busca:hover { background: #51221f; color: #f09c94; border-color: #2a3a5e; }
+:where(body.tema-escuro) .data-aux.aux-atraso { background: #51221f; color: #e9a29b; }
+:where(body.tema-escuro) .data-aux.aux-hoje { background: #513e1f; color: #f0c394; }
+:where(body.tema-escuro) .data-aux.aux-proximo { background: #51431f; color: #f0d594; }
+:where(body.tema-escuro) .data-aux.aux-ok { background: #1f512e; color: #96eeb7; }
+:where(body.tema-escuro) .status-emprestado { border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-atrasado { border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-devolvido { border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-devolucao_solicitada { background: #1f2b51; color: #a5a0e3; border-color: #2a3a5e; }
+:where(body.tema-escuro) .btn-devolver { background: #1f5135; color: #9be8bc; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .skeleton-wrapper { background: #162741; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .skeleton-row { background: linear-gradient(90deg, #22384f 25%, #26364a 50%, #22384f 75%); }
+:where(body.tema-escuro) .empty-illustration { background: linear-gradient(135deg, #1f3751, #1f3451); }
+:where(body.tema-escuro) .empty-state i { color: #94bdf0; }
+:where(body.tema-escuro) .empty-state p { color: #b8c0cc; }
+:where(body.tema-escuro) .toast-success i { color: #9be9bc; }
+:where(body.tema-escuro) .toast-error i { color: #f09c94; }
+:where(body.tema-escuro) .toast-info i { color: #94bdf0; }
+:where(body.tema-escuro) .badge-notif { border: 2px solid #2a3a5e; }
+:where(body.tema-escuro) .resultado-info { color: #b5c0ce; }
+:where(body.tema-escuro) .tab-badge.hoje { background: #513e1f; color: #f0c394; }
+:where(body.tema-escuro) .modal-icon { background: linear-gradient(135deg, #1f5135, #1f5134); color: #9be8bc; }
+:where(body.tema-escuro) .modal-header-text h3 { color: #a5b6df; }
+:where(body.tema-escuro) .modal-header-text p { color: #b8c0cc; }
+:where(body.tema-escuro) .modal-prazo-badge.aux-atraso { background: #51221f; color: #e9a29b; }
+:where(body.tema-escuro) .modal-prazo-badge.aux-hoje { background: #513e1f; color: #f0c394; }
+:where(body.tema-escuro) .modal-prazo-badge.aux-proximo { background: #51431f; color: #f0d594; }
+:where(body.tema-escuro) .modal-prazo-badge.aux-ok { background: #1f512e; color: #96eeb7; }
+:where(body.tema-escuro) .modal-aviso i { color: #f0bf94; }
+:where(body.tema-escuro) .btn-cancelar:hover:not(:disabled) { border-color: #2a3a5e; }
+:where(body.tema-escuro) .reservas-table tbody tr.pendencia-row { background: #162741; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .reservas-table tbody td::before { color: #b5c0ce; }
+:where(body.tema-escuro) .reservas-table tbody td.col-aluno { border-bottom: 1px solid #2a3a5e; }
+/* perfil_adm */
+:where(body.tema-escuro) .perfil-avatar-grande { border: 2px solid #2a3a5e; }
+:where(body.tema-escuro) .perfil-resumo-data { border-left: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .perfil-card h3 i { color: #f0bf94; }
+:where(body.tema-escuro) .perfil-resumo-data { border-top: 1px solid #2a3a5e; }
+/* perfil_aluno */
+:where(body.tema-escuro) .perfil-avatar-grande { border: 3px solid #2a3a5e; }
+:where(body.tema-escuro) .perfil-tabs { background: #1f2e51; }
+:where(body.tema-escuro) .perfil-tabs button { color: #f0f0f0; }
+:where(body.tema-escuro) .perfil-tabs button.active { background: #162741; color: #94bdf0; }
+:where(body.tema-escuro) .btn-voltar { background: #1f2e51; color: #94bdf0; }
+:where(body.tema-escuro) .btn-voltar:hover { background: #1f3251; }
+:where(body.tema-escuro) .status-pendente { background: #51341f; color: #f0b894; }
+:where(body.tema-escuro) .status-aprovada { background: #1f5135; color: #9be8bc; }
+:where(body.tema-escuro) .status-rejeitada { background: #51221f; color: #e9a29b; }
+:where(body.tema-escuro) .status-expirada { background: #51461f; color: #f0de94; }
+:where(body.tema-escuro) .admin-table thead th { color: #b5c0ce; border-bottom: 2px solid #2a3a5e; }
+:where(body.tema-escuro) .admin-table tbody td { border-bottom: 1px solid #2a3a5e; color: #f0f0f0; }
+/* reservas_adm */
+:where(body.tema-escuro) .filtro-aluno-tag { background: #1f3751; color: #94bdf0; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .btn-arquivar:hover { background: #1f3751; color: #94bdf0; border-color: #2a3a5e; }
+:where(body.tema-escuro) .btn-limpar-filtro:hover { background: #51221f; color: #f09c94; border-color: #2a3a5e; }
+:where(body.tema-escuro) .fechar-aviso { color: #b8c0cc; }
+:where(body.tema-escuro) .fechar-aviso:hover { color: #94bdf0; }
+:where(body.tema-escuro) .tab-badge { background: #22334e; color: #f0f0f0; }
+:where(body.tema-escuro) .tab-badge.pendente { background: #51341f; color: #f0bf94; }
+:where(body.tema-escuro) .tab-badge.aprovada { background: #1f5135; color: #9be9bc; }
+:where(body.tema-escuro) .tab-badge.rejeitada { background: #51221f; color: #f09c94; }
+:where(body.tema-escuro) .tab-badge.cancelada { background: #51221f; color: #f09c94; }
+:where(body.tema-escuro) .tab-badge.expirada { background: #22384f; color: #b8c0cc; }
+:where(body.tema-escuro) .tab-badge.retirada { background: #271f51; color: #b694f0; }
+:where(body.tema-escuro) .resultado-info { color: #b5c0ce; }
+:where(body.tema-escuro) .btn-ordenacao:hover { border-color: #2a3a5e; }
+:where(body.tema-escuro) .ordenacao-item i { color: #b5c0ce; }
+:where(body.tema-escuro) .filtro-busca-ativa { background: #1f3651; color: #94bdf0; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .limpar-busca { color: #b8c0cc; background: #162741; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .limpar-busca:hover { background: #51221f; color: #f09c94; border-color: #2a3a5e; }
+:where(body.tema-escuro) .data-aux.aux-atraso { background: #51221f; color: #e9a29b; }
+:where(body.tema-escuro) .data-aux.aux-hoje { background: #513e1f; color: #f0c394; }
+:where(body.tema-escuro) .data-aux.aux-proximo { background: #51431f; color: #f0d594; }
+:where(body.tema-escuro) .data-aux.aux-ok { background: #1f512e; color: #96eeb7; }
+:where(body.tema-escuro) .status-pendente { background: #51341f; color: #f0be94; border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-aprovada { background: #1f5135; color: #9be8bc; border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-rejeitada { background: #51221f; color: #e9a29b; border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-cancelada { background: #51221f; color: #e9a29b; border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-expirada { background: #22384f; color: #b8c0cc; border-color: #2a3a5e; }
+:where(body.tema-escuro) .status-retirada { background: linear-gradient(135deg, #271f51 0%, #281f51 100%); color: #b694f0; border-color: #2a3a5e; }
+:where(body.tema-escuro) .btn-retirar { background: linear-gradient(135deg, #271f51 0%, #281f51 100%); color: #b694f0; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .btn-aprovar-massa { background: #1f5135; color: #9be8bc; border-color: #2a3a5e; }
+:where(body.tema-escuro) .btn-rejeitar-massa { background: #51221f; color: #e9a29b; border-color: #2a3a5e; }
+:where(body.tema-escuro) .selecionados-info { color: #b5c0ce; }
+:where(body.tema-escuro) .acoes-massa.tem-selecao .selecionados-info { color: #94bdf0; }
+:where(body.tema-escuro) .empty-illustration { background: linear-gradient(135deg, #1f3751, #1f3451); }
+:where(body.tema-escuro) .empty-illustration i { color: #94bdf0; }
+:where(body.tema-escuro) .empty-state p { color: #b8c0cc; }
+:where(body.tema-escuro) .toast-success i { color: #9be9bc; }
+:where(body.tema-escuro) .toast-error i { color: #f09c94; }
+:where(body.tema-escuro) .toast-info i { color: #94bdf0; }
+:where(body.tema-escuro) .badge-notif { border: 2px solid #2a3a5e; }
+:where(body.tema-escuro) .cfm-icon { background: linear-gradient(135deg, #1f5135, #1f5134); color: #9be8bc; }
+:where(body.tema-escuro) .cfm-header-text h3 { color: #a5b6df; }
+:where(body.tema-escuro) .cfm-prazo-badge.aux-atraso { background: #51221f; color: #e9a29b; }
+:where(body.tema-escuro) .cfm-prazo-badge.aux-hoje { background: #513e1f; color: #f0c394; }
+:where(body.tema-escuro) .cfm-prazo-badge.aux-proximo { background: #51431f; color: #f0d594; }
+:where(body.tema-escuro) .cfm-prazo-badge.aux-ok { background: #1f512e; color: #96eeb7; }
+:where(body.tema-escuro) .cfm-btn-cancelar:hover:not(:disabled) { border-color: #2a3a5e; }
+:where(body.tema-escuro) .cfm-box[data-variante="rejeitar"] .cfm-icon { background: linear-gradient(135deg, #51221f, #51241f); color: #e9a29b; }
+:where(body.tema-escuro) .cfm-box[data-variante="retirar"] .cfm-icon { background: linear-gradient(135deg, #271f51, #281f51); color: #b694f0; }
+:where(body.tema-escuro) .reservas-table tbody tr.reserva-row { background: #162741; border: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .reserva-row.row-selecionada { background: #1f3651; border-color: #2a3a5e; }
+:where(body.tema-escuro) .reservas-table tbody tr.reserva-row td { border-bottom: 1px dashed #2a3a5e; }
+:where(body.tema-escuro) .reservas-table tbody tr.reserva-row td::before { color: #b5c0ce; }
+:where(body.tema-escuro) .reservas-table tbody tr.reserva-row td.col-aluno { border-bottom: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .filtro-tabela-wrapper input::placeholder { color: #b5c0ce; }
+/* modal_reserva */
+:where(body.tema-escuro) .modal-header h2 { color: #94bdf0; }
+:where(body.tema-escuro) .modal-header h2 i { color: #f0bf94; }
+:where(body.tema-escuro) .modal-close:hover { color: #f09c94; }
+:where(body.tema-escuro) .form-group label { color: #f0f0f0; }
+:where(body.tema-escuro) .form-group label .required { color: #f09c94; }
+:where(body.tema-escuro) .form-group .helper-text { color: #b5c0ce; }
+:where(body.tema-escuro) .busca-aluno-container input:focus { background: #162741; }
+:where(body.tema-escuro) .aluno-suggestions { background: #162741; border: 2px solid #2a3a5e; }
+:where(body.tema-escuro) .aluno-suggestions .suggestion-item { border-bottom: 1px solid #2a3a5e; }
+:where(body.tema-escuro) .aluno-suggestions .suggestion-item:hover { background: #1f2d51; }
+:where(body.tema-escuro) .aluno-suggestions .suggestion-item .nome { color: #f0f0f0; }
+:where(body.tema-escuro) .aluno-suggestions .suggestion-item .info { color: #b5c0ce; }
+:where(body.tema-escuro) .aluno-suggestions .suggestion-empty { color: #b5c0ce; }
+:where(body.tema-escuro) .material-suggestions { background: #162741; border-color: #2a3a5e; }
+:where(body.tema-escuro) .material-suggestions .suggestion-item { background: #162741; color: #f0f0f0; border-color: #2a3a5e; }
+:where(body.tema-escuro) .material-suggestions .suggestion-item:hover,
+:where(body.tema-escuro) .material-suggestions .suggestion-item:focus-visible { background: #1f375a; color: #ffffff; }
+:where(body.tema-escuro) .material-suggestions .suggestion-item .autor,
+:where(body.tema-escuro) .material-suggestions .suggestion-empty { color: #b5c0ce; }
+:where(body.tema-escuro) .material-suggestions .suggestion-item .disponibilidade { color: #9be8bc; }
+:where(body.tema-escuro) .aluno-selecionado .detalhes .nome { color: #f0f0f0; }
+:where(body.tema-escuro) .aluno-selecionado .detalhes .matricula { color: #b8c0cc; }
+:where(body.tema-escuro) .aluno-selecionado .btn-remover { color: #f09c94; }
+:where(body.tema-escuro) .aluno-selecionado .btn-remover:hover { background: #51221f; }
+:where(body.tema-escuro) .form-group input[type="text"] { border: 2px solid #2a3a5e; background: #1f3351; }
+:where(body.tema-escuro) .form-group input[type="date"] { border: 2px solid #2a3a5e; background: #1f3351; }
+:where(body.tema-escuro) .form-group select { border: 2px solid #2a3a5e; background: #1f3351; }
+:where(body.tema-escuro) .form-group input:focus { background: #162741; }
+:where(body.tema-escuro) .form-group select:focus { background: #162741; }
+:where(body.tema-escuro) .btn-modal-cancel { background: #22384f; color: #b8c0cc; }
+:where(body.tema-escuro) .btn-modal-cancel:hover { background: #26364a; }
+:where(body.tema-escuro) .toast-message { color: #b4bed0; }
+:where(body.tema-escuro) .toast-close:hover { color: #b7bfcc; }
+
+/* ---------- ALTO CONTRASTE ---------- */
+/* catalogo_adm */
+:where(body.tema-alto_contraste) .cat-header-search input { border: 1px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .tipo-tabs a { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .filtro-busca i { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtros-container select { border: 1px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .filtros-container input[type="search"] { border: 1px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .filtros-container input[type="text"] { border: 1px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .btn-limpar { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-limpar:hover { background: #000000; }
+:where(body.tema-alto_contraste) .catalogo-card { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .card-info .autor em { color: #ffffff; }
+:where(body.tema-alto_contraste) .meta-ano { color: #ffffff; }
+:where(body.tema-alto_contraste) .tipo-livro { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tipo-revista { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tipo-tcc { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-destaque:hover { background: #000000; }
+:where(body.tema-alto_contraste) .btn-editar { color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-editar:hover { background: #000000; }
+:where(body.tema-alto_contraste) .btn-excluir:hover { background: #000000; }
+:where(body.tema-alto_contraste) .paginacao a:hover:not(.active) { background: #000000; }
+:where(body.tema-alto_contraste) .paginacao .reticencias { color: #ffffff; }
+:where(body.tema-alto_contraste) .cat-modal-container { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cat-modal-close { color: #ffffff; }
+:where(body.tema-alto_contraste) .form-erros { background: #000000; border: 1px solid #ffffff; color: #ffffff; }
+:where(body.tema-alto_contraste) .cat-form-group input { border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cat-form-group select { border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cat-form-group textarea { border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .delete-icon { background: #000000; }
+:where(body.tema-alto_contraste) .delete-aviso { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cat-toast { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cat-toast button { color: #ffffff; }
+:where(body.tema-alto_contraste) .empty-state p { color: #ffffff; }
+:where(body.tema-alto_contraste) .empty-hint { color: #ffffff !important; background: #000000; border: 1px solid #ffffff; }
+/* extrato_adm */
+:where(body.tema-alto_contraste) .extrato-page .page-header h1 { color: #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .page-header h1 i { color: #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .page-subtitle { color: #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .btn-secundario { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .btn-secundario:hover { border-color: #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .filtros-extrato { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .filtros-extrato select:hover { background-color: #000000; }
+:where(body.tema-alto_contraste) .extrato-page .filtros-extrato select:focus-visible { background-color: #000000; }
+:where(body.tema-alto_contraste) .extrato-page .busca-tabela input { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .table-wrapper { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .table-extrato thead th { border-bottom: 2px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .extrato-page .table-extrato thead th[data-sort]:hover { background: #000000; }
+:where(body.tema-alto_contraste) .extrato-page .table-extrato td { border-bottom: 1px solid #ffffff; color: #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .table-extrato td.col-material { color: #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .table-extrato tbody tr:hover td { background: #000000; }
+:where(body.tema-alto_contraste) .extrato-page .status-pendente { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .status-aprovada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .status-rejeitada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .status-expirada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .status-retirada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .status-cancelada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .status-indefinido { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .extrato-page .sem-resultados { background: #000000; }
+:where(body.tema-alto_contraste) .extrato-page .table-extrato tbody tr { background: #000000 !important; }
+/* pendencias_adm */
+:where(body.tema-alto_contraste) .page-header h1 i { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtro-aluno-tag { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-limpar-filtro { background: #000000; border: 1px solid #ffffff; color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-limpar-filtro:hover { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-total { color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-total .stat-icon { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-atraso { color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-atraso .stat-icon { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-atraso .stat-value { color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-prazo { color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-prazo .stat-icon { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-prazo .stat-value { color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-hoje { color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-hoje .stat-icon { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .stat-hoje .stat-value { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtro-tab:hover { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.atrasado { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.emprestado { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-ordenacao:hover { background: #000000; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .ordenacao-item i { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtro-busca-ativa { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .limpar-busca { color: #ffffff; background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .limpar-busca:hover { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .pendencia-row.row-atraso td { background: #000000; }
+:where(body.tema-alto_contraste) .pendencia-row.row-atraso:hover td { background: #000000; }
+:where(body.tema-alto_contraste) .data-aux.aux-atraso { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .data-aux.aux-hoje { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .data-aux.aux-proximo { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .data-aux.aux-ok { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .status-emprestado { border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-atrasado { border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-devolvido { border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-devolucao_solicitada { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-devolver { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .skeleton-wrapper { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .skeleton-row { background: linear-gradient(90deg, #000000 25%, #000000 50%, #000000 75%); }
+:where(body.tema-alto_contraste) .empty-illustration { background: linear-gradient(135deg, #000000, #000000); }
+:where(body.tema-alto_contraste) .empty-state i { color: #ffffff; }
+:where(body.tema-alto_contraste) .empty-state p { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-success i { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-error i { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-info i { color: #ffffff; }
+:where(body.tema-alto_contraste) .badge-notif { border: 2px solid #ffffff; }
+:where(body.tema-alto_contraste) .resultado-info { color: #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.hoje { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .modal-icon { background: linear-gradient(135deg, #000000, #000000); color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .modal-header-text h3 { color: #ffffff; }
+:where(body.tema-alto_contraste) .modal-header-text p { color: #ffffff; }
+:where(body.tema-alto_contraste) .modal-info-label { color: #ffffff; }
+:where(body.tema-alto_contraste) .modal-prazo-badge.aux-atraso { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .modal-prazo-badge.aux-hoje { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .modal-prazo-badge.aux-proximo { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .modal-prazo-badge.aux-ok { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .modal-aviso i { color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-cancelar:hover:not(:disabled) { background: #000000; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .reservas-table tbody tr.pendencia-row { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .reservas-table tbody td::before { color: #ffffff; }
+:where(body.tema-alto_contraste) .reservas-table tbody td.col-aluno { border-bottom: 1px solid #ffffff; }
+/* perfil_adm */
+:where(body.tema-alto_contraste) .perfil-avatar-grande { border: 2px solid #ffffff; }
+:where(body.tema-alto_contraste) .perfil-resumo-data { border-left: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .perfil-card h3 i { color: #ffffff; }
+:where(body.tema-alto_contraste) .perfil-card .form-group input:focus { background: #000000; }
+:where(body.tema-alto_contraste) .senha-container input:focus { background: #000000; }
+:where(body.tema-alto_contraste) .toggle-senha:hover { color: #ffffff; }
+:where(body.tema-alto_contraste) .perfil-resumo-data { border-top: 1px solid #ffffff; }
+/* perfil_aluno */
+:where(body.tema-alto_contraste) .perfil-avatar-grande { border: 3px solid #ffffff; }
+:where(body.tema-alto_contraste) .perfil-tabs { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .perfil-tabs button { color: #ffffff; }
+:where(body.tema-alto_contraste) .perfil-tabs button.active { background: #ffd54f; color: #000000 !important; }
+:where(body.tema-alto_contraste) .btn-voltar { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-voltar:hover { background: #000000; }
+:where(body.tema-alto_contraste) .status-pendente { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .status-aprovada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .status-rejeitada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .status-expirada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .admin-table thead th { color: #ffffff; border-bottom: 2px solid #ffffff; }
+:where(body.tema-alto_contraste) .admin-table tbody td { border-bottom: 1px solid #ffffff; color: #ffffff; }
+/* reservas_adm */
+:where(body.tema-alto_contraste) .page-header h1 i { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtro-aluno-tag { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-arquivar { background: #000000; border: 1px solid #ffffff; color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-limpar-filtro { background: #000000; border: 1px solid #ffffff; color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-arquivar:hover { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-limpar-filtro:hover { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .aviso-arquivamento > i { color: #ffffff; }
+:where(body.tema-alto_contraste) .aviso-arquivamento a { color: #ffffff; }
+:where(body.tema-alto_contraste) .fechar-aviso { color: #ffffff; }
+:where(body.tema-alto_contraste) .fechar-aviso:hover { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtro-tab:hover { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.pendente { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.aprovada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.rejeitada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.cancelada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.expirada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .tab-badge.retirada { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .resultado-info { color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-ordenacao:hover { background: #000000; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .ordenacao-item i { color: #ffffff; }
+:where(body.tema-alto_contraste) .filtro-busca-ativa { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .limpar-busca { color: #ffffff; background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .limpar-busca:hover { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .reserva-row.row-vencida td { background: #000000; }
+:where(body.tema-alto_contraste) .reserva-row.row-vencida:hover td { background: #000000; }
+:where(body.tema-alto_contraste) .reserva-row.row-selecionada td { background: #000000; }
+:where(body.tema-alto_contraste) .reserva-row.row-selecionada:hover td { background: #000000; }
+:where(body.tema-alto_contraste) .data-aux.aux-atraso { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .data-aux.aux-hoje { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .data-aux.aux-proximo { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .data-aux.aux-ok { background: #000000; color: #ffffff; }
+:where(body.tema-alto_contraste) .status-pendente { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-aprovada { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-rejeitada { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-cancelada { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-expirada { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .status-retirada { background: linear-gradient(135deg, #000000 0%, #000000 100%); color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-retirar { background: linear-gradient(135deg, #000000 0%, #000000 100%); color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .acoes-massa.tem-selecao { background: #000000; }
+:where(body.tema-alto_contraste) .btn-aprovar-massa { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .btn-rejeitar-massa { background: #000000; color: #ffffff; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .selecionados-info { color: #ffffff; }
+:where(body.tema-alto_contraste) .acoes-massa.tem-selecao .selecionados-info { color: #ffffff; }
+:where(body.tema-alto_contraste) .empty-illustration { background: linear-gradient(135deg, #000000, #000000); }
+:where(body.tema-alto_contraste) .empty-illustration i { color: #ffffff; }
+:where(body.tema-alto_contraste) .empty-state p { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-success i { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-error i { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-info i { color: #ffffff; }
+:where(body.tema-alto_contraste) .badge-notif { border: 2px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-icon { background: linear-gradient(135deg, #000000, #000000); color: #ffffff; }
+:where(body.tema-alto_contraste) .cfm-header-text h3 { color: #ffffff; }
+:where(body.tema-alto_contraste) .cfm-header-text p { color: #ffffff; }
+:where(body.tema-alto_contraste) .cfm-info-label { color: #ffffff; }
+:where(body.tema-alto_contraste) .cfm-prazo-badge.aux-atraso { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-prazo-badge.aux-hoje { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-prazo-badge.aux-proximo { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-prazo-badge.aux-ok { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-lista li { border-bottom: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-lista .cfm-lista-mais { color: #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .cfm-btn-cancelar:hover:not(:disabled) { background: #000000; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .cfm-box[data-variante="rejeitar"] .cfm-icon { background: linear-gradient(135deg, #000000, #000000); color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .cfm-box[data-variante="retirar"] .cfm-icon { background: linear-gradient(135deg, #000000, #000000); color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .acoes-massa.tem-selecao { background: #000000; }
+:where(body.tema-alto_contraste) .reservas-table tbody tr.reserva-row { background: #000000; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .reserva-row.row-selecionada { background: #000000; border-color: #ffffff; }
+:where(body.tema-alto_contraste) .reservas-table tbody tr.reserva-row td { border-bottom: 1px dashed #ffffff; }
+:where(body.tema-alto_contraste) .reservas-table tbody tr.reserva-row td::before { color: #ffffff; }
+:where(body.tema-alto_contraste) .reservas-table tbody tr.reserva-row td.col-aluno { border-bottom: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .filtro-tabela-wrapper input:focus { background: #000000; }
+:where(body.tema-alto_contraste) .filtro-tabela-wrapper input::placeholder { color: #ffffff; }
+/* modal_reserva */
+:where(body.tema-alto_contraste) .modal-header h2 { color: #ffffff; }
+:where(body.tema-alto_contraste) .modal-header h2 i { color: #ffffff; }
+:where(body.tema-alto_contraste) .modal-close:hover { color: #ffffff; }
+:where(body.tema-alto_contraste) .form-group label { color: #ffffff; }
+:where(body.tema-alto_contraste) .form-group label .required { color: #ffffff; }
+:where(body.tema-alto_contraste) .form-group .helper-text { color: #ffffff; }
+:where(body.tema-alto_contraste) .busca-aluno-container input:focus { background: #000000; }
+:where(body.tema-alto_contraste) .aluno-suggestions { background: #000000; border: 2px solid #ffffff; }
+:where(body.tema-alto_contraste) .aluno-suggestions .suggestion-item { border-bottom: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .aluno-suggestions .suggestion-item:hover { background: #000000; }
+:where(body.tema-alto_contraste) .aluno-suggestions .suggestion-item .nome { color: #ffffff; }
+:where(body.tema-alto_contraste) .aluno-suggestions .suggestion-item .info { color: #ffffff; }
+:where(body.tema-alto_contraste) .aluno-suggestions .suggestion-empty { color: #ffffff; }
+:where(body.tema-alto_contraste) .aluno-selecionado .detalhes .nome { color: #ffffff; }
+:where(body.tema-alto_contraste) .aluno-selecionado .detalhes .matricula { color: #ffffff; }
+:where(body.tema-alto_contraste) .aluno-selecionado .btn-remover { color: #ffffff; }
+:where(body.tema-alto_contraste) .aluno-selecionado .btn-remover:hover { background: #000000; }
+:where(body.tema-alto_contraste) .form-group input[type="text"] { border: 2px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .form-group input[type="date"] { border: 2px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .form-group select { border: 2px solid #ffffff; background: #000000; }
+:where(body.tema-alto_contraste) .form-group input:focus { background: #000000; }
+:where(body.tema-alto_contraste) .form-group select:focus { background: #000000; }
+:where(body.tema-alto_contraste) .btn-modal-cancel { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+:where(body.tema-alto_contraste) .btn-modal-cancel:hover { background: #000000; }
+:where(body.tema-alto_contraste) .toast-message { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-close { color: #ffffff; }
+:where(body.tema-alto_contraste) .toast-close:hover { color: #ffffff; }
+
+}

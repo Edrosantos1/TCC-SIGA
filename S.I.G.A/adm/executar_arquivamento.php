@@ -1,20 +1,17 @@
 <?php
 // executar_arquivamento.php – Script de arquivamento mensal (sem Cron)
 
+require_once __DIR__ . '/../includes/config.php';
+
 $chamado_direto = (basename($_SERVER['SCRIPT_FILENAME']) === 'executar_arquivamento.php');
 
 // Se for chamado diretamente, verifica se é admin
 if ($chamado_direto) {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
     if (!isset($_SESSION['admin_id'])) {
         header('Location: login_adm.php');
         exit;
     }
 }
-
-require_once __DIR__ . '/../includes/config.php';
 
 // Identifica a conexão
 $db = null;
@@ -180,7 +177,12 @@ function executar_arquivamento($db) {
 // EXECUÇÃO
 // ============================================
 if ($chamado_direto) {
-    // Chamado pelo botão/URL: executa sempre
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
+        $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
+        header('Location: reservas_adm.php');
+        exit;
+    }
+
     if (executar_arquivamento($db)) {
         $_SESSION['msg_sucesso'] = 'Arquivamento mensal executado com sucesso!';
     } else {
@@ -190,8 +192,5 @@ if ($chamado_direto) {
     exit;
 }
 
-// Incluído (ex.: reservas_adm.php): só arquiva se já passou 1 mês
-if (verificar_necessidade_arquivamento($db)) {
-    return executar_arquivamento($db);
-}
+// O arquivamento só é executado pela ação POST protegida acima.
 return false;
