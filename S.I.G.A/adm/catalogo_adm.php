@@ -440,7 +440,7 @@ $catalogoData = [
                         <i class="fas fa-bell"></i>
                         <?php $countNotif = count($notificacoes_sininho); ?>
                         <?php if ($countNotif > 0): ?>
-                            <span class="badge" style="position:absolute; top:-4px; right:-4px; background:#e74c3c; color:white; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:0 5px;">
+                            <span class="badge">
                                 <?= $countNotif ?>
                             </span>
                         <?php endif; ?>

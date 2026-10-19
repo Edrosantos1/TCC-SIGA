@@ -1884,17 +1884,22 @@ body.tema-alto_contraste .busca-aluno-container .search-icon { color: #888888 !i
 .notification-dropdown.show { display: block; }
 
 .notification-btn { position: relative; }
-.notification-badge {
+.notification-btn .badge,
+.notification-btn .notification-badge {
     position: absolute;
     top: -4px;
     right: -4px;
-    background-color: #e74c3c;
+    background: #e74c3c;
     color: #ffffff;
-    font-size: 11px;
-    font-weight: bold;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
     border-radius: 50%;
-    padding: 2px 6px;
-    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
 }
 
 /* =============================================

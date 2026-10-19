@@ -346,22 +346,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                     <button class="notification-btn" id="notification-btn" title="Notificações">
                         <i class="fas fa-bell"></i>
                         <?php if (count($notificacoes) > 0): ?>
-                            <span class="badge" style="
-                                position: absolute;
-                                top: -4px;
-                                right: -4px;
-                                background: #e74c3c;
-                                color: white;
-                                font-size: 10px;
-                                font-weight: 700;
-                                min-width: 18px;
-                                height: 18px;
-                                border-radius: 50%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                padding: 0 5px;
-                            "><?= count($notificacoes) ?></span>
+                            <span class="badge"><?= count($notificacoes) ?></span>
                         <?php endif; ?>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
