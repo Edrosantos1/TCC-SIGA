@@ -124,6 +124,9 @@ $sqlSegmento = "
 ";
 
 $segmento_filtro = isset($_GET['segmento']) ? trim($_GET['segmento']) : '';
+if (!in_array($segmento_filtro, ['Ensino Fundamental II', 'Ensino Médio'], true)) {
+    $segmento_filtro = '';
+}
 $whereSeg = '';
 $bind_tipos   = '';
 $bind_valores = [];
@@ -133,6 +136,8 @@ if ($segmento_filtro !== '') {
     $bind_tipos   = 's';
     $bind_valores = [$segmento_filtro];
 }
+$bind_tipos_com_data = 's' . $bind_tipos;
+$bind_valores_com_data = array_merge([date('Y-m-d')], $bind_valores);
 
 $pendencias = $emprestimosAtivos = $reservasNovas = $atrasados = 0;
 $porSegmento = [];
@@ -163,18 +168,19 @@ if ($db) {
         $sql = "SELECT COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','devolucao_solicitada') $whereSeg";
+                                WHERE e.status = 'emprestado'
+                                    AND e.data_devolucao_prevista >= ? $whereSeg";
         if ($db instanceof mysqli) {
             $stmt = $db->prepare($sql);
             if ($stmt) {
-                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->bind_param($bind_tipos_com_data, ...$bind_valores_com_data);
                 $stmt->execute();
                 $emprestimosAtivos = (int) $stmt->get_result()->fetch_assoc()['total'];
                 $stmt->close();
             }
         } elseif ($db instanceof PDO) {
             $stmt = $db->prepare($sql);
-            $stmt->execute($bind_valores);
+            $stmt->execute($bind_valores_com_data);
             $emprestimosAtivos = (int) $stmt->fetchColumn();
         }
 
@@ -201,18 +207,19 @@ if ($db) {
         $sql = "SELECT COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status = 'atrasado' $whereSeg";
+                                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada')
+                                    AND e.data_devolucao_prevista < ? $whereSeg";
         if ($db instanceof mysqli) {
             $stmt = $db->prepare($sql);
             if ($stmt) {
-                if ($bind_tipos) $stmt->bind_param($bind_tipos, ...$bind_valores);
+                $stmt->bind_param($bind_tipos_com_data, ...$bind_valores_com_data);
                 $stmt->execute();
                 $atrasados = (int) $stmt->get_result()->fetch_assoc()['total'];
                 $stmt->close();
             }
         } elseif ($db instanceof PDO) {
             $stmt = $db->prepare($sql);
-            $stmt->execute($bind_valores);
+            $stmt->execute($bind_valores_com_data);
             $atrasados = (int) $stmt->fetchColumn();
         }
 
@@ -261,6 +268,11 @@ $labelsSegmento  = array_column($porSegmento, 'segmento');
 $valoresSegmento = array_map('intval', array_column($porSegmento, 'total'));
 $labelsSerie     = array_column($porSerie, 'serie');
 $valoresSerie    = array_map('intval', array_column($porSerie, 'total'));
+$segmentoQuery = $segmento_filtro !== '' ? http_build_query(['segmento' => $segmento_filtro]) : '';
+$hrefPendencias = 'pendencias_adm.php' . ($segmentoQuery !== '' ? '?' . $segmentoQuery : '');
+$hrefNoPrazo = 'pendencias_adm.php?filtro=emprestado' . ($segmentoQuery !== '' ? '&' . $segmentoQuery : '');
+$hrefReservas = 'reservas_adm.php?filtro=pendente' . ($segmentoQuery !== '' ? '&' . $segmentoQuery : '');
+$hrefAtrasados = 'pendencias_adm.php?filtro=atrasado' . ($segmentoQuery !== '' ? '&' . $segmentoQuery : '');
 
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 ?>
@@ -386,7 +398,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
 
             <!-- KPIs -->
             <section class="stats-grid">
-                <a href="pendencias_adm.php" class="stat-card-link">
+                <a href="<?= htmlspecialchars($hrefPendencias, ENT_QUOTES, 'UTF-8') ?>" class="stat-card-link">
                     <div class="stat-card stat-orange">
                         <i class="fas fa-exclamation-circle stat-icon"></i>
                         <div class="stat-info">
@@ -395,16 +407,16 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                         </div>
                     </div>
                 </a>
-                <a href="pendencias_adm.php?filtro=emprestado" class="stat-card-link">
+                <a href="<?= htmlspecialchars($hrefNoPrazo, ENT_QUOTES, 'UTF-8') ?>" class="stat-card-link">
                     <div class="stat-card stat-blue">
                         <i class="fas fa-book-open stat-icon"></i>
                         <div class="stat-info">
                             <span class="stat-number"><?= $emprestimosAtivos ?></span>
-                            <span class="stat-label">Empréstimos Ativos</span>
+                            <span class="stat-label">Empréstimos no Prazo</span>
                         </div>
                     </div>
                 </a>
-                <a href="reservas_adm.php?filtro=pendente" class="stat-card-link">
+                <a href="<?= htmlspecialchars($hrefReservas, ENT_QUOTES, 'UTF-8') ?>" class="stat-card-link">
                     <div class="stat-card stat-teal">
                         <i class="fas fa-bookmark stat-icon"></i>
                         <div class="stat-info">
@@ -413,7 +425,7 @@ $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS 
                         </div>
                     </div>
                 </a>
-                <a href="pendencias_adm.php?filtro=atrasado" class="stat-card-link">
+                <a href="<?= htmlspecialchars($hrefAtrasados, ENT_QUOTES, 'UTF-8') ?>" class="stat-card-link">
                     <div class="stat-card stat-red">
                         <i class="fas fa-exclamation-triangle stat-icon"></i>
                         <div class="stat-info">

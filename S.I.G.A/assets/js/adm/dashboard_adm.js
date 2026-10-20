@@ -250,6 +250,9 @@ function initBICharts() {
         return;
     }
 
+    (window.adminDashboardCharts || []).forEach(chart => chart.destroy());
+    window.adminDashboardCharts = [];
+
     const isDark    = document.body.classList.contains('tema-escuro');
     const isContras = document.body.classList.contains('tema-alto_contraste');
     const isDarkLike = isDark || isContras;
@@ -267,8 +270,9 @@ function initBICharts() {
     const elDonut = document.querySelector('#chartDonut');
     if (elDonut) {
         const temDadosDonut = valoresSegmento.some(v => v > 0);
+        const labelsDonut = temDadosDonut ? labelsSegmento : ['Sem dados'];
 
-        new ApexCharts(elDonut, {
+        const chart = new ApexCharts(elDonut, {
             chart: {
                 type: 'donut',
                 height: 240,
@@ -290,21 +294,27 @@ function initBICharts() {
                 }
             },
             series: temDadosDonut ? valoresSegmento : [1],
-            labels: temDadosDonut ? labelsSegmento : ['Sem dados'],
+            labels: labelsDonut,
             colors: temDadosDonut ? ['#0035ff', '#60a5fa', '#93c5fd'] : ['#cbd5e1'],
+            fill: { type: 'solid', opacity: 1 },
             legend: {
                 position: 'bottom',
-                labels: { colors: foreColor }
+                labels: { colors: labelsDonut.map(() => foreColor) }
             },
             dataLabels: { enabled: temDadosDonut },
-            tooltip: { theme: chartTheme }
-        }).render();
+            tooltip: {
+                theme: chartTheme,
+                style: { fontSize: '13px', fontFamily: 'Montserrat, sans-serif' }
+            }
+        });
+        window.adminDashboardCharts.push(chart);
+        chart.render();
     }
 
     // ---------- BARRAS ----------
     const elBarras = document.querySelector('#chartBarras');
     if (elBarras) {
-        new ApexCharts(elBarras, {
+        const chart = new ApexCharts(elBarras, {
             chart: {
                 type: 'bar',
                 height: 240,
@@ -314,20 +324,26 @@ function initBICharts() {
             series: [{ name: 'Pendências', data: valoresSerie }],
             xaxis: {
                 categories: labelsSerie,
-                labels: { style: { colors: foreColor } }
+                labels: { style: { colors: [foreColor] } }
             },
             yaxis: {
-                labels: { style: { colors: foreColor } }
+                labels: { style: { colors: [foreColor] } }
             },
             grid: { borderColor: gridColor },
             colors: ['#0035ff'],
+            fill: { type: 'solid', opacity: 1 },
             plotOptions: {
                 bar: { borderRadius: 6, columnWidth: '50%' }
             },
-            dataLabels: { enabled: true },
+            dataLabels: { enabled: true, style: { colors: [isDarkLike ? foreColor : '#ffffff'] } },
             noData: { text: 'Sem dados', style: { color: foreColor } },
-            tooltip: { theme: chartTheme }
-        }).render();
+            tooltip: {
+                theme: chartTheme,
+                style: { fontSize: '13px', fontFamily: 'Montserrat, sans-serif' }
+            }
+        });
+        window.adminDashboardCharts.push(chart);
+        chart.render();
     }
 }
 
@@ -350,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSearch();
     renderizarDropdownNotificacoes();
     initBICharts();
+    document.addEventListener('admin:appearancechange', initBICharts);
 
     console.log('✅ Dashboard com pesquisa local + BI carregado.');
 });

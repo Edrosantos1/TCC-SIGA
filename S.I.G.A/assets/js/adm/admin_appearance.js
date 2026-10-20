@@ -29,6 +29,7 @@
 
         const secure = location.protocol === 'https:' ? '; Secure' : '';
         document.cookie = `siga_admin_appearance=${appearance}; Max-Age=31536000; Path=/; SameSite=Lax${secure}`;
+        document.dispatchEvent(new CustomEvent('admin:appearancechange', { detail: { appearance } }));
     }
 
     updateButtons(currentAppearance());

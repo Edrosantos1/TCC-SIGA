@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('America/Sao_Paulo');
+
 // 1. Segurança Básica (Impede roubo de sessão por JavaScript)
 ini_set('session.use_only_cookies', 1);
 ini_set('session.cookie_httponly', 1);

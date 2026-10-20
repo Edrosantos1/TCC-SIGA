@@ -482,19 +482,6 @@
 .status-devolvido  { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
 .status-devolucao_solicitada { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
 
-.status-atrasado::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #e74c3c;
-    animation: dotPulse 1.8s infinite;
-}
-
-@keyframes dotPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: 0.5; transform: scale(0.85); }
-}
-
 /* ========== AÇÕES ========== */
 .acoes-cell { text-align: center; white-space: nowrap !important; }
 

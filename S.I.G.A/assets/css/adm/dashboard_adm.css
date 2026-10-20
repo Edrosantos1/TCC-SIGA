@@ -2022,6 +2022,52 @@ body.tema-alto_contraste .bi-filtro-alert {
 }
 body.tema-alto_contraste .bi-filtro-alert a { color: #ffffff; }
 
+.dashboard-main .apexcharts-tooltip {
+  background: #ffffff !important;
+  border: 1px solid #94a3b8 !important;
+  color: #1e293b !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2) !important;
+}
+.dashboard-main .apexcharts-tooltip,
+.dashboard-main .apexcharts-tooltip * {
+  color: #1e293b !important;
+}
+.dashboard-main .apexcharts-tooltip-title {
+  background: #f1f5f9 !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+body.tema-escuro .dashboard-main .apexcharts-tooltip {
+  background: #0f1a3a !important;
+  border-color: #8fa6c7 !important;
+  color: #f8fafc !important;
+}
+body.tema-escuro .dashboard-main .apexcharts-tooltip,
+body.tema-escuro .dashboard-main .apexcharts-tooltip * {
+  color: #f8fafc !important;
+}
+body.tema-escuro .dashboard-main .apexcharts-tooltip-title {
+  background: #1a2a4a !important;
+  border-bottom-color: #8fa6c7 !important;
+  color: #ffffff !important;
+}
+
+body.tema-alto_contraste .dashboard-main .apexcharts-tooltip {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+body.tema-alto_contraste .dashboard-main .apexcharts-tooltip,
+body.tema-alto_contraste .dashboard-main .apexcharts-tooltip * {
+  color: #ffffff !important;
+}
+body.tema-alto_contraste .dashboard-main .apexcharts-tooltip-title {
+  background: #000000 !important;
+  border-bottom: 1px solid #ffffff !important;
+  color: #ffea00 !important;
+}
+
 /* ---------- Ajustes de espaçamento ---------- */
 body.espacamento-compacto .stat-card { padding: 16px 18px; }
 body.espacamento-compacto .card-section { padding: 14px 18px; }

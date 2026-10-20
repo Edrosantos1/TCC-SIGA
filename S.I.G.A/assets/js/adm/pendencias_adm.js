@@ -85,8 +85,9 @@ function rotuloDias(p) {
     const d = p.dias_restantes;
     if (d === 0) return { texto: 'Vence hoje', classe: 'aux-hoje' };
     if (d === 1) return { texto: 'Amanhã', classe: 'aux-proximo' };
-    if (d <= 3)  return { texto: `Em ${d} dias`, classe: 'aux-proximo' };
-    return { texto: `Em ${d} dias`, classe: 'aux-ok' };
+    const textoPrazo = `Em ${d} ${d === 1 ? 'dia' : 'dias'}`;
+    if (d <= 3) return { texto: textoPrazo, classe: 'aux-proximo' };
+    return { texto: textoPrazo, classe: 'aux-ok' };
 }
 
 const venceHoje = p => p.status !== 'atrasado' && !p.atraso_pendente && p.dias_restantes === 0;
@@ -309,7 +310,8 @@ function renderizarPendencias() {
             'devolvido': 'fa-undo-alt'
         }[p.status] || 'fa-circle';
 
-        const statusLabel = p.status === 'emprestado' ? 'No prazo'
+        const statusLabel = p.status === 'emprestado'
+            ? (p.dias_restantes < 0 ? 'Em tolerância' : 'No prazo')
             : p.status === 'devolucao_solicitada' ? 'Devolução solicitada'
             : p.status.charAt(0).toUpperCase() + p.status.slice(1);
         const dataEmp = formatarDataBR(p.data_emprestimo);

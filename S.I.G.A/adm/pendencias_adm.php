@@ -20,6 +20,10 @@ $filtros_validos_status = ['todos', 'atrasado', 'hoje', 'emprestado'];
 if (!in_array($filtro_status, $filtros_validos_status, true)) {
     $filtro_status = 'todos';
 }
+$segmento_filtro = isset($_GET['segmento']) ? trim($_GET['segmento']) : '';
+if (!in_array($segmento_filtro, ['Ensino Fundamental II', 'Ensino Médio'], true)) {
+    $segmento_filtro = '';
+}
 
 // ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
@@ -75,9 +79,20 @@ if ($db) {
         WHERE e.status IN ('emprestado', 'atrasado', 'devolucao_solicitada')
     ";
     $params = [];
+    $param_types = '';
     if ($filtro_aluno_id > 0) {
         $query .= " AND e.id_aluno = ?";
         $params[] = $filtro_aluno_id;
+        $param_types .= 'i';
+    }
+    if ($segmento_filtro !== '') {
+        $query .= " AND CASE
+            WHEN l.serie_aluno IN ('6º ano','7º ano','8º ano','9º ano') THEN 'Ensino Fundamental II'
+            WHEN l.serie_aluno IN ('1º ano','2º ano','3º ano') THEN 'Ensino Médio'
+            ELSE 'Outros'
+        END = ?";
+        $params[] = $segmento_filtro;
+        $param_types .= 's';
     }
     $query .= " ORDER BY e.data_devolucao_prevista ASC";
 
@@ -87,7 +102,7 @@ if ($db) {
             error_log('Falha ao preparar a consulta de pendências: ' . $db->error);
         } else {
             if ($params) {
-                $stmt->bind_param('i', $params[0]);
+                $stmt->bind_param($param_types, ...$params);
             }
             $stmt->execute();
             $result = $stmt->get_result();
@@ -115,23 +130,27 @@ foreach ($pendencias as &$p) {
     $hoje_ts  = strtotime($data_hoje);
     $limite_ts = strtotime($p['data_limite']);
     $dias_diff = (int)floor(($limite_ts - $hoje_ts) / 86400);
+    $prazo_vencido = $dias_diff < 0;
+    $dias_prazo_exibicao = $dias_diff;
 
-    $p['atraso_pendente'] = $p['status'] === 'devolucao_solicitada' && $p['data_limite'] < $data_hoje;
-    if ($p['status'] !== 'devolucao_solicitada' && $p['status'] !== 'devolvido' && $p['data_limite'] < $data_hoje) {
+    $p['atraso_pendente'] = $p['status'] === 'devolucao_solicitada' && $prazo_vencido;
+    if ($p['status'] === 'atrasado' && !$prazo_vencido) {
+        $p['status'] = 'emprestado';
+    } elseif ($p['status'] !== 'devolucao_solicitada' && $p['status'] !== 'devolvido' && $prazo_vencido) {
         $p['status'] = 'atrasado';
     }
 
     if ($p['status'] === 'atrasado' || $p['atraso_pendente']) {
-        $p['dias_restantes'] = $dias_diff;
-        $p['dias_atraso'] = abs($dias_diff);
+        $p['dias_restantes'] = $dias_prazo_exibicao;
+        $p['dias_atraso'] = abs($dias_prazo_exibicao);
         $total_atrasados++;
     } else {
-        $p['dias_restantes'] = $dias_diff;
+        $p['dias_restantes'] = $dias_prazo_exibicao;
         $p['dias_atraso'] = 0;
         if ($p['status'] !== 'devolucao_solicitada') {
             $total_no_prazo++;
         }
-        if ($dias_diff === 0) $total_vence_hoje++;
+        if ($dias_prazo_exibicao === 0) $total_vence_hoje++;
     }
 }
 unset($p);
@@ -298,10 +317,15 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                                 <i class="fas fa-user"></i> <?= htmlspecialchars($filtro_aluno_nome) ?>
                             </strong>
                         <?php endif; ?>
+                        <?php if ($segmento_filtro !== ''): ?>
+                            <br><strong class="filtro-aluno-tag">
+                                <i class="fas fa-users"></i> <?= htmlspecialchars($segmento_filtro) ?>
+                            </strong>
+                        <?php endif; ?>
                     </p>
                 </div>
-                <?php if ($filtro_aluno_id > 0): ?>
-                    <a href="pendencias_adm.php" class="btn-limpar-filtro">
+                <?php if ($filtro_aluno_id > 0 || $segmento_filtro !== ''): ?>
+                    <a href="pendencias_adm.php<?= $filtro_status !== 'todos' ? '?filtro=' . rawurlencode($filtro_status) : '' ?>" class="btn-limpar-filtro">
                         <i class="fas fa-times"></i> Limpar Filtro
                     </a>
                 <?php endif; ?>

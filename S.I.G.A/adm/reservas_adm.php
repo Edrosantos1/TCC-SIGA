@@ -20,6 +20,10 @@ $filtros_validos_status = ['todos', 'pendente', 'aprovada', 'rejeitada', 'expira
 if (!in_array($filtro_status, $filtros_validos_status, true)) {
     $filtro_status = 'todos';
 }
+$segmento_filtro = isset($_GET['segmento']) ? trim($_GET['segmento']) : '';
+if (!in_array($segmento_filtro, ['Ensino Fundamental II', 'Ensino Médio'], true)) {
+    $segmento_filtro = '';
+}
 
 // ========== IDENTIFICAR CONEXÃO ==========
 $db = null;
@@ -102,17 +106,43 @@ if ($db) {
         FROM reservas r
         INNER JOIN login_aluno l ON r.id_aluno = l.id_aluno
     ";
+    $condicoes = [];
+    $params = [];
+    $param_types = '';
     if ($filtro_aluno_id > 0) {
-        $query .= " WHERE r.id_aluno = " . intval($filtro_aluno_id);
+        $condicoes[] = 'r.id_aluno = ?';
+        $params[] = $filtro_aluno_id;
+        $param_types .= 'i';
+    }
+    if ($segmento_filtro !== '') {
+        $condicoes[] = "CASE
+            WHEN l.serie_aluno IN ('6º ano','7º ano','8º ano','9º ano') THEN 'Ensino Fundamental II'
+            WHEN l.serie_aluno IN ('1º ano','2º ano','3º ano') THEN 'Ensino Médio'
+            ELSE 'Outros'
+        END = ?";
+        $params[] = $segmento_filtro;
+        $param_types .= 's';
+    }
+    if ($condicoes) {
+        $query .= ' WHERE ' . implode(' AND ', $condicoes);
     }
     $query .= " ORDER BY r.data_reserva DESC";
 
     if ($db instanceof mysqli) {
-        $result = $db->query($query);
-        if ($result) $reservas = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $db->prepare($query);
+        if ($stmt) {
+            if ($params) $stmt->bind_param($param_types, ...$params);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result) $reservas = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+        }
     } elseif ($db instanceof PDO) {
-        $stmt = $db->query($query);
-        if ($stmt) $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $db->prepare($query);
+        if ($stmt) {
+            $stmt->execute($params);
+            $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 }
 
@@ -292,11 +322,16 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                                 <i class="fas fa-user"></i> <?= htmlspecialchars($filtro_aluno_nome) ?>
                             </strong>
                         <?php endif; ?>
+                        <?php if ($segmento_filtro !== ''): ?>
+                            <br><strong class="filtro-aluno-tag">
+                                <i class="fas fa-users"></i> <?= htmlspecialchars($segmento_filtro) ?>
+                            </strong>
+                        <?php endif; ?>
                     </p>
                 </div>
                 <div class="page-actions">
-                    <?php if ($filtro_aluno_id > 0): ?>
-                        <a href="reservas_adm.php" class="btn-limpar-filtro">
+                    <?php if ($filtro_aluno_id > 0 || $segmento_filtro !== ''): ?>
+                        <a href="reservas_adm.php<?= $filtro_status !== 'todos' ? '?filtro=' . rawurlencode($filtro_status) : '' ?>" class="btn-limpar-filtro">
                             <i class="fas fa-times"></i> Limpar Filtro
                         </a>
                     <?php endif; ?>
