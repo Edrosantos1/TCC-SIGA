@@ -112,7 +112,6 @@ try {
         $_SESSION['usuario_serie'] = $usuario['serie_aluno'];
         $_SESSION['login_google'] = true;
         $_SESSION['user_email']   = $email;
-        $mensagem = 'Login realizado com sucesso.';
         $novo = false;
         // Se a série ainda não foi escolhida (conta antiga ou cadastro
         // via Google que nunca completou o perfil), sinaliza pro front.
@@ -139,7 +138,6 @@ try {
             $_SESSION['usuario_serie'] = $serie;
             $_SESSION['login_google'] = true;
             $_SESSION['user_email']   = $email;
-            $mensagem = 'Cadastro realizado com sucesso.';
             $novo = true;
         } else {
             throw new Exception("Erro ao inserir no banco: " . $stmt->error);
@@ -163,7 +161,7 @@ try {
     if ($precisaSerie) {
         header('Location: login.php?status=serie_necessaria&novo=' . ($novo ? '1' : '0'));
     } else {
-        header('Location: ../painel.php?mensagem=Login+realizado+com+sucesso');
+        header('Location: ../painel.php');
     }
     exit;
 

@@ -1,10 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
     $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
@@ -56,7 +59,7 @@ $material_query = "
                COALESCE(c.quantidade, 0)
                - (SELECT COUNT(*) FROM emprestimos e
                   WHERE e.id_catalogo = c.id_catalogo
-                    AND e.status IN ('emprestado', 'atrasado', 'devolucao_solicitada'))
+                    AND e.status IN ('emprestado', 'atrasado'))
                - (SELECT COUNT(*) FROM reservas r
                   WHERE r.id_catalogo = c.id_catalogo
                     AND r.status IN ('pendente', 'aprovada')),

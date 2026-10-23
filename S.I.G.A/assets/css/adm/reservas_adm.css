@@ -1240,7 +1240,7 @@ body.tema-alto_contraste .cfm-lista li strong { color: #fff; background: transpa
 body.tema-alto_contraste .aluno-serie,
 body.tema-alto_contraste .page-subtitle,
 body.tema-alto_contraste .cfm-lista li { color: #ddd; }
-body.tema-alto_contraste mark { background: #ff0; color: #000; }
+body.tema-alto_contraste mark { background: #fff; color: #000; }
 body.tema-alto_contraste .acoes-massa,
 body.tema-alto_contraste .aviso-arquivamento { background: #000; border-color: #fff; color: #fff; }
 body.tema-alto_contraste .cfm-header { background: #000; border-bottom-color: #fff; }

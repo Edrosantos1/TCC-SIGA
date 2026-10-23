@@ -86,6 +86,53 @@
   overflow-y: auto;
 }
 
+.notification-mark-read-form {
+  margin: 0;
+  padding: 0 12px 12px;
+}
+
+.notification-mark-read-btn {
+  display: inline-flex;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border: 1px solid var(--aluno-action-bg, #0035ff);
+  border-radius: 8px;
+  background: var(--aluno-action-bg, #0035ff);
+  color: var(--aluno-action-text, #ffffff);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notification-mark-read-btn:hover {
+  filter: brightness(0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.16);
+}
+
+.notification-mark-read-btn:focus-visible {
+  outline: 3px solid var(--aluno-accent-gold, #ffad00);
+  outline-offset: 2px;
+}
+
+html[data-tema="alto_contraste"] .notification-mark-read-btn {
+  border: 2px solid #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  filter: none;
+}
+
+html[data-tema="alto_contraste"] .notification-mark-read-btn:is(:hover, :focus-visible) {
+  background: #ffffff !important;
+  color: #000000 !important;
+  filter: none;
+}
+
 /* ========== ITEM ========== */
 .notification-item {
   display: flex;
@@ -179,3 +226,27 @@ html[data-tema="alto_contraste"] .notification-message { color: #ffffff; }
 html[data-tema="alto_contraste"] .notification-message strong { color: #ffffff; }
 html[data-tema="alto_contraste"] .notification-date { color: #aaaaaa; }
 html[data-tema="alto_contraste"] .empty-notifications { color: #cccccc; }
+
+/* Notificação já lida: mais discreta */
+.notification-item.is-read { opacity: 0.6; }
+.notification-mark-read-form[hidden] { display: none; }
+
+/* O dropdown tem altura máxima e overflow oculto: a lista rola sozinha e o botão
+   "Marcar tudo como lido" fica sempre visível no rodapé (antes era cortado). */
+.notification-container .notification-dropdown.show {
+  display: flex;
+  flex-direction: column;
+}
+.notification-container .notification-dropdown .notification-header,
+.notification-container .notification-dropdown .notification-mark-read-form {
+  flex: 0 0 auto;
+}
+.notification-container .notification-dropdown .notification-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.notification-container .notification-dropdown .notification-mark-read-form {
+  padding-top: 12px;
+}

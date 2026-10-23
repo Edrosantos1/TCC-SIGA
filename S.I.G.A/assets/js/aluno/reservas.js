@@ -147,7 +147,15 @@ const HISTORY_STATUS = ['rejeitada', 'expirada', 'cancelada', 'retirada'];
 
 // ===================== AUXILIARES =====================
 function getCurrentLanguage() {
-  return localStorage.getItem('dashboard_lang') || 'pt';
+  let idioma = localStorage.getItem('siga-idioma');
+  if (!idioma) {
+    idioma = localStorage.getItem('dashboard_lang');
+    if (idioma) {
+      localStorage.setItem('siga-idioma', idioma);
+      localStorage.removeItem('dashboard_lang');
+    }
+  }
+  return idioma || 'pt';
 }
 
 function tRes(key, lang, params = {}) {
@@ -315,10 +323,12 @@ function createReservaCard(reserva, lang) {
     : coverPlaceholderHTML(type, title);
 
   card.innerHTML = `
-    <div class="reserva-cover-wrap">${coverHTML}</div>
+    <div class="reserva-cover-wrap">
+      ${coverHTML}
+      <span class="tipo-badge ${typeMeta.css}"><i class="fas ${typeMeta.icon}"></i> ${tRes(typeMeta.key, lang)}</span>
+    </div>
     <div class="reserva-body">
       <div class="reserva-top">
-        <span class="tipo-badge ${typeMeta.css}"><i class="fas ${typeMeta.icon}"></i> ${tRes(typeMeta.key, lang)}</span>
         <span class="reserva-status ${statusMeta.css}"><i class="fas ${statusMeta.icon}"></i> ${tRes(statusMeta.key, lang)}</span>
       </div>
       <h3 class="title" title="${escapeHtml(title)}">${escapeHtml(title)}</h3>
@@ -337,8 +347,9 @@ function createReservaCard(reserva, lang) {
   const img = card.querySelector('img.reserva-cover');
   if (img) {
     img.addEventListener('error', () => {
-      const wrap = card.querySelector('.reserva-cover-wrap');
-      if (wrap) wrap.innerHTML = coverPlaceholderHTML(type, title);
+      const placeholder = document.createElement('template');
+      placeholder.innerHTML = coverPlaceholderHTML(type, title).trim();
+      img.replaceWith(placeholder.content.firstElementChild);
     }, { once: true });
   }
 
@@ -465,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('storage', (e) => {
-    if (e.key === 'dashboard_lang') applyReservasLanguage(e.newValue || 'pt');
+    if (e.key === 'siga-idioma') applyReservasLanguage(e.newValue || 'pt');
   });
 
   document.addEventListener('languageChanged', (e) => {

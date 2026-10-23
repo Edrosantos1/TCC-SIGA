@@ -12,7 +12,7 @@ const favoritosTranslations = {
     added_on: 'Adicionado em',
     empty_favoritos: 'Você ainda não tem nenhum item nos favoritos',
     explore_catalog: 'Explorar o Catálogo',
-    search_placeholder: 'Buscar nos seus favoritos...',
+    favorites_search_placeholder: 'Buscar nos seus favoritos...',
     filter_all: 'Todos',
     filter_livro: 'Livros',
     filter_revista: 'Revistas',
@@ -41,7 +41,7 @@ const favoritosTranslations = {
     added_on: 'Added on',
     empty_favoritos: 'You don\u2019t have any favorites yet',
     explore_catalog: 'Explore the Catalog',
-    search_placeholder: 'Search your favorites...',
+    favorites_search_placeholder: 'Search your favorites...',
     filter_all: 'All',
     filter_livro: 'Books',
     filter_revista: 'Magazines',
@@ -70,7 +70,7 @@ const favoritosTranslations = {
     added_on: 'Agregado el',
     empty_favoritos: 'Aún no tienes ningún elemento en favoritos',
     explore_catalog: 'Explorar el Catálogo',
-    search_placeholder: 'Buscar en tus favoritos...',
+    favorites_search_placeholder: 'Buscar en tus favoritos...',
     filter_all: 'Todos',
     filter_livro: 'Libros',
     filter_revista: 'Revistas',
@@ -107,7 +107,15 @@ if (typeof dashboardTranslations !== 'undefined') {
 // ===================== AUXILIARES =====================
 if (typeof window.getCurrentLanguage !== 'function') {
   window.getCurrentLanguage = function () {
-    return localStorage.getItem('dashboard_lang') || 'pt';
+    let idioma = localStorage.getItem('siga-idioma');
+    if (!idioma) {
+      idioma = localStorage.getItem('dashboard_lang');
+      if (idioma) {
+        localStorage.setItem('siga-idioma', idioma);
+        localStorage.removeItem('dashboard_lang');
+      }
+    }
+    return idioma || 'pt';
   };
 }
 
@@ -339,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFavoritosToolbar();
 
   window.addEventListener('storage', (e) => {
-    if (e.key === 'dashboard_lang') applyFavoritosLanguage(e.newValue || 'pt');
+    if (e.key === 'siga-idioma') applyFavoritosLanguage(e.newValue || 'pt');
   });
 
   document.addEventListener('languageChanged', (e) => {

@@ -113,7 +113,7 @@
   font-size: 0.875rem;
   color: #1e293b;
   background: #f8fafc;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 .fav-search input::placeholder { color: #9aa7ba; }
 .fav-search input:focus {
@@ -142,27 +142,20 @@
   font-weight: 600;
   color: #475569;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
-}
-.fav-chip i {
-  font-size: 0.6875rem;
-  opacity: 0.75;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 .fav-chip:hover:not(:disabled) {
   border-color: var(--primary-color, #0b4b9b);
   color: var(--primary-color, #0b4b9b);
-  transform: translateY(-1px);
 }
 .fav-chip.active {
   background: var(--primary-color, #0b4b9b);
   border-color: var(--primary-color, #0b4b9b);
   color: #fff;
 }
-.fav-chip.active i { opacity: 1; }
 .fav-chip.active:disabled {
   cursor: default;
   opacity: 1;
-  transform: none;
 }
 
 .fav-chip .chip-count {
@@ -348,6 +341,10 @@
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+#favoritos-grid:not(.list-view) .btn-remover-favorito:not(:disabled) {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
 .btn-remover-favorito:hover {
   background: var(--danger-color, #e74c3c);
   color: #fff;
@@ -406,10 +403,28 @@
 .catalog-grid.list-view .card-capa {
   position: static;
   overflow: visible;
-  width: 96px;
-  min-width: 96px;
-  height: 96px;
-  border-radius: 14px 0 0 14px;
+  width: 76px;
+  min-width: 76px;
+  height: 112px;
+  flex: 0 0 76px;
+  border-radius: 10px;
+  background: #e9edf3;
+}
+
+.catalog-grid.list-view .card-capa img {
+  border-radius: 10px;
+  object-position: center top;
+}
+
+.catalog-grid.list-view .capa-placeholder {
+  gap: 0;
+  padding: 6px;
+  border-radius: 10px;
+  font-size: 1.75rem;
+}
+
+.catalog-grid.list-view .capa-placeholder span {
+  display: none;
 }
 
 .catalog-grid.list-view .card-info {
@@ -582,7 +597,8 @@
   .catalog-grid.list-view .card-capa {
     width: 76px;
     min-width: 76px;
-    height: 76px;
+    height: 112px;
+    flex-basis: 76px;
   }
   .catalog-grid.list-view .card-info {
     padding: 10px 50px 10px 14px;
@@ -596,6 +612,13 @@
   .fav-hero { flex-direction: column; align-items: flex-start; }
   .stat-pill { width: 100%; }
 
-  .fav-chip .chip-label { display: none; }
-  .fav-chip { padding: 8px 12px; }
+}
+
+@media (max-width: 640px) {
+  .catalog-grid.list-view .card-capa {
+    width: 64px;
+    min-width: 64px;
+    height: 94px;
+    flex-basis: 64px;
+  }
 }

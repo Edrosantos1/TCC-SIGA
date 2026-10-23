@@ -70,13 +70,14 @@ if ($db) {
             l.nome_aluno AS aluno,
             l.serie_aluno AS serie,
             e.titulo_item AS material,
-            'Livro' AS tipo,
+            CASE c.tipo WHEN 'revista' THEN 'Revista' WHEN 'tcc' THEN 'TCC' ELSE 'Livro' END AS tipo,
             e.data_emprestimo,
             e.data_devolucao_prevista AS data_limite,
             e.status
         FROM emprestimos e
         INNER JOIN login_aluno l ON e.id_aluno = l.id_aluno
-        WHERE e.status IN ('emprestado', 'atrasado', 'devolucao_solicitada')
+        LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
+        WHERE e.status IN ('emprestado', 'atrasado')
     ";
     $params = [];
     $param_types = '';
@@ -133,23 +134,20 @@ foreach ($pendencias as &$p) {
     $prazo_vencido = $dias_diff < 0;
     $dias_prazo_exibicao = $dias_diff;
 
-    $p['atraso_pendente'] = $p['status'] === 'devolucao_solicitada' && $prazo_vencido;
     if ($p['status'] === 'atrasado' && !$prazo_vencido) {
         $p['status'] = 'emprestado';
-    } elseif ($p['status'] !== 'devolucao_solicitada' && $p['status'] !== 'devolvido' && $prazo_vencido) {
+    } elseif ($p['status'] !== 'devolvido' && $prazo_vencido) {
         $p['status'] = 'atrasado';
     }
 
-    if ($p['status'] === 'atrasado' || $p['atraso_pendente']) {
+    if ($p['status'] === 'atrasado') {
         $p['dias_restantes'] = $dias_prazo_exibicao;
         $p['dias_atraso'] = abs($dias_prazo_exibicao);
         $total_atrasados++;
     } else {
         $p['dias_restantes'] = $dias_prazo_exibicao;
         $p['dias_atraso'] = 0;
-        if ($p['status'] !== 'devolucao_solicitada') {
-            $total_no_prazo++;
-        }
+        $total_no_prazo++;
         if ($dias_prazo_exibicao === 0) $total_vence_hoje++;
     }
 }
@@ -164,7 +162,7 @@ if ($db) {
     $sql_alunos = "
         SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
         FROM login_aluno a
         ORDER BY a.nome_aluno
     ";
@@ -420,6 +418,9 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <a href="catalogo_adm.php" class="empty-cta" id="empty-catalogo">
                         <i class="fas fa-book"></i> Ir para o Catálogo
                     </a>
+                    <button type="button" class="empty-cta" id="empty-limpar" style="display: none;">
+                        <i class="fas fa-filter-circle-xmark"></i> Limpar filtros
+                    </button>
                 </div>
             </div>
 

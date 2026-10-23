@@ -480,7 +480,6 @@
 .status-emprestado { background: #eafaf1; color: #1e8449; border-color: #d4f0e0; }
 .status-atrasado   { background: #fef0ef; color: #c0392b; border-color: #fde2df; }
 .status-devolvido  { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
-.status-devolucao_solicitada { background: #eef2ff; color: #3730a3; border-color: #c7d2fe; }
 
 /* ========== AÇÕES ========== */
 .acoes-cell { text-align: center; white-space: nowrap !important; }
@@ -1086,7 +1085,7 @@ body.tema-alto_contraste .modal-box h3,
 body.tema-alto_contraste .modal-info-value { color: #fff; background: transparent; }
 body.tema-alto_contraste .aluno-serie,
 body.tema-alto_contraste .page-subtitle { color: #ddd; }
-body.tema-alto_contraste mark { background: #ff0; color: #000; }
+body.tema-alto_contraste mark { background: #fff; color: #000; }
 body.tema-alto_contraste .modal-header { background: #000; border-bottom-color: #fff; }
 body.tema-alto_contraste .modal-info-row { border-bottom-color: #666; }
 body.tema-alto_contraste .modal-aviso { background: #000; border-color: #fff; color: #fff; }

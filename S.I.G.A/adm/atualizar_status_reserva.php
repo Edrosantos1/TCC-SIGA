@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 
 // Verifica se o admin está logado
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
     $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
@@ -45,6 +48,9 @@ if (isset($_POST['id']) && is_numeric($_POST['id'])) {
         exit;
     }
 
+    // Guarda os dados antes de mudar o status, para avisar o aluno depois.
+    $reservasParaAvisar = siga_buscar_reservas_pendentes($db, [$id]);
+
     try {
         if ($db instanceof mysqli) {
             $stmt = $db->prepare("UPDATE reservas SET status = ? WHERE id_reserva = ? AND status = 'pendente'");
@@ -61,6 +67,7 @@ if (isset($_POST['id']) && is_numeric($_POST['id'])) {
         }
 
         if ($afetadas > 0) {
+            siga_notificar_decisao_reservas($db, $reservasParaAvisar, $status);
             $_SESSION['msg_sucesso'] = "Reserva $status com sucesso!";
         } else {
             $_SESSION['msg_erro'] = 'Reserva não encontrada ou já foi processada.';
@@ -90,6 +97,9 @@ if (isset($_POST['acao']) && in_array($_POST['acao'], ['aprovar', 'rejeitar']) &
 
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
 
+    // Guarda os dados antes de mudar o status, para avisar os alunos depois.
+    $reservasParaAvisar = siga_buscar_reservas_pendentes($db, $ids);
+
     try {
         $sql = "UPDATE reservas SET status = ? WHERE id_reserva IN ($placeholders) AND status = 'pendente'";
         if ($db instanceof mysqli) {
@@ -110,6 +120,7 @@ if (isset($_POST['acao']) && in_array($_POST['acao'], ['aprovar', 'rejeitar']) &
         }
 
         if ($afetadas > 0) {
+            siga_notificar_decisao_reservas($db, $reservasParaAvisar, $status);
             $_SESSION['msg_sucesso'] = "$afetadas reserva" . ($afetadas > 1 ? 's' : '') . " $status com sucesso!";
         } else {
             $_SESSION['msg_erro'] = 'Nenhuma reserva pendente foi atualizada. Verifique se já foram processadas.';

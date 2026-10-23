@@ -1,9 +1,9 @@
-﻿-- phpMyAdmin SQL Dump
+-- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 08/10/2026 às 16:26
+-- Tempo de geração: 23/10/2026 às 05:00
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -48,92 +48,36 @@ CREATE TABLE `catalogo` (
 --
 
 INSERT INTO `catalogo` (`id_catalogo`, `titulo`, `autor`, `tipo`, `editora`, `ano_publicacao`, `isbn`, `descricao`, `quantidade`, `localizacao`, `capa_url`, `destaque`, `data_cadastro`) VALUES
-(2, 'A Literatura brasileira', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(47, 'A poética do recorte', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(54, 'A primeira aula', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(59, 'A Ficção da Página: Seleção de Ensaios sobre a Literatura Brasileira', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(65, 'A nova literatura', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(70, 'A Academia brasileira de letras', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(102, 'A Maquina Performatica', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(115, 'A Escrita da Cidade', NULL, 'livro', NULL, NULL, NULL, NULL, 1, NULL, NULL, 0, '2026-09-23 11:32:27'),
-(132, 'História da Literatura Brasileira', 'José Verìssimo', 'livro', 'BoD - Books on Demand', 2024, '9791043106644', '\"História da Literatura Brasileira\" de José Veríssimo é uma obra seminal que examina a evolução da literatura no Brasil desde suas origens até o início do século XX. Publicada em 1916, esta obra é uma das primeiras tentativas de sistematizar e analisar criticamente a produção literária brasileira. José Veríssimo, um dos fundadores da Academia Brasileira de Letras, foi um crítico literário e historiador que desempenhou um papel fundamental na consolidação dos estudos literários no Brasil. \"História da Literatura Brasileira\" de José Veríssimo é uma obra monumental que oferece uma análise abrangente e crítica da evolução da literatura no Brasil. Combinando erudição e clareza, Veríssimo fornece uma visão detalhada dos principais movimentos literários e dos autores que moldaram a literatura brasileira, tornando-se uma leitura essencial para a compreensão do desenvolvimento literário do país.', 3, 'P10', 'assets/capas/132.jpg', 0, '2026-09-30 15:36:07'),
-(133, 'Literatura brasileira', 'Desconhecido', 'livro', '', 2010, 'N/A', '', 4, 'P8', '', 0, '2026-09-30 15:36:07'),
-(134, 'Senhora', 'José de Alencar', 'livro', 'Barsa Literatura', 2024, '9788542221114', 'Senhora\" é uma obra clássica da literatura brasileira, escrita por José de Alencar, que mergulha o leitor em uma narrativa rica e envolvente. Através de suas páginas, você será transportado para o século XIX, onde a história de amor e os dilemas sociais da época se entrelaçam de forma magistral. Este livro, publicado pela Editora Planeta do Brasil LTDA, é uma excelente adição à sua coleção literária. Com um formato físico, ele proporciona uma experiência de leitura tangível, permitindo que você aprecie cada detalhe da obra enquanto desfruta do prazer de folhear suas páginas. Escrito em português, \"Senhora\" é acessível a todos que desejam explorar a profundidade da literatura nacional. A obra não apenas entretém, mas também provoca reflexões sobre o papel da mulher na sociedade, tornando-se uma leitura essencial para quem busca compreender as nuances da cultura brasileira. Adquira \"Senhora\" e permita-se vivenciar uma história que transcende o tempo, enriquecendo sua biblioteca pessoal e sua compreensão da literatura. É uma oportunidade de se conectar com um dos grandes clássicos da literatura brasileira e apreciar a beleza da prosa de Alencar. Aurélia, filha de uma costureira pobre, é apaixonada por Fernando Seixas. Porém, ele prefere ficar com uma moça rica que pode lhe dar um bom futuro. Uma reviravolta faz com que o homem fique à mercê das vontades de Aurélia.', 1, 'P9', 'assets/capas/134.jpg', 0, '2026-09-30 15:36:07'),
-(135, 'Insônia', 'Graciliano Ramos', 'livro', 'Editora Record', 2013, '9788501404411', 'Clássico de um dos maiores escritores da literatura brasileira, autor de Vidas secas e S. Bernardo. Esta obra reúne treze contos de Graciliano Ramos, em que estão presentes a secura emotiva e a economia vocabular, características estilísticas do autor, que convivem com a precisão psicológica. Neste livro, Graciliano amplia os cenários em que seus personagens interagem, inserindo-os no mundo da cidade, no qual os dilemas do ser humano são tratados a partir dos medos e inseguranças de seus protagonistas com problemas próprios das urbes, como a violência, a fragilidade dos relacionamentos estabelecidos e o progresso atroz e irreversível do concreto armado.', 2, 'P1', 'assets/capas/135.jpg', 0, '2026-09-30 15:36:08'),
-(136, 'Presença da literatura brasileira', 'Antônio Cândido, José Aderaldo Castello', 'livro', '', 2001, 'N/A', '', 1, 'P1', 'assets/capas/136.jpg', 0, '2026-09-30 15:36:08'),
-(137, 'Breves estudos de literatura brasileira', 'Cassiano Nunes', 'livro', '', 1969, 'N/A', '', 5, 'P2', 'assets/capas/137.jpg', 0, '2026-09-30 15:36:08'),
-(138, 'Representação literária do indígena na literatura brasileira', 'Danglei de Castro Pereira', 'livro', '', 2021, '6556372692', '', 3, 'P8', '', 0, '2026-09-30 15:36:09'),
-(139, 'Estudos de literatura brasileira', 'Haroldo Bruno', 'livro', '', 1966, 'N/A', '', 4, 'P10', 'assets/capas/139.jpg', 0, '2026-09-30 15:36:09'),
-(140, 'O negro na literatura brasileira', 'Raymond S. Sayers', 'livro', '', 1958, 'N/A', '', 4, 'P8', 'assets/capas/140.jpg', 0, '2026-09-30 15:36:09'),
-(141, 'The Cambridge History of Latin American Literature', 'Roberto Gonzalez Echevarría, Enrique Pupo-Walker', 'livro', 'Cambridge University Press', 1996, '0521410355', 'The Cambridge History of Latin American Literature is by far the most comprehensive work of its kind ever written. Its three volumes cover the whole sweep of Latin American literature (including Brazilian) from pre-Colombian times to the present, and contain chapters on Latin American writing in the USA. Volume 3 is devoted partly to the history of Brazilian literature, from the earliest writing through the colonial period and the Portuguese-language traditions of the nineteenth and twentieth centuries; and partly also to an extensive bibliographical section in which annotated reading lists relating to the chapters in all three volumes of The Cambridge History of Latin American Literature are presented. These bibliographies are a unique feature of the History, further enhancing its immense value as a reference work.', 5, 'P7', 'assets/capas/141.jpg', 0, '2026-09-30 15:36:09'),
-(142, 'Tempos da literatura brasileira', 'Benjamin Abdala Júnior, Samira Campedelli', 'livro', '', 1985, 'N/A', '', 2, 'P1', 'assets/capas/142.jpg', 0, '2026-09-30 15:36:12'),
-(143, 'Literatura brasileira contemporânea', 'Regina Dalcastagnè', 'livro', '', 2012, 'N/A', '', 1, 'P9', 'assets/capas/143.jpg', 0, '2026-09-30 15:36:12'),
-(144, 'O romance histórico na literatura brasileira', 'José Antônio Pereira Ribeiro', 'livro', '', 1976, 'N/A', '', 4, 'P7', 'assets/capas/144.jpg', 0, '2026-09-30 15:36:12'),
-(145, 'Brasil Na América Latina, O', 'Hartmut Sangmeister, Sérgio Costa, Arbeitsgemeinschaft Deutsche Lateinamerika-Forschung. Symposium', 'livro', 'Annablume', 2007, '8574197629', '', 4, 'P1', 'assets/capas/145.jpg', 0, '2026-09-30 15:36:13'),
-(146, 'Catalog of the Latin American Collection', 'University of Texas at Austin. Library. Latin American Collection', 'livro', '', 1969, 'N/A', '', 3, 'P2', 'assets/capas/146.jpg', 0, '2026-09-30 15:36:13'),
-(147, 'Estudos de cultura e literatura brasileira', 'Jorge de Sena', 'livro', '', 1988, 'N/A', '', 4, 'P7', 'assets/capas/147.jpg', 0, '2026-09-30 15:36:13'),
-(148, 'Origens da literatura brasileira', 'Desconhecido', 'livro', '', 1979, 'N/A', '', 5, 'P9', 'assets/capas/148.jpg', 0, '2026-09-30 15:36:14'),
-(149, 'Literatura brasileira ...', 'Alvaro Guerra', 'livro', '', 1923, 'N/A', '', 4, 'P1', 'assets/capas/149.jpg', 0, '2026-09-30 15:36:14'),
-(150, 'Bending the Rules in the Quest for an Authentic Female Identity', 'Cristina Santos', 'livro', 'Peter Lang', 2004, '0820469173', 'The narrative style of both Clarice Lispector and Carmen Boullosa is characterized by a postmodern tendency toward an increased reader participation. This is accomplished by a process of liberalizing a pre-established socio-cultural repertoire with respect to female identity. The female protagonists, created by Lispector and Boullosa and examined in this book, struggle to find their true voices and their real life experiences. The resulting literary style of both these authors parallels this struggle, subverting traditional narrative structure and utilizing a dialogue that is particularly suited to describe this feminine process of conscientization.', 3, 'P6', 'assets/capas/150.jpg', 0, '2026-09-30 15:36:14'),
-(151, 'Revista da Academia Brasileira de Letras', 'Academia Brasileira de Letras', 'livro', '', 1929, 'N/A', '', 1, 'P2', 'assets/capas/151.jpg', 0, '2026-09-30 15:36:15'),
-(152, 'Antologia escolar de literatura brasileira', 'Maria Magaly Trindade Gonçalves, Zélia Maria Thomaz de Aquino', 'livro', '', 1998, 'N/A', 'Antologia Escolar de Literatura Brasileira abarca 500 anos de nosso cânon literário, desde o Descobrimento do Brasil. Reúne poetas e prosadores, a partir de Anchieta, o primeiro de nossos professores a cultivar a palavra artística na escola, até autores modernos e contemporâneos. Livro não efêmero, feito para acompanhar cada aluno, da infância no 1o grau à universidade. Também para ser lido em casa, entre amigos e familiares. Um livro escolar que não exclui os outros livros didáticos, capaz de conviver com os demais, onde cada texto motiva para a leitura de novos textos. Ter a literatuta na memória, pois o instrumental das mais avançadas tecnologias só se realiza com o conhecimento literário, mistérios que se complementam em aventura ou ventura e domínio, a fazer de cada criança ou adolescente o ser humano educado.', 5, 'P4', 'assets/capas/152.jpg', 0, '2026-09-30 15:36:15'),
-(153, 'Brazilian Literature', 'David William Foster, Walter Rela', 'livro', 'Scholarly Title', 1990, 'N/A', '', 5, 'P1', 'assets/capas/153.jpg', 0, '2026-09-30 15:36:15'),
-(154, 'História da Literatura Brasileira - Vol. III', 'Massaud Moisés', 'livro', 'Editora Cultrix', 2020, '9788531615733', 'Este volume de História da Literatura Brasileira, dedicado ao estudo das correntes do Modernismo, não apenas foi inteiramente revisto como também atualizado, a fim de acompanhar a criação literária das últimas décadas. Massaud Moisés percorreu os momento sem que se pode fragmentar a modernidade entre nós, desde a Semana de Arte Moderna até o fim do século XX: de 1922 a 1928, fase de implantação do ideário modernista; de 1928 a 1945, de consolidação das conquistas renovadoras; e de 1945 em diante, a geração do pós-guerra, chegando a uma análise minuciosa das tendências contemporâneas. O resultado é um panorama das nossas letras a partir dos anos 1920, que se recomenda pela soma de informações recolhidas e pelo balanço crítico, tornando este livro indispensável a todos que desejam uma visão ampla, fecunda e renovadora da nossa modernidade literária nas diversas facetas que veio exibindo ao longo de mais de oito decênios.', 2, 'P6', 'assets/capas/154.jpg', 0, '2026-09-30 15:36:16'),
-(155, 'Escritos de literatura brasileira', 'Letícia Malard', 'livro', '', 1981, 'N/A', '', 3, 'P9', 'assets/capas/155.jpg', 0, '2026-09-30 15:36:16'),
-(156, 'Catalog', 'University of Texas. Library. Latin American Collection', 'livro', '', 1969, 'N/A', '', 2, 'P10', 'assets/capas/156.jpg', 0, '2026-09-30 15:36:16'),
-(157, 'Por uma história da literatura brasileira contemporânea', 'Wellington Furtado Ramos, Erick Vinicius Mathias Leite', 'livro', 'Paco e Littera', 2023, '9788546223749', 'Orientado pelo esforço de construir uma história da literatura brasileira contemporânea, aquela possível a partir de perspectivas teóricas as mais variadas e que se dedicam à maior variedade possível de autores, o volume foi organizado a partir de uma chamada que possibilitasse aos pesquisadores submeterem seus manuscritos desde que comprometidos: com a apresentação de autor e obra; com uma abordagem analítica que considerasse o aspecto formal/linguístico dos textos literários; e com obras localizadas no intervalo de publicação de 1975 a 2021. Assim nasceu a coletânea que o leitor tem em mãos, um convite à leitura das obras dos autores nela tratadas.', 1, 'P3', 'assets/capas/157.jpg', 0, '2026-09-30 15:36:17'),
-(158, 'Dictionary Catalog of the University Library, 1919-1962', 'University of California, Los Angeles. Library', 'livro', '', 1963, 'N/A', '', 5, 'P8', 'assets/capas/158.jpg', 0, '2026-09-30 15:36:19'),
-(159, 'Listening to the People\'s Voice', 'Mark Dinneen', 'livro', 'Routledge', 1996, 'N/A', 'First published in 1996. Routledge is an imprint of Taylor & Francis, an informa company.', 1, 'P6', 'assets/capas/159.jpg', 0, '2026-09-30 15:36:19'),
-(160, 'Brazil', 'Ronald M. Harmon, Bobby J. Chamberlain', 'livro', '', 1975, 'N/A', '', 3, 'P10', 'assets/capas/160.jpg', 0, '2026-09-30 15:36:20'),
-(161, 'Vultos e livros: Academia brasileira de letras. 1. serie', 'Arthur Motta', 'livro', '', 1921, 'N/A', '', 1, 'P1', 'assets/capas/161.jpg', 0, '2026-09-30 15:36:20'),
-(162, 'A Current Bibliography on African Affairs', 'Desconhecido', 'livro', '', 1987, 'N/A', '', 4, 'P5', 'assets/capas/162.jpg', 0, '2026-09-30 15:36:20'),
-(163, 'MLA International Bibliography of Books and Articles on the Modern Languages and Literatures', 'Desconhecido', 'livro', '', 1977, 'N/A', 'Vols. for 1969- include ACTFL annual bibliography of books and articles on pedagogy in foreign languages 1969-', 1, 'P7', 'assets/capas/163.jpg', 0, '2026-09-30 15:36:21'),
-(164, 'Monographic Series', 'Library of Congress', 'livro', '', 1974, 'N/A', '', 5, 'P3', 'assets/capas/164.jpg', 0, '2026-09-30 15:36:21'),
-(165, 'Cassell\'s Encyclopædia of World Literature: Histories and general articles, Biographies to 1914 A-H', 'Sigfrid Henry Steinberg', 'livro', '', 1954, 'N/A', '', 4, 'P10', 'assets/capas/165.jpg', 0, '2026-09-30 15:36:21'),
-(166, 'Veja', 'Desconhecido', 'livro', '', 1990, 'N/A', '', 2, 'P8', 'assets/capas/166.jpg', 0, '2026-09-30 15:36:22'),
-(167, 'Pequena historia da literatura brasileira', 'Ronald de Carvalho', 'livro', '', 1925, 'N/A', '', 4, 'P7', 'assets/capas/167.jpg', 0, '2026-09-30 15:36:22'),
-(168, 'Charts of Brazilian Literature', 'Joseph Newhall Lincoln', 'livro', '', 1947, 'N/A', '', 1, 'P8', 'assets/capas/168.jpg', 0, '2026-09-30 15:36:22'),
-(169, 'Luso-Braz. Rev', 'Desconhecido', 'livro', '', 2001, 'N/A', '', 4, 'P1', 'assets/capas/169.jpg', 0, '2026-09-30 15:36:23'),
-(170, 'Science & Society', 'Bernhard Joseph Stern', 'livro', '', 1942, 'N/A', 'Includes section \"Book reviews.\"', 5, 'P10', 'assets/capas/170.jpg', 0, '2026-09-30 15:36:24'),
-(171, 'Library of Congress Catalogs', 'Library of Congress', 'livro', '', 1960, 'N/A', '', 5, 'P6', 'assets/capas/171.jpg', 0, '2026-09-30 15:36:24'),
-(172, 'Cassell\'s Encyclopædia of World Literature', 'Sigfrid Henry Steinberg', 'livro', '', 1954, 'N/A', '', 4, 'P1', 'assets/capas/172.jpg', 0, '2026-09-30 15:36:24'),
-(173, 'Tornar-se outro', 'Maria Cândida Ferreira de Almeida', 'livro', '', 2002, 'N/A', '', 3, 'P10', 'assets/capas/173.jpg', 0, '2026-09-30 15:36:25'),
-(174, 'Ariano Suassuna\'s A Pedra Do Reino', 'Candace Adelaide Slater', 'livro', '', 1975, 'N/A', '', 2, 'P2', 'assets/capas/174.jpg', 0, '2026-09-30 15:36:25'),
-(175, 'Subject Index of the Modern Works Added to the British Museum Library', 'Desconhecido', 'livro', '', 1956, 'N/A', '', 3, 'P9', 'assets/capas/175.jpg', 0, '2026-09-30 15:36:27'),
-(176, 'História da literatura brasileira: Realismo e simbolismo', 'Massaud Moisés', 'livro', '', 2001, '8531606985', '', 3, 'P6', '', 0, '2026-09-30 15:36:28'),
-(177, 'Sobre os ombros de gigantes', 'Maria Inês de Moraes Marreco', 'livro', '', 2022, '6500411757', '', 1, 'P6', '', 0, '2026-09-30 15:36:28'),
-(178, 'Catalog of the Oliveira Lima Library', 'Oliveira Lima Library', 'livro', 'Boston, Mass : G. K. Hall', 1970, 'N/A', '', 1, 'P5', 'assets/capas/178.jpg', 0, '2026-09-30 15:36:28'),
-(179, 'Brazilian Art', 'Brasil. Ministério das Relações Exteriores', 'livro', '', 1976, 'N/A', '\"The purpose of this publication of the ministry of External Relations is to offer to foreign readers a brief profile of Art in Brazil. The text endeavours to point out the principal historical phases and give special emphasis to the highlights of Brazilian culture\"--Pref.', 2, 'P4', 'assets/capas/179.jpg', 0, '2026-09-30 15:36:28'),
-(180, 'Obras completas de Castro Alves', 'Castro Alves', 'livro', '', 1938, 'N/A', '', 2, 'P5', 'assets/capas/180.jpg', 0, '2026-09-30 15:36:28'),
-(181, 'Poetas brasileros', 'Enrique Bustamante y Ballivián', 'livro', '', 1922, 'N/A', '', 1, 'P5', 'assets/capas/181.jpg', 0, '2026-09-30 15:36:29'),
-(182, 'Recent Brazilian Acquisitions of the Latin American Collection of the University of Texas Library', 'University of Texas. Library. Latin American Collection', 'livro', '', 1968, 'N/A', '', 2, 'P3', 'assets/capas/182.jpg', 0, '2026-09-30 15:36:29'),
-(183, 'Introdução à literatura brasileira', 'Alceu Amoroso Lima', 'livro', '', 1995, '8522003890', '', 4, 'P3', '', 0, '2026-09-30 15:36:29'),
-(184, 'The Hispanic American Historical Review', 'James Alexander Robertson', 'livro', '', 1938, 'N/A', 'Includes \"Bibliographical section\".', 4, 'P8', 'assets/capas/184.jpg', 0, '2026-09-30 15:36:29'),
-(185, 'The National Union Catalog, Pre-1956 Imprints', 'Desconhecido', 'livro', '', 1968, 'N/A', '', 2, 'P9', 'assets/capas/185.jpg', 0, '2026-09-30 15:36:30'),
-(186, 'Cassell\'s Encyclopaedia of Literature: Histories of the literatures of the world; and general literary subjects ; Biographies of authors who died before 1 August 1914 [A', 'Sigfrid Henry Steinberg', 'livro', '', 1953, 'N/A', '', 1, 'P3', 'assets/capas/186.jpg', 0, '2026-09-30 15:36:30'),
-(187, 'Brasil', 'Desconhecido', 'livro', '', 1988, 'N/A', '', 1, 'P7', 'assets/capas/187.jpg', 0, '2026-09-30 15:36:30'),
-(188, 'Dictionary Catalog of the Jesse E. Moorland Collection of Negro Life and History, Howard University Library, Washington, D.C.', 'Moorland Foundation', 'livro', '', 1970, 'N/A', '', 2, 'P4', 'assets/capas/188.jpg', 0, '2026-09-30 15:36:30'),
-(189, 'Literatura Brasileira em Foco IX', 'Leonardo Davino de Oliveira', 'livro', '', 2022, '6559660982', '', 2, 'P5', '', 0, '2026-09-30 15:36:31'),
-(190, 'Duas dezenas de imortais, vivos alguns, outros desaparecidos: Autores desaparecidos (2a dezena): Artur Azevedo, Dantas Barreto, Euclides da Cunha, José Veríssimo, Lauro Müler, Machado de Assis, Osório Duque Estrada, Rui Barbosa, Santos Dumont e Sí...', 'Liberato Bittencourt', 'livro', '', 1935, 'N/A', '', 3, 'P1', 'assets/capas/190.jpg', 0, '2026-09-30 15:36:31'),
-(191, 'Escritores são humanos', 'Carlos Costa', 'livro', '', 2023, '6554391584', '', 2, 'P6', '', 0, '2026-09-30 15:36:31'),
-(192, 'Espaços possíveis na literatura brasileira contemporânea', 'Desconhecido', 'livro', '', 2015, '8580490324', '', 3, 'P3', '', 0, '2026-09-30 15:36:31'),
-(193, 'Biographical Dictionaries and Related Works', 'Robert B. Slocum', 'livro', '', 1986, 'N/A', '', 2, 'P7', 'assets/capas/193.jpg', 0, '2026-09-30 15:36:31'),
-(194, 'Literatura brasileira no exterior', 'Alexandre Pilati', 'livro', '', 2024, '8521703597', '', 2, 'P9', '', 0, '2026-09-30 15:36:33'),
-(195, 'Diálogos com a literatura brasileira', 'Marco Vasques', 'livro', '', 2004, 'N/A', '', 5, 'P8', 'assets/capas/195.jpg', 0, '2026-09-30 15:36:33'),
-(196, 'Subject Catalog', 'Library of Congress', 'livro', '', 0, 'N/A', '', 2, 'P6', 'assets/capas/196.jpg', 0, '2026-09-30 15:36:33'),
-(197, 'Literary Cultures of Latin America : a Comparative History: Configurations of literary culture', 'Mario J. Valdés, Djelal Kadir', 'livro', 'Oxford University Press, USA', 2004, 'N/A', 'In three volumes of expert, innovative scholarship, Literary Cultures of Latin America offers a multidisciplinary reference on one of the most distinctive literary cultures in the world. In topically arranged articles written by a team of international scholars, Literary Cultures of Latin America explores the shifting problems that have arisen across national borders, geographic regions, time periods, linguistic systems, and cultural traditions in literary history. Bucking the tradition of focusing almost exclusively on the great canons of literature, this unique reference work casts its net wider, exploring pop culture, sermons, scientific essays, and more. While collaborators are careful to note that these volumes offer only a snapshot of the diverse body of Latin American literature, Literary Cultures of Latin America highlights unique cultural perspectives that have never before received academic attention. Comprised of signed articles each with complete bibliographies, this unique reference also takes into account relevant political, anthropological, economic, geographic, historical, demographic, and sociological research in order to understand the full context of each community\'s literature.', 4, 'P6', 'assets/capas/197.jpg', 0, '2026-09-30 15:36:33'),
-(198, 'G.K. Hall Bibliographic Guide to Latin American Studies', 'Benson Latin American Collection', 'livro', '', 2000, 'N/A', '', 5, 'P9', 'assets/capas/198.jpg', 0, '2026-09-30 15:36:34'),
-(199, 'Aspectos da literatura brasileira', 'Paulo Roberto Correia de Oliveira', 'livro', '', 2018, '8561817534', '', 5, 'P9', '', 0, '2026-09-30 15:36:34'),
-(200, 'Narrativas contemporâneas', 'Gínia Maria Gomes', 'livro', '', 2012, '8588412691', 'Esta obra reúne ensaios críticos centrados em romances e contos publicados, sobretudo, no século XXI. Sumário - Percursos da narrativa contemporânea; Teorias da cidade - do moderno ao pós-moderno; Cidade livre - fundação e memória cultural; Fisiognomia da contemporaneidade em Eles eram muitos cavalos, de Luiz Ruffato; Estraneidade e exclusão na São Petersburgo de O filho da mãe, de Bernardo Carvalho; Os percalços da memória em Leite derramado, de Chico Buarque; A prosa agonizante de Diário de um fescenino - antecedentes e condicionantes; O tempo no romance brasileiro contemporâneo; \'Pobre diabo\' e dissolução em A arte de produzir efeito sem causa, de Lourenço Mutarelli; Paredes do silêncio ou silêncios no escuro? Reflexões sobre o romance de Altair Martins; À sombra da cal, uma leitura de Ricardo Dicke; Entrecruzamento de vozes narrativas em Nove noites; Os (des)caminhos da Galileia - uma leitura do romance de Ronaldo Correia de Brito; Relato de um certo Oriente, de Milton Hatoum - a reconstrução do ser através da memória; Elementos para um estudo enunciativo de Leite derramado, de Chico Buarque.', 3, 'P8', '', 0, '2026-09-30 15:36:34'),
-(201, 'Contemporâneos', 'Beatriz Resende', 'livro', '', 2008, '8577340945', 'Em ensaios sobre a produção atual, Beatriz Resende analisa o papel da cidade, da violência e da internet nos novos romances, crônicas e contos. Em \'Contemporâneos - Expressões da Literatura Brasileira no Século XXI\', a autora analisa a obra de escritores como Bernardo Carvalho, Daniel Galera, Cecília Giannetti, Ana Paula Maia, Santiago Nazarian, Joca Terron, Marçal Aquino, Maira Parula, Paloma Vidal, Marcelino Freire e Luiz Schwarcz.', 4, 'P7', '', 0, '2026-09-30 15:36:34'),
-(202, 'Post-scripta', 'Silvia Albertazzi, Gabriella Imposti, Donatella Possamai', 'livro', 'Il Poligrafo', 2005, 'N/A', '', 3, 'P2', 'assets/capas/202.jpg', 0, '2026-09-30 15:36:34'),
-(203, 'The National union catalog, 1968-1972', 'Desconhecido', 'livro', '', 1973, 'N/A', '', 2, 'P10', 'assets/capas/203.jpg', 0, '2026-09-30 15:36:34'),
-(204, 'Estudios latinoamericanos', 'Desconhecido', 'livro', '', 1990, 'N/A', '', 5, 'P2', 'assets/capas/204.jpg', 0, '2026-09-30 15:36:35'),
-(205, 'Letras e literatos', 'José Veríssimo', 'livro', '', 1936, 'N/A', '', 3, 'P1', 'assets/capas/205.jpg', 0, '2026-09-30 15:36:35'),
-(206, 'O cego e o trapezista', 'Adriano Espínola', 'livro', 'Cepe editora', 2022, '9788578589714', 'Este livro reúne artigos e ensaios de Adriano Espínola, sobre os mais significativos escritores brasileiros, de diversos gêneros, do século XVI ao XXI. O traço em comum entre esses escritores é o fato de expressarem, direta ou indiretamente, a realidade humana, social e geográfica de um país em processo constante de construção e afirmação, em que pese as contradições surgidas devido às influências literárias externas - sobretudo europeias - e as manifestações linguísticas, sociais, afetivas e culturais internas.', 3, 'P7', 'assets/capas/206.jpg', 0, '2026-09-30 15:36:35'),
-(207, 'História da literatura brasileira, séculos XVI-XX.', 'Antônio Soares Amora', 'livro', '', 1965, 'N/A', '', 2, 'P9', 'assets/capas/207.jpg', 0, '2026-09-30 15:36:35'),
-(208, 'Actes du VIIIe congrès de l\'Association internationale de littérature comparée', 'Béla Köpeczi', 'livro', '', 1980, 'N/A', '', 4, 'P4', 'assets/capas/208.jpg', 0, '2026-09-30 15:36:36'),
-(209, 'Actes Du ... Congrès de L\'Association Internationale de Littérature Comparée', 'International Comparative Literature Association. Congress', 'livro', '', 1980, 'N/A', '', 3, 'P4', 'assets/capas/209.jpg', 0, '2026-09-30 15:36:36');
+(336, 'A literatura brasileira', 'José Aderaldo Castello', 'livro', 'EdUSP', 1999, '853140505X', '', 3, 'P7', 'assets/capas/gb_5e9a7695a06c0b1f.jpg', 0, '2026-10-23 02:58:31'),
+(337, 'Historia da literatura brasileira', 'José Veríssimo', 'livro', '', 1916, 'N/A', '', 2, 'P3', 'assets/capas/gb_bc3b3418057068d2.jpg', 0, '2026-10-23 02:58:31'),
+(338, 'Literatura brasileira', 'Pedro Julio Barbuda', 'livro', '', 1916, 'N/A', '', 2, 'P4', 'assets/capas/gb_bd1301928b9f5dad.jpg', 0, '2026-10-23 02:58:31'),
+(339, 'História da literatura brasileira: Formação e desenvolvimento autonômico da literatura nacional', 'Sílvio Romero', 'livro', '', 1943, 'N/A', '', 4, 'P1', 'assets/capas/gb_f9523c13625240f6.jpg', 0, '2026-10-23 02:58:31'),
+(340, 'História concisa da literatura brasileira', 'Alfredo Bosi', 'livro', 'Editora Cultrix', 1994, '8531601894', '\"In totally revised and updated edition by the author, that and professor of Brazilian Literature in the University of Sao Paulo, Cultrix presents to a university public this work again for he devoted, since it came to light in 1970, like the best in its genre. Divided into eight parts respectively dedicated to colonial condition, the Baroque, Arcadia and illustration, to Romanticism, the Pre-Modernism and Modernism and contemporary trends, the Concise History of Brazilian Literature, of each one of these moments an appreciation of their different trends by studying the following of its principal authors, about which provides the reader bibliographic data order besides a critical evaluation. And work that is especially recommended the attention of teachers and students of Brazilian Literature, both at the undergraduate or graduate level.\" --Translation of publisher\'s review.', 1, 'P7', 'assets/capas/gb_f1029d925a952e03.jpg', 0, '2026-10-23 02:58:31'),
+(341, 'A literatura brasileira', 'José Aderaldo Castello', 'livro', 'EdUSP', 1999, 'N/A', '', 3, 'P4', 'assets/capas/gb_73ce567815d4298d.jpg', 0, '2026-10-23 02:58:31'),
+(342, 'Espaços contemporâneos de Consagração e disseminação da Literatura Brasileira', 'Leni Nobre de Oliveira', 'livro', 'Editora Dialética', 2024, '9786525289403', 'Espaços contemporâneos de Consagração da Literatura Brasileira é um estudo profundo das diversas formas de consagração da Literatura brasileira que antecipa estudos na área de canonização literária, intersemiose e interdisciplinaridade na Literatura. Escrita numa linguagem acessível para professores do Ensino Básico, atende aos acadêmicos pela sua estrutura dinâmica, com vasta coleta de dados que comprovam hipóteses propostas pela autora e contribui decisivamente para o aprofundamento sobre a inclusão de novas formas de percepção do universo literário em suportes multimidiáticos. A obra contém uma arqueologia de indicação de obras em vestibulares, com base em 30 anos de vestibular da Universidade Federal de Minas Gerais e da Pontifícia Universidade Católica de Minas Gerais. Analisa a presença da Literatura em novelas, minisséries e filmes na teledramaturgia, enfocando particularmente a contribuição da Rede Globo na utilização de grandes autores em adaptações para a tela. No campo da poesia, demonstra de modo pertinente o consumo da lírica por meio das letras das músicas das trilhas sonoras dos produtos da TV brasileira, num momento em que o consumo de livros de poesia não se dá somente pela leitura do texto, mas pela audição das músicas. Com ampla pesquisa de campo, em entrevistas a estudantes, a autora analisa o contexto de recepção de obras literárias pelos vestibulandos e abre perspectivas para uma nova abordagem do ensino da Literatura Brasileira em sala de aula.', 2, 'P3', 'assets/capas/gb_69fa24d1e141e5c0.jpg', 0, '2026-10-23 02:58:31'),
+(343, 'Compendio de historia da literatura brasileira', 'Sílvio Romero, João Ribeiro', 'livro', '', 1909, 'N/A', '', 1, 'P9', 'assets/capas/gb_b5b8ab3d7f97075d.jpg', 0, '2026-10-23 02:58:31'),
+(344, 'História da Literatura Brasileira', 'José Verìssimo', 'livro', 'BoD - Books on Demand', 2024, '9791043106644', '\"História da Literatura Brasileira\" de José Veríssimo é uma obra seminal que examina a evolução da literatura no Brasil desde suas origens até o início do século XX. Publicada em 1916, esta obra é uma das primeiras tentativas de sistematizar e analisar criticamente a produção literária brasileira. José Veríssimo, um dos fundadores da Academia Brasileira de Letras, foi um crítico literário e historiador que desempenhou um papel fundamental na consolidação dos estudos literários no Brasil. \"História da Literatura Brasileira\" de José Veríssimo é uma obra monumental que oferece uma análise abrangente e crítica da evolução da literatura no Brasil. Combinando erudição e clareza, Veríssimo fornece uma visão detalhada dos principais movimentos literários e dos autores que moldaram a literatura brasileira, tornando-se uma leitura essencial para a compreensão do desenvolvimento literário do país.', 3, 'P9', 'assets/capas/gb_25daf45199e73633.jpg', 0, '2026-10-23 02:58:31'),
+(345, 'Panorama da literatura brasileira', 'Afrânio Peixoto', 'livro', '', 1940, 'N/A', '', 1, 'P10', 'assets/capas/gb_413d7e45df344ead.jpg', 0, '2026-10-23 02:58:31'),
+(346, 'Literatura brasileira ...', 'Alvaro Guerra', 'livro', '', 1923, 'N/A', '', 2, 'P2', 'assets/capas/gb_621e084a5fefb929.jpg', 0, '2026-10-23 02:58:31'),
+(347, 'Historia Da Literatura Brasileira', 'José Veríssimo', 'livro', '', 1929, 'N/A', '', 4, 'P4', 'assets/capas/gb_bb5eda275f8b3dec.jpg', 0, '2026-10-23 02:58:31'),
+(348, 'ESCREVIVÊNCIAS EM SILVIANO SANTIAGO', 'Pedro Henrique Alves de Medeiros', 'livro', 'Editora CRV', 2023, '9786525148274', 'Esta obra delineia uma leitura crítico-biográfica fronteiriça do projeto homo-bio-ficcional-ensaísta do escritor mineiro Silviano Santiago à luz, sobremaneira, do romance Mil rosas roubadas publicado em 2014. Nesse intento, utilizarei-me, como condição sine qua non de uma teorização outra, oriunda do Sul global, dos biografemas aquilatados em minha própria (auto)biografia intelectual enquanto homem-fronteira, pesquisador e homossexual que existe, (sobre)vive, pensa e escre(vi)ve a partir da fronteira-sul, geoistórico-epistemológica, vertida nos trópicos da América Latina e, em especial, do Brasil. Para tanto, as articulações angariadas se respaldarão, majoritariamente, no que compreendo, na esteira de Edgar Cézar Nolasco, enquanto crítica biográfica fronteiriça imbricada em uma metodologia de caráter bibliográfico. Em linhas gerais, esse recorte teórico outro compreende as aproximações entre as epistemologias do Sul, os estudos descoloniais/fronteiriços e as leituras crítico-biográficas atualmente discutidas no Brasil.', 1, 'P5', 'assets/capas/gb_5a4187cf6938fbfb.jpg', 0, '2026-10-23 02:58:31'),
+(349, 'Revista da Academia Brasileira de Letras', 'Academia Brasileira de Letras', 'livro', '', 1929, 'N/A', '', 4, 'P3', 'assets/capas/gb_1b4072f6a8e917a0.jpg', 0, '2026-10-23 02:58:31'),
+(350, 'História da literatura brasileira', 'José Veríssimo', 'livro', '', 1998, 'N/A', '', 2, 'P9', 'assets/capas/gb_a418a3f5a8528586.jpg', 0, '2026-10-23 02:58:31'),
+(351, 'A Academia brasileira de letras', 'Fernão Neves', 'livro', '', 1940, 'N/A', '', 3, 'P10', 'assets/capas/gb_6fb397685e26c821.jpg', 0, '2026-10-23 02:58:31'),
+(352, 'Breve diccionario de autores classicos da literatura brasileira', 'A. C. Chichorro da Gama', 'livro', '', 1921, 'N/A', '', 4, 'P1', 'assets/capas/gb_887bb4ad9f48af68.jpg', 0, '2026-10-23 02:58:31'),
+(353, 'História da literatura brasileira', 'Sílvio Romero', 'livro', '', 1943, 'N/A', '', 4, 'P4', 'assets/capas/gb_935e373c5e62965d.jpg', 0, '2026-10-23 02:58:35'),
+(354, 'La Littérature portugaise', 'Claude-Henri Frèches', 'livro', 'Presses Universitaires de France', 1970, 'N/A', '', 5, 'P3', 'assets/capas/gb_ab441c5016d1fac7.jpg', 0, '2026-10-23 02:58:35'),
+(355, 'O Brasil', 'Associação Comercial de São Paulo. Revista', 'livro', '', 1918, 'N/A', '', 5, 'P5', 'assets/capas/gb_1dc6ca44fb6be436.jpg', 0, '2026-10-23 02:58:35'),
+(356, 'Poetas brasileros', 'Enrique Bustamante y Ballivián', 'livro', '', 1922, 'N/A', '', 4, 'P6', 'assets/capas/gb_f938e447675da7cc.jpg', 0, '2026-10-23 02:58:35'),
+(357, 'Estudos de literatura brasileira', 'Haroldo Bruno', 'livro', '', 1966, 'N/A', '', 2, 'P3', 'assets/capas/gb_fb7b2d90ce7cc70d.jpg', 0, '2026-10-23 02:58:35'),
+(358, 'pt.5. Ultimos contos. pt.6 Excertos de outros livros. pt.7. Avulsos. pt.8. Literatura infantil', 'José Bento Monteiro Lobato', 'livro', '', 1948, 'N/A', '', 1, 'P9', 'assets/capas/gb_3b56ff90f16f14bf.jpg', 0, '2026-10-23 02:58:35'),
+(359, 'O Clarim e a oração', 'Desconhecido', 'livro', 'Geração Editorial', 2002, '8575090550', 'No ano em que o clássico \'Os Sertões\' faz cem anos, não poderia haver homenagem melhor do que debater e ampliar o seu entendimento. Para isso, \'O Clarim e a Oração\' traz o olhar sensível, crítico e informativo de expoentes da literatura, da poesia, da história, da sociologia, da crítica literária e da semiótica. Canudos e \'Os Sertões\' vistos pelo olhar de gente como Ariano Suassuna, Roberto Pompeu de Toledo, Augusto de Campos, Benedito Nunes e Gilberto Mendonça Telles, entre outros, fazendo \'a ponte entre \'Os Sertões\' e a realidade social do país\', como afirma o organizador Rinaldo de Fernandes.', 2, 'P1', 'assets/capas/gb_9c94646ebf4c2d6d.jpg', 0, '2026-10-23 02:58:35'),
+(360, 'Antologia Brasileira', 'Eugenio Werneck', 'livro', '', 1942, 'N/A', '', 1, 'P9', 'assets/capas/gb_6259d743e5adaa36.jpg', 0, '2026-10-23 02:58:35'),
+(361, 'Iniciação à literatura brasileira', 'Antonio Candido', 'livro', 'Todavia', 2023, '9786556924038', 'Iniciação à literatura brasileira foi concebido por Antonio Candido como um resumo da produção literária do país, tendo como público-alvo leitores estrangeiros. Em três capítulos —\"Manifestações literárias\", \"A configuração do sistema literário\" e \"O sistema literário consolidado\"—, Candido sintetiza vasto conhecimento em parágrafos de extrema concisão.', 4, 'P2', 'assets/capas/gb_e744d4f96994b2df.jpg', 0, '2026-10-23 02:58:35'),
+(362, 'Estudos brasileiros', 'Ronald de Carvalho', 'livro', '', 1924, 'N/A', '', 1, 'P3', 'assets/capas/gb_c6f7b34c7e694a29.jpg', 0, '2026-10-23 02:58:35'),
+(363, 'Revista nacional de literatura y ciencias', 'Daniel Martínez Vigil, Carlos Martínez Vigil, Víctor Pérez Petit, José Enrique Rodó', 'livro', '', 1897, 'N/A', '', 1, 'P10', 'assets/capas/gb_cc4823b0d8daa0ae.jpg', 0, '2026-10-23 02:58:35'),
+(364, 'Trovas brasileiras', 'Afrânio Peixoto', 'livro', '', 1944, 'N/A', '', 1, 'P5', 'assets/capas/gb_02803f483f6b7fb6.jpg', 0, '2026-10-23 02:58:35'),
+(365, 'La biografia greca', 'Italo Gallo', 'livro', 'Rubbettino Editore', 2005, '884981402X', '', 1, 'P8', 'assets/capas/gb_203f3de616cce3e7.jpg', 0, '2026-10-23 02:59:01');
 
 -- --------------------------------------------------------
 
@@ -148,13 +92,6 @@ CREATE TABLE `configuracoes` (
   `descricao` varchar(255) DEFAULT NULL,
   `atualizado_em` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `configuracoes`
---
-
-INSERT INTO `configuracoes` (`id`, `chave`, `valor`, `descricao`, `atualizado_em`) VALUES
-(1, 'ultimo_arquivamento', '2026-10-08', 'Data do último arquivamento mensal de reservas', '2026-10-08 12:51:19');
 
 -- --------------------------------------------------------
 
@@ -184,28 +121,16 @@ CREATE TABLE `emprestimos` (
   `titulo_item` varchar(255) NOT NULL,
   `data_emprestimo` datetime NOT NULL,
   `data_devolucao_prevista` date DEFAULT NULL,
-  `status` enum('emprestado','atrasado','devolucao_solicitada','devolvido') DEFAULT 'emprestado',
-  `renovado` tinyint(1) NOT NULL DEFAULT 0,
-  `data_renovacao` datetime DEFAULT NULL
+  `status` enum('emprestado','atrasado','devolucao_solicitada','devolvido') DEFAULT 'emprestado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Acionadores `emprestimos`
 --
 DELIMITER $$
-CREATE TRIGGER `calcular_data_devolucao_emprestimo_uteis` BEFORE INSERT ON `emprestimos` FOR EACH ROW BEGIN
-    DECLARE data_atual DATE;
-    DECLARE dias_adicionados INT DEFAULT 0;
-    DECLARE dias_uteis INT DEFAULT 7;
+CREATE TRIGGER `calcular_data_devolucao_emprestimo` BEFORE INSERT ON `emprestimos` FOR EACH ROW BEGIN
     IF NEW.data_devolucao_prevista IS NULL THEN
-        SET data_atual = DATE(NEW.data_emprestimo);
-        WHILE dias_adicionados < dias_uteis DO
-            SET data_atual = DATE_ADD(data_atual, INTERVAL 1 DAY);
-            IF DAYOFWEEK(data_atual) BETWEEN 2 AND 6 THEN
-                SET dias_adicionados = dias_adicionados + 1;
-            END IF;
-        END WHILE;
-        SET NEW.data_devolucao_prevista = data_atual;
+        SET NEW.data_devolucao_prevista = DATE_ADD(DATE(NEW.data_emprestimo), INTERVAL 7 DAY);
     END IF;
     IF NEW.status IS NULL THEN
         SET NEW.status = 'emprestado';
@@ -266,7 +191,20 @@ CREATE TABLE `login_admin` (
 --
 
 INSERT INTO `login_admin` (`id_adm`, `email_adm`, `senha_adm`, `nome_adm`) VALUES
-(1, 'adm@gmail.com', '$2y$10$OU3R5Y4wFGktpSSNGgSDNe4xAwgiolbl516LmriqltwoSZXz8iEz6', 'Administrador de demonstração');
+(1, 'adm@gmail.com', '$2y$10$0DzluewEFsa8F015rFGWxONMzJmszkdi0hAYLeaFH3vsVRMuaWCAa', 'Administrador de demonstração');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `login_admin_tentativas`
+--
+
+CREATE TABLE `login_admin_tentativas` (
+  `id` int(11) NOT NULL,
+  `ip` varchar(45) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `criado_em` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -283,6 +221,13 @@ CREATE TABLE `login_aluno` (
   `relembrar_token` varchar(255) DEFAULT NULL,
   `token_expiracao` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `login_aluno`
+--
+
+INSERT INTO `login_aluno` (`id_aluno`, `nome_aluno`, `serie_aluno`, `email_aluno`, `senha_aluno`, `relembrar_token`, `token_expiracao`) VALUES
+(1, 'Pedro', '3º ano', 'pedrosschweitzer@gmail.com', '$2y$10$U8dLqw2uWlF6ob..xzCbbufl/3fuj0kSuzCq30gbG0Hjkv8jlDA5S', '808b7c643da770ae1751d8f30b1f26da82e34a97ed27037a8daeb9324cd32e62', '2026-11-21 23:59:42');
 
 -- --------------------------------------------------------
 
@@ -386,6 +331,14 @@ ALTER TABLE `login_admin`
   ADD UNIQUE KEY `email_adm` (`email_adm`);
 
 --
+-- Índices de tabela `login_admin_tentativas`
+--
+ALTER TABLE `login_admin_tentativas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_tentativas_ip` (`ip`,`criado_em`),
+  ADD KEY `idx_tentativas_email` (`email`,`criado_em`);
+
+--
 -- Índices de tabela `login_aluno`
 --
 ALTER TABLE `login_aluno`
@@ -416,37 +369,37 @@ ALTER TABLE `reservas`
 -- AUTO_INCREMENT de tabela `catalogo`
 --
 ALTER TABLE `catalogo`
-  MODIFY `id_catalogo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=210;
+  MODIFY `id_catalogo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=366;
 
 --
 -- AUTO_INCREMENT de tabela `configuracoes`
 --
 ALTER TABLE `configuracoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `configuracoes_aluno`
 --
 ALTER TABLE `configuracoes_aluno`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `emprestimos`
 --
 ALTER TABLE `emprestimos`
-  MODIFY `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `extrato_reservas`
 --
 ALTER TABLE `extrato_reservas`
-  MODIFY `id_extrato` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id_extrato` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `favoritos`
 --
 ALTER TABLE `favoritos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `login_admin`
@@ -455,10 +408,16 @@ ALTER TABLE `login_admin`
   MODIFY `id_adm` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de tabela `login_admin_tentativas`
+--
+ALTER TABLE `login_admin_tentativas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `login_aluno`
 --
 ALTER TABLE `login_aluno`
-  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id_aluno` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `notificacoes`
@@ -470,7 +429,7 @@ ALTER TABLE `notificacoes`
 -- AUTO_INCREMENT de tabela `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id_reserva` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restrições para tabelas despejadas

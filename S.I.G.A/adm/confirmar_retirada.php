@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 
 // Verifica se o admin está logado
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
     $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
@@ -46,7 +49,7 @@ try {
 
         if (!$reserva) {
             $db->rollback();
-            $_SESSION['msg_erro'] = 'Reserva não encontrada ou não está aprovada.';
+            $_SESSION['msg_erro'] = 'Reserva não encontrada, não está aprovada ou o prazo de retirada expirou.';
             header('Location: reservas_adm.php');
             exit;
         }
@@ -80,7 +83,7 @@ try {
 
         if (!$reserva) {
             $db->rollBack();
-            $_SESSION['msg_erro'] = 'Reserva não encontrada ou não está aprovada.';
+            $_SESSION['msg_erro'] = 'Reserva não encontrada, não está aprovada ou o prazo de retirada expirou.';
             header('Location: reservas_adm.php');
             exit;
         }

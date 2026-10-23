@@ -22,6 +22,17 @@ if ($row = $stmt->get_result()->fetch_assoc()) {
 }
 $stmt->close();
 
+$notificacoes = [];
+$stmt_notificacoes = $conn->prepare(
+    'SELECT id_envio, titulo, mensagem, tipo, criado_em FROM notificacoes WHERE id_aluno = ? ORDER BY criado_em DESC LIMIT 5'
+);
+if ($stmt_notificacoes) {
+    $stmt_notificacoes->bind_param('i', $usuario_id);
+    $stmt_notificacoes->execute();
+    $notificacoes = $stmt_notificacoes->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt_notificacoes->close();
+}
+
 // Processar formulário (valida e grava; depois redireciona para evitar reenvio)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
     if (!csrf_validar()) {
@@ -67,16 +78,6 @@ $grupos = [
             'grande'  => ['Grande',  '<i class="fas fa-font" style="font-size: 22px;"></i>'],
         ],
     ],
-    'tema' => [
-        'titulo' => 'Tema',
-        'icone'  => 'fa-palette',
-        'desc'   => 'Escolha o tema visual do sistema',
-        'opcoes' => [
-            'claro'          => ['Claro',          '<i class="fas fa-sun"></i>'],
-            'escuro'         => ['Escuro',         '<i class="fas fa-moon"></i>'],
-            'alto_contraste' => ['Alto Contraste', '<i class="fas fa-circle-half-stroke"></i>'],
-        ],
-    ],
     'daltonismo' => [
         'titulo' => 'Daltonismo',
         'icone'  => 'fa-eye',
@@ -112,8 +113,11 @@ $grupos = [
     <link rel="stylesheet" href="../assets/css/aluno/painel_aluno.css">
     <link rel="stylesheet" href="../assets/css/aluno/aluno_unificado.css">
     <link rel="stylesheet" href="../assets/css/aluno/configuracoes_aluno.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="../assets/css/aluno/notificacoes_aluno.css">
     <link rel="stylesheet" href="../assets/css/shared/config_unsaved_changes.css?v=<?= filemtime(__DIR__ . '/../assets/css/shared/config_unsaved_changes.css') ?>">
     <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
+    <script src="../assets/js/aluno/painel_aluno.js?v=<?= time() ?>" defer></script>
+    <script src="../assets/js/aluno/notificacoes_aluno.js?v=<?= time() ?>" defer></script>
     <script src="../assets/js/aluno/configuracoes_aluno.js?v=<?= time() ?>" defer></script>
     <script src="../assets/js/shared/config_unsaved_changes.js?v=<?= filemtime(__DIR__ . '/../assets/js/shared/config_unsaved_changes.js') ?>" defer></script>
 </head>
@@ -131,35 +135,24 @@ $grupos = [
             </button>
         </div>
         <nav class="sidebar-nav">
-            <a href="painel.php" class="nav-item"><i class="fas fa-home"></i> Visão Geral</a>
-            <a href="catalogo.php" class="nav-item"><i class="fas fa-search"></i> Catálogo</a>
-            <a href="favoritos.php" class="nav-item"><i class="fas fa-heart"></i> Meus Favoritos</a>
-            <a href="emprestimos.php" class="nav-item"><i class="fas fa-book"></i> Meus Empréstimos</a>
-            <a href="reservas.php" class="nav-item"><i class="fas fa-clock"></i> Minhas Reservas</a>
-            <a href="historico.php" class="nav-item"><i class="fas fa-history"></i> Histórico</a>
-            <a href="configuracoes.php" class="nav-item active"><i class="fas fa-sliders-h"></i> Configurações</a>
+            <a href="painel.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+            <a href="catalogo.php" class="nav-item"><i class="fas fa-search"></i><span>Catálogo</span></a>
+            <a href="favoritos.php" class="nav-item"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
+            <a href="emprestimos.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+            <a href="reservas.php" class="nav-item"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
+            <a href="historico.php" class="nav-item"><i class="fas fa-history"></i><span>Histórico</span></a>
+            <a href="configuracoes.php" class="nav-item active"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
         </nav>
     </aside>
 
     <div class="main-content">
-        <header class="top-header">
-            <div class="header-right" style="width: 100%; justify-content: flex-end;">
-                <div class="user-info">
-                    <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-                    <span class="welcome">Olá, <strong><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
-                </div>
-                <a href="auth/sair.php" class="btn-logout" title="Sair">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Sair</span>
-                </a>
-            </div>
-        </header>
+        <?php require __DIR__ . '/../includes/aluno_top_header.php'; ?>
 
         <main class="container dashboard-main">
             <div class="config-container">
                 <div class="config-header">
                     <h1><i class="fas fa-sliders-h"></i> Minhas Preferências</h1>
-                    <p>Ajuste a aparência e acessibilidade do sistema. As mudanças aparecem na hora; clique em salvar para mantê-las.</p>
+                    <p>Ajuste suas preferências de acessibilidade. As mudanças aparecem na hora; clique em salvar para mantê-las.</p>
                 </div>
 
                 <?php if ($msg_sucesso): ?>

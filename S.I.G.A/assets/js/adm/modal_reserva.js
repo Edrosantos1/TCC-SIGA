@@ -27,10 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const students = typeof alunosData !== 'undefined' ? alunosData : [];
+    const materials = typeof materiaisData !== 'undefined' ? materiaisData : [];
     let selectedStudentId = null;
     let materialsById = new Map();
-    let materialSearchTimer = null;
-    let materialSearchController = null;
 
     function showToast(message, type = 'info') {
         const container = document.querySelector('.toast-container');
@@ -102,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('active');
         document.body.style.overflow = '';
         closeSuggestions();
-        if (materialSearchController) materialSearchController.abort();
     }
 
     function renderStudents(term) {
@@ -175,27 +173,15 @@ document.addEventListener('DOMContentLoaded', () => {
         materialSuggestions.classList.add('active');
     }
 
-    async function searchMaterials(term) {
+    function searchMaterials(term) {
         if (!materialSuggestions) return;
-        materialSearchController?.abort();
-        materialSearchController = new AbortController();
+        const termoNormalizado = term.toLocaleLowerCase('pt-BR');
+        const resultados = materials
+            .filter(material => [material.titulo, material.autor, material.isbn]
+                .some(valor => String(valor || '').toLocaleLowerCase('pt-BR').includes(termoNormalizado)))
+            .slice(0, 8);
 
-        try {
-            const response = await fetch(`buscar_materiais_reserva.php?q=${encodeURIComponent(term)}`, {
-                headers: { Accept: 'application/json' },
-                signal: materialSearchController.signal
-            });
-            const results = await response.json();
-            if (!response.ok) {
-                throw new Error(results.error || 'Não foi possível buscar materiais no catálogo.');
-            }
-            if (materialInput?.value.trim() === term) renderMaterials(results);
-        } catch (error) {
-            if (error.name === 'AbortError') return;
-            console.error('Erro ao buscar materiais disponíveis:', error);
-            materialSuggestions.innerHTML = '<div class="suggestion-empty">Não foi possível buscar materiais. Tente novamente.</div>';
-            materialSuggestions.classList.add('active');
-        }
+        renderMaterials(resultados);
     }
 
     function selectMaterial(material) {
@@ -254,14 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedCatalogIdInput) selectedCatalogIdInput.value = '';
         if (materialTypeInput) materialTypeInput.value = '';
         updateFormState();
-        clearTimeout(materialSearchTimer);
-
         if (!term) {
-            materialSearchController?.abort();
             materialSuggestions?.classList.remove('active');
             return;
         }
-        materialSearchTimer = setTimeout(() => searchMaterials(term), 200);
+        searchMaterials(term);
     });
 
     materialInput?.addEventListener('keydown', event => {

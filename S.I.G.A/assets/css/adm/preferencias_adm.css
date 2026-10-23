@@ -70,7 +70,7 @@ body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia
     color: #ffffff !important;
 }
 body:is(.daltonismo-protanopia, .daltonismo-deuteranopia, .daltonismo-tritanopia)
-    :is(.status-retirada, .status-devolucao_solicitada) {
+    .status-retirada {
     background: var(--cb-requested) !important;
     border-color: var(--cb-requested) !important;
     color: #ffffff !important;
@@ -152,8 +152,12 @@ body.reduzir-animacoes *::after {
 }
 
 .admin-appearance-button .icon-sun { display: none; color: #ffad00; }
-body.tema-escuro .admin-appearance-button[data-admin-appearance="escuro"] .icon-moon { display: none; }
-body.tema-escuro .admin-appearance-button[data-admin-appearance="escuro"] .icon-sun { display: block; }
+body.tema-escuro .admin-appearance-button .icon-moon,
+body.tema-alto_contraste .admin-appearance-button .icon-moon,
+body.tema-alto_contraste .admin-appearance-button .icon-sun { display: none; }
+body.tema-escuro .admin-appearance-button .icon-sun { display: block; }
+.admin-appearance-button .icon-contrast { display: none; }
+body.tema-alto_contraste .admin-appearance-button .icon-contrast { display: block; }
 
 body.tema-escuro .admin-appearance-button {
     background: #111a42;
@@ -169,13 +173,4 @@ body.tema-alto_contraste .admin-appearance-button {
     background: #000000;
     border: 1px solid #ffffff;
     color: #ffffff !important;
-}
-
-body.tema-alto_contraste .admin-appearance-button[aria-pressed="true"] {
-    background: #ffffff;
-    color: #000000 !important;
-}
-
-body.tema-alto_contraste .admin-appearance-button[aria-pressed="true"] i {
-    color: #000000 !important;
 }

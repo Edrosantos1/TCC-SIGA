@@ -15,13 +15,12 @@ const historicoTranslations = {
     period_180: 'Últimos 180 dias',
     period_365: 'Último ano',
     period_all: 'Todo o histórico',
-    search_placeholder: 'Buscar no histórico...',
+    history_search_placeholder: 'Buscar no histórico...',
     empty_message: 'Nenhum registro encontrado no histórico.',
     load_more: 'Carregar mais',
     status_returned: 'Devolvido',
     status_active: 'Ativo',
     status_overdue: 'Atrasado',
-    status_return_requested: 'Devolução solicitada',
     status_completed: 'Concluída',
     status_cancelled: 'Cancelada',
     status_pending: 'Pendente',
@@ -47,13 +46,12 @@ const historicoTranslations = {
     period_180: 'Last 180 days',
     period_365: 'Last year',
     period_all: 'All history',
-    search_placeholder: 'Search history...',
+    history_search_placeholder: 'Search history...',
     empty_message: 'No records found in history.',
     load_more: 'Load more',
     status_returned: 'Returned',
     status_active: 'Active',
     status_overdue: 'Overdue',
-    status_return_requested: 'Return requested',
     status_completed: 'Completed',
     status_cancelled: 'Cancelled',
     status_pending: 'Pending',
@@ -79,13 +77,12 @@ const historicoTranslations = {
     period_180: 'Últimos 180 días',
     period_365: 'Último año',
     period_all: 'Todo el historial',
-    search_placeholder: 'Buscar en el historial...',
+    history_search_placeholder: 'Buscar en el historial...',
     empty_message: 'No se encontraron registros en el historial.',
     load_more: 'Cargar más',
     status_returned: 'Devuelto',
     status_active: 'Activo',
     status_overdue: 'Atrasado',
-    status_return_requested: 'Devolución solicitada',
     status_completed: 'Completada',
     status_cancelled: 'Cancelada',
     status_pending: 'Pendiente',
@@ -125,7 +122,15 @@ let currentFilters = {
 
 // ===================== FUNÇÕES AUXILIARES =====================
 function getCurrentLanguage() {
-  return localStorage.getItem('dashboard_lang') || 'pt';
+  let idioma = localStorage.getItem('siga-idioma');
+  if (!idioma) {
+    idioma = localStorage.getItem('dashboard_lang');
+    if (idioma) {
+      localStorage.setItem('siga-idioma', idioma);
+      localStorage.removeItem('dashboard_lang');
+    }
+  }
+  return idioma || 'pt';
 }
 
 function getHistoricoTranslation(key, lang) {
@@ -174,7 +179,6 @@ function getStatusClass(status) {
     case 'returned': return 'status-returned';
     case 'active': return 'status-active';
     case 'overdue': return 'status-overdue';
-    case 'return_requested': return 'status-return-requested';
     case 'completed': return 'status-completed';
     case 'cancelled': return 'status-cancelled';
     case 'pending': return 'status-pending';
@@ -187,7 +191,6 @@ function getStatusLabel(status, lang) {
     returned: 'status_returned',
     active: 'status_active',
     overdue: 'status_overdue',
-    return_requested: 'status_return_requested',
     completed: 'status_completed',
     cancelled: 'status_cancelled',
     pending: 'status_pending',
@@ -490,7 +493,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Integrar com mudança de idioma
   window.addEventListener('storage', (e) => {
-    if (e.key === 'dashboard_lang') {
+    if (e.key === 'siga-idioma') {
       const lang = e.newValue || 'pt';
       applyHistoricoLanguage(lang);
       applyFilters();
@@ -544,7 +547,7 @@ function applyHistoricoLanguage(lang) {
   }
 
   const searchInput = document.getElementById('filter-search');
-  if (searchInput) searchInput.placeholder = t.search_placeholder;
+  if (searchInput) searchInput.placeholder = t.history_search_placeholder;
 
   const emptyMsg = document.getElementById('empty-message');
   if (emptyMsg) emptyMsg.textContent = t.empty_message;

@@ -3,7 +3,38 @@ require_once __DIR__ . '/../../includes/config.php';
 
 // Se a sessão está ativa, apenas permite continuar
 if (isset($_SESSION['usuario_id'])) {
-    return;
+    // Confirma que o aluno da sessão ainda existe no banco (ex.: banco reimportado ou aluno removido).
+    // Sem isso, ações como reservar falham com erro de chave estrangeira.
+    $alunoExiste = true;
+    try {
+        $stmtSessao = $conexao->prepare('SELECT 1 FROM login_aluno WHERE id_aluno = ? LIMIT 1');
+        if ($stmtSessao) {
+            $idSessao = (int) $_SESSION['usuario_id'];
+            $stmtSessao->bind_param('i', $idSessao);
+            $stmtSessao->execute();
+            $alunoExiste = $stmtSessao->get_result()->num_rows > 0;
+            $stmtSessao->close();
+        }
+    } catch (Throwable $e) {
+        error_log('Falha ao validar sessão do aluno: ' . $e->getMessage());
+    }
+
+    if ($alunoExiste) {
+        return;
+    }
+
+    session_unset();
+    session_destroy();
+    session_start();
+    session_regenerate_id(true);
+    setcookie('relembrar_token', '', appCookieOptions(time() - 3600));
+    setcookie('user_id', '', appCookieOptions(time() - 3600));
+    $_SESSION['flash_login_error'] = [
+        'msg' => 'Sua sessão não é mais válida. Entre novamente.',
+        'register' => false,
+    ];
+    header('Location: ' . appUrl('aluno/auth/login.php'));
+    exit;
 }
 
 // ✅ Recuperar apenas se tiver cookies de "Lembrar-me" (login normal)

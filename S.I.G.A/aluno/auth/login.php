@@ -10,7 +10,7 @@ $completarSerieGoogle = isset($_SESSION['usuario_id'])
     && ($_GET['status'] ?? '') === 'serie_necessaria';
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="light" data-suporta-alto-contraste="true">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,97 +20,97 @@ $completarSerieGoogle = isset($_SESSION['usuario_id'])
   <script>
     (function () {
       try {
-        var theme = localStorage.getItem("siga-theme");
-        if (theme !== "light" && theme !== "dark") {
+        var theme = localStorage.getItem("siga-tema");
+        if (theme !== "light" && theme !== "dark" && theme !== "contrast") {
+          theme = localStorage.getItem("siga-theme");
+          if (theme === "light" || theme === "dark" || theme === "contrast") {
+            localStorage.setItem("siga-tema", theme);
+            localStorage.removeItem("siga-theme");
+          }
+        }
+        if (theme !== "light" && theme !== "dark" && theme !== "contrast") {
           theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", theme);
       } catch (error) {}
     })();
   </script>
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- CSS -->
-  <link rel="stylesheet" href="../../assets/css/aluno/login_usuario.css?v=<?= filemtime(__DIR__ . '/../../assets/css/aluno/login_usuario.css') ?>">
-  <!-- JS -->
-  <script src="../../assets/js/aluno/login_usuario.js" defer></script>
+  <link rel="stylesheet" href="../../assets/css/aluno/login_aluno.css?v=<?= filemtime(__DIR__ . '/../../assets/css/aluno/login_aluno.css') ?>">
+  <script src="../../assets/js/aluno/login_aluno.js?v=<?= filemtime(__DIR__ . '/../../assets/js/aluno/login_aluno.js') ?>" defer></script>
 </head>
 <body>
-  <form id="form-google" action="google.php" method="POST" class="hidden-form">
+  <form id="formulario_google" action="google.php" method="POST" class="formulario-oculto">
     <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
-    <input type="hidden" name="google_token" id="google-token" value="">
+    <input type="hidden" name="google_token" id="token_google" value="">
   </form>
 
-  <div class="full-background">
+  <div class="fundo-autenticacao">
 
-    <button type="button" class="theme-toggle" id="theme_toggle" aria-pressed="false" aria-label="Tema escuro">
-      <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
-      <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+    <button type="button" class="alternar-tema" id="alternar_tema" aria-label="Alternar tema">
+      <i class="fas fa-moon icone-lua" aria-hidden="true"></i>
+      <i class="fas fa-sun icone-sol" aria-hidden="true"></i>
+      <i class="fas fa-circle-half-stroke icone-contraste" aria-hidden="true"></i>
     </button>
 
-    <!-- SELETOR DE IDIOMA -->
-    <div class="language-wrapper">
-      <button class="language-button" aria-label="Selecionar idioma" aria-expanded="false" aria-haspopup="listbox">
-        <img src="../../assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil" id="current-flag">
-        <span id="current-lang-text">PT</span>
+    <div class="seletor-idioma">
+      <button class="botao-idioma" aria-label="Selecionar idioma" aria-expanded="false" aria-haspopup="listbox">
+        <img src="../../assets/Imagens/br.png" class="bandeira" alt="Bandeira do Brasil" id="bandeira_atual">
+        <span id="texto_idioma_atual">PT</span>
         <svg viewBox="0 0 24 24">
           <path d="M7 10l5 5 5-5"/>
         </svg>
       </button>
-      <ul class="language-list" role="listbox">
-        <li data-lang="pt" tabindex="0" role="option" aria-selected="true">
-          <img src="../../assets/Imagens/br.png" class="flag" alt="Português"> Português
+      <ul class="lista-idiomas" role="listbox">
+        <li data-idioma="pt" tabindex="0" role="option" aria-selected="true">
+          <img src="../../assets/Imagens/br.png" class="bandeira" alt="Português"> Português
         </li>
-        <li data-lang="en" tabindex="0" role="option">
-          <img src="../../assets/Imagens/us.png" class="flag" alt="English"> English
+        <li data-idioma="en" tabindex="0" role="option">
+          <img src="../../assets/Imagens/us.png" class="bandeira" alt="English"> English
         </li>
-        <li data-lang="es" tabindex="0" role="option">
-          <img src="../../assets/Imagens/es.png" class="flag" alt="Español"> Español
+        <li data-idioma="es" tabindex="0" role="option">
+          <img src="../../assets/Imagens/es.png" class="bandeira" alt="Español"> Español
         </li>
       </ul>
     </div>
 
-    <!-- CABEÇALHO FIXO COMPARTILHADO -->
-    <div class="auth-header">
-      <a href="../../index.html" class="back-arrow" aria-label="Voltar para página inicial">
+    <div class="cabecalho-autenticacao">
+      <a href="../../index.html" class="link-voltar" aria-label="Voltar para página inicial">
         <i class="fas fa-arrow-left"></i>
       </a>
-      <a href="../../index.html" class="brand-logo">
-        <span class="fas fa-book-reader icon-logo"></span> SIGA ITJ
+      <a href="../../index.html" class="logotipo">
+        <span class="fas fa-book-reader icone-logotipo"></span> SIGA ITJ
       </a>
     </div>
 
-    <!-- CONTAINER PRINCIPAL -->
-    <div class="container" id="container">
+    <div class="formulario-acesso" id="formulario_acesso">
 
-      <!-- ================= LOGIN ================= -->
-      <!-- DOM order 1: é o formulário visível por padrão -->
-      <div class="form-container sign-in">
-        <form id="form-login" action="../../includes/aluno_login.php" method="POST" autocomplete="off" novalidate>
+      <div class="painel-formulario formulario-login">
+        <form id="formulario_login" action="../../includes/aluno_login.php" method="POST" novalidate>
           <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
-          <h1 id="title-login" class="dot-title">Faça seu Login</h1>
-          <div class="error-message" style="display:none;"></div>
+          <h1 id="titulo_login" class="titulo-pontuado">Faça seu Login</h1>
+          <div class="mensagem-erro" style="display:none;"></div>
 
-          <div class="input-group">
-            <input type="email" placeholder="Email" name="email" id="login-email">
-            <i class="fas fa-envelope icon-input"></i>
+          <div class="grupo-campo">
+            <input type="email" placeholder="Email" name="email" id="email_login" autocomplete="username">
+            <i class="fas fa-envelope icone-campo"></i>
           </div>
 
-          <div class="input-group">
-            <input type="password" placeholder="Senha" name="senha" id="login-password">
-            <i class="fas fa-eye toggle-eye" id="togglePasswordLogin"></i>
+          <div class="grupo-campo">
+            <input type="password" placeholder="Senha" name="senha" id="senha_login" autocomplete="current-password">
+            <i class="fas fa-eye alternar-senha" id="alternar_senha_login"></i>
           </div>
 
-          <p id="caps_warning" class="caps-warning">Caps Lock ativado!</p>
+          <p id="aviso_caps_lock_login" class="aviso-caps-lock">Caps Lock ativado!</p>
 
-          <div class="options-group">
-            <a href="#!" id="link-forgot">Esqueceu a senha?</a>
+          <div class="opcoes-login">
+            <a href="#!" id="link_esqueci_senha">Esqueceu a senha?</a>
           </div>
 
-          <div class="buttons-layout">
-            <button type="submit" class="btn-primary" id="btn-submit-login">Entrar</button>
-            <div class="google-login-container">
-              <button type="button" class="google-login-btn" id="googleLoginBtn">
+          <div class="grupo-botoes">
+            <button type="submit" class="botao-principal" id="botao_enviar_login">Entrar</button>
+            <div class="conteiner-login-google">
+              <button type="button" class="botao-login-google" id="botao_login_google">
                 <i class="fab fa-google"></i> Entrar com Google
               </button>
             </div>
@@ -118,21 +118,19 @@ $completarSerieGoogle = isset($_SESSION['usuario_id'])
         </form>
       </div>
 
-      <!-- ================= REGISTRO ================= -->
-      <!-- DOM order 2: oculto por padrão — inert remove da Tab nav e da a11y tree -->
-      <div class="form-container sign-up" inert>
-        <form id="form-register" action="../../includes/aluno_cadastro.php" method="POST" autocomplete="off" novalidate>
+      <div class="painel-formulario formulario-cadastro" inert>
+        <form id="formulario_cadastro" action="../../includes/aluno_cadastro.php" method="POST" novalidate>
           <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
-          <h1 id="title-register" class="dot-title">Crie sua Conta</h1>
-          <div class="reg-error-message" style="display:none;"></div>
+          <h1 id="titulo_cadastro" class="titulo-pontuado">Crie sua Conta</h1>
+          <div class="mensagem-erro-cadastro" style="display:none;"></div>
 
-          <div class="input-group">
-            <input type="text" placeholder="Nome" name="nome" id="reg-name">
-            <i class="fas fa-id-card icon-input"></i>
+          <div class="grupo-campo">
+            <input type="text" placeholder="Nome" name="nome" id="nome_cadastro" autocomplete="name">
+            <i class="fas fa-id-card icone-campo"></i>
           </div>
 
-          <div class="input-group">
-            <select name="serie" id="reg-serie">
+          <div class="grupo-campo">
+            <select name="serie" id="serie_cadastro">
               <option value="" disabled selected>Selecione a série</option>
               <option value="6º ano">6º ano</option>
               <option value="7º ano">7º ano</option>
@@ -142,131 +140,118 @@ $completarSerieGoogle = isset($_SESSION['usuario_id'])
               <option value="2º ano">2º EM</option>
               <option value="3º ano">3º EM</option>
             </select>
-            <i class="fas fa-graduation-cap icon-input"></i>
+            <i class="fas fa-graduation-cap icone-campo"></i>
           </div>
 
-          <div class="input-group">
-            <input type="email" placeholder="Email" name="email" id="reg-email">
-            <i class="fas fa-envelope icon-input"></i>
+          <div class="grupo-campo">
+            <input type="email" placeholder="Email" name="email" id="email_cadastro" autocomplete="email">
+            <i class="fas fa-envelope icone-campo"></i>
           </div>
 
-          <div class="input-group">
-            <input type="password" placeholder="Senha" name="senha" id="reg-password">
-            <i class="fas fa-eye toggle-eye" id="togglePasswordReg"></i>
+          <div class="grupo-campo">
+            <input type="password" placeholder="Senha" name="senha" id="senha_cadastro" autocomplete="new-password">
+            <i class="fas fa-eye alternar-senha" id="alternar_senha_cadastro"></i>
           </div>
 
-          <!-- INDICADOR DE FORÇA DE SENHA -->
-          <div class="strength-indicator" id="strength-indicator">
-            <div class="strength-bars">
-              <span class="strength-bar"></span>
-              <span class="strength-bar"></span>
-              <span class="strength-bar"></span>
-              <span class="strength-bar"></span>
+          <div class="indicador-forca" id="indicador_forca_senha">
+            <div class="barras-forca">
+              <span class="barra-forca"></span>
+              <span class="barra-forca"></span>
+              <span class="barra-forca"></span>
+              <span class="barra-forca"></span>
             </div>
-            <span class="strength-label" id="strength-label"></span>
+            <span class="rotulo-forca" id="rotulo_forca_senha"></span>
           </div>
 
-          <!-- CHECKLIST DE REQUISITOS -->
-          <ul class="password-requirements" id="password-requirements" aria-label="Requisitos da senha">
-            <li class="req-item" id="req-length">
-              <i class="fas fa-circle-xmark req-icon"></i>
-              <span id="req-length-text">Mínimo 8 caracteres</span>
+          <ul class="requisitos-senha" id="requisitos_senha" aria-label="Requisitos da senha">
+            <li class="item-requisito" id="requisito_comprimento">
+              <i class="fas fa-circle-xmark icone-requisito"></i>
+              <span id="texto_requisito_comprimento">Mínimo 8 caracteres</span>
             </li>
-            <li class="req-item" id="req-upper">
-              <i class="fas fa-circle-xmark req-icon"></i>
-              <span id="req-upper-text">Uma letra maiúscula</span>
+            <li class="item-requisito" id="requisito_maiuscula">
+              <i class="fas fa-circle-xmark icone-requisito"></i>
+              <span id="texto_requisito_maiuscula">Uma letra maiúscula</span>
             </li>
-            <li class="req-item" id="req-number">
-              <i class="fas fa-circle-xmark req-icon"></i>
-              <span id="req-number-text">Um número</span>
+            <li class="item-requisito" id="requisito_numero">
+              <i class="fas fa-circle-xmark icone-requisito"></i>
+              <span id="texto_requisito_numero">Um número</span>
             </li>
-            <li class="req-item" id="req-special">
-              <i class="fas fa-circle-xmark req-icon"></i>
-              <span id="req-special-text">Um caractere especial</span>
+            <li class="item-requisito" id="requisito_especial">
+              <i class="fas fa-circle-xmark icone-requisito"></i>
+              <span id="texto_requisito_especial">Um caractere especial</span>
             </li>
           </ul>
 
-          <div class="input-group">
-            <input type="password" placeholder="Confirmar Senha" name="confirmar_senha" id="reg-confirm-password">
-            <i class="fas fa-eye toggle-eye" id="toggleConfirmPasswordReg"></i>
-            <div id="confirm-error" class="error-message" style="display:none;"></div>
+          <div class="grupo-campo">
+            <input type="password" placeholder="Confirmar Senha" name="confirmar_senha" id="confirmar_senha_cadastro" autocomplete="new-password">
+            <i class="fas fa-eye alternar-senha" id="alternar_confirmacao_senha_cadastro"></i>
           </div>
 
-          <p id="caps_warning_reg" class="caps-warning">Caps Lock ativado!</p>
+          <p id="aviso_caps_lock_cadastro" class="aviso-caps-lock">Caps Lock ativado!</p>
 
-          <div class="buttons-layout">
-            <button type="submit" class="btn-primary" id="btn-submit-register">Criar conta</button>
-            <div class="google-login-container">
-            </div>
+          <div class="grupo-botoes">
+            <button type="submit" class="botao-principal" id="botao_enviar_cadastro">Criar conta</button>
           </div>
         </form>
       </div>
 
-      <!-- PAINEL LATERAL -->
-      <div class="toggle-container">
-        <div class="toggle">
-          <!-- toggle-left: fora da tela inicialmente -->
-          <div class="toggle-panel toggle-left">
-            <h1 id="panel-title-left">Já nos conhece?</h1>
-            <p id="panel-desc-left">Acesse sua conta para continuar sua jornada acadêmica.</p>
-            <button class="btn-secondary" id="login" tabindex="-1">ENTRAR</button>
+      <div class="conteiner-alternancia">
+        <div class="alternancia">
+          <div class="painel-alternancia painel-esquerdo">
+            <h1 id="titulo_painel_esquerdo">Já nos conhece?</h1>
+            <p id="descricao_painel_esquerdo">Acesse sua conta para continuar sua jornada acadêmica.</p>
+            <button class="botao-secundario" id="botao_ir_login" tabindex="-1">ENTRAR</button>
           </div>
-          <!-- toggle-right: visível no estado inicial -->
-          <div class="toggle-panel toggle-right">
-            <h1 id="panel-title-right">Novo por aqui?</h1>
-            <p id="panel-desc-right">Junte-se a nós e comece sua jornada acadêmica hoje mesmo.</p>
-            <button class="btn-secondary" id="register">REGISTRE-SE</button>
+          <div class="painel-alternancia painel-direito">
+            <h1 id="titulo_painel_direito">Novo por aqui?</h1>
+            <p id="descricao_painel_direito">Junte-se a nós e comece sua jornada acadêmica hoje mesmo.</p>
+            <button class="botao-secundario" id="botao_ir_cadastro">REGISTRE-SE</button>
           </div>
         </div>
       </div>
 
-    </div><!-- /container -->
-  </div><!-- /full-background -->
-
+    </div>
+  </div>
   <script>
-    window.SERVER_ERROR = <?= json_encode($serverError, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?>;
+    window.ERRO_SERVIDOR = <?= json_encode($serverError, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?>;
     window.COMPLETAR_SERIE_GOOGLE = <?= json_encode($completarSerieGoogle) ?>;
   </script>
 
-<!-- ================= MODAL: COMPLETAR SÉRIE (pós Google) ================= -->
-<!-- Exibido quando google.php responde com precisa_serie: true,
-     ou seja: cadastro novo via Google, ou conta antiga sem série salva. -->
-<div id="modalSerieGoogle" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalSerieTitle">
-  <div class="modal-box">
+<div id="modal_serie_google" class="sobreposicao-modal" role="dialog" aria-modal="true" aria-labelledby="titulo_modal_serie">
+  <div class="caixa-modal">
 
-    <span class="step">
-      <span class="dots"><span class="active"></span><span class="active"></span></span>
+    <span class="etapa">
+      <span class="pontos"><span class="ativo"></span><span class="ativo"></span></span>
       PASSO 2 DE 2
     </span>
 
-    <h2 id="modalSerieTitle" class="dot-title">Quase lá! <span class="cap">🎓</span></h2>
-    <p id="modalSerieDesc">Escolha sua série para concluir o cadastro.</p>
+    <h2 id="titulo_modal_serie" class="titulo-pontuado">Quase lá! <span class="icone-formatura">🎓</span></h2>
+    <p id="descricao_modal_serie">Escolha sua série para concluir o cadastro.</p>
 
-    <div class="group-label">Ensino Fundamental</div>
-    <div class="grade-grid">
-      <button type="button" class="grade" data-value="6º ano">6º</button>
-      <button type="button" class="grade" data-value="7º ano">7º</button>
-      <button type="button" class="grade" data-value="8º ano">8º</button>
-      <button type="button" class="grade" data-value="9º ano">9º</button>
+    <div class="rotulo-grupo">Ensino Fundamental</div>
+    <div class="grade-series">
+      <button type="button" class="botao-serie" data-valor="6º ano">6º</button>
+      <button type="button" class="botao-serie" data-valor="7º ano">7º</button>
+      <button type="button" class="botao-serie" data-valor="8º ano">8º</button>
+      <button type="button" class="botao-serie" data-valor="9º ano">9º</button>
     </div>
 
-    <div class="group-label">Ensino Médio</div>
-    <div class="grade-grid">
-      <button type="button" class="grade" data-value="1º ano">1º</button>
-      <button type="button" class="grade" data-value="2º ano">2º</button>
-      <button type="button" class="grade" data-value="3º ano">3º</button>
+    <div class="rotulo-grupo">Ensino Médio</div>
+    <div class="grade-series">
+      <button type="button" class="botao-serie" data-valor="1º ano">1º</button>
+      <button type="button" class="botao-serie" data-valor="2º ano">2º</button>
+      <button type="button" class="botao-serie" data-valor="3º ano">3º</button>
     </div>
 
-    <div class="reg-error-message" id="modalSerieError">âš  Selecione uma série para continuar.</div>
+    <div class="mensagem-erro-cadastro" id="erro_modal_serie" role="alert">Selecione uma série para continuar.</div>
 
-    <form id="form-completar-serie" action="completar_serie.php" method="POST">
+    <form id="formulario_completar_serie" action="completar_serie.php" method="POST">
       <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
-      <input type="hidden" id="modal-serie-select" name="serie" value="">
-      <button type="submit" class="btn-primary" id="btnConfirmarSerieGoogle">Confirmar</button>
+      <input type="hidden" id="serie_modal_google" name="serie" value="">
+      <button type="submit" class="botao-principal" id="botao_confirmar_serie_google">Confirmar</button>
     </form>
   </div>
 </div>
-  <!-- Google Sign-In SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer onload="window.onGoogleSDKLoaded && window.onGoogleSDKLoaded()"></script>
   <script src="../../assets/js/shared/tema.js"></script>
 </body>

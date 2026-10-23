@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 require_once __DIR__ . '/auth/verificar_login.php';
 
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: auth/login.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 $usuario_id = $_SESSION['usuario_id'];
 $sql = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
@@ -115,10 +118,10 @@ function renderReservaCard(array $r): void {
             <?php else: ?>
               <div class="reserva-cover-placeholder <?= $tipoCss ?>"><i class="fas <?= $tipoIcon ?>"></i><span><?= reservaEsc($titulo) ?></span></div>
             <?php endif; ?>
+            <span class="tipo-badge <?= $tipoCss ?>"><i class="fas <?= $tipoIcon ?>"></i> <?= $tipoLabel ?></span>
           </div>
           <div class="reserva-body">
             <div class="reserva-top">
-              <span class="tipo-badge <?= $tipoCss ?>"><i class="fas <?= $tipoIcon ?>"></i> <?= $tipoLabel ?></span>
               <span class="reserva-status <?= $statusCss ?>"><i class="fas <?= $statusIcon ?>"></i> <?= $statusLabel ?></span>
             </div>
             <h3 class="title" title="<?= reservaEsc($titulo) ?>"><?= reservaEsc($titulo) ?></h3>
@@ -165,8 +168,8 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/aluno/painel_aluno.css">
-  <link rel="stylesheet" href="../assets/css/aluno/reservas.css?v=<?= time() ?>">
   <link rel="stylesheet" href="../assets/css/aluno/aluno_unificado.css">
+  <link rel="stylesheet" href="../assets/css/aluno/reservas.css?v=<?= time() ?>">
   <link rel="stylesheet" href="../assets/css/aluno/notificacoes_aluno.css">
   <link rel="stylesheet" href="../assets/css/shared/alertas_ui.css">
   <?php include __DIR__ . '/../includes/aluno_preferencias_head.php'; ?>
@@ -201,52 +204,7 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
   </aside>
 
   <div class="main-content">
-    <header class="top-header">
-      <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search-input" placeholder="Buscar livros, autores, revistas..." autocomplete="off">
-      </div>
-
-      <div class="header-right">
-        <div class="language-wrapper">
-          <button class="language-button" aria-label="Selecionar idioma">
-            <img src="../assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
-            <span>PT</span>
-            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-          </button>
-          <ul class="language-list">
-            <li data-lang="pt" tabindex="0"><img src="../assets/Imagens/br.png" class="flag" alt="Português"> Português</li>
-            <li data-lang="en" tabindex="0"><img src="../assets/Imagens/us.png" class="flag" alt="English"> English</li>
-            <li data-lang="es" tabindex="0"><img src="../assets/Imagens/es.png" class="flag" alt="Español"> Español</li>
-          </ul>
-        </div>
-
-        <div class="user-info">
-          <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-          <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
-        </div>
-
-        <a href="auth/sair.php" class="btn-logout" title="Sair">
-          <i class="fas fa-sign-out-alt"></i>
-          <span id="logout-text">Sair</span>
-        </a>
-
-        <div class="notification-container">
-          <button class="notification-btn" id="notification-btn" title="Notificações">
-            <i class="fas fa-bell"></i>
-            <?php if (count($notificacoes) > 0): ?>
-              <span class="badge"><?= count($notificacoes) ?></span>
-            <?php endif; ?>
-          </button>
-          <div class="notification-dropdown" id="notification-dropdown">
-            <div class="notification-header">
-              <h4><i class="fas fa-bell"></i> Notificações</h4>
-            </div>
-            <div class="notification-list" id="notification-list-dropdown"></div>
-          </div>
-        </div>
-      </div>
-    </header>
+    <?php require __DIR__ . '/../includes/aluno_top_header.php'; ?>
 
     <form id="cancel-reserva-form" method="POST" action="../api/aluno_reservas.php" class="hidden-form">
       <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
@@ -342,8 +300,6 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
   </script>
 </body>
 </html>
-
-
 
 
 

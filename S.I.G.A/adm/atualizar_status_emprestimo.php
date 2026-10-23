@@ -44,7 +44,7 @@ if ($novo_status !== 'devolvido') {
 $stmt = $db->prepare(
     "UPDATE emprestimos SET status = 'devolvido'
      WHERE id_emprestimo = ?
-       AND status IN ('emprestado', 'atrasado', 'devolucao_solicitada')"
+       AND status IN ('emprestado', 'atrasado')"
 );
 if (!$stmt) {
     $_SESSION['msg_erro'] = 'Erro na preparação da consulta.';

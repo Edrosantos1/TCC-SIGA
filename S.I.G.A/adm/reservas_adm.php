@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 $config_classes = $GLOBALS['config_classes'] ?? '';
 
@@ -7,6 +8,8 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
 
@@ -69,7 +72,7 @@ if ($db) {
             SELECT COUNT(*) AS total
             FROM emprestimos
             WHERE status = 'atrasado'
-               OR (status IN ('emprestado', 'devolucao_solicitada') AND data_devolucao_prevista < '" . date('Y-m-d') . "')
+               OR (status IN ('emprestado') AND data_devolucao_prevista < '" . date('Y-m-d') . "')
         ";
         if ($db instanceof mysqli) {
             $res_atr = $db->query($sql_atrasados);
@@ -170,7 +173,7 @@ if ($db) {
     $sql_alunos = "
         SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
         FROM login_aluno a
         ORDER BY a.nome_aluno
     ";
@@ -196,6 +199,44 @@ if ($db) {
     }
 }
 $alunos_json = json_encode($alunos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+// Materiais disponíveis são carregados junto da página para a busca funcionar sem requisições em segundo plano.
+$materiais = [];
+if ($db) {
+    $sql_materiais = "
+        SELECT c.id_catalogo, c.titulo, c.autor, c.tipo, c.isbn,
+               GREATEST(
+                   COALESCE(c.quantidade, 0)
+                   - (SELECT COUNT(*) FROM emprestimos e
+                      WHERE e.id_catalogo = c.id_catalogo
+                        AND e.status IN ('emprestado', 'atrasado'))
+                   - (SELECT COUNT(*) FROM reservas r
+                      WHERE r.id_catalogo = c.id_catalogo
+                        AND r.status IN ('pendente', 'aprovada')),
+                   0
+               ) AS disponiveis
+        FROM catalogo c
+        HAVING disponiveis > 0
+        ORDER BY c.titulo
+    ";
+
+    if ($db instanceof mysqli) {
+        $resultado_materiais = $db->query($sql_materiais);
+        if ($resultado_materiais) {
+            $materiais = $resultado_materiais->fetch_all(MYSQLI_ASSOC);
+        } else {
+            error_log('Falha ao carregar materiais disponíveis para reserva: ' . $db->error);
+        }
+    } elseif ($db instanceof PDO) {
+        $stmt_materiais = $db->query($sql_materiais);
+        if ($stmt_materiais) {
+            $materiais = $stmt_materiais->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            error_log('Falha ao carregar materiais disponíveis para reserva: ' . implode(' ', $db->errorInfo()));
+        }
+    }
+}
+$materiais_json = json_encode($materiais, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // Nome do aluno filtrado
 if ($filtro_aluno_id > 0) {
@@ -572,6 +613,7 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
     <script>
         const reservasData     = <?= $reservas_json ?>;
         const alunosData       = <?= $alunos_json ?>;
+        const materiaisData    = <?= $materiais_json ?>;
         const notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         window.filtroInicialReservas = <?= json_encode($filtro_status) ?>;
     </script>

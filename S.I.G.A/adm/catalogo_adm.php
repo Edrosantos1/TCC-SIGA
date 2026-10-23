@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 $config_classes = $GLOBALS['config_classes'] ?? '';
 $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
@@ -110,7 +113,7 @@ function asset_v($rel) {
 const TIPOS_VALIDOS = ['livro', 'revista', 'tcc'];
 
 $selBase = "SELECT c.*,
-    (SELECT COUNT(*) FROM emprestimos e WHERE e.id_catalogo = c.id_catalogo AND e.status IN ('emprestado','atrasado','devolucao_solicitada')) AS emp_ativos,
+    (SELECT COUNT(*) FROM emprestimos e WHERE e.id_catalogo = c.id_catalogo AND e.status IN ('emprestado','atrasado')) AS emp_ativos,
     (SELECT COUNT(*) FROM reservas r WHERE r.id_catalogo = c.id_catalogo AND r.status IN ('pendente','aprovada')) AS res_ativas
     FROM catalogo c";
 
@@ -335,7 +338,7 @@ try {
     $alunos = db_all($db, "
         SELECT a.id_aluno, a.nome_aluno, a.serie_aluno,
                EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
+               EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
         FROM login_aluno a
         ORDER BY a.nome_aluno ASC
     ");
@@ -535,8 +538,8 @@ $catalogoData = [
                             <button type="button" class="btn-cadastrar" data-acao="novo"><i class="fas fa-plus"></i> Cadastrar novo item</button>
                             <form method="POST" action="importar_google_books.php">
                                 <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
-                                <button type="submit" name="importar" class="btn-import-empty" onclick="return confirm('Importar livros da Google Books? Isso pode demorar alguns segundos.')">
-                                    <i class="fas fa-cloud-download-alt"></i> Importar da Google Books
+                                <button type="submit" name="importar" class="btn-import-empty" onclick="return confirm('Importar livros com capa da Google Books? Isso pode demorar alguns segundos.')">
+                                    <i class="fas fa-cloud-download-alt"></i> Importar livros com capa
                                 </button>
                             </form>
                         </div>

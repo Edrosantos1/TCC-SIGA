@@ -13,7 +13,6 @@ const loansTranslations = {
     status_refused: 'Recusado',
     status_active: 'Ativo',
     status_overdue: 'Atrasado',
-    status_return_requested: 'Devolução solicitada',
     status_returned: 'Devolvido',
     loan_date: 'Empréstimo: {date}',
     due_date: 'Vencimento: {date}',
@@ -22,9 +21,7 @@ const loansTranslations = {
     days_today: 'Vence hoje',
     days_overdue: '{days} dias atrasado',
     days_overdue_one: '1 dia atrasado',
-    loading: 'Carregando empréstimos...',
-    error: 'Erro ao carregar empréstimos. Tente novamente.',
-    search_placeholder: 'Buscar nos seus empréstimos...',
+    loans_search_placeholder: 'Buscar nos seus empréstimos...',
     filter_all: 'Todos',
     filter_livro: 'Livros',
     filter_revista: 'Revistas',
@@ -49,9 +46,6 @@ const loansTranslations = {
     detail_code: 'Código',
     detail_close: 'Fechar',
     action_renew: 'Renovar empréstimo',
-    action_return: 'Solicitar devolução',
-    action_return_confirm: 'Enviar solicitação de devolução para conferência da biblioteca?',
-    action_working: 'Processando...',
     action_renewed: 'Empréstimo renovado por mais 15 dias.',
     action_requested: 'Solicitação enviada. Aguarde a conferência da biblioteca.',
     action_failed: 'Não foi possível concluir a ação.',
@@ -75,7 +69,6 @@ const loansTranslations = {
     status_refused: 'Refused',
     status_active: 'Active',
     status_overdue: 'Overdue',
-    status_return_requested: 'Return requested',
     status_returned: 'Returned',
     loan_date: 'Loan: {date}',
     due_date: 'Due: {date}',
@@ -84,9 +77,7 @@ const loansTranslations = {
     days_today: 'Due today',
     days_overdue: '{days} days overdue',
     days_overdue_one: '1 day overdue',
-    loading: 'Loading loans...',
-    error: 'Error loading loans. Please try again.',
-    search_placeholder: 'Search your loans...',
+    loans_search_placeholder: 'Search your loans...',
     filter_all: 'All',
     filter_livro: 'Books',
     filter_revista: 'Magazines',
@@ -111,9 +102,6 @@ const loansTranslations = {
     detail_code: 'Code',
     detail_close: 'Close',
     action_renew: 'Renew loan',
-    action_return: 'Request return',
-    action_return_confirm: 'Send a return request for library verification?',
-    action_working: 'Processing...',
     action_renewed: 'Loan renewed for 15 more days.',
     action_requested: 'Request sent. Please wait for the library to verify the return.',
     action_failed: 'The action could not be completed.',
@@ -137,7 +125,6 @@ const loansTranslations = {
     status_refused: 'Rechazado',
     status_active: 'Activo',
     status_overdue: 'Atrasado',
-    status_return_requested: 'Devolución solicitada',
     status_returned: 'Devuelto',
     loan_date: 'Préstamo: {date}',
     due_date: 'Vencimiento: {date}',
@@ -146,9 +133,7 @@ const loansTranslations = {
     days_today: 'Vence hoy',
     days_overdue: '{days} días atrasado',
     days_overdue_one: '1 día atrasado',
-    loading: 'Cargando préstamos...',
-    error: 'Error al cargar préstamos. Intente de nuevo.',
-    search_placeholder: 'Buscar en tus préstamos...',
+    loans_search_placeholder: 'Buscar en tus préstamos...',
     filter_all: 'Todos',
     filter_livro: 'Libros',
     filter_revista: 'Revistas',
@@ -173,9 +158,6 @@ const loansTranslations = {
     detail_code: 'Código',
     detail_close: 'Cerrar',
     action_renew: 'Renovar préstamo',
-    action_return: 'Solicitar devolución',
-    action_return_confirm: '¿Enviar la solicitud de devolución para que la biblioteca la verifique?',
-    action_working: 'Procesando...',
     action_renewed: 'Préstamo renovado por 15 días más.',
     action_requested: 'Solicitud enviada. Espera la verificación de la biblioteca.',
     action_failed: 'No se pudo completar la acción.',
@@ -203,7 +185,15 @@ if (typeof dashboardTranslations !== 'undefined') {
 // ===================== AUXILIARES =====================
 if (typeof window.getCurrentLanguage !== 'function') {
   window.getCurrentLanguage = function () {
-    return localStorage.getItem('dashboard_lang') || 'pt';
+    let idioma = localStorage.getItem('siga-idioma');
+    if (!idioma) {
+      idioma = localStorage.getItem('dashboard_lang');
+      if (idioma) {
+        localStorage.setItem('siga-idioma', idioma);
+        localStorage.removeItem('dashboard_lang');
+      }
+    }
+    return idioma || 'pt';
   };
 }
 
@@ -237,9 +227,6 @@ function mapStatus(raw) {
   if (s.startsWith('devolv') || s.startsWith('finaliz') ||
       s === 'returned'  || s === 'finished' || s === 'entregue') {
     return 'returned';
-  }
-  if (s.startsWith('devolucao_solicitada') || s === 'return_requested') {
-    return 'return_requested';
   }
   if (s.startsWith('recus') || s.startsWith('rejeit') ||
       s === 'refused'   || s === 'rejected') {
@@ -275,17 +262,10 @@ const loansState = {
 };
 
 // ===================== CARREGAR DADOS =====================
-function fetchLoans() {
+function loadLoans() {
   const lang = getCurrentLanguage();
   const activeContainer = document.getElementById('active-loans');
   const historyContainer = document.getElementById('history-loans');
-
-  if (activeContainer) {
-    activeContainer.innerHTML = `<div class="loan-empty"><i class="fas fa-spinner fa-pulse"></i><p>${getTranslation('loading', lang)}</p></div>`;
-  }
-  if (historyContainer) {
-    historyContainer.innerHTML = `<div class="loan-empty"><i class="fas fa-spinner fa-pulse"></i><p>${getTranslation('loading', lang)}</p></div>`;
-  }
 
   const raw = window.emprestimosData || [];
 
@@ -321,7 +301,6 @@ function getStatusLabel(status, lang) {
   const map = {
     active:   getTranslation('status_active', lang),
     overdue:  getTranslation('status_overdue', lang),
-    return_requested: getTranslation('status_return_requested', lang),
     returned: getTranslation('status_returned', lang),
     pending:  getTranslation('status_pending', lang),
     refused:  getTranslation('status_refused', lang),
@@ -330,7 +309,7 @@ function getStatusLabel(status, lang) {
 }
 
 function computeDaysInfo(loan, lang) {
-  if (!['active', 'overdue', 'return_requested'].includes(loan.status)) return { text: '', cls: 'neutral' };
+  if (!['active', 'overdue'].includes(loan.status)) return { text: '', cls: 'neutral' };
   if (!loan.dueDate) return { text: '', cls: 'neutral' };
 
   const now = new Date();
@@ -440,7 +419,7 @@ function renderLoans() {
 
   // Separa ativos e histórico
   const allActive  = loans.filter(l =>
-    l.status === 'active' || l.status === 'overdue' || l.status === 'pending' || l.status === 'return_requested'
+    l.status === 'active' || l.status === 'overdue' || l.status === 'pending'
   );
   const allHistory = loans.filter(l =>
     l.status === 'returned' || l.status === 'refused'
@@ -584,14 +563,6 @@ function openLoanModal(id) {
       </div>
 
       ${daysBlockHTML}
-      ${(loan.status === 'active' || loan.status === 'overdue') ? `
-        <div class="loan-action-buttons">
-          ${loan.status === 'active' && !loan.renovado && loan.dueDate && loan.dueDate >= new Date(new Date().setHours(0, 0, 0, 0)) ? `<button type="button" class="btn-secondary" data-loan-action="renew">${getTranslation('action_renew', lang)}</button>` : ''}
-          <button type="button" class="btn-secondary" data-loan-action="return">${getTranslation('action_return', lang)}</button>
-        </div>
-      ` : ''}
-      ${loan.status === 'return_requested' ? `<p class="loan-return-requested" role="status">${getTranslation('action_requested', lang)}</p>` : ''}
-      <p id="loan-action-message" role="status" aria-live="polite"></p>
     </div>
   `;
 
@@ -599,65 +570,9 @@ function openLoanModal(id) {
     cancelBtn.onclick = closeLoanModal;
     cancelBtn.textContent = getTranslation('detail_close', lang);
   }
-  content.querySelectorAll('[data-loan-action]').forEach(button => {
-    button.addEventListener('click', () => performLoanAction(loan, button));
-  });
 
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
-}
-
-async function performLoanAction(loan, button) {
-  const lang = getCurrentLanguage();
-  const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
-  const message = document.getElementById('loan-action-message');
-  if (!csrf || !message) {
-    if (message) message.textContent = getTranslation('action_failed', lang);
-    return;
-  }
-
-  const action = button.dataset.loanAction;
-  if (action === 'return' && !window.confirm(getTranslation('action_return_confirm', lang))) return;
-
-  const buttons = document.querySelectorAll('[data-loan-action]');
-  buttons.forEach(item => { item.disabled = true; });
-  button.textContent = getTranslation('action_working', lang);
-
-  try {
-    const response = await fetch('../api/aluno_emprestimos.php', {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, id: loan.id, csrf }),
-    });
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || getTranslation('action_failed', lang));
-    }
-
-    const rawLoan = (window.emprestimosData || []).find(item => Number(item.id_emprestimo || item.id) === loan.id);
-    if (action === 'renew') {
-      loan.dueDate = new Date(`${result.new_due}T00:00:00`);
-      loan.renovado = true;
-      if (rawLoan) {
-        rawLoan.data_devolucao_prevista = result.new_due;
-        rawLoan.renovado = 1;
-      }
-      message.textContent = getTranslation('action_renewed', lang);
-    } else {
-      loan.status = 'return_requested';
-      loan.rawStatus = 'devolucao_solicitada';
-      if (rawLoan) rawLoan.status = 'devolucao_solicitada';
-      message.textContent = getTranslation('action_requested', lang);
-    }
-    renderLoans();
-    openLoanModal(loan.id);
-    const refreshedMessage = document.getElementById('loan-action-message');
-    if (refreshedMessage) refreshedMessage.textContent = getTranslation(action === 'renew' ? 'action_renewed' : 'action_requested', lang);
-  } catch (error) {
-    message.textContent = error.message || getTranslation('action_failed', lang);
-    buttons.forEach(item => { item.disabled = false; });
-  }
 }
 
 function closeLoanModal() {
@@ -787,7 +702,7 @@ if (typeof applyDashboardLanguage === 'function') {
 document.addEventListener('DOMContentLoaded', () => {
   applyLoansLanguage(getCurrentLanguage());
   initLoansToolbar();
-  fetchLoans();
+  loadLoans();
 
   const tabActiveEl  = document.getElementById('tab-active');
   const tabHistoryEl = document.getElementById('tab-history');
@@ -812,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('languageChanged', (e) => applyLoansLanguage(e.detail.lang));
   window.addEventListener('storage', (e) => {
-    if (e.key === 'dashboard_lang') applyLoansLanguage(e.newValue || 'pt');
+    if (e.key === 'siga-idioma') applyLoansLanguage(e.newValue || 'pt');
   });
 
   console.log('%cMeus Empréstimos SiGA ITJ carregado!', 'color: #0b4b9b; font-weight: bold;');

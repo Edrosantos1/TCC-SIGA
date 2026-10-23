@@ -2,6 +2,7 @@
 // executar_arquivamento.php – Script de arquivamento mensal (sem Cron)
 
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 
 $chamado_direto = (basename($_SERVER['SCRIPT_FILENAME']) === 'executar_arquivamento.php');
 
@@ -12,6 +13,9 @@ if ($chamado_direto) {
         exit;
     }
 }
+
+// Só depois da checagem de login: marca como expiradas as reservas vencidas
+siga_expirar_reservas($conexao);
 
 // Identifica a conexão
 $db = null;
@@ -70,13 +74,14 @@ if (!function_exists('executar_arquivamento')) {
 function executar_arquivamento($db) {
     $mes = date('Y-m');
 
-    // 1. Buscar reservas finalizadas (todos os status exceto 'pendente')
+    // 1. Buscar reservas finalizadas. Reservas 'pendente' e 'aprovada' continuam ativas
+    //    (aprovada = aguardando retirada) e NÃO podem ser arquivadas.
     //    O tipo do item vem do catálogo (reservas não tem coluna tipo_item)
     $sql_select = "SELECT r.id_reserva, r.id_aluno, r.id_catalogo, r.titulo_item,
                           c.tipo AS tipo_item, r.data_reserva, r.data_limite, r.status
                    FROM reservas r
                    LEFT JOIN catalogo c ON c.id_catalogo = r.id_catalogo
-                   WHERE r.status != 'pendente'";
+                   WHERE r.status IN ('retirada', 'rejeitada', 'cancelada', 'expirada')";
 
     $insert_sql = "INSERT INTO extrato_reservas
                    (id_reserva_original, id_aluno, id_catalogo, titulo_item, tipo_item,

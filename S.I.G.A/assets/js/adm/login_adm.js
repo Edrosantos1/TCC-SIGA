@@ -61,8 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Salvar e carregar idioma
   function saveLanguage(lang) {
     try {
-      localStorage.setItem('idiomaAdmin', lang);
-      localStorage.setItem('siga-lang', lang);
+      localStorage.setItem('siga-idioma', lang);
+      localStorage.removeItem('idiomaAdmin');
+      localStorage.removeItem('siga-lang');
     } catch (error) {
       // A preferência continua aplicada nesta página.
     }
@@ -71,7 +72,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function loadSavedLanguage() {
     let savedLang = null;
     try {
-      savedLang = localStorage.getItem('siga-lang') || localStorage.getItem('idiomaAdmin');
+      savedLang = localStorage.getItem('siga-idioma')
+        || localStorage.getItem('siga-lang')
+        || localStorage.getItem('idiomaAdmin');
+      if (savedLang) {
+        localStorage.setItem('siga-idioma', savedLang);
+        localStorage.removeItem('siga-lang');
+        localStorage.removeItem('idiomaAdmin');
+      }
     } catch (error) {
       return;
     }

@@ -77,6 +77,33 @@ if (!function_exists('appUrl')) {
     }
 }
 
+if (!function_exists('redirect_seguro')) {
+    /**
+     * Aceita apenas destinos do próprio site (caminho relativo ou URL do mesmo host).
+     * Qualquer outra coisa volta para o destino padrão (evita redirecionamento aberto).
+     */
+    function redirect_seguro($url, string $padrao): string
+    {
+        if (!is_string($url)) {
+            return $padrao;
+        }
+        $url = trim($url);
+        if ($url === '' || preg_match('/[\x00-\x1F\x7F\\\\]/', $url) || strncmp($url, '//', 2) === 0) {
+            return $padrao;
+        }
+        if (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $url)) {
+            $partes = parse_url($url);
+            $hostAtual = strtolower(explode(':', (string) ($_SERVER['HTTP_HOST'] ?? ''))[0]);
+            $esquema = strtolower((string) ($partes['scheme'] ?? ''));
+            $host = strtolower((string) ($partes['host'] ?? ''));
+            if (!in_array($esquema, ['http', 'https'], true) || $host === '' || $host !== $hostAtual) {
+                return $padrao;
+            }
+        }
+        return $url;
+    }
+}
+
 // 3. Controle de Inatividade (1 hora = 3600 segundos)
 $tempo_limite = 3600;
 

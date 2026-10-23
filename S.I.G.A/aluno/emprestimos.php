@@ -8,6 +8,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = $_SESSION['usuario_id'];
+
 $sql = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $usuario_id);
@@ -42,7 +43,12 @@ if ($stmt_notif) {
 $emprestimos = [];
 $stmt_emprestimos = $conn->prepare(
     "SELECT e.id_emprestimo, e.titulo_item, e.data_emprestimo, e.data_devolucao_prevista,
-            e.status, e.renovado, c.autor, c.capa_url, c.tipo
+            e.status,
+            CASE
+                WHEN e.data_devolucao_prevista > DATE_ADD(DATE(e.data_emprestimo), INTERVAL 7 DAY) THEN 1
+                ELSE 0
+            END AS renovado,
+            c.autor, c.capa_url, c.tipo
      FROM emprestimos e
      LEFT JOIN catalogo c ON c.id_catalogo = e.id_catalogo
      WHERE e.id_aluno = ?
@@ -52,6 +58,7 @@ $stmt_emprestimos->bind_param('i', $usuario_id);
 $stmt_emprestimos->execute();
 $emprestimos = $stmt_emprestimos->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt_emprestimos->close();
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -102,53 +109,7 @@ $stmt_emprestimos->close();
   </aside>
 
   <div class="main-content">
-    <header class="top-header">
-      <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search-input" placeholder="Buscar livros, autores, revistas..." autocomplete="off">
-      </div>
-
-      <div class="header-right">
-        <div class="language-wrapper">
-          <button class="language-button" aria-label="Selecionar idioma">
-            <img src="../assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
-            <span>PT</span>
-            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-          </button>
-          <ul class="language-list">
-            <li data-lang="pt" tabindex="0"><img src="../assets/Imagens/br.png" class="flag" alt="Português"> Português</li>
-            <li data-lang="en" tabindex="0"><img src="../assets/Imagens/us.png" class="flag" alt="English"> English</li>
-            <li data-lang="es" tabindex="0"><img src="../assets/Imagens/es.png" class="flag" alt="Español"> Español</li>
-          </ul>
-        </div>
-
-        <div class="user-info">
-          <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-          <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
-        </div>
-
-        <a href="auth/sair.php" class="btn-logout" title="Sair">
-          <i class="fas fa-sign-out-alt"></i>
-          <span id="logout-text">Sair</span>
-        </a>
-
-        <!-- ========== NOTIFICAÇÃO (sininho) ========== -->
-        <div class="notification-container">
-          <button class="notification-btn" id="notification-btn" title="Notificações">
-            <i class="fas fa-bell"></i>
-            <?php if (count($notificacoes) > 0): ?>
-              <span class="badge"><?= count($notificacoes) ?></span>
-            <?php endif; ?>
-          </button>
-          <div class="notification-dropdown" id="notification-dropdown">
-            <div class="notification-header">
-              <h4><i class="fas fa-bell"></i> Notificações</h4>
-            </div>
-            <div class="notification-list" id="notification-list-dropdown"></div>
-          </div>
-        </div>
-      </div>
-    </header>
+    <?php require __DIR__ . '/../includes/aluno_top_header.php'; ?>
 
     <main class="container loans-main">
       <div class="loans-header">
@@ -164,7 +125,7 @@ $stmt_emprestimos->close();
       <div class="loans-toolbar" id="loans-toolbar" hidden>
         <div class="loans-search">
           <i class="fas fa-search"></i>
-          <input type="text" id="loans-search-input" data-i18n-placeholder="search_placeholder" placeholder="Buscar nos seus empréstimos..." autocomplete="off">
+          <input type="text" id="loans-search-input" data-i18n-placeholder="loans_search_placeholder" placeholder="Buscar nos seus empréstimos..." autocomplete="off">
         </div>
 
         <div class="loans-chips" role="group" aria-label="Filtrar por tipo">
@@ -218,22 +179,19 @@ $stmt_emprestimos->close();
                 $status = 'atrasado';
             }
 
-            $isActive = in_array($status, ['emprestado', 'atrasado', 'devolucao_solicitada'], true);
-            $isHistory = in_array($status, ['devolvido', 'finalizado', 'recusado'], true);
+            $isActive = in_array($status, ['emprestado', 'atrasado'], true);
+            $isHistory = in_array($status, ['devolvido'], true);
             if (!$isActive && !$isHistory) continue;
             $tipo = $emprestimo['tipo'] ?: 'livro';
             $tipoIcon = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'][$tipo] ?? 'fa-book';
             $statusLabel = match ($status) {
                 'emprestado' => 'Ativo', 'atrasado' => 'Atrasado', 'pendente' => 'Aguardando aprovação',
-                'devolucao_solicitada' => 'Devolução solicitada',
-                'devolvido', 'finalizado' => 'Devolvido', 'recusado' => 'Recusado', default => 'Pendente'
+                'devolvido' => 'Devolvido', default => 'Pendente'
             };
             $statusClass = match ($status) {
                 'emprestado' => 'active',
                 'atrasado' => 'overdue',
-                'devolucao_solicitada' => 'return_requested',
-                'devolvido', 'finalizado' => 'returned',
-                'recusado' => 'refused',
+                'devolvido' => 'returned',
                 default => 'pending'
             };
         ?>
@@ -261,11 +219,11 @@ $stmt_emprestimos->close();
       </div>
       <div class="loans-grid" id="history-loans" style="display: none;">
         <?php foreach ($emprestimos as $emprestimo):
-            if (!in_array($emprestimo['status'], ['devolvido', 'finalizado', 'recusado'], true)) continue;
+            if ($emprestimo['status'] !== 'devolvido') continue;
             $tipo = $emprestimo['tipo'] ?: 'livro';
         ?>
         <article class="loan-card" data-status="<?= htmlspecialchars($emprestimo['status']) ?>">
-          <div class="loan-cover-wrap"><div class="loan-cover-placeholder"><i class="fas fa-book"></i></div><span class="loan-badge status-<?= htmlspecialchars($emprestimo['status']) ?>"><?= htmlspecialchars($emprestimo['status'] === 'recusado' ? 'Recusado' : 'Devolvido') ?></span></div>
+          <div class="loan-cover-wrap"><div class="loan-cover-placeholder"><i class="fas fa-book"></i></div><span class="loan-badge status-<?= htmlspecialchars($emprestimo['status']) ?>"><?= htmlspecialchars('Devolvido') ?></span></div>
           <div class="loan-body"><h4 class="loan-title"><?= htmlspecialchars($emprestimo['titulo_item']) ?></h4><p class="loan-author"><?= htmlspecialchars($emprestimo['autor'] ?: 'Autor não informado') ?></p></div>
         </article>
         <?php endforeach; ?>
@@ -303,9 +261,6 @@ $stmt_emprestimos->close();
   </script>
 </body>
 </html>
-
-
-
 
 
 

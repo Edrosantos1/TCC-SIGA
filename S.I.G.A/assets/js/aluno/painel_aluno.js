@@ -5,7 +5,7 @@
 // ===================== TRADUÇÕES DO DASHBOARD =====================
 const dashboardTranslations = {
   pt: {
-    search_placeholder: "Buscar livros, autores, revistas...",
+    search_placeholder: "Buscar Livros, autores, revistas...",
     welcome_prefix: "Olá, ",
     logout: "Sair",
     notification_title: "Notificações",
@@ -15,10 +15,7 @@ const dashboardTranslations = {
     nav_loans: "Meus Empréstimos",
     nav_reservations: "Minhas Reservas",
     nav_history: "Histórico",
-      last_viewed_title: "Meus Empréstimos Ativos",
-    rating_label: "Avalie este material:",
-    continue_reading: "Continuar Leitura →",
-    progress_text: "% concluído • Página {current} de {total}",
+    nav_settings: "Configurações",
     quick_actions_title: "Ações Rápidas",
     explore_catalog: "Explorar Catálogo",
     my_loans: "Meus Empréstimos",
@@ -42,10 +39,7 @@ const dashboardTranslations = {
     nav_loans: "My Loans",
     nav_reservations: "My Reservations",
     nav_history: "History",
-      last_viewed_title: "My Active Loans",
-    rating_label: "Rate this material:",
-    continue_reading: "Continue Reading →",
-    progress_text: "% completed • Page {current} of {total}",
+    nav_settings: "Settings",
     quick_actions_title: "Quick Actions",
     explore_catalog: "Explore Catalog",
     my_loans: "My Loans",
@@ -69,10 +63,7 @@ const dashboardTranslations = {
     nav_loans: "Mis Préstamos",
     nav_reservations: "Mis Reservas",
     nav_history: "Historial",
-      last_viewed_title: "Mis Préstamos Activos",
-    rating_label: "Califica este material:",
-    continue_reading: "Continuar Lectura →",
-    progress_text: "% completado • Página {current} de {total}",
+    nav_settings: "Configuración",
     quick_actions_title: "Acciones Rápidas",
     explore_catalog: "Explorar Catálogo",
     my_loans: "Mis Préstamos",
@@ -131,46 +122,13 @@ function applyDashboardLanguage(lang) {
     t.nav_favorites, 
     t.nav_loans, 
     t.nav_reservations, 
-    t.nav_history
+    t.nav_history,
+    t.nav_settings
   ];
   navItems.forEach((item, idx) => {
     const span = item.querySelector('span');
     if (span && navTexts[idx]) span.textContent = navTexts[idx];
   });
-
-  // Seção "Última Coisa Vista"
-  const lastViewedTitle = document.querySelector('.last-viewed h2');
-  if (lastViewedTitle) {
-    const icon = lastViewedTitle.querySelector('i');
-    if (icon) lastViewedTitle.innerHTML = `<i class="${icon.className}"></i> ${t.last_viewed_title}`;
-    else lastViewedTitle.innerHTML = `<i class="fas fa-clock"></i> ${t.last_viewed_title}`;
-  }
-
-  const ratingSpan = document.querySelector('.rating span');
-  if (ratingSpan) ratingSpan.textContent = t.rating_label;
-
-  const continueBtn = document.querySelector('.btn-continue');
-  if (continueBtn) continueBtn.textContent = t.continue_reading;
-
-  // Tradução do texto de progresso
-  const progressTextElem = document.querySelector('.progress-text');
-  if (progressTextElem) {
-    const originalText = progressTextElem.textContent;
-    const match = originalText.match(/(\d+)%.*?Página\s*(\d+)\s*de\s*(\d+)/i);
-    if (match) {
-      const percent = match[1];
-      const current = match[2];
-      const total = match[3];
-      progressTextElem.textContent = t.progress_text
-        .replace('%', percent)
-        .replace('{current}', current)
-        .replace('{total}', total);
-    } else {
-      let newText = originalText.replace('concluído', 'completado');
-      if (lang === 'en') newText = newText.replace('concluído', 'completed');
-      progressTextElem.textContent = newText;
-    }
-  }
 
   // Seção "Ações Rápidas"
   const quickTitle = document.querySelector('.section-title');
@@ -229,12 +187,21 @@ function initLanguageSwitcher() {
 
       applyDashboardLanguage(lang);
       wrapper.classList.remove('open');
-      localStorage.setItem('dashboard_lang', lang);
+      localStorage.setItem('siga-idioma', lang);
+      localStorage.removeItem('dashboard_lang');
       console.log(`Idioma alterado para: ${lang}`);
     });
   });
 
-  const savedLang = localStorage.getItem('dashboard_lang') || 'pt';
+  let savedLang = localStorage.getItem('siga-idioma');
+  if (!savedLang) {
+    savedLang = localStorage.getItem('dashboard_lang');
+    if (savedLang) {
+      localStorage.setItem('siga-idioma', savedLang);
+      localStorage.removeItem('dashboard_lang');
+    }
+  }
+  savedLang = savedLang || 'pt';
   const selectedItem = Array.from(items).find(item => item.dataset.lang === savedLang);
   if (selectedItem && langSpan && mainFlag) {
     const flagImg = selectedItem.querySelector('.flag');
@@ -249,26 +216,26 @@ function initLanguageSwitcher() {
 
 // ===================== INICIALIZAÇÃO =====================
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Collapse da sidebar - SEM RESTAURAR ESTADO AUTOMATICAMENTE
+  // 1. Sidebar: restaura o estado sem animar o carregamento inicial
   const sidebar = document.getElementById('sidebar');
   const collapseBtn = document.getElementById('collapseBtn');
   
   if (collapseBtn && sidebar) {
-    // Remove qualquer classe 'collapsed' que possa ter sido salva anteriormente
-    sidebar.classList.remove('collapsed');
+    const podeRecolher = window.matchMedia('(min-width: 901px)').matches;
+    let recolhida = false;
+    try {
+      recolhida = podeRecolher && localStorage.getItem('sidebarCollapsed') === 'true';
+    } catch (error) {}
+
+    sidebar.classList.toggle('collapsed', recolhida);
+    document.documentElement.classList.remove('sidebar-collapsed-init');
     
-    // Evento de clique para alternar a classe manualmente
     collapseBtn.addEventListener('click', () => {
       sidebar.classList.toggle('collapsed');
-      // Salva o estado atual para que outras páginas mantenham, mas NÃO restauramos automaticamente
-      localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+      try {
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+      } catch (error) {}
     });
-    
-    // NÃO restauramos o estado salvo automaticamente - sempre inicia expandido
-    // Se quiser manter a consistência com o estado salvo, descomente a linha abaixo:
-    // if (localStorage.getItem('sidebarCollapsed') === 'true') {
-    //   sidebar.classList.add('collapsed');
-    // }
   }
 
   // 2. Barra de pesquisa
@@ -281,6 +248,35 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  document.querySelectorAll('.podium-material[data-catalogo-visualizar]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+      if (!csrf) {
+        window.location.href = link.href;
+        return;
+      }
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = link.href;
+
+      [
+        ['visualizar', link.dataset.catalogoVisualizar],
+        ['csrf', csrf]
+      ].forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+    });
+  });
 
   // 3. Inicializa idioma
   initLanguageSwitcher();
@@ -297,7 +293,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (window.reservasData) {
     window.reservasData.forEach(reserva => {
-      if (reserva.id_catalogo) tccActiveReserves.add(Number(reserva.id_catalogo));
+      if (reserva.id_catalogo) {
+        tccActiveReserves.add(Number(reserva.id_catalogo));
+        tccReservationIds.set(Number(reserva.id_catalogo), Number(reserva.id_reserva));
+      }
     });
   }
   initNotifications();
@@ -323,6 +322,7 @@ const tccTranslations = {
     favorited: 'Favoritado',
     reserve: 'Reservar',
     reserved: 'Reservado',
+    cancel_reserve: 'Cancelar reserva',
     feedback_favorited: 'TCC adicionado aos favoritos!',
     feedback_unfavorited: 'TCC removido dos favoritos.',
     feedback_reserved: 'Reserva realizada com sucesso!',
@@ -338,6 +338,7 @@ const tccTranslations = {
     favorited: 'Favorited',
     reserve: 'Reserve',
     reserved: 'Reserved',
+    cancel_reserve: 'Cancel reservation',
     feedback_favorited: 'Thesis added to favorites!',
     feedback_unfavorited: 'Thesis removed from favorites.',
     feedback_reserved: 'Reservation made successfully!',
@@ -353,6 +354,7 @@ const tccTranslations = {
     favorited: 'Favorito',
     reserve: 'Reservar',
     reserved: 'Reservado',
+    cancel_reserve: 'Cancelar reserva',
     feedback_favorited: '¡TFC agregado a favoritos!',
     feedback_unfavorited: 'TFC eliminado de favoritos.',
     feedback_reserved: '¡Reserva realizada con éxito!',
@@ -371,82 +373,6 @@ const tccData = (window.tccsData || []).map(item => ({
   theme: item.descricao || 'Descrição não informada',
   members: (item.autor || 'Autor não informado').split(',').map(member => member.trim())
 }));
-/*
-const legacyTccData = [
-  {
-    id: 1,
-    title: 'Sistema de Monitoramento de Estufa com IoT',
-    cover: null,
-    year: 2024,
-    area: 'Tecnologia da Informação',
-    theme: 'Desenvolvimento de um sistema embarcado com Arduino e sensores de temperatura, umidade e luminosidade para monitoramento automatizado de estufas agrícolas, com painel de controle via web.',
-    members: ['Ana Paula Ferreira', 'Lucas Rodrigues', 'Thiago Mendes']
-  },
-  {
-    id: 2,
-    title: 'Aplicativo de Gestão Financeira para Jovens',
-    cover: null,
-    year: 2024,
-    area: 'Desenvolvimento de Software',
-    theme: 'Criação de um aplicativo mobile com React Native voltado para educação financeira e controle de gastos para jovens entre 15 e 25 anos, com gamificação de metas.',
-    members: ['Beatriz Santos', 'Felipe Lima']
-  },
-  {
-    id: 3,
-    title: 'Plataforma E-learning para Ensino de Programação',
-    cover: null,
-    year: 2023,
-    area: 'Educação & Tecnologia',
-    theme: 'Desenvolvimento de uma plataforma web interativa com trilhas de aprendizado personalizadas, exercícios com correção automática e fórum de dúvidas para ensino de lógica de programação.',
-    members: ['Carlos Eduardo Nunes', 'Mariana Costa', 'Rafael Souza', 'Juliana Alves']
-  },
-  {
-    id: 4,
-    title: 'Reconhecimento de Gestos com Machine Learning',
-    cover: null,
-    year: 2023,
-    area: 'Inteligência Artificial',
-    theme: 'Implementação de um modelo de aprendizado de máquina com TensorFlow para reconhecimento de gestos em tempo real via câmera, aplicado ao controle de dispositivos domésticos.',
-    members: ['Diego Carvalho', 'Fernanda Oliveira']
-  },
-  {
-    id: 5,
-    title: 'Rede Social para Troca de Livros',
-    cover: null,
-    year: 2023,
-    area: 'Desenvolvimento Web',
-    theme: 'Desenvolvimento de uma rede social com geolocalização para facilitar a doação e troca de livros entre usuários próximos, incentivando o hábito da leitura e a economia circular.',
-    members: ['Gabriel Martins', 'Isabela Torres', 'Pedro Henrique Costa']
-  },
-  {
-    id: 6,
-    title: 'Dashboard de Análise de Dados para Pequenos Negócios',
-    cover: null,
-    year: 2022,
-    area: 'Business Intelligence',
-    theme: 'Criação de um painel de análise de dados com gráficos interativos e relatórios automáticos voltado para microempresas, integrando dados de vendas, estoque e clientes.',
-    members: ['Letícia Barbosa', 'Matheus Ribeiro']
-  },
-  {
-    id: 7,
-    title: 'Robô Autônomo para Mapeamento de Ambientes',
-    cover: null,
-    year: 2022,
-    area: 'Robótica',
-    theme: 'Construção de um robô com sensores ultrassônicos e câmera capaz de mapear ambientes fechados autonomamente e gerar plantas baixas em formato digital.',
-    members: ['Nicolas Almeida', 'Rebeca Fonseca', 'Samuel Dias']
-  },
-  {
-    id: 8,
-    title: 'Chatbot de Atendimento para Biblioteca Escolar',
-    cover: null,
-    year: 2022,
-    area: 'Inteligência Artificial',
-    theme: 'Desenvolvimento de um assistente virtual baseado em processamento de linguagem natural para auxílio no atendimento de uma biblioteca escolar, com funcionalidades de consulta de acervo e reserva de livros.',
-    members: ['Vitória Nascimento', 'Henrique Castro']
-  }
-]; */
-
 // Paleta de gradientes para os placeholders
 const tccGradients = [
   'linear-gradient(135deg, #0b4b9b 0%, #17c8cc 100%)',
@@ -463,6 +389,7 @@ let tccCurrentIndex = 0;
 let tccVisibleCount = 0;
 let tccActiveFavorites = new Set();
 let tccActiveReserves = new Set();
+let tccReservationIds = new Map();
 let tccCurrentId = null;
 
 function getTccVisibleCount() {
@@ -507,7 +434,10 @@ function renderTccCarousel() {
 
     card.addEventListener('click', () => openTccModal(tcc.id));
     card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') openTccModal(tcc.id);
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openTccModal(tcc.id);
+      }
     });
 
     track.appendChild(card);
@@ -524,8 +454,8 @@ function updateTccNav() {
 
   const prevBtn = document.getElementById('tcc-prev');
   const nextBtn = document.getElementById('tcc-next');
-  if (prevBtn) prevBtn.disabled = tccCurrentIndex <= 0;
-  if (nextBtn) nextBtn.disabled = tccCurrentIndex >= maxIndex;
+  if (prevBtn) prevBtn.disabled = maxIndex === 0;
+  if (nextBtn) nextBtn.disabled = maxIndex === 0;
 
   const track = document.getElementById('tcc-track');
   if (track) {
@@ -542,8 +472,10 @@ function initTccCarousel() {
 
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
-      if (tccCurrentIndex > 0) {
-        tccCurrentIndex--;
+      tccVisibleCount = getTccVisibleCount();
+      const maxIndex = Math.max(0, tccData.length - tccVisibleCount);
+      if (maxIndex > 0) {
+        tccCurrentIndex = tccCurrentIndex === 0 ? maxIndex : tccCurrentIndex - 1;
         updateTccNav();
       }
     });
@@ -553,11 +485,23 @@ function initTccCarousel() {
     nextBtn.addEventListener('click', () => {
       tccVisibleCount = getTccVisibleCount();
       const maxIndex = Math.max(0, tccData.length - tccVisibleCount);
-      if (tccCurrentIndex < maxIndex) {
-        tccCurrentIndex++;
+      if (maxIndex > 0) {
+        tccCurrentIndex = tccCurrentIndex >= maxIndex ? 0 : tccCurrentIndex + 1;
         updateTccNav();
       }
     });
+  }
+
+  const carousel = document.querySelector('.tcc-carousel');
+  if (carousel && tccData.length > getTccVisibleCount()) {
+    window.setInterval(() => {
+      if (document.hidden || carousel.matches(':hover, :focus-within')) return;
+      if (document.getElementById('tcc-modal-overlay')?.classList.contains('open')) return;
+
+      const maxIndex = Math.max(0, tccData.length - getTccVisibleCount());
+      tccCurrentIndex = tccCurrentIndex >= maxIndex ? 0 : tccCurrentIndex + 1;
+      updateTccNav();
+    }, 5000);
   }
 
   // Reajusta no resize
@@ -726,7 +670,15 @@ function openTccModal(id) {
   if (resBtn && resText) {
     const isReserved = tccActiveReserves.has(id);
     resBtn.classList.toggle('reserved', isReserved);
-    resText.textContent = isReserved ? tr.reserved : tr.reserve;
+    resText.textContent = isReserved ? tr.cancel_reserve : tr.reserve;
+    const reservaForm = resBtn.closest('form');
+    const reservaIdInput = reservaForm?.querySelector('[name="id_catalogo"], [name="id"]');
+    const reservaActionInput = reservaForm?.querySelector('[name="action"]');
+    if (reservaIdInput) {
+      reservaIdInput.name = isReserved ? 'id' : 'id_catalogo';
+      reservaIdInput.value = isReserved ? (tccReservationIds.get(id) || id) : id;
+    }
+    if (reservaActionInput) reservaActionInput.value = isReserved ? 'cancel' : '';
   }
 
   // Abrir overlay
@@ -795,7 +747,7 @@ function renderizarDropdownNotificacoes() {
         const label = isPendencia ? 'Pendência' : 'Aviso';
 
         return `
-            <div class="notification-item">
+            <div class="notification-item${Number(notificacao.lida) ? ' is-read' : ''}">
                 <div class="notification-icon" style="color: ${corIcon};">
                     <i class="fas ${icone}"></i>
                 </div>
@@ -835,5 +787,13 @@ function initNotifications() {
 
 // ===================== FUNÇÃO PARA OBTER IDIOMA ATUAL =====================
 function getCurrentLanguage() {
-  return localStorage.getItem('dashboard_lang') || 'pt';
+  let idioma = localStorage.getItem('siga-idioma');
+  if (!idioma) {
+    idioma = localStorage.getItem('dashboard_lang');
+    if (idioma) {
+      localStorage.setItem('siga-idioma', idioma);
+      localStorage.removeItem('dashboard_lang');
+    }
+  }
+  return idioma || 'pt';
 }

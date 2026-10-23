@@ -172,7 +172,6 @@ body.tema-alto_contraste { color-scheme: dark; }
 :where(body.tema-escuro) .status-emprestado { border-color: #2a3a5e; }
 :where(body.tema-escuro) .status-atrasado { border-color: #2a3a5e; }
 :where(body.tema-escuro) .status-devolvido { border-color: #2a3a5e; }
-:where(body.tema-escuro) .status-devolucao_solicitada { background: #1f2b51; color: #a5a0e3; border-color: #2a3a5e; }
 :where(body.tema-escuro) .btn-devolver { background: #1f5135; color: #9be8bc; border: 1px solid #2a3a5e; }
 :where(body.tema-escuro) .skeleton-wrapper { background: #162741; border: 1px solid #2a3a5e; }
 :where(body.tema-escuro) .skeleton-row { background: linear-gradient(90deg, #22384f 25%, #26364a 50%, #22384f 75%); }
@@ -399,7 +398,6 @@ body.tema-alto_contraste { color-scheme: dark; }
 :where(body.tema-alto_contraste) .status-emprestado { border-color: #ffffff; }
 :where(body.tema-alto_contraste) .status-atrasado { border-color: #ffffff; }
 :where(body.tema-alto_contraste) .status-devolvido { border-color: #ffffff; }
-:where(body.tema-alto_contraste) .status-devolucao_solicitada { background: #000000; color: #ffffff; border-color: #ffffff; }
 :where(body.tema-alto_contraste) .btn-devolver { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
 :where(body.tema-alto_contraste) .skeleton-wrapper { background: #000000; border: 1px solid #ffffff; }
 :where(body.tema-alto_contraste) .skeleton-row { background: linear-gradient(90deg, #000000 25%, #000000 50%, #000000 75%); }
@@ -437,7 +435,7 @@ body.tema-alto_contraste { color-scheme: dark; }
 :where(body.tema-alto_contraste) .perfil-avatar-grande { border: 3px solid #ffffff; }
 :where(body.tema-alto_contraste) .perfil-tabs { background: #000000; border: 1px solid #ffffff; }
 :where(body.tema-alto_contraste) .perfil-tabs button { color: #ffffff; }
-:where(body.tema-alto_contraste) .perfil-tabs button.active { background: #ffd54f; color: #000000 !important; }
+:where(body.tema-alto_contraste) .perfil-tabs button.active { background: #ffffff; color: #000000 !important; }
 :where(body.tema-alto_contraste) .btn-voltar { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
 :where(body.tema-alto_contraste) .btn-voltar:hover { background: #000000; }
 :where(body.tema-alto_contraste) .status-pendente { background: #000000; color: #ffffff; border: 1px solid #ffffff; }

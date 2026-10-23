@@ -108,6 +108,9 @@ function carregar_configuracoes_aluno($usuario_id, $conn): array
 function salvar_configuracoes_aluno($usuario_id, array $dados, $conn): bool
 {
     $usuario_id = (int) $usuario_id;
+    if (!array_key_exists('tema', $dados)) {
+        $dados['tema'] = aluno_config_da_sessao($conn)['tema'];
+    }
     $config = aluno_config_sanitizar($dados);
     aluno_config_criar_tabela($conn);
 

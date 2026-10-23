@@ -1,11 +1,14 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login_adm.php');
     exit;
 }
+
+siga_expirar_reservas($conexao);
 
 $config_classes = $GLOBALS['config_classes'] ?? '';
 $nome_bibliotecaria = $_SESSION['admin_nome'] ?? 'Bibliotecária';
@@ -35,7 +38,7 @@ if ($db) {
                         $tem_reservas = ($reservas_result->fetch_assoc()['total'] > 0);
                         $reservas_stmt->close();
                     }
-                    $emprestimos_sql = "SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado', 'devolucao_solicitada')";
+                    $emprestimos_sql = "SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')";
                     $emprestimos_stmt = $db->prepare($emprestimos_sql);
                     $tem_emprestimos = false;
                     if ($emprestimos_stmt) {
@@ -61,7 +64,7 @@ if ($db) {
                         $reservas_stmt->execute([$id]);
                         $tem_reservas = ($reservas_stmt->fetchColumn() > 0);
                     }
-                    $emprestimos_stmt = $db->prepare("SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado', 'devolucao_solicitada')");
+                    $emprestimos_stmt = $db->prepare("SELECT COUNT(*) as total FROM emprestimos WHERE id_aluno = ? AND status IN ('emprestado', 'atrasado')");
                     $tem_emprestimos = false;
                     if ($emprestimos_stmt) {
                         $emprestimos_stmt->execute([$id]);
@@ -149,7 +152,7 @@ if ($db) {
         $sql = "SELECT COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada') $whereSeg";
+                WHERE e.status IN ('emprestado','atrasado') $whereSeg";
         if ($db instanceof mysqli) {
             $stmt = $db->prepare($sql);
             if ($stmt) {
@@ -207,7 +210,7 @@ if ($db) {
         $sql = "SELECT COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada')
+                                WHERE e.status IN ('emprestado','atrasado')
                                     AND e.data_devolucao_prevista < ? $whereSeg";
         if ($db instanceof mysqli) {
             $stmt = $db->prepare($sql);
@@ -227,7 +230,7 @@ if ($db) {
         $sql = "SELECT ($sqlSegmento) AS segmento, COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada')
+                WHERE e.status IN ('emprestado','atrasado')
                 GROUP BY segmento ORDER BY segmento";
         if ($db instanceof mysqli) {
             $r = $db->query($sql);
@@ -240,7 +243,7 @@ if ($db) {
         $sql = "SELECT a.serie_aluno AS serie, COUNT(*) AS total
                 FROM emprestimos e
                 JOIN login_aluno a ON a.id_aluno = e.id_aluno
-                WHERE e.status IN ('emprestado','atrasado','devolucao_solicitada') $whereSeg
+                WHERE e.status IN ('emprestado','atrasado') $whereSeg
                 GROUP BY a.serie_aluno
                 ORDER BY FIELD(a.serie_aluno,
                   '6º ano','7º ano','8º ano','9º ano',

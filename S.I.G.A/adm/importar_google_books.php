@@ -2,15 +2,18 @@
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/verificar_login_adm.php';
 
-set_time_limit(0); // sem limite de tempo
+set_time_limit(0);
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
+header('Content-Type: text/html; charset=utf-8');
 
-$db = null;
-if (isset($conn)) $db = $conn;
-elseif (isset($conexao)) $db = $conexao;
-elseif (isset($pdo)) $db = $pdo;
+@ini_set('output_buffering', 'off');
+@ini_set('zlib.output_compression', 'off');
+header('X-Accel-Buffering: no');
+while (ob_get_level() > 0) { @ob_end_flush(); }
+ob_implicit_flush(true);
 
+$db = $conn ?? $conexao ?? null;
 if (!$db) {
     die('Erro de conexão.');
 }
@@ -20,248 +23,232 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !csrf_validar()) {
     exit('Token CSRF inválido. Recarregue a página e tente novamente.');
 }
 
-// Configure GOOGLE_BOOKS_API_KEY no ambiente do PHP.
-$apiKey = getenv('GOOGLE_BOOKS_API_KEY');
-if ($apiKey === false || trim($apiKey) === '') {
-    http_response_code(500);
-    exit('Configure a chave GOOGLE_BOOKS_API_KEY para importar livros.');
-}
-$maxItens = 600; // meta
+// Libera o bloqueio da sessão: sem isso o resto do site fica travado enquanto importa.
+session_write_close();
+
+// A chave NÃO fica mais no código. Defina GOOGLE_BOOKS_API_KEY no ambiente do PHP.
+// Sem chave a API ainda responde, só que com limite de uso menor.
+$apiKey = getenv('GOOGLE_BOOKS_API_KEY') ?: 'AIzaSyAjKtOjQ23WZ4F2e8hpx5wkWXD5BBc79KQ';
+
+$maxItens = 30;                 // quantos livros COM CAPA importar por execução
+$maxPaginasPorTermo = 5;
 $termos = [
     'literatura brasileira', 'romance', 'ficção científica', 'aventura',
     'história do brasil', 'biografia', 'poesia', 'filosofia',
-    'educação', 'ciência', 'tecnologia', 'arte', 'culinária',
-    'autoajuda', 'religião', 'revista', 'magazine',
-    'contos', 'crônicas', 'teatro', 'ensaio', 'psicologia',
-    'sociologia', 'política', 'economia', 'direito', 'medicina',
-    'saúde', 'esporte', 'viagem', 'infantil', 'juvenil',
-    'quadrinhos', 'gibi', 'mangá', 'hq', 'terror', 'suspense'
+    'educação', 'ciência', 'tecnologia', 'arte', 'autoajuda',
+    'contos', 'crônicas', 'teatro', 'psicologia', 'sociologia',
+    'infantil', 'juvenil', 'quadrinhos', 'terror', 'suspense',
 ];
+shuffle($termos); // cada execução começa por um assunto diferente
 
-$inseridos = 0;
-$ignorados = 0;
-$capasBaixadas = 0;
-$capasFalhas = 0;
-$totalRetornados = 0;
+$ultimoErroApi = '';
+$inseridos = $ignorados = $semCapa = $duplicados = $capasFalhas = $totalRetornados = 0;
 
-// ========== CRIAR PASTA PARA CAPAS ==========
 $pastaCapas = __DIR__ . '/../assets/capas/';
 if (!is_dir($pastaCapas)) {
     mkdir($pastaCapas, 0755, true);
 }
 
-// ========== FUNÇÃO PARA BAIXAR CAPA ==========
-function baixarCapa($url, $id) {
-    global $pastaCapas;
-    if (empty($url)) return null;
-    
-    $ext = 'jpg';
-    $nome = $id . '.' . $ext;
-    $caminho = $pastaCapas . $nome;
-    
-    // Tenta com file_get_contents
-    $conteudo = @file_get_contents($url);
-    if ($conteudo === false) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        $conteudo = curl_exec($ch);
-        curl_close($ch);
-        
-        if ($conteudo === false) {
-            return null;
-        }
+if (!is_dir($pastaCapas) || !is_writable($pastaCapas)) {
+    echo '<p style="color:#c00;font-size:18px">❌ A pasta <b>' . htmlspecialchars(realpath($pastaCapas) ?: $pastaCapas) . '</b> não existe ou não aceita gravação. Corrija a permissão e tente de novo.</p>';
+    exit;
+}
+$inicio = time();
+$limiteSegundos = 150;   // a importação para sozinha depois disso
+$falhasApiSeguidas = 0;
+$motivoCapa = '';
+
+function cortar(string $s, int $max): string {
+    return mb_strlen($s) > $max ? mb_substr($s, 0, $max - 3) . '...' : $s;
+}
+
+/** Valida e grava a imagem com nome ÚNICO (hash do livro), nunca o id do banco. */
+function salvarCapa($conteudo, string $chave): ?string {
+    global $pastaCapas, $motivoCapa;
+    $motivoCapa = '';
+    if (!$conteudo) { $motivoCapa = 'resposta vazia'; return null; }
+    $tam = strlen($conteudo);
+    $img = @getimagesizefromstring($conteudo);
+    if (!$img) { $motivoCapa = "o arquivo baixado não é imagem ($tam bytes, começa com: " . preg_replace('/[^\x20-\x7E]/', '.', substr($conteudo, 0, 60)) . ')'; return null; }
+    if ($img[0] < 80 || $img[1] < 100 || $tam < 1500) { $motivoCapa = "imagem pequena demais/indisponível ({$img[0]}x{$img[1]}, $tam bytes)"; return null; }
+    $ext = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_GIF => 'gif', IMAGETYPE_WEBP => 'webp'][$img[2]] ?? null;
+    if (!$ext) { $motivoCapa = 'formato de imagem não suportado'; return null; }
+    $nome = 'gb_' . substr(sha1($chave), 0, 16) . '.' . $ext;
+    if (@file_put_contents($pastaCapas . $nome, $conteudo, LOCK_EX) === false) { $motivoCapa = 'não consegui gravar em ' . $pastaCapas . ' (sem permissão de escrita?)'; return null; }
+    return 'assets/capas/' . $nome;
+}
+
+/** Baixa várias capas AO MESMO TEMPO. Recebe [chave => url], devolve [chave => conteúdo|null]. */
+function baixarCapasEmParalelo(array $urls): array {
+    $mh = curl_multi_init();
+    $handles = [];
+    foreach ($urls as $k => $url) {
+        $url = str_replace('&edge=curl', '', preg_replace('/^http:/i', 'https:', $url));
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_PROTOCOLS      => CURLPROTO_HTTPS,
+            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+        ]);
+        curl_multi_add_handle($mh, $ch);
+        $handles[$k] = $ch;
     }
-    
-    if (file_put_contents($caminho, $conteudo)) {
-        return 'assets/capas/' . $nome;
+    do {
+        $status = curl_multi_exec($mh, $ativo);
+        if ($ativo) curl_multi_select($mh, 1.0);
+    } while ($ativo && $status === CURLM_OK);
+
+    $res = [];
+    foreach ($handles as $k => $ch) {
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $body = curl_multi_getcontent($ch);
+        $res[$k] = ($http >= 200 && $http < 300 && $body) ? $body : null;
+        curl_multi_remove_handle($mh, $ch);
+        curl_close($ch);
+    }
+    curl_multi_close($mh);
+    return $res;
+}
+
+function buscarGoogleBooks(string $termo, int $start, int $max = 40, int $tentativas = 5): ?array {
+    global $apiKey, $ultimoErroApi;
+    $url = 'https://www.googleapis.com/books/v1/volumes?q=' . urlencode($termo)
+         . "&startIndex={$start}&maxResults={$max}&langRestrict=pt&printType=books&fields=items(volumeInfo(title,authors,publisher,publishedDate,description,industryIdentifiers,imageLinks,categories))";
+    if ($apiKey !== '') $url .= '&key=' . urlencode($apiKey);
+
+    for ($t = 0; $t < $tentativas; $t++) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 30, CURLOPT_SSL_VERIFYPEER => true]);
+        $resp = curl_exec($ch);
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $erroCurl = curl_error($ch);
+        curl_close($ch);
+        $ultimoErroApi = "HTTP $http" . ($erroCurl ? " / curl: $erroCurl" : '') . ($http != 200 && $resp ? ' / ' . mb_substr(strip_tags((string)$resp), 0, 300) : '');
+        if ($http == 200) return json_decode($resp, true) ?: null;
+        if ($t < $tentativas - 1) sleep(min(8, 1 << $t)); // espera 1s, 2s, 4s, 8s
     }
     return null;
 }
 
-// ========== FUNÇÃO PARA BUSCAR GOOGLE BOOKS COM RETRY ==========
-function buscarGoogleBooks($termo, $startIndex = 0, $max = 40, $tentativas = 3) {
-    global $apiKey;
-    $url = "https://www.googleapis.com/books/v1/volumes?q=" . urlencode($termo) . "&startIndex={$startIndex}&maxResults={$max}&langRestrict=pt&key=" . $apiKey;
-    
-    for ($t = 0; $t < $tentativas; $t++) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        if ($httpCode == 200) {
-            $data = json_decode($response, true);
-            if (isset($data['items']) && count($data['items']) > 0) {
-                return $data;
-            } else {
-                // Nenhum item, mas resposta ok
-                return $data;
-            }
-        } else {
-            // Erro, espera e tenta novamente
-            sleep(2 * ($t + 1));
-        }
-    }
-    return null; // falhou todas as tentativas
-}
+echo '<meta charset="utf-8"><body style="font-family:sans-serif;max-width:800px;margin:30px auto">';
+echo "<h2>📚 Importando até $maxItens livros COM CAPA...</h2>";
+@ob_flush(); flush();
 
-echo "<h2>📚 Importando até $maxItens livros da Google Books...</h2>";
-echo "<p>🔑 Usando chave de API</p>";
-flush();
-
-// ========== LOOP DE IMPORTAÇÃO ==========
 foreach ($termos as $termo) {
     if ($inseridos >= $maxItens) break;
-    
-    $start = 0;
-    $maxPorPagina = 40;
-    $maxPaginasPorTermo = 15; // 15 * 40 = 600 itens por termo (mas limitamos pelo total)
-    $paginas = 0;
-    
-    while ($inseridos < $maxItens && $paginas < $maxPaginasPorTermo) {
-        $data = buscarGoogleBooks($termo, $start, $maxPorPagina);
-        if (!$data || empty($data['items'])) {
-            // Se não veio nenhum item, pula para o próximo termo
+    if (time() - $inicio > $limiteSegundos) { echo '<p>⏱️ Tempo limite atingido, finalizando.</p>'; break; }
+    if ($falhasApiSeguidas >= 6) { echo '<p style="color:#c00">⚠️ O Google está instável (muitos erros seguidos). Tente de novo em alguns minutos.</p>'; break; }
+
+    for ($pag = 0; $pag < $maxPaginasPorTermo && $inseridos < $maxItens; $pag++) {
+        $data = buscarGoogleBooks($termo, $pag * 40);
+        if (!$data) {
+            $falhasApiSeguidas++;
+            echo '<p style="color:#c00">⚠️ A API do Google falhou em “' . htmlspecialchars($termo) . '”: ' . htmlspecialchars($ultimoErroApi) . '</p>';
             break;
         }
-        
-        $items = $data['items'];
-        $totalRetornados += count($items);
-        echo "<p>🔍 Termo '<strong>" . htmlspecialchars($termo) . "</strong>' – página " . ($paginas+1) . " – retornou " . count($items) . " itens.</p>";
-        flush();
-        
-        foreach ($items as $item) {
+        $falhasApiSeguidas = 0;
+        if (empty($data['items'])) break;
+        $totalRetornados += count($data['items']);
+
+        // ---- Fase 1: separa candidatos (com capa, não duplicados) sem baixar nada ainda
+        $cands = [];
+        foreach ($data['items'] as $item) {
+            if (count($cands) >= ($maxItens - $inseridos)) break;
+
+            $info   = $item['volumeInfo'] ?? [];
+            $titulo = cortar(trim($info['title'] ?? ''), 255);
+            if ($titulo === '') continue;
+
+            $links = $info['imageLinks'] ?? [];
+            $capaUrl = trim($links['thumbnail'] ?? $links['smallThumbnail'] ?? '');
+            if ($capaUrl === '') { $semCapa++; continue; }
+
+            $autor = cortar(!empty($info['authors']) ? implode(', ', $info['authors']) : 'Desconhecido', 255);
+            $isbn = 'N/A';
+            foreach ($info['industryIdentifiers'] ?? [] as $idf) {
+                if (in_array($idf['type'], ['ISBN_13', 'ISBN_10'], true)) { $isbn = $idf['identifier']; break; }
+            }
+
+            $chave = $isbn !== 'N/A' ? $isbn : $titulo . '|' . $autor;
+            if (isset($cands[$chave])) { $duplicados++; continue; } // repetido na própria página
+
+            if ($isbn !== 'N/A') {
+                $st = $db->prepare('SELECT 1 FROM catalogo WHERE isbn = ? OR (titulo = ? AND autor = ?) LIMIT 1');
+                $st->bind_param('sss', $isbn, $titulo, $autor);
+            } else {
+                $st = $db->prepare('SELECT 1 FROM catalogo WHERE titulo = ? AND autor = ? LIMIT 1');
+                $st->bind_param('ss', $titulo, $autor);
+            }
+            $st->execute();
+            $existe = $st->get_result()->num_rows > 0;
+            $st->close();
+            if ($existe) { $duplicados++; continue; }
+
+            $cands[$chave] = compact('info', 'titulo', 'autor', 'isbn', 'capaUrl');
+        }
+        if (!$cands) continue;
+
+        // ---- Fase 2: baixa TODAS as capas da página ao mesmo tempo
+        $urls = [];
+        foreach ($cands as $k => $c) $urls[$k] = $c['capaUrl'];
+        $baixadas = baixarCapasEmParalelo($urls);
+        $okCapas = count(array_filter($baixadas));
+        echo '<p>🔍 ' . htmlspecialchars($termo) . ' – pág. ' . ($pag + 1) . ': ' . count($cands) . ' candidatos, ' . $okCapas . ' capas baixadas</p>';
+
+        $motivos = [];
+        // ---- Fase 3: grava só quem tem capa válida
+        foreach ($cands as $k => $c) {
             if ($inseridos >= $maxItens) break;
-            
-            $info = $item['volumeInfo'] ?? [];
-            $titulo_original = trim($info['title'] ?? '');
-            if (empty($titulo_original)) continue;
-            
-            // ========== CORREÇÃO: Título ==========
-            $titulo = $titulo_original;
-            if (strlen($titulo) > 255) {
-                $titulo = substr($titulo, 0, 252) . '...';
-            }
-            
-            // ========== CORREÇÃO: Autor ==========
-            $autor = !empty($info['authors']) ? implode(', ', $info['authors']) : 'Desconhecido';
-            if (strlen($autor) > 255) {
-                $autor = substr($autor, 0, 252) . '...';
-            }
-            
-            // ========== VERIFICAR DUPLICATA (somente por título, mais flexível) ==========
-            $existe = false;
-            // Busca por título exato ou similar (pode ser case-insensitive)
-            $stmt = $db->prepare("SELECT id_catalogo FROM catalogo WHERE titulo = ?");
-            $stmt->bind_param('s', $titulo);
-            $stmt->execute();
-            if ($stmt->get_result()->num_rows > 0) $existe = true;
-            $stmt->close();
-            
-            if ($existe) {
-                $ignorados++;
+            $capaLocal = salvarCapa($baixadas[$k] ?? null, (string)$k);
+            if (!$capaLocal) {
+                $capasFalhas++;
+                $m = empty($baixadas[$k]) ? 'a capa não baixou (sem resposta do Google)' : $motivoCapa;
+                $motivos[$m] = ($motivos[$m] ?? 0) + 1;
                 continue;
             }
-            
-            // ========== DADOS DO LIVRO ==========
-            $editora = $info['publisher'] ?? '';
-            if (strlen($editora) > 255) {
-                $editora = substr($editora, 0, 252) . '...';
-            }
-            
-            $ano = !empty($info['publishedDate']) ? (int)substr($info['publishedDate'], 0, 4) : 0;
-            $isbn = 'N/A';
-            if (!empty($info['industryIdentifiers'])) {
-                foreach ($info['industryIdentifiers'] as $id) {
-                    if (in_array($id['type'], ['ISBN_13', 'ISBN_10'])) {
-                        $isbn = $id['identifier'];
-                        break;
-                    }
-                }
-            }
-            $descricao = $info['description'] ?? '';
-            if (strlen($descricao) > 65535) {
-                $descricao = substr($descricao, 0, 65532) . '...';
-            }
-            $capa_url = $info['imageLinks']['thumbnail'] ?? '';
-            $quantidade = rand(1, 5);
-            $localizacao = 'P' . rand(1, 10);
-            $capa_vazia = '';
-            
-            $tipo = 'livro';
-            $categories = $info['categories'] ?? [];
-            $catStr = is_array($categories) ? implode(' ', $categories) : '';
-            if (strpos(strtolower($termo), 'revista') !== false || strpos(strtolower($catStr), 'magazine') !== false) {
-                $tipo = 'revista';
-            }
-            
-            // ========== INSERIR ==========
-            $sql = "INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $db->prepare($sql);
-            $stmt->bind_param('ssssisssss', $titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capa_vazia);
-            
-            if ($stmt->execute()) {
-                $novoId = $stmt->insert_id;
-                $capaLocal = null;
-                
-                // ========== BAIXAR CAPA ==========
-                if (!empty($capa_url)) {
-                    $capaLocal = baixarCapa($capa_url, $novoId);
-                    if ($capaLocal) {
-                        $capasBaixadas++;
-                        $update = $db->prepare("UPDATE catalogo SET capa_url = ? WHERE id_catalogo = ?");
-                        $update->bind_param('si', $capaLocal, $novoId);
-                        $update->execute();
-                        $update->close();
-                    } else {
-                        $capasFalhas++;
-                    }
-                }
-                
+
+            $info = $c['info'];
+            $titulo = $c['titulo']; $autor = $c['autor']; $isbn = $c['isbn'];
+            $editora    = cortar((string)($info['publisher'] ?? ''), 255);
+            $ano        = !empty($info['publishedDate']) ? (int)substr($info['publishedDate'], 0, 4) : 0;
+            $descricao  = cortar((string)($info['description'] ?? ''), 65535);
+            $quantidade = random_int(1, 5);
+            $localizacao = 'P' . random_int(1, 10);
+            $catStr = strtolower(implode(' ', $info['categories'] ?? []));
+            $tipo = (strpos(strtolower($termo), 'revista') !== false || strpos($catStr, 'magazine') !== false) ? 'revista' : 'livro';
+
+            $st = $db->prepare('INSERT INTO catalogo (titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url)
+                                VALUES (?,?,?,?,?,?,?,?,?,?)');
+            $st->bind_param('ssssississ', $titulo, $autor, $tipo, $editora, $ano, $isbn, $descricao, $quantidade, $localizacao, $capaLocal);
+            if ($st->execute()) {
                 $inseridos++;
-                $statusCapa = $capaLocal ? '🖼️' : '📖';
-                echo "<p>✅ $inseridos – " . htmlspecialchars($titulo) . " " . $statusCapa . "</p>";
-                flush();
+                echo '<p>✅ ' . $inseridos . ' – ' . htmlspecialchars($titulo) . ' 🖼️</p>';
             } else {
-                // erro no insert
-                echo "<p>❌ Erro ao inserir: " . htmlspecialchars($titulo) . "</p>";
-                flush();
+                error_log('Importação: erro ao inserir "' . $titulo . '": ' . $st->error);
+                echo '<p style="color:#c00">❌ Erro ao gravar “' . htmlspecialchars($titulo) . '”: ' . htmlspecialchars($st->error) . '</p>';
+                @unlink(__DIR__ . '/../' . $capaLocal);
+                $ignorados++;
             }
-            $stmt->close();
+            $st->close();
         }
-        
-        $start += $maxPorPagina;
-        $paginas++;
-        
-        // Pequena pausa entre páginas para não sobrecarregar a API
-        usleep(300000); // 0.3 segundos
+        foreach ($motivos as $m => $n) {
+            echo '<p style="color:#a60">🖼️ ' . $n . ' capa(s) rejeitada(s): ' . htmlspecialchars($m) . '</p>';
+        }
+        @ob_flush(); flush();
     }
-    
-    // Pausa entre termos
-    sleep(1);
 }
 
-// ========== FINALIZAR ==========
-echo "<hr>";
-echo "<h2 style='color:green;'>✅ Importação concluída!</h2>";
-echo "<p><strong>Inseridos:</strong> $inseridos</p>";
-echo "<p><strong>Ignorados (duplicatas):</strong> $ignorados</p>";
-echo "<p><strong>Total retornados pela API:</strong> $totalRetornados</p>";
-echo "<p><strong>Capas baixadas:</strong> $capasBaixadas</p>";
-echo "<p><strong>Capas com falha:</strong> $capasFalhas</p>";
+echo '<hr><h2 style="color:green">✅ Importação concluída</h2>';
+echo "<p><b>Inseridos (todos com capa):</b> $inseridos</p>";
+echo "<p><b>Sem capa na API (ignorados):</b> $semCapa</p>";
+echo "<p><b>Capa não baixou (ignorados):</b> $capasFalhas</p>";
+echo "<p><b>Duplicados:</b> $duplicados</p>";
+echo "<p><b>Erros de insert:</b> $ignorados</p>";
+echo "<p><b>Retornados pela API:</b> $totalRetornados</p>";
 
-$_SESSION['flash_message'] = "Importação concluída: $inseridos livros inseridos, $ignorados duplicatas. Capas: $capasBaixadas baixadas, $capasFalhas falhas.";
-$_SESSION['flash_type'] = 'success';
-
-echo "<p style='margin-top:20px;'><a href='catalogo_adm.php' style='display:inline-block; padding:12px 30px; background:#0035ff; color:white; text-decoration:none; border-radius:8px; font-weight:600;'>📚 Voltar ao Catálogo</a></p>";
+echo "<p><a href='catalogo_adm.php' style='display:inline-block;padding:12px 30px;background:#0035ff;color:#fff;text-decoration:none;border-radius:8px;font-weight:600'>📚 Voltar ao Catálogo</a></p>";
 exit;
-?>

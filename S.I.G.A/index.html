@@ -1,17 +1,24 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="light" data-suporta-alto-contraste="true">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>Acesso - SIGA ITJ</title>
+  <title>Início - SIGA ITJ</title>
 
-  <!-- Aplica o tema salvo (ou o do sistema) ANTES de renderizar, evitando "piscar" branco -->
+  <!-- Define o tema antes da renderização para evitar mudança visual ao carregar a página. -->
   <script>
     (function () {
       try {
-        var t = localStorage.getItem("siga-theme");
-        if (t !== "light" && t !== "dark") {
+        var t = localStorage.getItem("siga-tema");
+        if (t !== "light" && t !== "dark" && t !== "contrast") {
+          t = localStorage.getItem("siga-theme");
+          if (t === "light" || t === "dark" || t === "contrast") {
+            localStorage.setItem("siga-tema", t);
+            localStorage.removeItem("siga-theme");
+          }
+        }
+        if (t !== "light" && t !== "dark" && t !== "contrast") {
           t = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", t);
@@ -23,47 +30,47 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/shared/previa.css">
+  <link rel="stylesheet" href="assets/css/inicio.css">
 </head>
 <body id="inicio">
 
-  <header class="site-header">
-    <div class="header-inner">
-      <a href="#inicio" class="logo" aria-label="SIGA ITJ">
+  <header class="cabecalho-site">
+    <div class="conteudo-cabecalho">
+      <a href="#inicio" class="logotipo" aria-label="SIGA ITJ">
         <i class="fas fa-book-reader" aria-hidden="true"></i>
         <span><strong>SIGA ITJ</strong></span>
       </a>
 
-      <nav class="nav-links" aria-label="Principal">
-        <a href="#sobre" data-i18n="nav_about">Sobre o SIGA</a>
-        <a href="#secretaria" data-i18n="nav_contact">Contato institucional</a>
+      <nav class="links-navegacao" aria-label="Principal">
+        <a href="#titulo_sobre" data-traducao="navegacao_sobre">Sobre o SIGA</a>
+        <a href="#secretaria" data-traducao="navegacao_contato">Contato institucional</a>
       </nav>
 
-      <div class="header-actions">
-        <!-- BOTÃO DE TEMA ESCURO -->
-        <button type="button" class="theme-toggle" id="theme_toggle" aria-pressed="false"
-                data-i18n-aria="theme_label" aria-label="Tema escuro">
-          <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
-          <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+      <div class="acoes-cabecalho">
+        <button type="button" class="alternar-tema" id="alternar_tema"
+                data-traducao-aria="rotulo_tema" aria-label="Alternar tema">
+          <i class="fas fa-moon icone-lua" aria-hidden="true"></i>
+          <i class="fas fa-sun icone-sol" aria-hidden="true"></i>
+          <i class="fas fa-circle-half-stroke icone-contraste" aria-hidden="true"></i>
         </button>
 
-        <div class="language-wrapper">
-          <button type="button" class="language-button" data-i18n-aria="lang_label"
+        <div class="seletor-idioma">
+          <button type="button" class="botao-idioma" data-traducao-aria="rotulo_idioma"
                   aria-label="Selecionar idioma" aria-expanded="false" aria-haspopup="listbox">
-            <img src="assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
+            <img src="assets/Imagens/br.png" class="bandeira" alt="Bandeira do Brasil">
             <span>PT</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg>
           </button>
 
-          <ul class="language-list" role="listbox">
-            <li data-lang="pt" tabindex="-1" role="option" aria-selected="true">
-              <img src="assets/Imagens/br.png" class="flag" alt="Português"> Português
+          <ul class="lista-idiomas" role="listbox">
+            <li data-idioma="pt" tabindex="-1" role="option" aria-selected="true">
+              <img src="assets/Imagens/br.png" class="bandeira" alt="Português"> Português
             </li>
-            <li data-lang="en" tabindex="-1" role="option" aria-selected="false">
-              <img src="assets/Imagens/us.png" class="flag" alt="English"> English
+            <li data-idioma="en" tabindex="-1" role="option" aria-selected="false">
+              <img src="assets/Imagens/us.png" class="bandeira" alt="English"> English
             </li>
-            <li data-lang="es" tabindex="-1" role="option" aria-selected="false">
-              <img src="assets/Imagens/es.png" class="flag" alt="Español"> Español
+            <li data-idioma="es" tabindex="-1" role="option" aria-selected="false">
+              <img src="assets/Imagens/es.png" class="bandeira" alt="Español"> Español
             </li>
           </ul>
         </div>
@@ -72,108 +79,105 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="hero-content">
-        <h1 data-i18n="title">Seja muito bem-vindo ao SIGA</h1>
-        <p class="hero-sub" data-i18n="subtitle">Acesse livros, materiais e recursos educacionais em um só lugar.</p>
+    <section class="destaque-inicial">
+      <div class="conteudo-destaque">
+        <h1 data-traducao="titulo_principal">Seja muito bem-vindo ao SIGA</h1>
+        <p class="subtitulo-destaque" data-traducao="subtitulo_principal">Acesse livros, materiais e recursos educacionais em um só lugar.</p>
 
-        <div class="profiles">
-          <a href="aluno/auth/redirecionar.php" class="profile-btn student-btn">
+        <div class="opcoes-acesso">
+          <a href="aluno/auth/redirecionar.php" class="botao-perfil botao-aluno">
             <i class="fas fa-user-graduate" aria-hidden="true"></i>
-            <span data-i18n="btn_student">Sou Aluno</span>
+            <span data-traducao="botao_aluno">Sou Aluno</span>
           </a>
-          <a href="adm/login_adm.php" class="profile-btn admin-btn">
+          <a href="adm/login_adm.php" class="botao-perfil botao-administrador">
             <i class="fas fa-user-shield" aria-hidden="true"></i>
-            <span data-i18n="btn_admin">Sou Administrador</span>
+            <span data-traducao="botao_administrador">Sou Administrador</span>
           </a>
         </div>
       </div>
 
-      <div class="hero-image">
-        <img src="assets/Imagens/garota.jpg" class="humano" alt="Estudante sorrindo segurando cadernos">
-        <div class="floating-icon icon-1" aria-hidden="true"><i class="fas fa-bookmark"></i></div>
-        <div class="floating-icon icon-2" aria-hidden="true"><i class="fas fa-book-open"></i></div>
+      <div class="imagem-destaque">
+        <img src="assets/Imagens/garota.jpg" alt="Estudante sorrindo segurando cadernos">
+        <div class="icone-flutuante icone-flutuante-um" aria-hidden="true"><i class="fas fa-bookmark"></i></div>
+        <div class="icone-flutuante icone-flutuante-dois" aria-hidden="true"><i class="fas fa-book-open"></i></div>
       </div>
     </section>
 
-    <!-- SEÇÃO SOBRE -->
-    <section class="about-siga" id="sobre" aria-labelledby="sobre_title">
-      <div class="about-inner">
-        <div class="section-header">
-          <h2 id="sobre_title" data-i18n="sobre_title">O que é o SIGA?</h2>
-          <p data-i18n="sobre_subtitle">Conheça um pouco do nosso trabalho e propósito</p>
+    <section class="sobre-siga" id="sobre" aria-labelledby="titulo_sobre">
+      <div class="conteudo-sobre">
+        <div class="cabecalho-secao">
+          <h2 id="titulo_sobre" data-traducao="titulo_sobre">O que é o SIGA?</h2>
+          <p data-traducao="subtitulo_sobre">Conheça um pouco do nosso trabalho e propósito</p>
         </div>
 
-        <div class="about-content">
-          <div class="about-text">
-            <p data-i18n-html="sobre_p1">
+        <div class="conteudo-sobre-principal">
+          <div class="texto-sobre">
+            <p data-traducao-html="texto_sobre_1">
               O <strong>SIGA</strong> (Sistema Integrado de Gestão de Acervo) é uma plataforma digital para gerenciamento de bibliotecas escolares, criada para tornar o acesso ao acervo e a organização de empréstimos mais práticos para alunos e administradores.
             </p>
-            <p data-i18n-html="sobre_p2">
+            <p data-traducao-html="texto_sobre_2">
               O SIGA atende alunos, professores e funcionários, reunindo livros didáticos, artigos científicos, trabalhos acadêmicos, periódicos e outros recursos educacionais em um só lugar.
             </p>
-            <p data-i18n-html="sobre_p3">
+            <p data-traducao-html="texto_sobre_3">
               A plataforma permite pesquisar por títulos, autores e categorias, acompanhar empréstimos e fazer reservas. O objetivo é apoiar a jornada acadêmica com um acesso simples e organizado ao acervo.
             </p>
           </div>
 
-          <div class="about-image">
+          <div class="imagem-sobre">
             <img src="assets/Imagens/bibliotecaria_usando_siga.jpg"
-                 alt="Aluno de costas usando o SiGA ITJ num notebook na biblioteca" class="about-img" loading="lazy">
+                 alt="Aluno de costas usando o SiGA ITJ num notebook na biblioteca" loading="lazy">
           </div>
         </div>
       </div>
     </section>
 
-    <!-- CONTATO COM A SECRETARIA -->
-    <section class="how-it-works" id="secretaria" aria-labelledby="secretaria_title">
-      <div class="how-inner">
-        <div class="section-header">
-          <h2 id="secretaria_title" data-i18n="sec_title">Fale com a secretaria</h2>
-          <p data-i18n="sec_subtitle">Precisa de ajuda com cadastro, acesso ou dúvidas? Estamos por aqui.</p>
+    <section class="contato-secretaria" id="secretaria" aria-labelledby="titulo_secretaria">
+      <div class="conteudo-secretaria">
+        <div class="cabecalho-secao">
+          <h2 id="titulo_secretaria" data-traducao="titulo_secretaria">Fale com a secretaria</h2>
+          <p data-traducao="subtitulo_secretaria">Precisa de ajuda com cadastro, acesso ou dúvidas? Estamos por aqui.</p>
         </div>
 
-        <ul class="steps-container">
-          <li class="step-card">
-            <div class="step-icon"><i class="fas fa-school" aria-hidden="true"></i></div>
-            <h3 data-i18n="sec1_title">Pessoalmente</h3>
-            <p data-i18n="sec1_desc">Vá até a secretaria da escola no horário de atendimento.</p>
+        <ul class="etapas-contato">
+          <li class="etapa-contato">
+            <div class="icone-etapa"><i class="fas fa-school" aria-hidden="true"></i></div>
+            <h3 data-traducao="titulo_etapa_1">Pessoalmente</h3>
+            <p data-traducao="descricao_etapa_1">Vá até a secretaria da escola no horário de atendimento.</p>
           </li>
-          <li class="step-card">
-            <div class="step-icon"><i class="fas fa-envelope" aria-hidden="true"></i></div>
-            <h3 data-i18n="sec2_title">Canais oficiais</h3>
-            <p data-i18n="sec2_desc">Entre em contato por e-mail ou telefone institucional.</p>
+          <li class="etapa-contato">
+            <div class="icone-etapa"><i class="fas fa-envelope" aria-hidden="true"></i></div>
+            <h3 data-traducao="titulo_etapa_2">Canais oficiais</h3>
+            <p data-traducao="descricao_etapa_2">Entre em contato por e-mail ou telefone institucional.</p>
           </li>
-          <li class="step-card">
-            <div class="step-icon"><i class="fas fa-circle-question" aria-hidden="true"></i></div>
-            <h3 data-i18n="sec3_title">Como podemos ajudar</h3>
-            <p data-i18n="sec3_desc">Cadastro, recuperação de acesso, reservas e outras dúvidas.</p>
+          <li class="etapa-contato">
+            <div class="icone-etapa"><i class="fas fa-circle-question" aria-hidden="true"></i></div>
+            <h3 data-traducao="titulo_etapa_3">Como podemos ajudar</h3>
+            <p data-traducao="descricao_etapa_3">Cadastro, recuperação de acesso, reservas e outras dúvidas.</p>
           </li>
         </ul>
       </div>
     </section>
   </main>
 
-  <footer class="main-footer">
-    <div class="footer-content">
-      <p data-i18n="footer_copyright">&copy; 2026 SIGA. Todos os direitos reservados.</p>
-      <p id="contact-note" data-i18n="contact_note">Para atendimento, utilize os canais institucionais da biblioteca.</p>
-      <div class="footer-links">
-        <a href="#" data-dialog="support" data-i18n="footer_support">Suporte</a>
-        <a href="#" data-dialog="terms" data-i18n="footer_terms">Termos de Uso</a>
-        <a href="#" data-dialog="privacy" data-i18n="footer_privacy">Política de Privacidade</a>
+  <footer class="rodape-principal">
+    <div class="conteudo-rodape">
+      <p data-traducao="rodape_direitos_autorais">&copy; 2026 SIGA. Todos os direitos reservados.</p>
+      <p id="nota-contato" data-traducao="nota_contato">Para atendimento, utilize os canais institucionais da biblioteca.</p>
+      <div class="links-rodape">
+        <a href="#" data-dialogo="suporte" data-traducao="rodape_suporte">Suporte</a>
+        <a href="#" data-dialogo="termos" data-traducao="rodape_termos">Termos de Uso</a>
+        <a href="#" data-dialogo="privacidade" data-traducao="rodape_privacidade">Política de Privacidade</a>
       </div>
     </div>
   </footer>
 
-  <!-- Janela de informações (substitui os alert() do rodapé) -->
-  <dialog id="info_dialog" aria-labelledby="info_title">
-    <h2 id="info_title"></h2>
-    <p id="info_body"></p>
-    <button type="button" class="dialog-close" id="info_close" data-i18n="modal_close">Fechar</button>
+  <dialog id="dialogo_informacoes" aria-labelledby="titulo_informacoes">
+    <h2 id="titulo_informacoes"></h2>
+    <p id="texto_informacoes"></p>
+    <button type="button" class="botao-fechar-dialogo" id="fechar_informacoes" data-traducao="fechar_modal">Fechar</button>
   </dialog>
 
-  <script src="assets/js/shared/previa.js"></script>
+  <script src="assets/js/inicio.js"></script>
   <script src="assets/js/shared/tema.js"></script>
 </body>
 </html>

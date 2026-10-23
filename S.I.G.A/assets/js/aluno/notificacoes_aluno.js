@@ -35,6 +35,8 @@
     if (!lista) return;
 
     const notificacoes = Array.isArray(window.notificacoesData) ? window.notificacoesData : [];
+    const formLer = document.getElementById('mark-read-form');
+    if (formLer) formLer.hidden = !notificacoes.some(n => !Number(n.lida));
 
     if (notificacoes.length === 0) {
       lista.innerHTML = `
@@ -52,7 +54,7 @@
       const label = isPendencia ? 'Pendência' : 'Aviso';
 
       return `
-        <div class="notification-item">
+        <div class="notification-item${Number(n.lida) ? ' is-read' : ''}">
           <div class="notification-icon" style="color: ${corIcon};">
             <i class="fas ${icone}"></i>
           </div>

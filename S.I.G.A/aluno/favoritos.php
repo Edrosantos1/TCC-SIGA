@@ -109,52 +109,7 @@ if ($stmt_notif) {
   </aside>
 
   <div class="main-content">
-    <header class="top-header">
-      <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="search-input" placeholder="Buscar livros, autores, revistas..." autocomplete="off">
-      </div>
-
-      <div class="header-right">
-        <div class="language-wrapper">
-          <button class="language-button" aria-label="Selecionar idioma">
-            <img src="../assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
-            <span>PT</span>
-            <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-          </button>
-          <ul class="language-list">
-            <li data-lang="pt" tabindex="0"><img src="../assets/Imagens/br.png" class="flag" alt="Português"> Português</li>
-            <li data-lang="en" tabindex="0"><img src="../assets/Imagens/us.png" class="flag" alt="English"> English</li>
-            <li data-lang="es" tabindex="0"><img src="../assets/Imagens/es.png" class="flag" alt="Español"> Español</li>
-          </ul>
-        </div>
-
-        <div class="user-info">
-          <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-          <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
-        </div>
-
-        <a href="auth/sair.php" class="btn-logout" title="Sair">
-          <i class="fas fa-sign-out-alt"></i>
-          <span id="logout-text">Sair</span>
-        </a>
-
-        <div class="notification-container">
-          <button class="notification-btn" id="notification-btn" title="Notificações">
-            <i class="fas fa-bell"></i>
-            <?php if (count($notificacoes) > 0): ?>
-              <span class="badge"><?= count($notificacoes) ?></span>
-            <?php endif; ?>
-          </button>
-          <div class="notification-dropdown" id="notification-dropdown">
-            <div class="notification-header">
-              <h4><i class="fas fa-bell"></i> Notificações</h4>
-            </div>
-            <div class="notification-list" id="notification-list-dropdown"></div>
-          </div>
-        </div>
-      </div>
-    </header>
+    <?php require __DIR__ . '/../includes/aluno_top_header.php'; ?>
 
     <main class="container catalog-main">
       <!-- HERO -->
@@ -173,32 +128,27 @@ if ($stmt_notif) {
         <?php endif; ?>
       </div>
 
-      <?php if ($totalFavoritos > 0): ?>
       <!-- TOOLBAR -->
       <div class="fav-toolbar" id="fav-toolbar">
         <div class="fav-search">
           <i class="fas fa-search"></i>
-          <input type="text" id="fav-search-input" data-i18n-placeholder="search_placeholder" placeholder="Buscar nos seus favoritos..." autocomplete="off">
+          <input type="text" id="fav-search-input" data-i18n-placeholder="favorites_search_placeholder" placeholder="Buscar nos seus favoritos..." autocomplete="off">
         </div>
 
         <div class="fav-chips" role="group" aria-label="Filtrar por tipo">
           <button type="button" class="fav-chip active" data-filter="todos" aria-pressed="true" disabled>
-            <i class="fas fa-layer-group"></i>
             <span class="chip-label" data-i18n="filter_all">Todos</span>
             <span class="chip-count"><?= $totalFavoritos ?></span>
           </button>
           <button type="button" class="fav-chip" data-filter="livro" aria-pressed="false">
-            <i class="fas fa-book"></i>
             <span class="chip-label" data-i18n="filter_livro">Livros</span>
             <span class="chip-count"><?= $contagemTipos['livro'] ?></span>
           </button>
           <button type="button" class="fav-chip" data-filter="revista" aria-pressed="false">
-            <i class="fas fa-newspaper"></i>
             <span class="chip-label" data-i18n="filter_revista">Revistas</span>
             <span class="chip-count"><?= $contagemTipos['revista'] ?></span>
           </button>
           <button type="button" class="fav-chip" data-filter="tcc" aria-pressed="false">
-            <i class="fas fa-graduation-cap"></i>
             <span class="chip-label" data-i18n="filter_tcc">TCCs</span>
             <span class="chip-count"><?= $contagemTipos['tcc'] ?></span>
           </button>
@@ -225,7 +175,6 @@ if ($stmt_notif) {
           </div>
         </div>
       </div>
-      <?php endif; ?>
 
       <!-- GRID -->
       <div class="catalog-grid" id="favoritos-grid">
@@ -302,7 +251,7 @@ if ($stmt_notif) {
                 </div>
                 <h3 data-i18n="empty_favoritos">Você ainda não tem nenhum item nos favoritos</h3>
                 <p class="empty-hint">Explore o catálogo e salve livros, revistas e TCCs para encontrar depois.</p>
-                <a href="catalogo.php" class="fav-clear-btn empty-cta" data-i18n="explore_catalog">
+                <a href="catalogo.php" class="fav-clear-btn empty-cta btn-explore" data-i18n="explore_catalog">
                   <i class="fas fa-compass"></i> Explorar o Catálogo
                 </a>
             </div>

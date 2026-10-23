@@ -9,6 +9,7 @@ if (file_exists($configPath)) {
     exit;
 }
 
+/** @var mysqli $conn */
 if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
@@ -54,8 +55,6 @@ while ($row = $result->fetch_assoc()) {
             $row['status'] = 'returned';
         } elseif ($row['status'] === 'atrasado') {
             $row['status'] = 'overdue';
-        } elseif ($row['status'] === 'devolucao_solicitada') {
-            $row['status'] = 'return_requested';
         } elseif ($row['status'] === 'emprestado') {
             $row['status'] = 'active';
         } elseif ($row['status'] === 'retirado') {

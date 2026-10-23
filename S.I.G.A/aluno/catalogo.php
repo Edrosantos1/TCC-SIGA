@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 require_once __DIR__ . '/auth/verificar_login.php';
 
 if (!isset($_SESSION['usuario_id'])) {
@@ -7,7 +8,26 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+siga_expirar_reservas($conexao);
+
 $usuario_id = $_SESSION['usuario_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['visualizar'])) {
+    if (!csrf_validar()) {
+        http_response_code(403);
+        exit('Token CSRF inválido. Recarregue a página e tente novamente.');
+    }
+
+    $itemParaAbrir = (int) $_POST['visualizar'];
+    if ($itemParaAbrir > 0) {
+        $_SESSION['catalogo_item_para_abrir'] = $itemParaAbrir;
+    }
+    header('Location: catalogo.php', true, 303);
+    exit;
+}
+
+$itemParaAbrir = (int) ($_SESSION['catalogo_item_para_abrir'] ?? 0);
+unset($_SESSION['catalogo_item_para_abrir']);
 
 // Mensagem de feedback guardada na sessão (flash): aparece uma vez e some,
 // sem poluir a URL. Gravada por alternar_favorito.php / api/aluno_reservas.php.
@@ -79,7 +99,7 @@ $offset = ($paginaAtual - 1) * $porPagina;
 $filtroTipo = isset($_GET['tipo']) ? $_GET['tipo'] : '';
 $filtroBusca = isset($_GET['busca']) ? trim($_GET['busca']) : '';
 
-$where = "1=1";
+$where = "capa_url IS NOT NULL AND capa_url <> ''"; // só itens com capa
 $params = [];
 if ($filtroTipo) {
     $where .= " AND tipo = ?";
@@ -108,8 +128,9 @@ if (!$stmt) {
 
 $totalPaginas = ceil($total / $porPagina);
 
-$sql = "SELECT id_catalogo, titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url 
-        FROM catalogo 
+$sql = "SELECT id_catalogo, titulo, autor, tipo, editora, ano_publicacao, isbn, descricao, quantidade, localizacao, capa_url, "
+        . siga_sql_disponiveis('c') . " AS disponiveis
+        FROM catalogo c
         WHERE $where 
         ORDER BY titulo ASC 
         LIMIT ? OFFSET ?";
@@ -130,6 +151,24 @@ if (!$stmt) {
     $stmt->close();
 }
 
+if ($itemParaAbrir > 0 && !array_filter($itens, static function ($item) use ($itemParaAbrir) {
+    return (int) $item['id_catalogo'] === $itemParaAbrir;
+})) {
+    $itemStmt = $conn->prepare(
+        'SELECT c.id_catalogo, c.titulo, c.autor, c.tipo, c.editora, c.ano_publicacao, c.isbn, c.descricao, c.quantidade, c.localizacao, c.capa_url, '
+        . siga_sql_disponiveis('c') . ' AS disponiveis FROM catalogo c WHERE c.id_catalogo = ?'
+    );
+    if ($itemStmt) {
+        $itemStmt->bind_param('i', $itemParaAbrir);
+        $itemStmt->execute();
+        $itemSolicitado = $itemStmt->get_result()->fetch_assoc();
+        if ($itemSolicitado) {
+            $itens[] = $itemSolicitado;
+        }
+        $itemStmt->close();
+    }
+}
+
 $catalogData = [];
 foreach ($itens as $row) {
     $capa = $row['capa_url'];
@@ -145,8 +184,8 @@ foreach ($itens as $row) {
         'category'    => '',
         'location'    => $row['localizacao'],
         'cover'       => $capa,
-        'quantity'    => $row['quantidade'],
-        'available'   => $row['quantidade'] > 0,
+        'quantity'    => (int) $row['disponiveis'],
+        'available'   => (int) $row['disponiveis'] > 0,
         'description' => $row['descricao'],
     ];
 }
@@ -173,6 +212,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
     <script src="../assets/js/aluno/notificacoes_aluno.js" defer></script>
     <script>
         window.catalogData = <?= $catalogDataJson ?>;
+        window.itemParaAbrir = <?= $itemParaAbrir ?>;
         window.favoritosPHP = <?= json_encode($favoritos) ?>;
         window.reservasAtivas = <?= json_encode($reservasAtivas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
         window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
@@ -198,42 +238,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
     </aside>
 
     <div class="main-content">
-        <header class="top-header">
-            <div class="search-container"></div>
-            <div class="header-right">
-                <div class="language-wrapper">
-                    <button class="language-button">
-                        <img src="../assets/Imagens/br.png" class="flag" alt="PT"><span>PT</span>
-                        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
-                    </button>
-                    <ul class="language-list">
-                        <li data-lang="pt"><img src="../assets/Imagens/br.png" class="flag" alt="Português"> Português</li>
-                        <li data-lang="en"><img src="../assets/Imagens/us.png" class="flag" alt="English"> English</li>
-                        <li data-lang="es"><img src="../assets/Imagens/es.png" class="flag" alt="Español"> Español</li>
-                    </ul>
-                </div>
-                <div class="user-info">
-                    <div class="user-avatar"><i class="fas fa-user-circle"></i></div>
-                    <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNome) ?></strong>!</span>
-                </div>
-                <a href="auth/sair.php" class="btn-logout" title="Sair"><i class="fas fa-sign-out-alt"></i><span id="logout-text">Sair</span></a>
-
-                <div class="notification-container">
-                    <button class="notification-btn" id="notification-btn" title="Notificações">
-                        <i class="fas fa-bell"></i>
-                        <?php if (count($notificacoes) > 0): ?>
-                            <span class="badge"><?= count($notificacoes) ?></span>
-                        <?php endif; ?>
-                    </button>
-                    <div class="notification-dropdown" id="notification-dropdown">
-                        <div class="notification-header">
-                            <h4><i class="fas fa-bell"></i> Notificações</h4>
-                        </div>
-                        <div class="notification-list" id="notification-list-dropdown"></div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <?php require __DIR__ . '/../includes/aluno_top_header.php'; ?>
 
         <main class="container catalog-main">
 
@@ -259,7 +264,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                     <i class="fas fa-search"></i>
                     <input type="text"
                            name="busca"
-                           placeholder="Buscar por título ou autor..."
+                           placeholder="Buscar Livros, autores, revistas..."
                            value="<?= htmlspecialchars($filtroBusca) ?>"
                            autocomplete="off">
                 </div>

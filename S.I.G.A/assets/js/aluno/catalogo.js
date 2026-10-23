@@ -12,7 +12,7 @@ const catalogTranslations = {
     filter_books: 'Livros',
     filter_magazines: 'Revistas',
     filter_tcc: 'TCCs',
-    search_placeholder: 'Buscar por título ou autor...',
+    search_placeholder: 'Buscar Livros, autores, revistas...',
     no_results: 'Nenhum resultado encontrado',
     availability_available: 'Disponível',
     availability_unavailable: 'Indisponível',
@@ -49,7 +49,7 @@ const catalogTranslations = {
     filter_books: 'Books',
     filter_magazines: 'Magazines',
     filter_tcc: 'Theses',
-    search_placeholder: 'Search by title or author...',
+    search_placeholder: 'Search books, authors, magazines...',
     no_results: 'No results found',
     availability_available: 'Available',
     availability_unavailable: 'Unavailable',
@@ -86,7 +86,7 @@ const catalogTranslations = {
     filter_books: 'Libros',
     filter_magazines: 'Revistas',
     filter_tcc: 'TFCs',
-    search_placeholder: 'Buscar por título o autor...',
+    search_placeholder: 'Buscar libros, autores, revistas...',
     no_results: 'No se encontraron resultados',
     availability_available: 'Disponible',
     availability_unavailable: 'No disponible',
@@ -135,7 +135,15 @@ let reservations = new Map();
 
 // ===================== AUXILIARES =====================
 function getCurrentLanguage() {
-  return localStorage.getItem('dashboard_lang') || 'pt';
+  let idioma = localStorage.getItem('siga-idioma');
+  if (!idioma) {
+    idioma = localStorage.getItem('dashboard_lang');
+    if (idioma) {
+      localStorage.setItem('siga-idioma', idioma);
+      localStorage.removeItem('dashboard_lang');
+    }
+  }
+  return idioma || 'pt';
 }
 
 function tCat(key, params = {}) {
@@ -225,6 +233,9 @@ function loadCatalogData() {
       );
     }
     renderCatalog();
+    if (window.itemParaAbrir) {
+      requestAnimationFrame(() => openItemModal(String(window.itemParaAbrir)));
+    }
   } else {
     const grid = document.getElementById('catalog-grid');
     if (grid) {
@@ -279,6 +290,9 @@ function createItemCard(item, index, lang) {
 
   const isFav = favorites.has(itemId);
   const isRes = reservations.has(itemId);
+  const cardQty = item.quantity ?? item.quantidade;
+  const isAvail = item.available !== undefined ? !!item.available : (cardQty === undefined || cardQty > 0);
+  const reserveBlocked = !isAvail && !isRes;
   const itemType = item.tipo || item.type || 'livro';
   const typeLabel = getItemTypeLabel(itemType, lang);
   const coverUrl = item.capa_url || item.cover;
@@ -306,6 +320,7 @@ function createItemCard(item, index, lang) {
       <span class="tipo-badge ${badgeClass}">
         <i class="fas ${getTypeIcon(itemType)}"></i> ${typeLabel}
       </span>
+      <span class="disp-badge ${isAvail ? 'available' : 'unavailable'}">${isAvail ? tCat('availability_available') : tCat('availability_unavailable')}</span>
     </div>
     <div class="card-info">
       <h4 title="${title}">${title}</h4>
@@ -315,10 +330,10 @@ function createItemCard(item, index, lang) {
           <i class="fas fa-heart"></i>
           <span>${isFav ? tCat('action_favorited') : tCat('action_favorite')}</span>
         </button>
-        <button class="btn-reserve ${isRes ? 'reserved' : ''}" data-action="reserve" type="button"
-                aria-pressed="${isRes}" ${isRes ? `title="${tCat('action_cancel_reserve')}"` : ''}>
-          <i class="fas ${isRes ? 'fa-check' : 'fa-hand-holding'}"></i>
-          <span>${isRes ? tCat('action_reserved') : tCat('action_reserve')}</span>
+        <button class="btn-reserve ${isRes ? 'reserved' : ''} ${reserveBlocked ? 'indisponivel' : ''}" data-action="reserve" type="button"
+                aria-pressed="${isRes}" ${reserveBlocked ? 'aria-disabled="true"' : ''} ${isRes ? `title="${tCat('action_cancel_reserve')}"` : (reserveBlocked ? `title="${tCat('feedback_reserve_unavailable')}"` : '')}>
+          <i class="fas ${isRes ? 'fa-check' : (reserveBlocked ? 'fa-ban' : 'fa-hand-holding')}"></i>
+          <span>${isRes ? tCat('action_reserved') : (reserveBlocked ? tCat('availability_unavailable') : tCat('action_reserve'))}</span>
         </button>
       </div>
     </div>
@@ -381,6 +396,7 @@ let actionInFlight = false;
 // URL atual da listagem, sem os parâmetros de mensagem
 function cleanListUrl() {
   const params = new URLSearchParams(window.location.search);
+  params.delete('visualizar');
   params.delete('mensagem');
   params.delete('erro');
   const qs = params.toString();
@@ -547,7 +563,7 @@ function toggleReserve(id) {
   }
 
   const qty = item.quantity ?? item.quantidade;
-  if (qty !== undefined && qty <= 0) {
+  if (item.available === false || (qty !== undefined && qty <= 0)) {
     showFeedback(tCat('feedback_reserve_unavailable'), 'warning');
     return;
   }
@@ -665,7 +681,11 @@ function openItemModal(id) {
   resText.textContent = isRes ? tCat('action_reserved') : tCat('action_reserve');
   resBtn.classList.toggle('reserved', isRes);
   resBtn.disabled = false;
-  resBtn.title = isRes ? tCat('action_cancel_reserve') : '';
+  const modalBlocked = !isAvail && !isRes;
+  resBtn.classList.toggle('indisponivel', modalBlocked);
+  resBtn.setAttribute('aria-disabled', modalBlocked ? 'true' : 'false');
+  resBtn.title = isRes ? tCat('action_cancel_reserve') : (modalBlocked ? tCat('feedback_reserve_unavailable') : '');
+  if (modalBlocked) resText.textContent = tCat('availability_unavailable');
   const resIcon = resBtn.querySelector('i');
   if (resIcon) resIcon.className = isRes ? 'fas fa-check' : 'fas fa-hand-holding';
 
@@ -766,7 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   window.addEventListener('storage', (e) => {
-    if (e.key === 'dashboard_lang') applyCatalogLanguage(e.newValue || 'pt');
+    if (e.key === 'siga-idioma') applyCatalogLanguage(e.newValue || 'pt');
   });
 
   document.addEventListener('languageChanged', (e) => {

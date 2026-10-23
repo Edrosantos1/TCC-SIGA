@@ -37,7 +37,7 @@ $sql_alunos_busca = "
         EXISTS (
             SELECT 1 FROM emprestimos e
             WHERE e.id_aluno = a.id_aluno
-              AND e.status IN ('emprestado', 'atrasado', 'devolucao_solicitada')
+              AND e.status IN ('emprestado', 'atrasado')
         ) AS tem_emprestimos
     FROM login_aluno a
     ORDER BY a.nome_aluno

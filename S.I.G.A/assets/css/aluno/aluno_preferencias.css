@@ -41,6 +41,18 @@ body {
     color: var(--aluno-text);
 }
 
+.dashboard-main,
+.catalog-main,
+.reservas-main,
+.historico-main {
+    animation: studentPageIn 0.35s ease;
+}
+
+@keyframes studentPageIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 body {
     font-size: 1rem;
     line-height: inherit;
@@ -1334,7 +1346,7 @@ html[data-tema="escuro"] .main-content :is(
     color: var(--aluno-status-pending) !important;
 }
 
-html[data-tema="escuro"] .main-content :is(.status-return-requested, .status-return_requested, .status-retirada, .status-devolucao_solicitada) {
+html[data-tema="escuro"] .main-content .status-retirada {
     background: #263b67 !important;
     border-color: #7995d4 !important;
     color: #dce7ff !important;
@@ -1414,6 +1426,61 @@ html[data-tema="escuro"] .top-header .btn-logout:hover {
     border: 1px solid #dbe3ee !important;
     border-radius: 50% !important;
     line-height: 1;
+}
+
+.aluno-appearance-controls {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.aluno-appearance-button {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 1px solid #d3daf5;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #0035ff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.aluno-appearance-button:hover {
+    border-color: #ffad00;
+    transform: rotate(-12deg);
+}
+
+.aluno-appearance-button:focus-visible {
+    outline: 3px solid #ffad00 !important;
+    outline-offset: 3px !important;
+}
+
+.aluno-appearance-button .icon-sun { display: none; color: #ffad00; }
+html[data-tema="escuro"] .aluno-appearance-button .icon-moon,
+html[data-tema="alto_contraste"] .aluno-appearance-button .icon-moon,
+html[data-tema="alto_contraste"] .aluno-appearance-button .icon-sun { display: none; }
+html[data-tema="escuro"] .aluno-appearance-button .icon-sun { display: block; }
+.aluno-appearance-button .icon-contrast { display: none; }
+html[data-tema="alto_contraste"] .aluno-appearance-button .icon-contrast { display: block; }
+
+html[data-tema="escuro"] .aluno-appearance-button {
+    background: #111a42;
+    border-color: #28357f;
+    color: #8fa6ff;
+}
+
+html[data-tema="escuro"] .aluno-appearance-button:hover {
+    border-color: #ffad00;
+}
+
+html[data-tema="alto_contraste"] .aluno-appearance-button {
+    background: #000000;
+    border: 1px solid #ffffff;
+    color: #ffffff !important;
 }
 
 .top-header .notification-btn > i {

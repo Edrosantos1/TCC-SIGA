@@ -9,6 +9,13 @@ if (file_exists($configPath)) {
     exit;
 }
 
+$conn = $GLOBALS['conn'] ?? null;
+if (!($conn instanceof mysqli)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Conexão com o banco de dados indisponível']);
+    exit;
+}
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(401);
@@ -31,11 +38,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['error' => 'Ação inválida']);
         exit;
     }
-    $stmt = $conn->prepare('UPDATE notificacoes SET lida = 1 WHERE id_aluno = ?');
+    $stmt = $conn->prepare('UPDATE notificacoes SET lida = 1 WHERE id_aluno = ? AND (lida = 0 OR lida IS NULL)');
+    if (!$stmt) {
+        http_response_code(500);
+        exit('Não foi possível atualizar as notificações.');
+    }
     $stmt->bind_param('i', $usuario_id);
     $stmt->execute();
+    $stmt->close();
     if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
-        header('Location: ../aluno/painel.php?mensagem=Notificacoes+marcadas+como+lidas');
+        $paginasPermitidas = [
+            'painel.php',
+            'catalogo.php',
+            'favoritos.php',
+            'emprestimos.php',
+            'reservas.php',
+            'historico.php',
+            'configuracoes.php',
+        ];
+        $pagina = $input['redirect'] ?? 'painel.php';
+        $consulta = '';
+        if (is_string($pagina) && strpos($pagina, '?') !== false) {
+            [$pagina, $consulta] = explode('?', $pagina, 2);
+            if (!preg_match('/^[A-Za-z0-9_\-.%=&\[\]+,:@~]*$/', $consulta)) {
+                $consulta = '';
+            }
+        }
+        if (!is_string($pagina) || !in_array($pagina, $paginasPermitidas, true)) {
+            $pagina = 'painel.php';
+            $consulta = '';
+        }
+        $diretorioRaiz = dirname(dirname(str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '')));
+        $basePath = rtrim($diretorioRaiz, '/');
+        header('Location: ' . $basePath . '/aluno/' . $pagina . ($consulta !== '' ? '?' . $consulta : ''), true, 303);
         exit;
     }
     echo json_encode(['success' => true]);

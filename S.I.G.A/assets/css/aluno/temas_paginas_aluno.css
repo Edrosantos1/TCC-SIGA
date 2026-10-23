@@ -1,19 +1,42 @@
 html[data-tema="escuro"] .dashboard-main .card-section,
-html[data-tema="escuro"] .dashboard-main .ranking-container {
+html[data-tema="escuro"] .dashboard-main .ranking-container,
+html[data-tema="escuro"] .dashboard-main .loans-dashboard-section {
     background: var(--aluno-surface) !important;
     border-color: var(--aluno-border) !important;
     color: var(--aluno-text) !important;
     box-shadow: var(--aluno-shadow) !important;
 }
 
-html[data-tema="escuro"] .dashboard-main .continue-card,
-html[data-tema="escuro"] .dashboard-main .ranking-item,
-html[data-tema="escuro"] .dashboard-main .ranking-sub small,
+html[data-tema="escuro"] .dashboard-main .emprestimo-ativo-item,
+html[data-tema="escuro"] .dashboard-main .podium-material,
 html[data-tema="escuro"] .dashboard-main .tcc-cover-card.empty {
     background: var(--aluno-surface-raised) !important;
     border-color: var(--aluno-border) !important;
     color: var(--aluno-text) !important;
     box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main :is(.section-header h2, .emprestimo-ativo-info h3, .emprestimo-ativo-info p, .emprestimo-ativo-info small, .podium-title, .podium-author) {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main :is(.tcc-subtitle, .ranking-empty, .painel-vazio, .podium-favorites) {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .tcc-modal {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .tcc-modal :is(h3, h4, p, li) {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .podium-type {
+    background: var(--aluno-surface-raised) !important;
+    color: var(--aluno-text) !important;
 }
 
 html[data-tema="escuro"] .catalog-main .catalog-filters,
@@ -245,7 +268,7 @@ html[data-tema="escuro"][data-daltonismo]:not([data-daltonismo="normal"]) .confi
 
 html[data-tema] .sidebar,
 html[data-tema] .top-header,
-html[data-tema] .main-content :is(.card, .card-section, .ranking-container, .config-card, .catalog-filters, .fav-toolbar, .catalogo-card, .favorito-card, .loans-tabs, .loans-toolbar, .loan-card, .loan-detail-item, .reserva-card, .reserva-date, .historico-filters, .historico-item, .catalog-empty, .catalog-empty-inner, .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty, .continue-card, .ranking-item, .ranking-sub small, .tcc-cover-card.empty, .config-card .opcao-card:not(.active)) {
+html[data-tema] .main-content :is(.card, .card-section, .ranking-container, .loans-dashboard-section, .emprestimo-ativo-item, .podium-material, .config-card, .catalog-filters, .fav-toolbar, .catalogo-card, .favorito-card, .loans-tabs, .loans-toolbar, .loan-card, .loan-detail-item, .reserva-card, .reserva-date, .historico-filters, .historico-item, .catalog-empty, .catalog-empty-inner, .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty, .continue-card, .ranking-item, .ranking-sub small, .tcc-cover-card.empty, .config-card .opcao-card:not(.active)) {
     background-color: var(--aluno-surface) !important;
     border-color: var(--aluno-border) !important;
     color: var(--aluno-text) !important;
@@ -260,8 +283,26 @@ html[data-tema] .catalog-main .filter-chip:not(.active) {
     color: var(--aluno-text) !important;
 }
 
-html[data-tema] .catalog-main :is(.catalog-hero-content h1, .stat-pill-num, .filter-summary, .filter-summary i, .tipo-livro, .paginacao a) {
+html[data-tema] .catalog-main :is(.catalog-hero-content h1, .stat-pill-num, .filter-summary, .filter-summary i, .tipo-livro) {
     color: var(--aluno-primary) !important;
+}
+
+html[data-tema] .catalog-main .paginacao a:not(.active) {
+    background: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema] .catalog-main .paginacao a:not(.active):is(:hover, :focus-visible) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-primary) !important;
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema] .catalog-main .paginacao a.active {
+    background: var(--aluno-action-bg) !important;
+    border-color: var(--aluno-action-bg) !important;
+    color: var(--aluno-action-text) !important;
 }
 
 html[data-tema="escuro"] .catalog-main #catalog-title {
@@ -385,11 +426,37 @@ html[data-tema="escuro"] .main-content :is(.filter-chip.active:disabled, .fav-ch
 
 html[data-tema="alto_contraste"] .sidebar,
 html[data-tema="alto_contraste"] .top-header,
-html[data-tema="alto_contraste"] .main-content :is(.card, .card-section, .ranking-container, .config-card, .catalog-filters, .fav-toolbar, .catalogo-card, .favorito-card, .loans-tabs, .loans-toolbar, .loan-card, .loan-detail-item, .reserva-card, .reserva-date, .historico-filters, .historico-item, .catalog-empty, .catalog-empty-inner, .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty, .continue-card, .ranking-item, .ranking-sub small, .tcc-cover-card.empty, .config-card .opcao-card:not(.active)) {
+html[data-tema="alto_contraste"] .main-content :is(.card, .card-section, .ranking-container, .loans-dashboard-section, .emprestimo-ativo-item, .podium-material, .config-card, .catalog-filters, .fav-toolbar, .catalogo-card, .favorito-card, .loans-tabs, .loans-toolbar, .loan-card, .loan-detail-item, .reserva-card, .reserva-date, .historico-filters, .historico-item, .catalog-empty, .catalog-empty-inner, .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty, .continue-card, .ranking-item, .ranking-sub small, .tcc-cover-card.empty, .config-card .opcao-card:not(.active)) {
     background: #ffffff !important;
     border: 2px solid #000000 !important;
     color: #000000 !important;
     box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .dashboard-main :is(.podium-title, .podium-author, .emprestimo-ativo-info h3, .emprestimo-ativo-info p, .emprestimo-ativo-info small) {
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .dashboard-main .podium-platform {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .dashboard-main .tcc-modal {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .dashboard-main .podium-medal {
+    border-color: #000000 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .dashboard-main .podium-medal b {
+    color: #ffffff !important;
 }
 
 html[data-tema="alto_contraste"] .sidebar .nav-item.active,
@@ -570,16 +637,11 @@ html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
 html[data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
     .loan-badge.status-pending,
     .loan-badge.status-pendente,
-    .loan-badge.status-return_requested,
     .loan-detail-status.status-pending,
     .loan-detail-status.status-pendente,
-    .loan-detail-status.status-return_requested,
     .reserva-status.status-pending,
     .status-pending,
-    .status-pendente,
-    .status-return-requested,
-    .status-return_requested,
-    .status-devolucao_solicitada
+    .status-pendente
 ) {
     background: var(--aluno-status-pending-bg) !important;
     border-color: var(--aluno-status-pending) !important;
@@ -716,4 +778,527 @@ html[data-tema="escuro"] .main-content :is(.btn-danger, .btn-cancel, .btn-return
 
 html[data-tema="escuro"] .main-content :is(.loans-main .loans-view-toggle > button:not(.active):not([aria-pressed="true"]), .catalog-main .fav-view-toggle > button:not(.active):not([aria-pressed="true"]), .reservas-main .view-toggle .view-btn:not(.active):not([aria-pressed="true"])) :is(span, i, strong) {
     color: var(--aluno-button-secondary-text) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .emprestimo-ativo-status {
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .emprestimo-ativo-status.status-atrasado {
+    color: var(--aluno-status-danger) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .painel-feedback.sucesso {
+    background: var(--aluno-status-active-bg) !important;
+    border: 1px solid var(--aluno-status-active) !important;
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .painel-feedback.erro {
+    background: var(--aluno-status-danger-bg) !important;
+    border: 1px solid var(--aluno-status-danger) !important;
+    color: var(--aluno-status-danger) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .tcc-nav-btn {
+    background: var(--aluno-surface-raised) !important;
+    border: 1px solid var(--aluno-border) !important;
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .tcc-nav-btn:disabled {
+    opacity: 0.75 !important;
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .tcc-nav-btn:hover:not(:disabled),
+html[data-tema="escuro"] .dashboard-main .tcc-nav-btn:focus-visible {
+    background: var(--aluno-button-secondary-hover) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .dashboard-main .podium-favorites i {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-empty-inner .empty-illustration i,
+    .catalog-empty > i,
+    .fav-empty > i,
+    .loan-empty > i,
+    .loan-no-results > i,
+    .reservas-empty > i,
+    .historico-empty > i,
+    .historico-main .empty-state > i
+),
+html[data-tema="escuro"] .notification-dropdown .empty-notifications > i {
+    color: var(--aluno-primary) !important;
+    opacity: 1 !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-favorite:not(.favorited)
+) {
+    background: var(--aluno-surface-raised) !important;
+    border: 1px solid var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-favorite:not(.favorited)
+):is(:hover, :focus-visible) {
+    background: #24366f !important;
+    border-color: var(--aluno-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-favorite.favorited
+) {
+    background: var(--aluno-button-danger-bg) !important;
+    border: 1px solid var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .catalog-main .card-actions .btn-favorite :is(span, i, strong) {
+    color: inherit !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-reserve:not(.reserved)
+) {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #123c46 !important;
+    border: 1px solid #23606a !important;
+    color: #9be8e8 !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-reserve:not(.reserved)
+):is(:hover, :focus-visible) {
+    background: #164c57 !important;
+    border-color: #46a6b2 !important;
+    color: #d8ffff !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-reserve.reserved
+) {
+    background: var(--aluno-status-active-bg) !important;
+    border: 1px solid var(--aluno-status-active) !important;
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] .catalog-main :is(
+    .card-actions .btn-reserve.reserved:hover
+) {
+    background: var(--aluno-button-danger-bg) !important;
+    border-color: var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] .catalog-main .card-actions .btn-reserve :is(span, i, strong) {
+    color: inherit !important;
+}
+
+html[data-tema="escuro"] .catalog-main .card-actions :is(.btn-favorite, .btn-reserve):focus-visible,
+html[data-tema="escuro"] #item-modal-overlay .modal-actions :is(#modal-favorite-btn, #modal-reserve-btn):focus-visible {
+    outline: 2px solid var(--aluno-primary) !important;
+    outline-offset: 2px !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-favorite-btn:not(.favorited) {
+    background: var(--aluno-surface-raised) !important;
+    border: 1px solid var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-favorite-btn:not(.favorited):is(:hover, :focus-visible) {
+    background: #24366f !important;
+    border-color: var(--aluno-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-favorite-btn.favorited {
+    background: var(--aluno-button-danger-bg) !important;
+    border: 1px solid var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-favorite-btn :is(span, i, strong) {
+    color: inherit !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn:not(.reserved) {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #123c46 !important;
+    border: 1px solid #23606a !important;
+    color: #9be8e8 !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn:not(.reserved):is(:hover, :focus-visible) {
+    background: #164c57 !important;
+    border-color: #46a6b2 !important;
+    color: #d8ffff !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn.reserved {
+    background: var(--aluno-status-active-bg) !important;
+    border: 1px solid var(--aluno-status-active) !important;
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn.reserved:hover {
+    background: var(--aluno-button-danger-bg) !important;
+    border-color: var(--aluno-button-danger-border) !important;
+    color: var(--aluno-button-danger-text) !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn :is(span, i, strong) {
+    color: inherit !important;
+}
+
+html[data-tema="alto_contraste"] {
+    color-scheme: light;
+    --aluno-page-bg: #ffffff;
+    --aluno-surface: #ffffff;
+    --aluno-surface-raised: #ffffff;
+    --aluno-text: #000000;
+    --aluno-muted: #222222;
+    --aluno-border: #000000;
+    --aluno-primary: #000000;
+    --aluno-primary-strong: #000000;
+    --aluno-action-bg: #000000;
+    --aluno-action-text: #ffffff;
+    --aluno-shadow: none;
+}
+
+html[data-tema="alto_contraste"],
+html[data-tema="alto_contraste"] body,
+html[data-tema="alto_contraste"] .sidebar,
+html[data-tema="alto_contraste"] .main-content,
+html[data-tema="alto_contraste"] .top-header,
+html[data-tema="alto_contraste"] .main-content main {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    .card, .card-section, .config-card, .table-card, .catalog-filters,
+    .fav-toolbar, .loans-tabs, .loans-toolbar, .reservas-toolbar,
+    .historico-filters, .filter-summary, .catalog-empty, .catalog-empty-inner,
+    .fav-empty, .loan-empty, .loan-no-results, .reservas-empty, .historico-empty,
+    .catalogo-card, .favorito-card, .loan-card, .reserva-card, .historico-item,
+    .loan-detail-item, .reserva-date, .continue-card, .ranking-container,
+    .ranking-item, .loans-dashboard-section, .emprestimo-ativo-item,
+    .podium-material, .tcc-cover-card.empty
+),
+html[data-tema="alto_contraste"] :is(
+    .modal-container, .modal-content, .modal-info, .tcc-modal,
+    .unsaved-dialog__panel, .notification-dropdown, .notification-header,
+    .notification-item, .ui-alert
+) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    h1, h2, h3, h4, h5, p, label, small, li, td, th, dt, dd, span, strong,
+    .desc, .muted, .text-muted, .empty-hint, .empty-description,
+    .modal-meta, .modal-description, .filter-group label
+),
+html[data-tema="alto_contraste"] :is(
+    .modal-container, .modal-content, .modal-info, .tcc-modal,
+    .unsaved-dialog__panel, .notification-dropdown, .notification-item
+) :is(h1, h2, h3, h4, p, span, small, li, strong, label) {
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(a:not(.btn-primary):not(.btn-primary-action):not(.btn-salvar):not(.btn-explore):not(.btn-continue):not(.btn-success):not(.btn-danger):not(.btn-cancel):not(.btn-pickup):not(.btn-return):not(.btn-renew):not(.btn-remover-favorito), .filter-clear),
+html[data-tema="alto_contraste"] .modal-content a:not([class*="btn-"]) {
+    color: #003c8f !important;
+    text-decoration: underline !important;
+    text-decoration-thickness: 2px !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(input, select, textarea),
+html[data-tema="alto_contraste"] :is(.modal-content, .modal-info, .tcc-modal, .unsaved-dialog__panel) :is(input, select, textarea) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(input, textarea)::placeholder {
+    color: #333333 !important;
+    opacity: 1 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(input[type="checkbox"], input[type="radio"]) {
+    accent-color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content select option {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content button,
+html[data-tema="alto_contraste"] :is(.modal-content, .modal-info, .tcc-modal, .unsaved-dialog__panel) button,
+html[data-tema="alto_contraste"] .top-header :is(.notification-btn, .language-button, .aluno-appearance-button),
+html[data-tema="alto_contraste"] .unsaved-dialog__button {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .main-content button :is(span, i, strong),
+html[data-tema="alto_contraste"] :is(.modal-content, .modal-info, .tcc-modal, .unsaved-dialog__panel) button :is(span, i, strong),
+html[data-tema="alto_contraste"] .unsaved-dialog__button :is(span, i, strong) {
+    color: inherit !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    .btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue,
+    .btn-success, .btn-danger, .btn-cancel, .btn-pickup, .btn-return, .btn-renew,
+    .btn-remover-favorito, .btn-reserve:not(.reserved), .filter-submit,
+    .tab-btn.active, .view-btn.active, .view-btn[aria-pressed="true"],
+    .loans-view-toggle button.active, .fav-view-toggle button.active,
+    .loans-view-toggle button[aria-pressed="true"], .fav-view-toggle button[aria-pressed="true"],
+    .filter-chip.active, .fav-chip.active, .loan-chip.active,
+    .config-container .opcao-card.active, .sidebar .nav-item.active
+) {
+    background: #000000 !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    .btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue,
+    .btn-success, .btn-danger, .btn-cancel, .btn-pickup, .btn-return, .btn-renew,
+    .btn-remover-favorito, .btn-reserve:not(.reserved), .filter-submit,
+    .tab-btn.active, .view-btn.active, .view-btn[aria-pressed="true"],
+    .loans-view-toggle button.active, .fav-view-toggle button.active,
+    .loans-view-toggle button[aria-pressed="true"], .fav-view-toggle button[aria-pressed="true"],
+    .filter-chip.active, .fav-chip.active, .loan-chip.active,
+    .config-container .opcao-card.active, .sidebar .nav-item.active
+) :is(span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .unsaved-dialog__button--save {
+    background: #000000 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .unsaved-dialog__button--save :is(span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    .tab-btn:not(.active), .view-btn:not(.active):not([aria-pressed="true"]), .view-btn[aria-pressed="false"],
+    .filter-chip:not(.active), .fav-chip:not(.active), .loan-chip:not(.active),
+    .filter-clear, .fav-clear-btn:not(.btn-explore), .loan-clear-btn,
+    .loans-view-toggle button:not(.active):not([aria-pressed="true"]),
+    .fav-view-toggle button:not(.active):not([aria-pressed="true"]),
+    .modal-close, .tcc-modal-close, .modal-actions button:not(.btn-primary):not(.btn-primary-action)
+),
+html[data-tema="alto_contraste"] .top-header :is(.notification-btn, .language-button, .aluno-appearance-button) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    .tab-btn.active, .view-btn.active, .view-btn[aria-pressed="true"],
+    .filter-chip.active, .fav-chip.active, .loan-chip.active,
+    .loans-view-toggle button.active, .fav-view-toggle button.active
+) :is(span, i) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] :is(.modal-overlay, .tcc-modal-overlay, .unsaved-dialog) {
+    background: rgba(0, 0, 0, .88) !important;
+}
+
+html[data-tema="alto_contraste"] :is(.modal-container, .modal-content, .tcc-modal, .unsaved-dialog__panel) {
+    border: 3px solid #000000 !important;
+}
+
+html[data-tema="alto_contraste"] :is(.modal-close, .tcc-modal-close, .unsaved-dialog__button):is(:hover, :focus-visible),
+html[data-tema="alto_contraste"] .main-content :is(button, .filter-clear, .fav-clear-btn):not(.btn-primary):not(.btn-primary-action):not(.btn-salvar):not(.btn-explore):not(.btn-continue):not(.btn-success):not(.btn-danger):not(.btn-cancel):not(.btn-pickup):not(.btn-return):not(.btn-renew):not(.btn-remover-favorito):is(:hover, :focus-visible) {
+    background: #000000 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] :is(.modal-close, .tcc-modal-close, .unsaved-dialog__button):is(:hover, :focus-visible) :is(i, span),
+html[data-tema="alto_contraste"] .main-content :is(button, .filter-clear, .fav-clear-btn):is(:hover, :focus-visible) :is(i, span) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] :is(
+    .modal-overlay, .tcc-modal-overlay, .unsaved-dialog
+) :is(.modal-container, .modal-content, .modal-info, .tcc-modal, .unsaved-dialog__panel) {
+    background: #ffffff !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] :is(.modal-actions, .tcc-modal-actions, .modal-footer, .unsaved-dialog__actions) {
+    border-top: 2px solid #000000 !important;
+}
+
+html[data-tema="alto_contraste"] :is(
+    a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled),
+    textarea:not(:disabled), [tabindex]:not([tabindex="-1"])
+):focus-visible {
+    outline: 3px solid #000000 !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] :is(button, input, select, textarea):disabled,
+html[data-tema="alto_contraste"] button[aria-disabled="true"] {
+    background: #eeeeee !important;
+    border: 2px solid #333333 !important;
+    color: #333333 !important;
+    opacity: 1 !important;
+}
+
+html[data-tema="alto_contraste"] :is(.status-badge, .loan-badge, .reserva-status, .item-type-badge, .tipo-badge, .fav-type-badge, .badge-loan, .badge-reservation) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .catalog-main .btn-favorite.favorited,
+html[data-tema="alto_contraste"] #item-modal-overlay #modal-favorite-btn.favorited {
+    background: #000000 !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .catalog-main .btn-favorite.favorited :is(span, i, strong),
+html[data-tema="alto_contraste"] #item-modal-overlay #modal-favorite-btn.favorited :is(span, i, strong) {
+    color: #ffffff !important;
+}
+
+.catalog-main .card-info h4,
+.loans-main .loan-title,
+.historico-main .historico-info .title,
+.dashboard-main .emprestimo-ativo-info h3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    height: calc(1.3em * 2);
+    min-height: calc(1.3em * 2);
+    max-height: calc(1.3em * 2);
+    margin-bottom: 4px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+    hyphens: manual;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+@supports not ((-webkit-line-clamp: 2) or (line-clamp: 2)) {
+    .catalog-main .card-info h4,
+    .loans-main .loan-title,
+    .historico-main .historico-info .title,
+    .dashboard-main .emprestimo-ativo-info h3 {
+        display: block;
+        white-space: nowrap;
+    }
+}
+
+html[data-tema="claro"] #item-modal-overlay #modal-reserve-btn:not(.reserved) {
+    background: #d1fae5 !important;
+    border: 1px solid #a7f3d0 !important;
+    color: #065f46 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="claro"] #item-modal-overlay #modal-reserve-btn:not(.reserved):is(:hover, :focus-visible) {
+    background: #a7f3d0 !important;
+    border-color: #6ee7b7 !important;
+    color: #064e3b !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn:not(.reserved) {
+    background: #123c38 !important;
+    border: 1px solid #2c7a4b !important;
+    color: #9be8bc !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="escuro"] #item-modal-overlay #modal-reserve-btn:not(.reserved):is(:hover, :focus-visible) {
+    background: #1f5135 !important;
+    border-color: #9be8bc !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] #item-modal-overlay #modal-reserve-btn:not(.reserved) {
+    background: #006b2d !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] #item-modal-overlay #modal-reserve-btn:not(.reserved):is(:hover, :focus-visible) {
+    background: #004d20 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema] #item-modal-overlay #modal-reserve-btn:not(.reserved) :is(span, i, strong) {
+    color: inherit !important;
+}
+
+html[data-tema="claro"] .main-content :is(
+    .catalog-main .card-info h4,
+    .loans-main .loan-title,
+    .historico-main .historico-info .title,
+    .reservas-main .reserva-body .title,
+    .dashboard-main .emprestimo-ativo-info h3,
+    .dashboard-main .podium-title
+) {
+    color: #0b1e33 !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-main .card-info h4,
+    .loans-main .loan-title,
+    .historico-main .historico-info .title,
+    .reservas-main .reserva-body .title,
+    .dashboard-main .emprestimo-ativo-info h3,
+    .dashboard-main .podium-title
+) {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(
+    .catalog-main .card-info h4,
+    .loans-main .loan-title,
+    .historico-main .historico-info .title,
+    .reservas-main .reserva-body .title,
+    .dashboard-main .emprestimo-ativo-info h3,
+    .dashboard-main .podium-title
+) {
+    color: #000000 !important;
 }

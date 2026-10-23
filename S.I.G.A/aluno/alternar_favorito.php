@@ -14,13 +14,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $usuario_id = $_SESSION['usuario_id'];
+
+    $stmt_usuario = $conn->prepare('SELECT id_aluno FROM login_aluno WHERE id_aluno = ?');
+    $stmt_usuario->bind_param('i', $usuario_id);
+    $stmt_usuario->execute();
+    $usuarioExiste = $stmt_usuario->get_result()->num_rows > 0;
+    $stmt_usuario->close();
+
+    if (!$usuarioExiste) {
+        unset($_SESSION['usuario_id'], $_SESSION['usuario_nome'], $_SESSION['usuario_serie']);
+        setcookie('relembrar_token', '', appCookieOptions(time() - 3600));
+        setcookie('user_id', '', appCookieOptions(time() - 3600));
+        session_regenerate_id(true);
+        $_SESSION['flash_login_error'] = [
+            'msg' => 'sessao_usuario_invalida',
+            'register' => false,
+        ];
+        header('Location: auth/login.php');
+        exit;
+    }
+
     $item_id = intval($_POST['item_id']);
     $tipo_item = $_POST['tipo_item'];
     
     // Define para onde redirecionar (padrão é a página anterior)
-    $redirect = isset($_POST['redirect']) && !empty($_POST['redirect']) 
-                ? $_POST['redirect'] 
-                : (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'catalogo.php');
+    $redirect = redirect_seguro($_POST['redirect'] ?? ($_SERVER['HTTP_REFERER'] ?? ''), 'catalogo.php');
 
     // Validação básica do tipo de item
     $tipos_permitidos = ['livro', 'revista', 'tcc'];
@@ -64,6 +82,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
-
-
 

@@ -280,7 +280,7 @@ body.tema-escuro .btn-restaurar:hover {
 
 body.tema-alto_contraste .config-header h1,
 body.tema-alto_contraste .config-card h3 {
-    color: #ffff00;
+    color: #ffffff;
 }
 
 body.tema-alto_contraste .config-header p,
@@ -304,9 +304,9 @@ body.tema-alto_contraste .opcao-card {
 body.tema-alto_contraste .opcao-card:hover,
 body.tema-alto_contraste .opcao-card.active {
     color: #000;
-    background: #ff0;
-    border-color: #ff0;
-    box-shadow: 0 0 0 2px #000, 0 0 0 4px #ff0;
+    background: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff;
 }
 
 body.tema-alto_contraste .opcao-card:hover *,
@@ -327,8 +327,8 @@ body.tema-alto_contraste .toggle-switch .slider {
 }
 
 body.tema-alto_contraste .toggle-switch input:checked + .slider {
-    background: #ff0;
-    border-color: #ff0;
+    background: #fff;
+    border-color: #fff;
 }
 
 body.tema-alto_contraste .toggle-switch input:checked + .slider::before {
@@ -337,7 +337,7 @@ body.tema-alto_contraste .toggle-switch input:checked + .slider::before {
 
 body.tema-alto_contraste .btn-salvar {
     color: #000;
-    background: #ff0;
+    background: #fff;
     border: 2px solid #fff;
 }
 
@@ -360,12 +360,12 @@ body.tema-alto_contraste .btn-restaurar {
 
 body.tema-alto_contraste .btn-restaurar:hover {
     color: #000;
-    background: #ff0;
+    background: #fff;
 }
 
 body.tema-alto_contraste .aviso-nao-salvo {
     color: #000;
-    background: #ff0;
+    background: #fff;
     border-color: #fff;
 }
 

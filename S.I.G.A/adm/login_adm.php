@@ -10,7 +10,7 @@ $erro = $_SESSION['flash_admin_login_error'] ?? '';
 unset($_SESSION['flash_admin_login_error']);
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="light" data-suporta-alto-contraste="true">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,8 +20,15 @@ unset($_SESSION['flash_admin_login_error']);
   <script>
     (function () {
       try {
-        var theme = localStorage.getItem("siga-theme");
-        if (theme !== "light" && theme !== "dark") {
+        var theme = localStorage.getItem("siga-tema");
+        if (theme !== "light" && theme !== "dark" && theme !== "contrast") {
+          theme = localStorage.getItem("siga-theme");
+          if (theme === "light" || theme === "dark" || theme === "contrast") {
+            localStorage.setItem("siga-tema", theme);
+            localStorage.removeItem("siga-theme");
+          }
+        }
+        if (theme !== "light" && theme !== "dark" && theme !== "contrast") {
           theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
         }
         document.documentElement.setAttribute("data-theme", theme);
@@ -29,14 +36,15 @@ unset($_SESSION['flash_admin_login_error']);
     })();
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/adm/login_adm.css">
+  <link rel="stylesheet" href="../assets/css/adm/login_adm.css?v=<?= filemtime(__DIR__ . '/../assets/css/adm/login_adm.css') ?>">
 </head>
 <body>
   <div class="full-background">
 
-    <button type="button" class="theme-toggle" id="theme_toggle" aria-pressed="false" aria-label="Tema escuro">
+    <button type="button" class="theme-toggle" id="theme_toggle" aria-label="Alternar tema">
       <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
       <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+      <i class="fas fa-circle-half-stroke icone-contraste" aria-hidden="true"></i>
     </button>
 
     <!-- SELETOR DE IDIOMA -->

@@ -28,7 +28,7 @@ if ($db) {
         $queryAlunos = "
             SELECT a.id_aluno, a.nome_aluno, a.serie_aluno, a.serie_aluno AS turma,
                    EXISTS(SELECT 1 FROM reservas r WHERE r.id_aluno = a.id_aluno AND r.status IN ('pendente','aprovada')) AS tem_reservas,
-                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado','devolucao_solicitada')) AS tem_emprestimos
+                   EXISTS(SELECT 1 FROM emprestimos m WHERE m.id_aluno = a.id_aluno AND m.status IN ('emprestado','atrasado')) AS tem_emprestimos
             FROM login_aluno a
             ORDER BY a.nome_aluno ASC
         ";

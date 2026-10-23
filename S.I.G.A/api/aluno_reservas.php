@@ -1,8 +1,31 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/reservas_funcoes.php';
 
 ini_set('display_errors', 0);
-error_reporting(0);
+ini_set('log_errors', 1);
+error_reporting(E_ALL);
+
+// Qualquer erro inesperado (ex.: falha do MySQL) é registrado no log do PHP e vira
+// uma mensagem em vez de uma tela em branco. Em desenvolvimento, mostra o detalhe.
+set_exception_handler(function (Throwable $e) {
+    error_log('[SIGA] api/aluno_reservas.php: ' . $e->getMessage() . ' em ' . $e->getFile() . ':' . $e->getLine());
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    $emDesenvolvimento = (($GLOBALS['ambiente'] ?? 'production') === 'development');
+    if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
+        header('Content-Type: application/json');
+        echo json_encode(['error' => 'Não foi possível concluir a ação.'] + ($emDesenvolvimento ? ['detalhe' => $e->getMessage()] : []));
+        exit;
+    }
+    header('Content-Type: text/html; charset=UTF-8');
+    echo '<p>Não foi possível concluir a ação. <a href="javascript:history.back()">Voltar</a></p>';
+    if ($emDesenvolvimento) {
+        echo '<pre>' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . '</pre>';
+    }
+    exit;
+});
 
 function jsonResponse($data, $status = 200) {
     http_response_code($status);
@@ -15,9 +38,31 @@ if (!isset($_SESSION['usuario_id'])) {
     jsonResponse(['error' => 'Não autorizado'], 401);
 }
 
+siga_expirar_reservas($conexao);
+
 $usuario_id = (int)$_SESSION['usuario_id'];
 $method = $_SERVER['REQUEST_METHOD'];
 $db = $conn;
+
+// O aluno da sessão precisa existir no banco (senão o INSERT falha por chave estrangeira).
+$stmtAluno = $db->prepare('SELECT 1 FROM login_aluno WHERE id_aluno = ? LIMIT 1');
+if ($stmtAluno) {
+    $stmtAluno->bind_param('i', $usuario_id);
+    $stmtAluno->execute();
+    $alunoExiste = $stmtAluno->get_result()->num_rows > 0;
+    $stmtAluno->close();
+    if (!$alunoExiste) {
+        session_unset();
+        session_destroy();
+        session_start();
+        $_SESSION['flash_login_error'] = ['msg' => 'Sua sessão não é mais válida. Entre novamente.', 'register' => false];
+        if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
+            jsonResponse(['error' => 'Sessão inválida. Faça login novamente.'], 401);
+        }
+        header('Location: ../aluno/auth/login.php');
+        exit;
+    }
+}
 
 // ---------- GET: listar reservas do aluno ----------
 if ($method === 'GET') {
@@ -42,7 +87,7 @@ if ($method === 'POST') {
     if (!csrf_validar(isset($input['csrf']) && is_string($input['csrf']) ? $input['csrf'] : null)) {
         jsonResponse(['error' => 'Token CSRF inválido. Recarregue a página e tente novamente.'], 403);
     }
-    $redirect = $input['redirect'] ?? '../aluno/reservas.php';
+    $redirect = redirect_seguro($input['redirect'] ?? '', '../aluno/reservas.php');
     $redirectSeparator = strpos($redirect, '?') === false ? '?' : '&';
 
     // Ação de cancelamento
@@ -81,13 +126,19 @@ if ($method === 'POST') {
     $tipo = trim($input['tipo'] ?? 'livro');
     if ($id_catalogo <= 0) jsonResponse(['error' => 'ID do catálogo inválido'], 400);
 
-    $check = $db->prepare("SELECT id_catalogo, titulo, quantidade FROM catalogo WHERE id_catalogo = ? AND tipo = ?");
+    // A transação trava a linha do item: duas reservas simultâneas do último exemplar não passam juntas.
+    $db->begin_transaction();
+    $check = $db->prepare("SELECT c.id_catalogo, c.titulo, " . siga_sql_disponiveis('c') . " AS disponiveis FROM catalogo c WHERE c.id_catalogo = ? AND c.tipo = ? FOR UPDATE");
     if (!$check) jsonResponse(['error' => 'Erro na verificação do item'], 500);
     $check->bind_param('is', $id_catalogo, $tipo);
     $check->execute();
     $item = $check->get_result()->fetch_assoc();
-    if (!$item) jsonResponse(['error' => 'Item não encontrado'], 404);
-    if ((int) $item['quantidade'] <= 0) {
+    if (!$item) {
+        $db->rollback();
+        jsonResponse(['error' => 'Item não encontrado'], 404);
+    }
+    if ((int) $item['disponiveis'] <= 0) {
+        $db->rollback();
         jsonResponse(['error' => 'Este item está indisponível para reserva'], 409);
     }
 
@@ -96,6 +147,7 @@ if ($method === 'POST') {
     $checkRes->bind_param('ii', $usuario_id, $id_catalogo);
     $checkRes->execute();
     if ($checkRes->get_result()->num_rows > 0) {
+        $db->rollback();
         if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
             header('Location: ' . $redirect . $redirectSeparator . http_build_query(['error' => 'Você já possui uma reserva ativa']));
             exit;
@@ -104,16 +156,29 @@ if ($method === 'POST') {
     }
 
     $data_limite = date('Y-m-d', strtotime('+7 days'));
-    $insert = $db->prepare("INSERT INTO reservas (id_aluno, id_catalogo, titulo_item, data_reserva, data_limite, status) VALUES (?, ?, ?, NOW(), ?, 'pendente')");
-    if (!$insert) jsonResponse(['error' => 'Erro na preparação da inserção'], 500);
-    $insert->bind_param('iiss', $usuario_id, $id_catalogo, $item['titulo'], $data_limite);
+    // Alguns bancos antigos têm a coluna tipo_item em reservas; se existir, preenche.
+    $coluna_tipo = false;
+    $tipoCheck = $db->query("SHOW COLUMNS FROM reservas LIKE 'tipo_item'");
+    if ($tipoCheck && $tipoCheck->num_rows > 0) $coluna_tipo = true;
+
+    if ($coluna_tipo) {
+        $insert = $db->prepare("INSERT INTO reservas (id_aluno, id_catalogo, titulo_item, tipo_item, data_reserva, data_limite, status) VALUES (?, ?, ?, ?, NOW(), ?, 'pendente')");
+        if (!$insert) jsonResponse(['error' => 'Erro na preparação da inserção'], 500);
+        $insert->bind_param('iisss', $usuario_id, $id_catalogo, $item['titulo'], $tipo, $data_limite);
+    } else {
+        $insert = $db->prepare("INSERT INTO reservas (id_aluno, id_catalogo, titulo_item, data_reserva, data_limite, status) VALUES (?, ?, ?, NOW(), ?, 'pendente')");
+        if (!$insert) jsonResponse(['error' => 'Erro na preparação da inserção'], 500);
+        $insert->bind_param('iiss', $usuario_id, $id_catalogo, $item['titulo'], $data_limite);
+    }
     if ($insert->execute()) {
+        $db->commit();
         if (!str_contains($_SERVER['CONTENT_TYPE'] ?? '', 'application/json')) {
             header('Location: ' . $redirect . $redirectSeparator . http_build_query(['mensagem' => 'Reserva criada com sucesso']));
             exit;
         }
         jsonResponse(['success' => true, 'message' => 'Reserva criada com sucesso', 'id' => $insert->insert_id]);
     } else {
+        $db->rollback();
         jsonResponse(['error' => 'Erro ao criar reserva: ' . $insert->error], 500);
     }
 }
@@ -142,8 +207,8 @@ if ($method === 'DELETE') {
     $check->execute();
     $res = $check->get_result()->fetch_assoc();
     if (!$res) jsonResponse(['error' => 'Reserva não encontrada'], 404);
-    if ($res['status'] !== 'pendente') {
-        jsonResponse(['error' => 'Apenas reservas pendentes podem ser canceladas'], 400);
+    if (!in_array($res['status'], ['pendente', 'aprovada'], true)) {
+        jsonResponse(['error' => 'Esta reserva não pode mais ser cancelada'], 400);
     }
     $update = $db->prepare("UPDATE reservas SET status = 'cancelada' WHERE id_reserva = ?");
     if (!$update) jsonResponse(['error' => 'Erro na preparação'], 500);

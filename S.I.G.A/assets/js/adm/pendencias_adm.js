@@ -78,7 +78,7 @@ function formatarDataRelativa(data) {
 }
 
 function rotuloDias(p) {
-    if (p.status === 'atrasado' || p.atraso_pendente) {
+    if (p.status === 'atrasado') {
         const d = p.dias_atraso || 0;
         return { texto: d === 1 ? '1 dia de atraso' : `${d} dias de atraso`, classe: 'aux-atraso' };
     }
@@ -90,7 +90,7 @@ function rotuloDias(p) {
     return { texto: textoPrazo, classe: 'aux-ok' };
 }
 
-const venceHoje = p => p.status !== 'atrasado' && !p.atraso_pendente && p.dias_restantes === 0;
+const venceHoje = p => p.status !== 'atrasado' && p.dias_restantes === 0;
 
 // ========== BUSCA DE ALUNO NO TOPO (copiada do dashboard_adm.js) ==========
 function getAvatarColor() { return '#0035ff'; }
@@ -242,7 +242,7 @@ function filtrarEOrdenar() {
     let lista = [...pendencias];
 
     if (filtroAtual === 'hoje') lista = lista.filter(venceHoje);
-    else if (filtroAtual === 'atrasado') lista = lista.filter(p => p.status === 'atrasado' || p.atraso_pendente);
+    else if (filtroAtual === 'atrasado') lista = lista.filter(p => p.status === 'atrasado');
     else if (filtroAtual !== 'todos') lista = lista.filter(p => p.status === filtroAtual);
 
     const termos = normalizar(buscaAtual).split(/\s+/).filter(Boolean);
@@ -259,7 +259,7 @@ function filtrarEOrdenar() {
         lista.sort((a, b) => new Date(a.data_emprestimo) - new Date(b.data_emprestimo));
     } else if (ordemAtual === 'urgencia') {
         lista.sort((a, b) => {
-            const rank = p => p.status === 'atrasado' || p.atraso_pendente ? 0 : 1;
+            const rank = p => p.status === 'atrasado' ? 0 : 1;
             const r = rank(a) - rank(b);
             if (r !== 0) return r;
             return new Date(a.data_limite) - new Date(b.data_limite);
@@ -306,29 +306,27 @@ function renderizarPendencias() {
         const statusIcon = {
             'emprestado': 'fa-check-circle',
             'atrasado': 'fa-exclamation-triangle',
-            'devolucao_solicitada': 'fa-clipboard-check',
             'devolvido': 'fa-undo-alt'
         }[p.status] || 'fa-circle';
 
         const statusLabel = p.status === 'emprestado'
             ? (p.dias_restantes < 0 ? 'Em tolerância' : 'No prazo')
-            : p.status === 'devolucao_solicitada' ? 'Devolução solicitada'
             : p.status.charAt(0).toUpperCase() + p.status.slice(1);
         const dataEmp = formatarDataBR(p.data_emprestimo);
         const dataLim = formatarDataBR(p.data_limite);
         const inicial = p.aluno ? p.aluno.trim().charAt(0).toUpperCase() : '?';
         const rotulo = rotuloDias(p);
 
-        const rowClass = p.status === 'atrasado' || p.atraso_pendente
+        const rowClass = p.status === 'atrasado'
             ? 'pendencia-row row-atraso'
             : (venceHoje(p) ? 'pendencia-row row-hoje' : 'pendencia-row');
 
         const delay = idx < 8 ? `style="animation-delay:${idx * 35}ms"` : '';
         const serie = p.serie ? `<span class="aluno-serie">${escapeHtml(p.serie)}</span>` : '';
 
-        const acoes = (p.status === 'emprestado' || p.status === 'atrasado' || p.status === 'devolucao_solicitada')
-            ? `<button type="button" class="btn-acao btn-devolver" data-id="${escapeHtml(p.id)}" title="${p.status === 'devolucao_solicitada' ? 'Confirmar devolução recebida' : 'Registrar devolução recebida'}">
-                    <i class="fas ${p.status === 'devolucao_solicitada' ? 'fa-clipboard-check' : 'fa-undo-alt'}"></i> ${p.status === 'devolucao_solicitada' ? 'Confirmar recebimento' : 'Registrar devolução'}
+        const acoes = (p.status === 'emprestado' || p.status === 'atrasado')
+            ? `<button type="button" class="btn-acao btn-devolver" data-id="${escapeHtml(p.id)}" title="Registrar devolução recebida">
+                    <i class="fas fa-undo-alt"></i> Registrar devolução
                </button>`
             : `<span class="sem-acao" title="Sem ações disponíveis">—</span>`;
 
@@ -425,9 +423,7 @@ function abrirModalDevolucao(item) {
 
     const btn = document.getElementById('modal-confirmar');
     btn.disabled = false;
-    btn.innerHTML = item.status === 'devolucao_solicitada'
-        ? '<i class="fas fa-check"></i> Confirmar recebimento'
-        : '<i class="fas fa-check"></i> Registrar devolução recebida';
+    btn.innerHTML = '<i class="fas fa-check"></i> Registrar devolução recebida';
     document.getElementById('modal-cancelar').disabled = false;
 
     overlay.hidden = false;
@@ -509,7 +505,7 @@ function initModalDevolucao() {
 // ========== BADGES ==========
 function atualizarBadges() {
     const total = pendencias.length;
-    const atrasados = pendencias.filter(p => p.status === 'atrasado' || p.atraso_pendente).length;
+    const atrasados = pendencias.filter(p => p.status === 'atrasado').length;
     const emprestados = pendencias.filter(p => p.status === 'emprestado').length;
     const hoje = pendencias.filter(venceHoje).length;
 

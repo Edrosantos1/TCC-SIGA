@@ -18,14 +18,12 @@
 
     var ATRIBUTO = {
         tamanho_fonte: 'data-fonte',
-        tema: 'data-tema',
         daltonismo: 'data-daltonismo',
         espacamento: 'data-espacamento'
     };
 
     var PADRAO = {
         tamanho_fonte: 'medio',
-        tema: 'claro',
         daltonismo: 'normal',
         espacamento: 'normal',
         reduzir_animacoes: false

@@ -2,7 +2,10 @@
     const controls = document.querySelector('.admin-appearance-controls');
     if (!controls || !document.body) return;
 
-    const buttons = [...controls.querySelectorAll('[data-admin-appearance]')];
+    const button = controls.querySelector('[data-admin-appearance-toggle]');
+    if (!button) return;
+
+    const appearances = ['claro', 'escuro', 'alto_contraste'];
     const appearanceClasses = ['tema-claro', 'tema-escuro', 'tema-alto_contraste'];
 
     function currentAppearance() {
@@ -11,33 +14,33 @@
         return 'claro';
     }
 
-    function updateButtons(appearance) {
-        buttons.forEach(button => {
-            const active = button.dataset.adminAppearance === appearance;
-            const label = button.dataset.adminAppearance === 'escuro' ? 'modo escuro' : 'alto contraste';
-            const action = active ? 'Desativar' : 'Ativar';
-            button.setAttribute('aria-pressed', String(active));
-            button.setAttribute('aria-label', `${action} ${label}`);
-            button.title = `${action} ${label}`;
-        });
+    function updateButton(appearance) {
+        const currentIndex = appearances.indexOf(appearance);
+        const nextAppearance = appearances[(currentIndex + 1) % appearances.length];
+        const labels = {
+            claro: 'claro',
+            escuro: 'escuro',
+            alto_contraste: 'alto contraste'
+        };
+        const label = `Tema atual: ${labels[appearance]}. Próximo: ${labels[nextAppearance]}.`;
+        button.setAttribute('aria-label', label);
+        button.title = label;
     }
 
     function setAppearance(appearance) {
         document.body.classList.remove(...appearanceClasses);
         if (appearance !== 'claro') document.body.classList.add(`tema-${appearance}`);
-        updateButtons(appearance);
+        updateButton(appearance);
 
         const secure = location.protocol === 'https:' ? '; Secure' : '';
         document.cookie = `siga_admin_appearance=${appearance}; Max-Age=31536000; Path=/; SameSite=Lax${secure}`;
         document.dispatchEvent(new CustomEvent('admin:appearancechange', { detail: { appearance } }));
     }
 
-    updateButtons(currentAppearance());
+    updateButton(currentAppearance());
 
-    buttons.forEach(button => {
-        button.addEventListener('click', () => {
-            const selected = button.dataset.adminAppearance;
-            setAppearance(currentAppearance() === selected ? 'claro' : selected);
-        });
+    button.addEventListener('click', () => {
+        const currentIndex = appearances.indexOf(currentAppearance());
+        setAppearance(appearances[(currentIndex + 1) % appearances.length]);
     });
 })();

@@ -825,3 +825,48 @@
     .modal-actions button.is-loading::before { animation-duration: 1.8s; }
     .catalogo-card.card-flash { animation: none; outline: 2px solid #0b4b9b; }
 }
+
+/* ===================== DISPONIBILIDADE NO CARD ===================== */
+.disp-badge {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.disp-badge::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.disp-badge.available   { background: #dcfce7; color: #166534; }
+.disp-badge.unavailable { background: #fee2e2; color: #991b1b; }
+
+/* Reservar bloqueado: item sem exemplar livre */
+.btn-reserve.indisponivel,
+.btn-reserve.indisponivel:hover {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+.catalogo-card:has(.disp-badge.unavailable) .card-capa img {
+    filter: grayscale(0.6);
+    opacity: 0.85;
+}
+
+/* Garante o visual de bloqueado em qualquer tema (claro, escuro, alto contraste) */
+html[data-tema] .catalog-main .btn-reserve.indisponivel,
+html[data-tema] .modal-actions .btn-reserve.indisponivel,
+.modal-actions button.indisponivel {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+}
