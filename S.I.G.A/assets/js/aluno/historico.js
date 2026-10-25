@@ -121,18 +121,6 @@ let currentFilters = {
 };
 
 // ===================== FUNÇÕES AUXILIARES =====================
-function getCurrentLanguage() {
-  let idioma = localStorage.getItem('siga-idioma');
-  if (!idioma) {
-    idioma = localStorage.getItem('dashboard_lang');
-    if (idioma) {
-      localStorage.setItem('siga-idioma', idioma);
-      localStorage.removeItem('dashboard_lang');
-    }
-  }
-  return idioma || 'pt';
-}
-
 function getHistoricoTranslation(key, lang) {
   const t = historicoTranslations[lang] || historicoTranslations.pt;
   return t[key] || key;

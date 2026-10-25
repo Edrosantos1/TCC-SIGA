@@ -354,6 +354,9 @@ document.addEventListener("DOMContentLoaded", () => {
     idiomaAtual = lang;
     const t = translations[lang];
 
+    document.documentElement.lang = ({ pt: "pt-BR", en: "en", es: "es" })[lang] || "pt-BR";
+    if (typeof window.atualizarRotuloTema === "function") window.atualizarRotuloTema();
+
     document.getElementById("bandeira_atual").src = t.bandeira;
     document.getElementById("texto_idioma_atual").textContent = lang.toUpperCase();
 

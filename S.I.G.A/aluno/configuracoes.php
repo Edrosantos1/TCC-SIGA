@@ -36,7 +36,7 @@ if ($stmt_notificacoes) {
 // Processar formulário (valida e grava; depois redireciona para evitar reenvio)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
     if (!csrf_validar()) {
-        $_SESSION['msg_erro'] = 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.';
+        $_SESSION['msg_erro'] = 'flash_csrf';
         header('Location: configuracoes.php');
         exit;
     }
@@ -49,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['salvar'])) {
     }
 
     if ($ok) {
-        $_SESSION['msg_sucesso'] = 'Preferências salvas com sucesso!';
+        $_SESSION['msg_sucesso'] = 'flash_saved';
     } else {
-        $_SESSION['msg_erro'] = 'Não foi possível salvar suas preferências. Tente novamente.';
+        $_SESSION['msg_erro'] = 'flash_error';
     }
     $destino = $ok ? config_destino_local_seguro($_POST['redirect_apos_salvar'] ?? null) : null;
     header('Location: ' . ($destino ?? 'configuracoes.php'));
@@ -66,37 +66,44 @@ $msg_sucesso = $_SESSION['msg_sucesso'] ?? null;
 $msg_erro    = $_SESSION['msg_erro'] ?? null;
 unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
 
+// Texto padrão (português) de cada mensagem; configuracoes_aluno.js troca pelo idioma escolhido
+$textosFlash = [
+    'flash_saved' => 'Preferências salvas com sucesso!',
+    'flash_error' => 'Não foi possível salvar suas preferências. Tente novamente.',
+    'flash_csrf'  => 'Sessão expirada ou token de segurança inválido. Recarregue a página e tente novamente.',
+];
+
 // Grupos de opções (cada um vira um card; o valor salvo é a chave de 'opcoes')
 $grupos = [
     'tamanho_fonte' => [
-        'titulo' => 'Tamanho da Fonte',
+        'titulo' => 'Tamanho da Fonte', 'titulo_key' => 'cfg_font_title',
         'icone'  => 'fa-font',
-        'desc'   => 'Altere o tamanho do texto em todo o sistema',
+        'desc'   => 'Altere o tamanho do texto em todo o sistema', 'desc_key' => 'cfg_font_desc',
         'opcoes' => [
-            'pequeno' => ['Pequeno', '<i class="fas fa-font" style="font-size: 12px;"></i>'],
-            'medio'   => ['Médio',   '<i class="fas fa-font" style="font-size: 16px;"></i>'],
-            'grande'  => ['Grande',  '<i class="fas fa-font" style="font-size: 22px;"></i>'],
+            'pequeno' => ['Pequeno', '<i class="fas fa-font" style="font-size: 12px;"></i>', 'opt_small'],
+            'medio'   => ['Médio',   '<i class="fas fa-font" style="font-size: 16px;"></i>', 'opt_medium'],
+            'grande'  => ['Grande',  '<i class="fas fa-font" style="font-size: 22px;"></i>', 'opt_large'],
         ],
     ],
     'daltonismo' => [
-        'titulo' => 'Daltonismo',
+        'titulo' => 'Daltonismo', 'titulo_key' => 'cfg_color_title',
         'icone'  => 'fa-eye',
-        'desc'   => 'Ajuste as cores para facilitar a diferença entre tons confundidos',
+        'desc'   => 'Ajuste as cores para facilitar a diferença entre tons confundidos', 'desc_key' => 'cfg_color_desc',
         'opcoes' => [
-            'normal'       => ['Normal',       '<i class="fas fa-eye"></i>'],
-            'protanopia'   => ['Protanopia',   '<span class="emoji" aria-hidden="true">🔴</span>'],
-            'deuteranopia' => ['Deuteranopia', '<span class="emoji" aria-hidden="true">🟢</span>'],
-            'tritanopia'   => ['Tritanopia',   '<span class="emoji" aria-hidden="true">🔵</span>'],
+            'normal'       => ['Normal',       '<i class="fas fa-eye"></i>', 'opt_normal'],
+            'protanopia'   => ['Protanopia',   '<span class="emoji" aria-hidden="true">🔴</span>', 'opt_protanopia'],
+            'deuteranopia' => ['Deuteranopia', '<span class="emoji" aria-hidden="true">🟢</span>', 'opt_deuteranopia'],
+            'tritanopia'   => ['Tritanopia',   '<span class="emoji" aria-hidden="true">🔵</span>', 'opt_tritanopia'],
         ],
     ],
     'espacamento' => [
-        'titulo' => 'Espaçamento',
+        'titulo' => 'Espaçamento', 'titulo_key' => 'cfg_spacing_title',
         'icone'  => 'fa-arrows-alt-h',
-        'desc'   => 'Ajuste a densidade da informação na tela',
+        'desc'   => 'Ajuste a densidade da informação na tela', 'desc_key' => 'cfg_spacing_desc',
         'opcoes' => [
-            'compacto'    => ['Compacto',    '<i class="fas fa-compress-arrows-alt"></i>'],
-            'normal'      => ['Normal',      '<i class="fas fa-arrows-alt-h"></i>'],
-            'confortavel' => ['Confortável', '<i class="fas fa-expand-arrows-alt"></i>'],
+            'compacto'    => ['Compacto',    '<i class="fas fa-compress-arrows-alt"></i>', 'opt_compact'],
+            'normal'      => ['Normal',      '<i class="fas fa-arrows-alt-h"></i>', 'opt_normal'],
+            'confortavel' => ['Confortável', '<i class="fas fa-expand-arrows-alt"></i>', 'opt_comfortable'],
         ],
     ],
 ];
@@ -129,7 +136,7 @@ $grupos = [
                 <i class="fas fa-book-reader"></i>
                 <span>SiGA ITJ</span>
             </div>
-            <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
+            <button class="collapse-icon" id="collapseBtn" title="Recolher menu" data-i18n-title="collapse_menu">
                 <span></span>
                 <span></span>
             </button>
@@ -151,21 +158,21 @@ $grupos = [
         <main class="container dashboard-main">
             <div class="config-container">
                 <div class="config-header">
-                    <h1><i class="fas fa-sliders-h"></i> Minhas Preferências</h1>
-                    <p>Ajuste suas preferências de acessibilidade. As mudanças aparecem na hora; clique em salvar para mantê-las.</p>
+                    <h1><i class="fas fa-sliders-h"></i> <span data-i18n="cfg_title">Minhas Preferências</span></h1>
+                    <p data-i18n="cfg_subtitle">Ajuste suas preferências de acessibilidade. As mudanças aparecem na hora; clique em salvar para mantê-las.</p>
                 </div>
 
                 <?php if ($msg_sucesso): ?>
                     <div class="flash-message flash-success" role="status">
                         <i class="fas fa-check-circle"></i>
-                        <?= htmlspecialchars($msg_sucesso) ?>
+                        <span data-i18n="<?= htmlspecialchars($msg_sucesso) ?>"><?= htmlspecialchars($textosFlash[$msg_sucesso] ?? $msg_sucesso) ?></span>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($msg_erro): ?>
                     <div class="flash-message flash-error" role="alert">
                         <i class="fas fa-exclamation-circle"></i>
-                        <?= htmlspecialchars($msg_erro) ?>
+                        <span data-i18n="<?= htmlspecialchars($msg_erro) ?>"><?= htmlspecialchars($textosFlash[$msg_erro] ?? $msg_erro) ?></span>
                     </div>
                 <?php endif; ?>
 
@@ -174,17 +181,17 @@ $grupos = [
 
                     <?php foreach ($grupos as $campo => $grupo): ?>
                         <?php $atual = $configuracoes[$campo]; ?>
-                        <div class="config-card" role="radiogroup" aria-label="<?= htmlspecialchars($grupo['titulo']) ?>">
-                            <h3><i class="fas <?= $grupo['icone'] ?>"></i> <?= htmlspecialchars($grupo['titulo']) ?></h3>
-                            <p class="desc"><?= htmlspecialchars($grupo['desc']) ?></p>
+                        <div class="config-card" role="radiogroup" aria-label="<?= htmlspecialchars($grupo['titulo']) ?>" data-i18n-aria="<?= $grupo['titulo_key'] ?>">
+                            <h3><i class="fas <?= $grupo['icone'] ?>"></i> <span data-i18n="<?= $grupo['titulo_key'] ?>"><?= htmlspecialchars($grupo['titulo']) ?></span></h3>
+                            <p class="desc" data-i18n="<?= $grupo['desc_key'] ?>"><?= htmlspecialchars($grupo['desc']) ?></p>
                             <div class="form-group">
                                 <div class="opcoes-grid">
-                                    <?php foreach ($grupo['opcoes'] as $valor => [$rotulo, $icone]): ?>
+                                    <?php foreach ($grupo['opcoes'] as $valor => [$rotulo, $icone, $chaveRotulo]): ?>
                                         <?php $marcado = ($atual === $valor); ?>
                                         <label class="opcao-card <?= $marcado ? 'active' : '' ?>">
                                             <input type="radio" name="<?= $campo ?>" value="<?= $valor ?>" <?= $marcado ? 'checked' : '' ?>>
                                             <?= $icone ?>
-                                            <span><?= htmlspecialchars($rotulo) ?></span>
+                                            <span data-i18n="<?= $chaveRotulo ?>"><?= htmlspecialchars($rotulo) ?></span>
                                         </label>
                                     <?php endforeach; ?>
                                 </div>
@@ -194,26 +201,26 @@ $grupos = [
 
                     <!-- Reduzir Animações -->
                     <div class="config-card">
-                        <h3><i class="fas fa-stop-circle"></i> Acessibilidade</h3>
-                        <p class="desc">Reduza ou desative animações para melhor performance e acessibilidade</p>
+                        <h3><i class="fas fa-stop-circle"></i> <span data-i18n="cfg_access_title">Acessibilidade</span></h3>
+                        <p class="desc" data-i18n="cfg_access_desc">Reduza ou desative animações para melhor performance e acessibilidade</p>
                         <div class="form-group">
                             <label class="toggle-switch">
                                 <input type="checkbox" name="reduzir_animacoes" value="1" <?= $configuracoes['reduzir_animacoes'] === '1' ? 'checked' : '' ?>>
                                 <span class="slider"></span>
-                                <span class="toggle-label">Reduzir animações</span>
+                                <span class="toggle-label" data-i18n="cfg_reduce_motion">Reduzir animações</span>
                             </label>
                         </div>
                     </div>
 
                     <div class="config-actions">
                         <div class="aviso-nao-salvo" id="avisoNaoSalvo" hidden>
-                            <i class="fas fa-info-circle"></i> Você tem alterações que ainda não foram salvas.
+                            <i class="fas fa-info-circle"></i> <span data-i18n="cfg_unsaved_notice">Você tem alterações que ainda não foram salvas.</span>
                         </div>
                         <button type="submit" name="salvar" class="btn-salvar">
-                            <i class="fas fa-save"></i> Salvar Preferências
+                            <i class="fas fa-save"></i> <span data-i18n="cfg_save">Salvar Preferências</span>
                         </button>
                         <button type="button" class="btn-restaurar" id="btnRestaurar">
-                            <i class="fas fa-undo"></i> Restaurar padrão
+                            <i class="fas fa-undo"></i> <span data-i18n="cfg_restore">Restaurar padrão</span>
                         </button>
                     </div>
                 </form>
@@ -224,12 +231,12 @@ $grupos = [
     <div class="unsaved-dialog" id="unsaved-changes-dialog" role="dialog" aria-modal="true" aria-labelledby="unsaved-dialog-title" aria-describedby="unsaved-dialog-description" hidden>
         <div class="unsaved-dialog__panel">
             <div class="unsaved-dialog__icon" aria-hidden="true"><i class="fas fa-floppy-disk"></i></div>
-            <h2 id="unsaved-dialog-title">Alterações não salvas</h2>
-            <p id="unsaved-dialog-description">Você alterou suas preferências. Deseja aplicar as mudanças antes de sair?</p>
+            <h2 id="unsaved-dialog-title" data-i18n="cfg_dialog_title">Alterações não salvas</h2>
+            <p id="unsaved-dialog-description" data-i18n="cfg_dialog_desc">Você alterou suas preferências. Deseja aplicar as mudanças antes de sair?</p>
             <div class="unsaved-dialog__actions">
-                <button type="button" class="unsaved-dialog__button unsaved-dialog__button--save" data-unsaved-action="save">Salvar e sair</button>
-                <button type="button" class="unsaved-dialog__button unsaved-dialog__button--discard" data-unsaved-action="discard">Sair sem salvar</button>
-                <button type="button" class="unsaved-dialog__button unsaved-dialog__button--stay" data-unsaved-action="stay">Continuar editando</button>
+                <button type="button" class="unsaved-dialog__button unsaved-dialog__button--save" data-unsaved-action="save" data-i18n="cfg_dialog_save">Salvar e sair</button>
+                <button type="button" class="unsaved-dialog__button unsaved-dialog__button--discard" data-unsaved-action="discard" data-i18n="cfg_dialog_discard">Sair sem salvar</button>
+                <button type="button" class="unsaved-dialog__button unsaved-dialog__button--stay" data-unsaved-action="stay" data-i18n="cfg_dialog_stay">Continuar editando</button>
             </div>
         </div>
     </div>

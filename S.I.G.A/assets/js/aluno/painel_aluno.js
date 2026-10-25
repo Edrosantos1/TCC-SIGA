@@ -20,13 +20,33 @@ const dashboardTranslations = {
     explore_catalog: "Explorar Catálogo",
     my_loans: "Meus Empréstimos",
     my_reservations: "Minhas Reservas",
-    notifications: {
-      overdue: "O livro \"{book}\" está {days} dias atrasado. Por favor, devolva à biblioteca.",
-      reminder: "Lembrete: Você tem um livro para devolver amanhã.",
-      newBook: "Novo livro disponível no catálogo: \"{book}\".",
-      reservationReady: "Sua reserva de \"{book}\" já está disponível para retirada.",
-      empty: "Nenhuma notificação nova"
-    }
+    collapse_menu: "Recolher menu",
+    language_label: "Selecionar idioma",
+    appearance_label: "Aparência",
+    mark_all_read: "Marcar tudo como lido",
+    notif_empty: "Nenhuma notificação por aqui",
+    notif_pendency: "Pendência",
+    notif_notice: "Aviso",
+    time_now: "Agora pouco",
+    time_min: "min atrás",
+    time_hour: "h atrás",
+    time_yesterday: "Ontem",
+    loans_active_title: "Meus Empréstimos Ativos",
+    view_loans: "Ver empréstimos",
+    return_expected: "Devolução prevista:",
+    no_active_loans: "Você não tem empréstimos ativos no momento.",
+    tcc_view_all: "Ver todos",
+    tcc_empty: "Ainda não há TCCs cadastrados no catálogo.",
+    tcc_prev: "TCCs anteriores",
+    tcc_next: "Próximos TCCs",
+    tcc_close: "Fechar detalhes",
+    ranking_title: "Acervos em destaque",
+    ranking_link: "Meus favoritos",
+    ranking_empty: "O ranking aparece assim que os materiais receberem favoritos.",
+    place_label: "{n}º lugar",
+    favorites_word: "favoritos",
+    loan_date_label: "Empréstimo:",
+    due_date_label: "Vencimento:"
   },
   en: {
     search_placeholder: "Search books, authors, magazines...",
@@ -44,13 +64,33 @@ const dashboardTranslations = {
     explore_catalog: "Explore Catalog",
     my_loans: "My Loans",
     my_reservations: "My Reservations",
-    notifications: {
-      overdue: "The book \"{book}\" is {days} days overdue. Please return it to the library.",
-      reminder: "Reminder: You have a book to return tomorrow.",
-      newBook: "New book available in the catalog: \"{book}\".",
-      reservationReady: "Your reservation for \"{book}\" is now available for pickup.",
-      empty: "No new notifications"
-    }
+    collapse_menu: "Collapse menu",
+    language_label: "Select language",
+    appearance_label: "Appearance",
+    mark_all_read: "Mark all as read",
+    notif_empty: "No notifications here",
+    notif_pendency: "Pending issue",
+    notif_notice: "Notice",
+    time_now: "Just now",
+    time_min: "min ago",
+    time_hour: "h ago",
+    time_yesterday: "Yesterday",
+    loans_active_title: "My Active Loans",
+    view_loans: "View loans",
+    return_expected: "Expected return:",
+    no_active_loans: "You have no active loans at the moment.",
+    tcc_view_all: "View all",
+    tcc_empty: "There are no theses registered in the catalog yet.",
+    tcc_prev: "Previous theses",
+    tcc_next: "Next theses",
+    tcc_close: "Close details",
+    ranking_title: "Featured collection",
+    ranking_link: "My favorites",
+    ranking_empty: "The ranking appears as soon as items receive favorites.",
+    place_label: "Rank {n}",
+    favorites_word: "favorites",
+    loan_date_label: "Loan:",
+    due_date_label: "Due:"
   },
   es: {
     search_placeholder: "Buscar libros, autores, revistas...",
@@ -68,13 +108,33 @@ const dashboardTranslations = {
     explore_catalog: "Explorar Catálogo",
     my_loans: "Mis Préstamos",
     my_reservations: "Mis Reservas",
-    notifications: {
-      overdue: "El libro \"{book}\" tiene {days} días de retraso. Por favor, devuélvalo a la biblioteca.",
-      reminder: "Recordatorio: Tiene un libro que devolver mañana.",
-      newBook: "Nuevo libro disponible en el catálogo: \"{book}\".",
-      reservationReady: "Su reserva de \"{book}\" ya está disponible para recoger.",
-      empty: "No hay notificaciones nuevas"
-    }
+    collapse_menu: "Contraer menú",
+    language_label: "Seleccionar idioma",
+    appearance_label: "Apariencia",
+    mark_all_read: "Marcar todo como leído",
+    notif_empty: "No hay notificaciones por aquí",
+    notif_pendency: "Pendiente",
+    notif_notice: "Aviso",
+    time_now: "Hace un momento",
+    time_min: "min atrás",
+    time_hour: "h atrás",
+    time_yesterday: "Ayer",
+    loans_active_title: "Mis Préstamos Activos",
+    view_loans: "Ver préstamos",
+    return_expected: "Devolución prevista:",
+    no_active_loans: "No tienes préstamos activos en este momento.",
+    tcc_view_all: "Ver todos",
+    tcc_empty: "Aún no hay TFCs registrados en el catálogo.",
+    tcc_prev: "TFCs anteriores",
+    tcc_next: "Próximos TFCs",
+    tcc_close: "Cerrar detalles",
+    ranking_title: "Acervos destacados",
+    ranking_link: "Mis favoritos",
+    ranking_empty: "El ranking aparece cuando los materiales reciban favoritos.",
+    place_label: "Puesto {n}",
+    favorites_word: "favoritos",
+    loan_date_label: "Préstamo:",
+    due_date_label: "Vencimiento:"
   }
 };
 
@@ -98,15 +158,47 @@ function showFeedbackMessage(message) {
 
 function applyDashboardLanguage(lang) {
   const t = dashboardTranslations[lang];
-  if (!t) {
-    console.warn(`Idioma "${lang}" não encontrado.`);
-    return;
-  }
-  console.log(`Aplicando idioma: ${lang}`);
+  if (!t) return;
 
-  // Header
+  document.documentElement.lang = { pt: 'pt-BR', en: 'en', es: 'es' }[lang] || 'pt-BR';
+  if (typeof window.atualizarRotuloTema === 'function') window.atualizarRotuloTema();
+
+  // Textos marcados no HTML: data-i18n (texto), -placeholder, -title (title + aria-label), -aria, -alt
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const texto = t[el.dataset.i18n];
+    if (texto !== undefined) el.textContent = texto;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const texto = t[el.dataset.i18nPlaceholder];
+    if (texto !== undefined) el.placeholder = texto;
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach((el) => {
+    const texto = t[el.dataset.i18nTitle];
+    if (texto !== undefined) {
+      el.title = texto;
+      el.setAttribute('aria-label', texto);
+    }
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+    const texto = t[el.dataset.i18nAria];
+    if (texto !== undefined) el.setAttribute('aria-label', texto);
+  });
+  document.querySelectorAll('[data-i18n-alt]').forEach((el) => {
+    const texto = t[el.dataset.i18nAlt];
+    if (texto !== undefined) el.alt = texto;
+  });
+  document.querySelectorAll('.podium-medal[data-pos]').forEach((el) => {
+    el.setAttribute('aria-label', t.place_label.replace('{n}', el.dataset.pos));
+  });
+
+  // Cabeçalho
   const searchInput = document.getElementById('search-input');
   if (searchInput) searchInput.placeholder = t.search_placeholder;
+
+  const welcome = document.querySelector('.user-info .welcome');
+  if (welcome && welcome.firstChild && welcome.firstChild.nodeType === Node.TEXT_NODE) {
+    welcome.firstChild.textContent = t.welcome_prefix;
+  }
 
   const logoutSpan = document.getElementById('logout-text');
   if (logoutSpan) logoutSpan.textContent = t.logout;
@@ -114,41 +206,33 @@ function applyDashboardLanguage(lang) {
   const notifBtn = document.getElementById('notification-btn');
   if (notifBtn) notifBtn.title = t.notification_title;
 
-  // ========== SIDEBAR ==========
-  const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+  // Menu lateral (na ordem dos links)
   const navTexts = [
-    t.nav_overview, 
-    t.nav_catalog, 
-    t.nav_favorites, 
-    t.nav_loans, 
-    t.nav_reservations, 
+    t.nav_overview,
+    t.nav_catalog,
+    t.nav_favorites,
+    t.nav_loans,
+    t.nav_reservations,
     t.nav_history,
     t.nav_settings
   ];
-  navItems.forEach((item, idx) => {
+  document.querySelectorAll('.sidebar-nav .nav-item').forEach((item, idx) => {
     const span = item.querySelector('span');
     if (span && navTexts[idx]) span.textContent = navTexts[idx];
   });
 
-  // Seção "Ações Rápidas"
+  // Painel: ações rápidas (só existem nessa página)
   const quickTitle = document.querySelector('.section-title');
   if (quickTitle) quickTitle.textContent = t.quick_actions_title;
 
-  const actionBtns = document.querySelectorAll('.actions-grid .action-btn span');
   const actionTexts = [t.explore_catalog, t.my_loans, t.my_reservations];
-  actionBtns.forEach((btn, idx) => {
+  document.querySelectorAll('.actions-grid .action-btn span').forEach((btn, idx) => {
     if (actionTexts[idx]) btn.textContent = actionTexts[idx];
   });
 
-  // Atualiza notificações se o sistema já estiver carregado
-  if (typeof renderNotifications === 'function') {
-    renderNotifications(lang);
-  }
-
-  // Atualiza textos do carrossel de TCCs
-  if (typeof applyTccLanguage === 'function') {
-    applyTccLanguage(lang);
-  }
+  // Sininho e carrossel de TCCs
+  document.dispatchEvent(new CustomEvent('siga:idioma', { detail: { lang } }));
+  if (typeof applyTccLanguage === 'function') applyTccLanguage(lang);
 }
 
 // ===================== SELETOR DE IDIOMA =====================
@@ -160,7 +244,6 @@ function initLanguageSwitcher() {
   const langSpan = button?.querySelector('span');
 
   if (!wrapper || !button) {
-    console.error('Elementos do seletor de idioma não encontrados!');
     return;
   }
 
@@ -182,14 +265,13 @@ function initLanguageSwitcher() {
       if (langSpan && mainFlag && clickedFlag) {
         langSpan.textContent = lang.toUpperCase();
         mainFlag.src = clickedFlag;
-        mainFlag.alt = `Bandeira ${clickedAlt}`;
+        mainFlag.alt = clickedAlt;
       }
 
       applyDashboardLanguage(lang);
       wrapper.classList.remove('open');
       localStorage.setItem('siga-idioma', lang);
       localStorage.removeItem('dashboard_lang');
-      console.log(`Idioma alterado para: ${lang}`);
     });
   });
 
@@ -281,10 +363,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 3. Inicializa idioma
   initLanguageSwitcher();
   
-  // 4. Inicializa notificações
-  if (typeof window.notificacoesData !== 'undefined') {
-    notificacoes = window.notificacoesData;
-  }
   if (window.favoritosPHP) {
     Object.keys(window.favoritosPHP).forEach(key => {
       const parts = key.split('_');
@@ -299,13 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  initNotifications();
-  renderizarDropdownNotificacoes();
-
   // 5. Inicializa carrossel de TCCs
   initTccCarousel();
 
-  console.log('%cDashboard SiGA ITJ carregado com sucesso!', 'color: #0b4b9b; font-weight: bold;');
 });
 
 // ===================== CARROSSEL DE TCCs =====================
@@ -327,6 +401,11 @@ const tccTranslations = {
     feedback_unfavorited: 'TCC removido dos favoritos.',
     feedback_reserved: 'Reserva realizada com sucesso!',
     feedback_unreserved: 'Reserva cancelada.',
+    untitled: 'Sem título',
+    no_author: 'Autor não informado',
+    no_year: 'Ano não informado',
+    no_description: 'Descrição não informada',
+    view_details: 'Ver detalhes',
   },
   en: {
     section_title: 'Thesis Works',
@@ -343,6 +422,11 @@ const tccTranslations = {
     feedback_unfavorited: 'Thesis removed from favorites.',
     feedback_reserved: 'Reservation made successfully!',
     feedback_unreserved: 'Reservation cancelled.',
+    untitled: 'Untitled',
+    no_author: 'Author not informed',
+    no_year: 'Year not informed',
+    no_description: 'Description not informed',
+    view_details: 'View details',
   },
   es: {
     section_title: 'Trabajos de Fin de Carrera',
@@ -350,8 +434,8 @@ const tccTranslations = {
     badge: 'TFC',
     theme_label: 'Tema',
     members_label: 'Integrantes',
-    favorite: 'Favoritar',
-    favorited: 'Favorito',
+    favorite: 'Agregar a favoritos',
+    favorited: 'En favoritos',
     reserve: 'Reservar',
     reserved: 'Reservado',
     cancel_reserve: 'Cancelar reserva',
@@ -359,20 +443,29 @@ const tccTranslations = {
     feedback_unfavorited: 'TFC eliminado de favoritos.',
     feedback_reserved: '¡Reserva realizada con éxito!',
     feedback_unreserved: 'Reserva cancelada.',
+    untitled: 'Sin título',
+    no_author: 'Autor no informado',
+    no_year: 'Año no informado',
+    no_description: 'Descripción no informada',
+    view_details: 'Ver detalles',
   }
 };
 
 // TCCs cadastrados no banco e injetados pela página.
-const tccData = (window.tccsData || []).map(item => ({
-  id: Number(item.id_catalogo),
-  title: item.titulo || 'TCC sem título',
-  author: item.autor || 'Autor não informado',
-  cover: item.capa_url || null,
-  year: item.ano_publicacao || 'Ano não informado',
-  area: item.autor || 'TCC',
-  theme: item.descricao || 'Descrição não informada',
-  members: (item.autor || 'Autor não informado').split(',').map(member => member.trim())
-}));
+const tccData = (window.tccsData || []).map(item => {
+  const tr = () => tccTranslations[getCurrentLanguage()] || tccTranslations.pt;
+  // Getters: os textos padrão acompanham o idioma escolhido no momento da exibição.
+  return {
+    id: Number(item.id_catalogo),
+    get title() { return item.titulo || tr().untitled; },
+    get author() { return item.autor || tr().no_author; },
+    cover: item.capa_url || null,
+    get year() { return item.ano_publicacao || tr().no_year; },
+    area: item.autor || 'TCC',
+    get theme() { return item.descricao || tr().no_description; },
+    get members() { return (item.autor || tr().no_author).split(',').map(member => member.trim()); }
+  };
+});
 // Paleta de gradientes para os placeholders
 const tccGradients = [
   'linear-gradient(135deg, #0b4b9b 0%, #17c8cc 100%)',
@@ -411,7 +504,7 @@ function renderTccCarousel() {
     card.className = 'tcc-cover-card';
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-label', `Ver detalhes: ${tcc.title}`);
+    card.setAttribute('aria-label', `${(tccTranslations[getCurrentLanguage()] || tccTranslations.pt).view_details}: ${tcc.title}`);
     card.dataset.id = tcc.id;
 
     const gradient = tccGradients[idx % tccGradients.length];
@@ -698,91 +791,13 @@ function applyTccLanguage(lang) {
   const t = tccTranslations[lang] || tccTranslations.pt;
 
   const titleEl = document.getElementById('tcc-section-title');
-  if (titleEl) titleEl.textContent = t.section_title;
+  if (titleEl) titleEl.lastChild.textContent = ' ' + t.section_title;
 
   const subtitleEl = document.getElementById('tcc-section-subtitle');
   if (subtitleEl) subtitleEl.textContent = t.section_subtitle;
-}
 
-// ========== NOTIFICAÇÕES (SININHO) ==========
-let notificacoes = [];
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function formatarData(data) {
-    const d = new Date(data);
-    const agora = new Date();
-    const diff = Math.floor((agora - d) / 1000);
-
-    if (diff < 60) return 'Agora pouco';
-    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
-    if (diff < 172800) return 'Ontem';
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
-}
-
-function renderizarDropdownNotificacoes() {
-    const lista = document.getElementById('notification-list-dropdown');
-    if (!lista) return;
-
-    if (!notificacoes || notificacoes.length === 0) {
-        lista.innerHTML = `
-            <div class="empty-notifications">
-                <i class="far fa-bell-slash"></i>
-                <p>Nenhuma notificação nova</p>
-            </div>
-        `;
-        return;
-    }
-
-    lista.innerHTML = notificacoes.map(notificacao => {
-        const isPendencia = notificacao.tipo === 'pendencia';
-        const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
-        const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
-        const label = isPendencia ? 'Pendência' : 'Aviso';
-
-        return `
-            <div class="notification-item${Number(notificacao.lida) ? ' is-read' : ''}">
-                <div class="notification-icon" style="color: ${corIcon};">
-                    <i class="fas ${icone}"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-message">
-                        <strong style="color: ${corIcon};">${label}</strong><br>
-                        ${escapeHtml(notificacao.mensagem)}
-                    </div>
-                    <div class="notification-footer">
-                        <span class="notification-date">${formatarData(notificacao.criado_em)}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function initNotifications() {
-    const btn = document.getElementById('notification-btn');
-    const dropdown = document.getElementById('notification-dropdown');
-    if (!btn || !dropdown) return;
-
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('show');
-        if (dropdown.classList.contains('show')) {
-            renderizarDropdownNotificacoes();
-        }
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('show');
-        }
-    });
+  // Os cartões são desenhados pelo JS: refaz para trocar o aria-label e os textos padrão
+  if (document.getElementById('tcc-track')) renderTccCarousel();
 }
 
 // ===================== FUNÇÃO PARA OBTER IDIOMA ATUAL =====================

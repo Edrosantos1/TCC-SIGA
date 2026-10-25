@@ -8,9 +8,10 @@ $destinoAposLerTopo = $paginaAtualTopo . ($consultaTopo !== '' ? '?' . $consulta
 
 // O sininho mostra e conta só as notificações não lidas: ao marcar tudo como lido, elas somem.
 $idAlunoTopo = (int) ($_SESSION['usuario_id'] ?? 0);
-if ($idAlunoTopo > 0 && isset($conn) && $conn instanceof mysqli) {
+$connTopo = $GLOBALS['conn'] ?? null;
+if ($idAlunoTopo > 0 && $connTopo instanceof mysqli) {
     try {
-        $stmtTopo = $conn->prepare(
+        $stmtTopo = $connTopo->prepare(
             'SELECT id, id_envio, titulo, mensagem, tipo, criado_em, COALESCE(lida, 0) AS lida
              FROM notificacoes WHERE id_aluno = ? AND COALESCE(lida, 0) = 0
              ORDER BY criado_em DESC, id DESC LIMIT 10'
@@ -22,7 +23,7 @@ if ($idAlunoTopo > 0 && isset($conn) && $conn instanceof mysqli) {
             $stmtTopo->close();
         }
 
-        $stmtContaTopo = $conn->prepare('SELECT COUNT(*) FROM notificacoes WHERE id_aluno = ? AND COALESCE(lida, 0) = 0');
+        $stmtContaTopo = $connTopo->prepare('SELECT COUNT(*) FROM notificacoes WHERE id_aluno = ? AND COALESCE(lida, 0) = 0');
         if ($stmtContaTopo) {
             $stmtContaTopo->bind_param('i', $idAlunoTopo);
             $stmtContaTopo->execute();
@@ -45,7 +46,7 @@ if ($idAlunoTopo > 0 && isset($conn) && $conn instanceof mysqli) {
     <div class="header-right">
         <?php require __DIR__ . '/aluno_appearance_controls.php'; ?>
         <div class="language-wrapper">
-            <button class="language-button" aria-label="Selecionar idioma">
+            <button class="language-button" aria-label="Selecionar idioma" data-i18n-aria="language_label">
                 <img src="../assets/Imagens/br.png" class="flag" alt="Bandeira do Brasil">
                 <span>PT</span>
                 <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5"/></svg>
@@ -62,7 +63,7 @@ if ($idAlunoTopo > 0 && isset($conn) && $conn instanceof mysqli) {
             <span class="welcome">Olá, <strong id="user-name"><?= htmlspecialchars($primeiroNomeTopo, ENT_QUOTES, 'UTF-8') ?></strong>!</span>
         </div>
 
-        <a href="auth/sair.php" class="btn-logout" title="Sair">
+        <a href="auth/sair.php" class="btn-logout" title="Sair" data-i18n-title="logout">
             <i class="fas fa-sign-out-alt"></i>
             <span id="logout-text">Sair</span>
         </a>
@@ -76,14 +77,18 @@ if ($idAlunoTopo > 0 && isset($conn) && $conn instanceof mysqli) {
             </button>
             <div class="notification-dropdown" id="notification-dropdown">
                 <div class="notification-header">
-                    <h4><i class="fas fa-bell"></i> Notificações</h4>
+                    <h4><i class="fas fa-bell"></i> <span data-i18n="notification_title">Notificações</span></h4>
                 </div>
                 <div class="notification-list" id="notification-list-dropdown"></div>
                 <form id="mark-read-form" class="notification-mark-read-form"<?= $naoLidasTopo > 0 ? '' : ' hidden' ?> action="../api/aluno_notificacoes.php" method="POST">
-                    <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="csrf" value="<?= htmlspecialchars(
+                    function_exists('csrf_token') ? csrf_token() : '',
+                    ENT_QUOTES,
+                    'UTF-8'
+                ) ?>">
                     <input type="hidden" name="action" value="mark_all_read">
                     <input type="hidden" name="redirect" value="<?= htmlspecialchars($destinoAposLerTopo, ENT_QUOTES, 'UTF-8') ?>">
-                    <button type="submit" class="notification-mark-read-btn" id="mark-read-btn">Marcar tudo como lido</button>
+                    <button type="submit" class="notification-mark-read-btn" id="mark-read-btn" data-i18n="mark_all_read">Marcar tudo como lido</button>
                 </form>
             </div>
         </div>

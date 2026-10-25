@@ -223,7 +223,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo"><i class="fas fa-book-reader"></i><span>SiGA ITJ</span></div>
-            <button class="collapse-icon" id="collapseBtn"><span></span><span></span></button>
+            <button class="collapse-icon" id="collapseBtn" title="Recolher menu" data-i18n-title="collapse_menu"><span></span><span></span></button>
         </div>
         <nav class="sidebar-nav">
             <a href="painel.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
@@ -268,7 +268,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                            autocomplete="off">
                 </div>
 
-                <div class="filter-chips" role="group" aria-label="Filtrar por tipo">
+                <div class="filter-chips" role="group" aria-label="Filtrar por tipo" data-i18n-aria="filter_by_type">
                     <button type="submit" name="tipo" value=""
                             class="filter-chip <?= $filtroTipo === '' ? 'active' : '' ?>"
                             aria-pressed="<?= $filtroTipo === '' ? 'true' : 'false' ?>"
@@ -297,8 +297,8 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
 
                 <div class="filter-actions">
                     <?php if ($filtroTipo || $filtroBusca): ?>
-                        <a href="catalogo.php" class="filter-clear" title="Limpar filtros">
-                            <i class="fas fa-times"></i> Limpar
+                        <a href="catalogo.php" class="filter-clear" title="Limpar filtros" data-i18n-title="clear_filters">
+                            <i class="fas fa-times"></i> <span data-i18n="clear">Limpar</span>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -310,10 +310,11 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                     <i class="fas fa-info-circle"></i>
                     <?php
                         $resumo = [];
-                        if ($filtroBusca) $resumo[] = 'busca: "' . htmlspecialchars($filtroBusca) . '"';
-                        if ($filtroTipo) $resumo[] = 'tipo: ' . htmlspecialchars(ucfirst($filtroTipo));
+                        $chavesTipo = ['livro' => 'type_book', 'revista' => 'type_magazine', 'tcc' => 'type_tcc'];
+                        if ($filtroBusca) $resumo[] = '<span data-i18n="summary_search">busca</span>: "' . htmlspecialchars($filtroBusca) . '"';
+                        if ($filtroTipo) $resumo[] = '<span data-i18n="summary_type">tipo</span>: <span data-i18n="' . ($chavesTipo[$filtroTipo] ?? 'type_book') . '">' . htmlspecialchars(ucfirst($filtroTipo)) . '</span>';
                     ?>
-                    Mostrando <strong><?= $total ?></strong> <?= $total == 1 ? 'resultado' : 'resultados' ?> · <?= implode(' · ', $resumo) ?>
+                    <span data-i18n="showing">Mostrando</span> <strong><?= $total ?></strong> <span data-i18n="<?= $total == 1 ? 'result_one' : 'result_many' ?>"><?= $total == 1 ? 'resultado' : 'resultados' ?></span> · <?= implode(' · ', $resumo) ?>
                 </div>
             <?php endif; ?>
 
@@ -322,10 +323,10 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
 
             <!-- ========== PAGINAÇÃO ========== -->
             <?php if ($totalPaginas > 1): ?>
-            <nav class="paginacao" aria-label="Paginação do catálogo">
+            <nav class="paginacao" aria-label="Paginação do catálogo" data-i18n-aria="pagination_label">
                 <?php if ($paginaAtual > 1): ?>
                     <a href="?pagina=<?= $paginaAtual-1 ?>&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>" class="page-nav">
-                        <i class="fas fa-chevron-left"></i> Anterior
+                        <i class="fas fa-chevron-left"></i> <span data-i18n="prev_page">Anterior</span>
                     </a>
                 <?php endif; ?>
 
@@ -353,7 +354,7 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
 
                 <?php if ($paginaAtual < $totalPaginas): ?>
                     <a href="?pagina=<?= $paginaAtual+1 ?>&tipo=<?= urlencode($filtroTipo) ?>&busca=<?= urlencode($filtroBusca) ?>" class="page-nav">
-                        Próximo <i class="fas fa-chevron-right"></i>
+                        <span data-i18n="next_page">Próximo</span> <i class="fas fa-chevron-right"></i>
                     </a>
                 <?php endif; ?>
             </nav>
@@ -366,9 +367,9 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
                         <i class="fas fa-search"></i>
                     </div>
                     <h3 id="catalog-no-results">Nenhum resultado encontrado</h3>
-                    <p>Tente ajustar os filtros ou explorar outra categoria.</p>
+                    <p data-i18n="no_results_hint">Tente ajustar os filtros ou explorar outra categoria.</p>
                     <a href="catalogo.php" class="empty-cta">
-                        <i class="fas fa-undo"></i> Limpar filtros
+                        <i class="fas fa-undo"></i> <span data-i18n="clear_filters">Limpar filtros</span>
                     </a>
                 </div>
             </div>
@@ -378,10 +379,10 @@ $catalogDataJson = json_encode($catalogData, JSON_HEX_TAG | JSON_HEX_APOS | JSON
     <!-- ========== MODAL ========== -->
     <div class="modal-overlay" id="item-modal-overlay">
         <div class="modal-container">
-            <button class="modal-close" id="item-modal-close" aria-label="Fechar"><i class="fas fa-times"></i></button>
+            <button class="modal-close" id="item-modal-close" aria-label="Fechar" data-i18n-aria="close"><i class="fas fa-times"></i></button>
             <div class="modal-content">
                 <div class="modal-cover">
-                    <img id="modal-cover-img" src="" alt="Capa">
+                    <img id="modal-cover-img" src="" alt="Capa" data-i18n-alt="cover_alt">
                     <div class="modal-cover-placeholder" id="modal-cover-placeholder" style="display:none;">
                         <i class="fas fa-book"></i><span>Título</span>
                     </div>

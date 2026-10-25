@@ -92,7 +92,7 @@ if ($stmt_notif) {
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo"><i class="fas fa-book-reader"></i><span>SiGA ITJ</span></div>
-      <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
+      <button class="collapse-icon" id="collapseBtn" title="Recolher menu" data-i18n-title="collapse_menu">
         <span></span>
         <span></span>
       </button>

@@ -105,20 +105,6 @@ if (typeof dashboardTranslations !== 'undefined') {
 }
 
 // ===================== AUXILIARES =====================
-if (typeof window.getCurrentLanguage !== 'function') {
-  window.getCurrentLanguage = function () {
-    let idioma = localStorage.getItem('siga-idioma');
-    if (!idioma) {
-      idioma = localStorage.getItem('dashboard_lang');
-      if (idioma) {
-        localStorage.setItem('siga-idioma', idioma);
-        localStorage.removeItem('dashboard_lang');
-      }
-    }
-    return idioma || 'pt';
-  };
-}
-
 function tFav(key, params = {}) {
   const lang = getCurrentLanguage();
   const dict = favoritosTranslations[lang] || favoritosTranslations.pt;

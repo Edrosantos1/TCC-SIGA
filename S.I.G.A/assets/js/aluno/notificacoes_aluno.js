@@ -1,8 +1,8 @@
 /* =============================================
    notificacoes_aluno.js
    Sistema de notificações do ALUNO
-   Intercepta o clique na fase de CAPTURA
-   para evitar conflito com painel_aluno.js
+   Sininho do topo: lista, abrir/fechar e idioma.
+   Os textos vêm de dashboardTranslations (painel_aluno.js).
    ============================================= */
 
 (function () {
@@ -16,17 +16,28 @@
     return div.innerHTML;
   }
 
+  function idiomaAtual() {
+    return typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : 'pt';
+  }
+
+  function traduzir(chave) {
+    const dicionarios = typeof dashboardTranslations !== 'undefined' ? dashboardTranslations : {};
+    const dic = dicionarios[idiomaAtual()] || dicionarios.pt || {};
+    return dic[chave] || '';
+  }
+
   function formatarData(data) {
     const d = new Date(data);
-    const agora = new Date();
-    const diff = Math.floor((agora - d) / 1000);
+    const diff = Math.floor((new Date() - d) / 1000);
 
-    if (diff < 60) return 'Agora pouco';
-    if (diff < 3600) return Math.floor(diff / 60) + ' min atrás';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h atrás';
-    if (diff < 172800) return 'Ontem';
-    return d.toLocaleDateString('pt-BR') + ' ' +
-           d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    if (diff < 60) return traduzir('time_now');
+    if (diff < 3600) return Math.floor(diff / 60) + ' ' + traduzir('time_min');
+    if (diff < 86400) return Math.floor(diff / 3600) + traduzir('time_hour');
+    if (diff < 172800) return traduzir('time_yesterday');
+
+    const local = { pt: 'pt-BR', en: 'en-US', es: 'es-ES' }[idiomaAtual()] || 'pt-BR';
+    return d.toLocaleDateString(local) + ' ' +
+           d.toLocaleTimeString(local, { hour: '2-digit', minute: '2-digit' });
   }
 
   // ========== RENDER ==========
@@ -42,7 +53,7 @@
       lista.innerHTML = `
         <div class="empty-notifications">
           <i class="far fa-bell-slash"></i>
-          <p>Nenhuma notificação por aqui</p>
+          <p>${traduzir('notif_empty')}</p>
         </div>`;
       return;
     }
@@ -51,7 +62,7 @@
       const isPendencia = n.tipo === 'pendencia';
       const corIcon = isPendencia ? '#e67e22' : '#0b4b9b';
       const icone = isPendencia ? 'fa-exclamation-triangle' : 'fa-info-circle';
-      const label = isPendencia ? 'Pendência' : 'Aviso';
+      const label = isPendencia ? traduzir('notif_pendency') : traduzir('notif_notice');
 
       return `
         <div class="notification-item${Number(n.lida) ? ' is-read' : ''}">
@@ -72,8 +83,6 @@
   }
 
   // ========== CLIQUE NO SININHO ==========
-  // Fase de captura (true) + stopImmediatePropagation()
-  // → garante que SOMENTE este handler controle o dropdown
   function handleBellClick(e) {
     const btn = e.target.closest('#notification-btn');
     if (!btn) return;
@@ -115,8 +124,9 @@
     document.addEventListener('click', handleOutside, false);
     document.addEventListener('keydown', handleEsc, false);
 
+    // Troca de idioma: redesenha a lista com os textos novos
+    document.addEventListener('siga:idioma', renderizarDropdownNotificacoes);
     renderizarDropdownNotificacoes();
-    console.log('🔔 notificacoes_aluno.js carregado');
   }
 
   if (document.readyState === 'loading') {

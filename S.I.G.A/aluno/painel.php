@@ -155,7 +155,7 @@ if ($stmt_notif) {
         <i class="fas fa-book-reader"></i>
         <span>SiGA ITJ</span>
       </div>
-      <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
+      <button class="collapse-icon" id="collapseBtn" title="Recolher menu" data-i18n-title="collapse_menu">
         <span></span>
         <span></span>
       </button>
@@ -198,8 +198,8 @@ if ($stmt_notif) {
 
       <section class="loans-dashboard-section" aria-labelledby="emprestimos-ativos-title">
         <div class="section-header">
-          <h2 id="emprestimos-ativos-title"><i class="fas fa-book-reader"></i> Meus Empréstimos Ativos</h2>
-          <a href="emprestimos.php" class="ver-tudo-link">Ver empréstimos <i class="fas fa-arrow-right"></i></a>
+          <h2 id="emprestimos-ativos-title"><i class="fas fa-book-reader"></i> <span data-i18n="loans_active_title">Meus Empréstimos Ativos</span></h2>
+          <a href="emprestimos.php" class="ver-tudo-link"><span data-i18n="view_loans">Ver empréstimos</span> <i class="fas fa-arrow-right"></i></a>
         </div>
         <?php if (!empty($emprestimosAtivos)): ?>
           <div class="emprestimos-ativos-lista">
@@ -228,38 +228,38 @@ if ($stmt_notif) {
                   <h3><?= htmlspecialchars($emprestimoAtivo['titulo_item'], ENT_QUOTES, 'UTF-8') ?></h3>
                   <p><?= htmlspecialchars($emprestimoAtivo['autor'] ?: 'Autor não informado', ENT_QUOTES, 'UTF-8') ?></p>
                   <?php if (!empty($emprestimoAtivo['data_devolucao_prevista'])): ?>
-                    <small>Devolução prevista: <?= date('d/m/Y', strtotime($emprestimoAtivo['data_devolucao_prevista'])) ?></small>
+                    <small><span data-i18n="return_expected">Devolução prevista:</span> <?= date('d/m/Y', strtotime($emprestimoAtivo['data_devolucao_prevista'])) ?></small>
                   <?php endif; ?>
                 </div>
               </article>
             <?php endforeach; ?>
           </div>
         <?php else: ?>
-          <p class="painel-vazio">Você não tem empréstimos ativos no momento.</p>
+          <p class="painel-vazio" data-i18n="no_active_loans">Você não tem empréstimos ativos no momento.</p>
         <?php endif; ?>
       </section>
 
       <section class="card-section tcc-section" aria-labelledby="tcc-section-title">
         <div class="section-header">
           <h2 id="tcc-section-title"><i class="fas fa-graduation-cap"></i> Trabalhos de Conclusão de Curso</h2>
-          <a href="catalogo.php?tipo=tcc" class="ver-tudo-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+          <a href="catalogo.php?tipo=tcc" class="ver-tudo-link"><span data-i18n="tcc_view_all">Ver todos</span> <i class="fas fa-arrow-right"></i></a>
         </div>
         <p id="tcc-section-subtitle" class="tcc-subtitle">Conheça os projetos de outras turmas e inspire-se.</p>
         <?php if (!empty($tccs)): ?>
           <div class="tcc-carousel">
-            <button class="tcc-nav-btn" id="tcc-prev" type="button" aria-label="TCCs anteriores"><i class="fas fa-chevron-left"></i></button>
+            <button class="tcc-nav-btn" id="tcc-prev" type="button" aria-label="TCCs anteriores" data-i18n-aria="tcc_prev"><i class="fas fa-chevron-left"></i></button>
             <div class="tcc-track-container"><div class="tcc-track" id="tcc-track"></div></div>
-            <button class="tcc-nav-btn" id="tcc-next" type="button" aria-label="Próximos TCCs"><i class="fas fa-chevron-right"></i></button>
+            <button class="tcc-nav-btn" id="tcc-next" type="button" aria-label="Próximos TCCs" data-i18n-aria="tcc_next"><i class="fas fa-chevron-right"></i></button>
           </div>
         <?php else: ?>
-          <p class="painel-vazio">Ainda não há TCCs cadastrados no catálogo.</p>
+          <p class="painel-vazio" data-i18n="tcc_empty">Ainda não há TCCs cadastrados no catálogo.</p>
         <?php endif; ?>
       </section>
 
       <section class="ranking-container" aria-labelledby="ranking-title">
         <div class="section-header">
-          <h2 id="ranking-title"><i class="fas fa-trophy"></i> Acervos em destaque</h2>
-          <a href="favoritos.php" class="ver-tudo-link">Meus favoritos <i class="fas fa-arrow-right"></i></a>
+          <h2 id="ranking-title"><i class="fas fa-trophy"></i> <span data-i18n="ranking_title">Acervos em destaque</span></h2>
+          <a href="favoritos.php" class="ver-tudo-link"><span data-i18n="ranking_link">Meus favoritos</span> <i class="fas fa-arrow-right"></i></a>
         </div>
         <?php if (!empty($rankingFavoritos)): ?>
           <ol class="ranking-podium">
@@ -267,24 +267,24 @@ if ($stmt_notif) {
               <?php $posicaoPodio = ['primeiro', 'segundo', 'terceiro'][$indice] ?? 'terceiro'; ?>
               <li class="ranking-podium-item podium-<?= $posicaoPodio ?>">
                 <a class="podium-material" href="catalogo.php" data-catalogo-visualizar="<?= (int) $item['id_catalogo'] ?>">
-                  <span class="podium-medal" aria-label="<?= $indice + 1 ?>º lugar"><i class="fas fa-medal" aria-hidden="true"></i><b><?= $indice + 1 ?></b></span>
+                  <span class="podium-medal" data-pos="<?= $indice + 1 ?>" aria-label="<?= $indice + 1 ?>º lugar"><i class="fas fa-medal" aria-hidden="true"></i><b><?= $indice + 1 ?></b></span>
                   <strong class="podium-title" title="<?= htmlspecialchars($item['titulo'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($item['titulo'], ENT_QUOTES, 'UTF-8') ?></strong>
                   <span class="podium-author"><?= htmlspecialchars($item['autor'] ?: 'Autor não informado', ENT_QUOTES, 'UTF-8') ?></span>
                   <span class="podium-type"><?= htmlspecialchars(ucfirst($item['tipo']), ENT_QUOTES, 'UTF-8') ?></span>
-                  <span class="podium-favorites"><i class="fas fa-heart" aria-hidden="true"></i> <?= (int) $item['total_favoritos'] ?> favoritos</span>
+                  <span class="podium-favorites"><i class="fas fa-heart" aria-hidden="true"></i> <?= (int) $item['total_favoritos'] ?> <span data-i18n="favorites_word">favoritos</span></span>
                 </a>
                 <div class="podium-platform" aria-hidden="true"><span><?= $indice + 1 ?></span></div>
               </li>
             <?php endforeach; ?>
           </ol>
         <?php else: ?>
-          <p class="ranking-empty">O ranking aparece assim que os materiais receberem favoritos.</p>
+          <p class="ranking-empty" data-i18n="ranking_empty">O ranking aparece assim que os materiais receberem favoritos.</p>
         <?php endif; ?>
       </section>
 
       <div class="tcc-modal-overlay" id="tcc-modal-overlay" aria-hidden="true">
         <section class="tcc-modal" role="dialog" aria-modal="true" aria-labelledby="tcc-modal-title">
-          <button class="tcc-modal-close" id="tcc-modal-close" type="button" aria-label="Fechar detalhes"><i class="fas fa-times"></i></button>
+          <button class="tcc-modal-close" id="tcc-modal-close" type="button" aria-label="Fechar detalhes" data-i18n-aria="tcc_close"><i class="fas fa-times"></i></button>
           <div class="tcc-modal-body">
               <div class="tcc-modal-cover-wrap"><img id="tcc-modal-cover" src="" alt=""></div>
             <div class="tcc-modal-info">

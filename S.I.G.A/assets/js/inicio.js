@@ -229,6 +229,23 @@ document.addEventListener("DOMContentLoaded", () => {
     fecharMenu(true);
   }
 
+  // Navegação interna sem deixar #sobre ou #secretaria na URL.
+  // O link continua apontando para a seção para manter a navegação acessível,
+  // mas o hash é removido imediatamente após o clique.
+  document.querySelectorAll('a[href^="#"]').forEach(linkInterno => {
+    const destino = linkInterno.getAttribute("href");
+    if (!destino || destino === "#") return;
+
+    const secao = document.querySelector(destino);
+    if (!secao) return;
+
+    linkInterno.addEventListener("click", (evento) => {
+      evento.preventDefault();
+      secao.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    });
+  });
+
   const dialogo = document.getElementById("dialogo_informacoes");
   const tituloDialogo = document.getElementById("titulo_informacoes");
   const textoDialogo = document.getElementById("texto_informacoes");

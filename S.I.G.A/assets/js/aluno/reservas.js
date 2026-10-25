@@ -1,6 +1,7 @@
 // ===================== TRADUÇÕES =====================
 const reservasTranslations = {
   pt: {
+    reservations_tabs: 'Reservas',
     page_title: 'Minhas Reservas',
     page_subtitle: 'Acompanhe suas reservas ativas e histórico',
     tab_active: 'Ativas',
@@ -39,6 +40,7 @@ const reservasTranslations = {
     empty_cta: 'Explorar catálogo',
   },
   en: {
+    reservations_tabs: 'Reservations',
     page_title: 'My Reservations',
     page_subtitle: 'Track your active reservations and history',
     tab_active: 'Active',
@@ -77,6 +79,7 @@ const reservasTranslations = {
     empty_cta: 'Browse catalog',
   },
   es: {
+    reservations_tabs: 'Reservas',
     page_title: 'Mis Reservas',
     page_subtitle: 'Sigue tus reservas activas e historial',
     tab_active: 'Activas',
@@ -146,18 +149,6 @@ const ACTIVE_STATUS = ['pendente', 'aprovada'];
 const HISTORY_STATUS = ['rejeitada', 'expirada', 'cancelada', 'retirada'];
 
 // ===================== AUXILIARES =====================
-function getCurrentLanguage() {
-  let idioma = localStorage.getItem('siga-idioma');
-  if (!idioma) {
-    idioma = localStorage.getItem('dashboard_lang');
-    if (idioma) {
-      localStorage.setItem('siga-idioma', idioma);
-      localStorage.removeItem('dashboard_lang');
-    }
-  }
-  return idioma || 'pt';
-}
-
 function tRes(key, lang, params = {}) {
   const dict = reservasTranslations[lang] || reservasTranslations.pt;
   let text = dict[key] || reservasTranslations.pt[key] || key;

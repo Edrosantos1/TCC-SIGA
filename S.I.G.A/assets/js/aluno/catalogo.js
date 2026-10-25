@@ -6,6 +6,20 @@
 // ===================== TRADUÇÕES =====================
 const catalogTranslations = {
   pt: {
+    clear: 'Limpar',
+    clear_filters: 'Limpar filtros',
+    summary_search: 'busca',
+    summary_type: 'tipo',
+    showing: 'Mostrando',
+    result_one: 'resultado',
+    result_many: 'resultados',
+    filter_by_type: 'Filtrar por tipo',
+    pagination_label: 'Paginação do catálogo',
+    prev_page: 'Anterior',
+    next_page: 'Próximo',
+    no_results_hint: 'Tente ajustar os filtros ou explorar outra categoria.',
+    close: 'Fechar',
+    cover_alt: 'Capa',
     catalog_title: 'Catálogo',
     catalog_subtitle: 'Explore nosso acervo de livros, revistas e TCCs',
     filter_all: 'Todos',
@@ -43,6 +57,20 @@ const catalogTranslations = {
     confirm_unfav_no: 'Cancelar'
   },
   en: {
+    clear: 'Clear',
+    clear_filters: 'Clear filters',
+    summary_search: 'search',
+    summary_type: 'type',
+    showing: 'Showing',
+    result_one: 'result',
+    result_many: 'results',
+    filter_by_type: 'Filter by type',
+    pagination_label: 'Catalog pagination',
+    prev_page: 'Previous',
+    next_page: 'Next',
+    no_results_hint: 'Try adjusting the filters or exploring another category.',
+    close: 'Close',
+    cover_alt: 'Cover',
     catalog_title: 'Catalog',
     catalog_subtitle: 'Explore our collection of books, magazines and theses',
     filter_all: 'All',
@@ -80,6 +108,20 @@ const catalogTranslations = {
     confirm_unfav_no: 'Cancel'
   },
   es: {
+    clear: 'Limpiar',
+    clear_filters: 'Limpiar filtros',
+    summary_search: 'búsqueda',
+    summary_type: 'tipo',
+    showing: 'Mostrando',
+    result_one: 'resultado',
+    result_many: 'resultados',
+    filter_by_type: 'Filtrar por tipo',
+    pagination_label: 'Paginación del catálogo',
+    prev_page: 'Anterior',
+    next_page: 'Siguiente',
+    no_results_hint: 'Intenta ajustar los filtros o explorar otra categoría.',
+    close: 'Cerrar',
+    cover_alt: 'Portada',
     catalog_title: 'Catálogo',
     catalog_subtitle: 'Explora nuestro acervo de libros, revistas y TFCs',
     filter_all: 'Todos',
@@ -90,7 +132,7 @@ const catalogTranslations = {
     no_results: 'No se encontraron resultados',
     availability_available: 'Disponible',
     availability_unavailable: 'No disponible',
-    action_favorite: 'Favoritar',
+    action_favorite: 'Agregar a favoritos',
     action_favorited: 'Favorito',
     action_reserve: 'Reservar',
     action_reserved: 'Reservado',
@@ -134,18 +176,6 @@ let favorites = new Set();
 let reservations = new Map();
 
 // ===================== AUXILIARES =====================
-function getCurrentLanguage() {
-  let idioma = localStorage.getItem('siga-idioma');
-  if (!idioma) {
-    idioma = localStorage.getItem('dashboard_lang');
-    if (idioma) {
-      localStorage.setItem('siga-idioma', idioma);
-      localStorage.removeItem('dashboard_lang');
-    }
-  }
-  return idioma || 'pt';
-}
-
 function tCat(key, params = {}) {
   const lang = getCurrentLanguage();
   const dict = catalogTranslations[lang] || catalogTranslations.pt;
@@ -248,11 +278,6 @@ function loadCatalogData() {
   }
 }
 
-function submitForm(form) {
-  form.method = 'POST';
-  form.action = form.action || window.location.pathname;
-  form.submit();
-}
 
 // ===================== HELPERS DE TIPO =====================
 function getItemTypeLabel(type, lang) {

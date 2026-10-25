@@ -102,7 +102,7 @@ unset($emp);
         <i class="fas fa-book-reader"></i>
         <span>SiGA ITJ</span>
       </div>
-      <button class="collapse-icon" id="collapseBtn" title="Recolher menu">
+      <button class="collapse-icon" id="collapseBtn" title="Recolher menu" data-i18n-title="collapse_menu">
         <span></span>
         <span></span>
       </button>
@@ -220,9 +220,9 @@ unset($emp);
             <h4 class="loan-title"><?= htmlspecialchars($emprestimo['titulo_item']) ?></h4>
             <p class="loan-author"><?= htmlspecialchars($emprestimo['autor'] ?: 'Autor não informado') ?></p>
             <div class="loan-dates">
-              <span><i class="far fa-clock"></i> Empréstimo: <?= date('d/m/Y', strtotime($emprestimo['data_emprestimo'])) ?></span>
+              <span><i class="far fa-clock"></i> <span data-i18n="loan_date_label">Empréstimo:</span> <?= date('d/m/Y', strtotime($emprestimo['data_emprestimo'])) ?></span>
               <?php if (!empty($emprestimo['data_devolucao_prevista'])): ?>
-                <span><i class="far fa-calendar-check"></i> Vencimento: <?= date('d/m/Y', strtotime($emprestimo['data_devolucao_prevista'])) ?></span>
+                <span><i class="far fa-calendar-check"></i> <span data-i18n="due_date_label">Vencimento:</span> <?= date('d/m/Y', strtotime($emprestimo['data_devolucao_prevista'])) ?></span>
               <?php endif; ?>
             </div>
           </div>
