@@ -125,7 +125,7 @@ if (isset($_SESSION['usuario_id']) || isset($_SESSION['id_adm']) || isset($_SESS
                 'msg' => 'Sua sessão expirou por inatividade.',
                 'register' => false,
             ];
-            header('Location: ' . appUrl('aluno/auth/login.php'));
+            header('Location: ' . appUrl('aluno/auth/login_user.php'));
         }
         exit;
     }

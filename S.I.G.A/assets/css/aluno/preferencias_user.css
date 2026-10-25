@@ -1,0 +1,1672 @@
+/*
+ * Preferências de acessibilidade e aparência do aluno (SiGA ITJ).
+ * Os valores são aplicados ao <html> por preferencias_head_user.php.
+ */
+:root {
+    --aluno-font-size: 1rem;
+    --aluno-line-height: 1.5;
+    --aluno-card-padding: 1rem;
+    --aluno-sidebar-width: 240px;
+    --aluno-transition: 180ms ease;
+    --aluno-accent-gold: #ffad00;
+    --aluno-brand-blue: #0035ff;
+    --aluno-brand-teal: #17c8cc;
+    --aluno-page-bg: #f5f7ff;
+    --aluno-surface: #ffffff;
+    --aluno-surface-raised: #e9edff;
+    --aluno-text: #0a1233;
+    --aluno-muted: #475079;
+    --aluno-border: #d3daf5;
+    --aluno-primary: #0035ff;
+    --aluno-primary-strong: #0024a8;
+    --aluno-action-bg: #0035ff;
+    --aluno-action-text: #ffffff;
+    --aluno-shadow: 0 12px 28px rgba(10, 18, 51, .12);
+    --aluno-status-active: #166534;
+    --aluno-status-active-bg: #dcfce7;
+    --aluno-status-danger: #b91c1c;
+    --aluno-status-danger-bg: #fee2e2;
+    --aluno-status-pending: #854d0e;
+    --aluno-status-pending-bg: #fef3c7;
+}
+
+html {
+    font-size: var(--aluno-font-size);
+    line-height: var(--aluno-line-height);
+}
+
+html,
+body {
+    background: var(--aluno-page-bg);
+    color: var(--aluno-text);
+}
+
+.dashboard-main,
+.catalog-main,
+.reservas-main,
+.historico-main {
+    animation: studentPageIn 0.35s ease;
+}
+
+@keyframes studentPageIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+body {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+html[data-tema="alto_contraste"] {
+    color-scheme: light;
+    --aluno-page-bg: #ffffff;
+    --aluno-surface: #ffffff;
+    --aluno-text: #000000;
+    --aluno-muted: #222222;
+    --aluno-border: #000000;
+    --aluno-primary: #0047b3;
+    --aluno-primary-strong: #00347a;
+    --aluno-shadow: none;
+    background: var(--aluno-page-bg);
+    color: var(--aluno-text);
+}
+
+html[data-tema="alto_contraste"] body,
+html[data-tema="alto_contraste"] .sidebar,
+html[data-tema="alto_contraste"] .main-content,
+html[data-tema="alto_contraste"] .top-header {
+    background: var(--aluno-page-bg);
+    color: var(--aluno-text);
+}
+
+html[data-tema="alto_contraste"] .card,
+html[data-tema="alto_contraste"] .card-section,
+html[data-tema="alto_contraste"] .config-card,
+html[data-tema="alto_contraste"] .sidebar,
+html[data-tema="alto_contraste"] .top-header,
+html[data-tema="alto_contraste"] .table-card {
+    border-color: var(--aluno-border);
+    color: var(--aluno-text);
+}
+
+html[data-tema="alto_contraste"] a,
+html[data-tema="alto_contraste"] button,
+html[data-tema="alto_contraste"] input,
+html[data-tema="alto_contraste"] select,
+html[data-tema="alto_contraste"] textarea {
+    color: #000000;
+}
+
+html[data-tema="alto_contraste"] .btn,
+html[data-tema="alto_contraste"] .primary,
+html[data-tema="alto_contraste"] .button-primary {
+    background: var(--aluno-primary) !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+html[data-fonte="pequeno"] {
+    --aluno-font-size: .875rem;
+}
+
+html[data-fonte="medio"] {
+    --aluno-font-size: 1rem;
+}
+
+html[data-fonte="grande"] {
+    --aluno-font-size: 1.125rem;
+}
+
+html[data-daltonismo="protanopia"] {
+    --aluno-access-primary: #0072b2;
+    --aluno-access-success: #009e73;
+    --aluno-access-danger: #d55e00;
+    --aluno-status-active: #005a8c;
+    --aluno-status-active-bg: #e5f3fb;
+    --aluno-status-danger: #a44300;
+    --aluno-status-danger-bg: #fff0e5;
+    --aluno-status-pending: #624900;
+    --aluno-status-pending-bg: #fff7cc;
+}
+
+html[data-daltonismo="deuteranopia"] {
+    --aluno-access-primary: #332288;     
+    --aluno-access-success: #117733;    
+    --aluno-access-danger: #d55e00;     
+
+    --aluno-status-active: #332288;      
+    --aluno-status-active-bg: #f0eef8;   
+
+    --aluno-status-danger: #a44300;       
+    --aluno-status-danger-bg: #fff0e5;    
+
+    --aluno-status-pending: #805600;      
+    --aluno-status-pending-bg: #fff7dc;   
+}
+
+html[data-daltonismo="tritanopia"] {
+    --aluno-access-primary: #b2182b;
+    --aluno-access-success: #008837;
+    --aluno-access-danger: #7b3294;
+    --aluno-status-active: #006b2d;
+    --aluno-status-active-bg: #e7f5ec;
+    --aluno-status-danger: #762a83;
+    --aluno-status-danger-bg: #f4eaf6;
+    --aluno-status-pending: #704d00;
+    --aluno-status-pending-bg: #fff5d6;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) {
+    --aluno-primary: var(--aluno-access-primary);
+    --aluno-action-bg: var(--aluno-access-primary);
+    --aluno-action-text: #ffffff;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .nav-item.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .opcao-card.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-salvar,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-primary,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-primary-action,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-explore,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-continue,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .filter-chip.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .tab-btn.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .view-btn.active {
+    background: var(--aluno-access-primary) !important;
+    border-color: var(--aluno-access-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-success,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-pickup,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-renew {
+    background: var(--aluno-access-success) !important;
+    border-color: var(--aluno-access-success) !important;
+    color: #ffffff !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-danger,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-cancel,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-return,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .btn-remover-favorito {
+    background: var(--aluno-access-danger) !important;
+    border-color: var(--aluno-access-danger) !important;
+    color: #ffffff !important;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .reserva-status,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-badge,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .item-type-badge,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .tipo-badge,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .fav-type-badge,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .badge-loan,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .badge-reservation {
+    border: 2px solid currentColor;
+    font-weight: 700;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .filter-chip.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .tab-btn.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .view-btn.active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .nav-item.active {
+    outline: 2px solid var(--aluno-access-primary);
+    outline-offset: 2px;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-emprestado,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .reserva-status.status-approved,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-returned,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-completed,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-emprestado,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-aprovada {
+    color: var(--aluno-status-active);
+    background: var(--aluno-status-active-bg);
+    border-style: double;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-overdue,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-atrasado,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-refused,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-recusado,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .reserva-status.status-rejected,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .reserva-status.status-cancelled,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-overdue,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-atrasado,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-rejected,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-cancelled,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-recusado {
+    color: var(--aluno-status-danger);
+    background: var(--aluno-status-danger-bg);
+    border-style: solid;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-pending,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-pendente,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .reserva-status.status-pending,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-pending,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .status-pendente {
+    color: var(--aluno-status-pending);
+    background: var(--aluno-status-pending-bg);
+    border-style: dashed;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-active,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-emprestado {
+    border-style: double;
+}
+
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-pending,
+html[data-daltonismo]:not([data-daltonismo="normal"]) .loan-badge.status-pendente {
+    border-style: dashed;
+}
+
+html[data-espacamento="compacto"] {
+    --aluno-line-height: 1.35;
+    --aluno-card-padding: .75rem;
+}
+
+html[data-espacamento="normal"] {
+    --aluno-line-height: 1.5;
+    --aluno-card-padding: 1rem;
+}
+
+html[data-espacamento="confortavel"] {
+    --aluno-line-height: 1.75;
+    --aluno-card-padding: 1.5rem;
+}
+
+html[data-espacamento]:not([data-espacamento="normal"]) .card,
+html[data-espacamento]:not([data-espacamento="normal"]) .card-section,
+html[data-espacamento]:not([data-espacamento="normal"]) .config-card,
+html[data-espacamento]:not([data-espacamento="normal"]) .table-card,
+html[data-espacamento]:not([data-espacamento="normal"]) .panel {
+    padding: var(--aluno-card-padding);
+}
+
+html[data-espacamento="compacto"] .sidebar-nav {
+    gap: .35rem;
+}
+
+html[data-espacamento="confortavel"] .sidebar-nav {
+    gap: .75rem;
+}
+
+html[data-animacoes="reduzidas"] *,
+html[data-animacoes="reduzidas"] *::before,
+html[data-animacoes="reduzidas"] *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+}
+
+html[data-tema="escuro"] {
+    color-scheme: dark;
+    --aluno-page-bg: #080d26;
+    --aluno-surface: #111a42;
+    --aluno-surface-raised: #17215a;
+    --aluno-text: #eef1ff;
+    --aluno-muted: #a8b3e3;
+    --aluno-border: #28357f;
+    --aluno-primary: #8fa6ff;
+    --aluno-primary-strong: #ffad00;
+    --aluno-accent-gold: #ffad00;
+    --aluno-action-bg: #ffad00;
+    --aluno-action-text: #071a33;
+    --aluno-status-active: #9be0ba;
+    --aluno-status-active-bg: #123c38;
+    --aluno-status-danger: #ffaaa3;
+    --aluno-status-danger-bg: #49272c;
+    --aluno-status-pending: #f0d27a;
+    --aluno-status-pending-bg: #4a3a1b;
+    --aluno-shadow: 0 12px 28px rgba(0, 0, 0, .45);
+}
+
+html[data-tema="escuro"],
+html[data-tema="escuro"] body,
+html[data-tema="escuro"] .main-content,
+html[data-tema="escuro"] main {
+    background: var(--aluno-page-bg) !important;
+    color: var(--aluno-text);
+}
+
+html[data-tema="escuro"] .sidebar,
+html[data-tema="escuro"] .top-header,
+html[data-tema="escuro"] .modal-container,
+html[data-tema="escuro"] .modal-content,
+html[data-tema="escuro"] .modal-info,
+html[data-tema="escuro"] .modal,
+html[data-tema="escuro"] .notification-dropdown,
+html[data-tema="escuro"] .notification-header,
+html[data-tema="escuro"] .notification-item,
+html[data-tema="escuro"] .config-container .flash-message {
+    background-color: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow);
+}
+
+html[data-tema="escuro"] .main-content :is(h1, h2, h3, h4, h5, p, label, small, li, td, th, dt, dd, .desc, .muted, .text-muted, .loan-author, .loan-details, .reserva-info, .historico-info, .empty-hint, .empty-description, .filter-group label),
+html[data-tema="escuro"] .sidebar .nav-item,
+html[data-tema="escuro"] .top-header .welcome {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.text-secondary, .text-muted, .loan-author, .reserva-author, .historico-author, .empty-hint, .empty-description, .filter-group label, .config-card .desc) {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(input, select, textarea),
+html[data-tema="escuro"] .search-container input,
+html[data-tema="escuro"] .main-content :is(.search-input, .filter-search input, .fav-search input) {
+    background-color: var(--aluno-surface-raised) !important;
+    color: var(--aluno-text) !important;
+    border-color: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(input, select, textarea)::placeholder {
+    color: var(--aluno-muted) !important;
+    opacity: 1;
+}
+
+html[data-tema="escuro"] .search-container input::placeholder {
+    color: var(--aluno-muted) !important;
+    opacity: 1;
+}
+
+html[data-tema="escuro"] .main-content :is(a, .filter-clear) {
+    color: var(--aluno-primary);
+}
+
+html[data-tema="escuro"] .main-content :is(.loans-hero, .reservas-hero, .historico-hero, .dashboard-hero),
+html[data-tema="escuro"] .main-content :is(.loans-hero, .reservas-hero, .historico-hero, .dashboard-hero) :is(h1, h2, h3, p, span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.catalog-hero, .fav-hero) h1 {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.catalog-hero, .fav-hero) :is(p, .stat-pill-label) {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.catalog-hero, .fav-hero) .stat-pill {
+    background: var(--aluno-surface-raised);
+    border-color: var(--aluno-border);
+}
+
+html[data-tema="escuro"] .main-content :is(.catalog-hero, .fav-hero) .stat-pill-num {
+    color: var(--aluno-primary) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .btn-success, .btn-danger, .btn-cancel, .btn-pickup, .btn-return, .btn-renew, .btn-remover-favorito) {
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.tab-btn, .view-btn, .filter-chip, .filter-clear, .notification-btn, .loan-clear-btn, .fav-clear-btn) {
+    background-color: var(--aluno-surface-raised);
+    border-color: var(--aluno-border);
+    color: var(--aluno-text);
+}
+
+html[data-tema="escuro"] .main-content :is(.tab-btn.active, .view-btn.active, .filter-chip.active) {
+    background: var(--aluno-action-bg) !important;
+    border-color: var(--aluno-action-bg) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.loan-badge, .reserva-status, .status-badge, .item-type-badge, .tipo-badge, .fav-type-badge, .badge-loan, .badge-reservation) {
+    box-shadow: none;
+}
+
+html[data-tema="escuro"] .main-content :is(.loan-badge.status-active, .loan-badge.status-emprestado, .reserva-status.status-approved, .status-returned, .status-completed, .status-emprestado, .status-aprovada) {
+    color: var(--aluno-status-active);
+    background: var(--aluno-status-active-bg);
+}
+
+html[data-tema="escuro"] .main-content :is(.loan-badge.status-overdue, .loan-badge.status-atrasado, .loan-badge.status-refused, .loan-badge.status-recusado, .reserva-status.status-rejected, .reserva-status.status-cancelled, .status-overdue, .status-atrasado, .status-rejected, .status-cancelled, .status-recusado) {
+    color: var(--aluno-status-danger);
+    background: var(--aluno-status-danger-bg);
+}
+
+html[data-tema="escuro"] .main-content :is(.loan-badge.status-pending, .loan-badge.status-pendente, .reserva-status.status-pending, .status-pending, .status-pendente) {
+    color: var(--aluno-status-pending);
+    background: var(--aluno-status-pending-bg);
+}
+
+html[data-tema="claro"] .sidebar,
+html[data-tema="claro"] .top-header,
+html[data-tema="claro"] .card,
+html[data-tema="claro"] .card-section,
+html[data-tema="claro"] .config-card,
+html[data-tema="claro"] .table-card,
+html[data-tema="claro"] .notification-dropdown {
+    background-color: #ffffff;
+    color: #172b4d;
+}
+
+html[data-tema="claro"] .sidebar .nav-item.active {
+    background: linear-gradient(135deg, #eaf2ff, #dceaff);
+    border-left: 3px solid var(--aluno-accent-gold);
+    color: var(--aluno-brand-blue);
+}
+
+html[data-tema="claro"] .sidebar .nav-item.active i,
+html[data-tema="claro"] .top-header .welcome strong,
+html[data-tema="claro"] .notification-header h4 {
+    color: var(--aluno-brand-blue);
+}
+
+html[data-tema="claro"] .notification-header {
+    background: #eef4fc;
+    border-bottom-color: #d7e3f2;
+}
+
+html[data-tema="claro"] .notification-btn,
+html[data-tema="claro"] .search-icon {
+    color: var(--aluno-brand-blue);
+}
+
+html[data-tema="escuro"] .top-header {
+    border-bottom: 2px solid rgba(240, 196, 90, .55);
+}
+
+html[data-tema="escuro"] .sidebar .nav-item {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .sidebar .nav-item:not(.active):is(:hover, :focus-visible) {
+    background: #1b416a !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .sidebar .nav-item:not(.active):is(:hover, :focus-visible) i {
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .sidebar .nav-item.active {
+    background: linear-gradient(135deg, #17385d, #1b416a) !important;
+    border-left: 3px solid var(--aluno-accent-gold) !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .sidebar .nav-item.active i,
+html[data-tema="escuro"] .main-content :is(a, .filter-clear),
+html[data-tema="escuro"] .top-header .welcome strong {
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .sidebar-logo,
+html[data-tema="escuro"] .sidebar-logo i {
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .nav-divider {
+    background: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .search-icon,
+html[data-tema="escuro"] .notification-btn {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .notification-btn:hover,
+html[data-tema="escuro"] .user-info:hover {
+    background: #1b416a !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .language-button,
+html[data-tema="escuro"] .language-list {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .language-button svg {
+    stroke: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .language-list li {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .language-list li:hover {
+    background: var(--aluno-surface-raised) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue) {
+    background: var(--aluno-action-bg) !important;
+    border-color: var(--aluno-action-bg) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue) :is(span, i, strong) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .notification-header {
+    background: var(--aluno-surface-raised) !important;
+    border-bottom-color: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .main-content .notification-header h4,
+html[data-tema="escuro"] .notification-message strong {
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="escuro"] .notification-item {
+    border-bottom-color: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .notification-item:hover {
+    background: var(--aluno-surface-raised) !important;
+}
+
+html[data-tema="escuro"] .notification-message,
+html[data-tema="escuro"] .notification-date,
+html[data-tema="escuro"] .empty-notifications {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .ui-alert-card {
+    background: var(--aluno-surface) !important;
+    border: 1px solid var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow) !important;
+}
+
+html[data-tema="escuro"] .ui-alert-title {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .ui-alert-message {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .ui-alert-btn-cancel {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .ui-alert-close {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .ui-alert-close:hover,
+html[data-tema="escuro"] .ui-alert-btn-cancel:hover {
+    background: #1b416a !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+html[data-tema="alto_contraste"] {
+    --aluno-page-bg: #ffffff;
+    --aluno-surface: #ffffff;
+    --aluno-surface-raised: #ffffff;
+    --aluno-text: #000000;
+    --aluno-muted: #222222;
+    --aluno-border: #000000;
+    --aluno-primary: #0035ff;
+    --aluno-primary-strong: #0024a8;
+    --aluno-accent-gold: #8a5700;
+    --aluno-action-bg: #0035ff;
+    --aluno-action-text: #ffffff;
+    --aluno-shadow: none;
+}
+
+html[data-tema="alto_contraste"],
+html[data-tema="alto_contraste"] body,
+html[data-tema="alto_contraste"] .main-content,
+html[data-tema="alto_contraste"] main {
+    background: var(--aluno-page-bg) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="alto_contraste"] .sidebar,
+html[data-tema="alto_contraste"] .top-header,
+html[data-tema="alto_contraste"] .card,
+html[data-tema="alto_contraste"] .card-section,
+html[data-tema="alto_contraste"] .config-card,
+html[data-tema="alto_contraste"] .catalog-filters,
+html[data-tema="alto_contraste"] .historico-filters,
+html[data-tema="alto_contraste"] .loan-card,
+html[data-tema="alto_contraste"] .reserva-card,
+html[data-tema="alto_contraste"] .historico-item,
+html[data-tema="alto_contraste"] .modal-container,
+html[data-tema="alto_contraste"] .modal-content,
+html[data-tema="alto_contraste"] .notification-dropdown,
+html[data-tema="alto_contraste"] .notification-item,
+html[data-tema="alto_contraste"] .continue-card,
+html[data-tema="alto_contraste"] .table-card,
+html[data-tema="alto_contraste"] .panel,
+html[data-tema="alto_contraste"] .menu-card {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(h1, h2, h3, h4, h5, p, label, small, li, td, th, dt, dd, span, strong, .desc, .muted, .text-muted),
+html[data-tema="alto_contraste"] .sidebar .nav-item,
+html[data-tema="alto_contraste"] .top-header .welcome {
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(a, .filter-clear) {
+    color: #003c8f !important;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(input, select, textarea, button) {
+    border: 2px solid #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .btn-success, .btn-danger, .btn-cancel, .btn-pickup, .btn-return, .btn-renew, .btn-remover-favorito) {
+    background: #003c8f !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.btn-primary, .btn-primary-action, .btn-salvar, .btn-explore, .btn-continue, .btn-success, .btn-danger, .btn-cancel, .btn-pickup, .btn-return, .btn-renew, .btn-remover-favorito) :is(span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.tab-btn, .view-btn, .filter-chip, .filter-clear, .notification-btn, .loan-clear-btn, .fav-clear-btn) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.tab-btn.active, .view-btn.active, .filter-chip.active) {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.tab-btn.active, .view-btn.active, .filter-chip.active) :is(span, i) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.view-toggle, .loans-view-toggle, .fav-view-toggle) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.loans-view-toggle button.active, .fav-view-toggle button.active) {
+    background: #000000 !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.loans-view-toggle button.active, .fav-view-toggle button.active) :is(span, i) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.loans-hero, .reservas-hero, .historico-hero, .dashboard-hero) {
+    background: #000000 !important;
+    border: 2px solid #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.loans-hero, .reservas-hero, .historico-hero, .dashboard-hero) :is(h1, h2, h3, p, span, i, strong) {
+    color: #ffffff !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.catalog-hero, .fav-hero) :is(h1, p, .stat-pill-num, .stat-pill-label) {
+    color: #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.catalog-hero, .fav-hero) .stat-pill {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+}
+
+html[data-tema="alto_contraste"] .main-content :is(.loan-badge, .reserva-status, .status-badge, .item-type-badge, .tipo-badge, .fav-type-badge, .badge-loan, .badge-reservation) {
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+}
+
+/* Classes adicionais para cards e menus da aplicação. */
+.card,
+.card-section,
+.config-card,
+.table-card,
+.panel,
+.menu-card {
+    border: 1px solid var(--aluno-border, #dce0e9);
+    border-radius: 14px;
+    background: var(--aluno-surface, #ffffff);
+    color: var(--aluno-text, #20232b);
+    box-shadow: var(--aluno-shadow, 0 4px 16px rgba(0, 0, 0, .06));
+}
+
+.sidebar {
+    width: var(--aluno-sidebar-width);
+    background: var(--aluno-surface, #ffffff);
+    color: var(--aluno-text, #20232b);
+}
+
+.sidebar-nav {
+    gap: .5rem;
+}
+
+.nav-item {
+    color: var(--aluno-muted, #596173);
+}
+
+.nav-item.active,
+.nav-item:hover {
+    color: var(--aluno-primary, #2f6fed);
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        width: 100%;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .fav-search,
+    .fav-sort,
+    .fav-view-toggle,
+    .fav-view-toggle button:not(.active),
+    .filter-chip:not(.active),
+    .tab-btn:not(.active),
+    .view-btn:not(.active),
+    .btn-favorite,
+    .btn-reserve
+) {
+    background-color: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .favorito-card .card-info h4,
+    .favorito-card .card-info .autor,
+    .favorito-card .card-added,
+    .loan-title,
+    .loan-author,
+    .loan-dates,
+    .historico-info .title,
+    .historico-info .author,
+    .historico-info .meta,
+    .reserva-body,
+    .reserva-body :is(h1, h2, h3, h4, p, span, small),
+    .modal-content :is(h1, h2, h3, h4, p, li, small, strong),
+    .modal-meta,
+    .modal-description,
+    .config-header p,
+    .config-card :is(h3, .desc),
+    .opcao-card,
+    .toggle-switch,
+    .aviso-nao-salvo
+) {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .favorito-card .card-info .autor,
+    .favorito-card .card-added,
+    .loan-author,
+    .loan-dates,
+    .historico-info .author,
+    .historico-info .meta,
+    .config-header p,
+    .config-card .desc,
+    .toggle-switch
+) {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"][data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .filter-chip.active,
+    .tab-btn.active,
+    .view-btn.active
+) {
+    background: var(--aluno-access-primary) !important;
+    border-color: var(--aluno-access-primary) !important;
+    color: #ffffff !important;
+    outline: 2px solid var(--aluno-access-primary);
+    outline-offset: 2px;
+}
+
+html[data-tema="escuro"][data-daltonismo]:not([data-daltonismo="normal"]) .main-content :is(
+    .filter-chip.active,
+    .tab-btn.active,
+    .view-btn.active
+) :is(span, i) {
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"][data-daltonismo="protanopia"] {
+    --aluno-status-active: #7dd3fc;
+    --aluno-status-active-bg: #123c58;
+    --aluno-status-danger: #fdba74;
+    --aluno-status-danger-bg: #4a2e19;
+    --aluno-status-pending: #facc15;
+    --aluno-status-pending-bg: #4a3b11;
+}
+
+html[data-tema="escuro"][data-daltonismo="deuteranopia"] {
+    --aluno-status-active: #86efac;
+    --aluno-status-active-bg: #153c2c;
+    --aluno-status-danger: #fdba74;
+    --aluno-status-danger-bg: #4a2e19;
+    --aluno-status-pending: #fde68a;
+    --aluno-status-pending-bg: #4a3b11;
+}
+
+html[data-tema="escuro"][data-daltonismo="tritanopia"] {
+    --aluno-status-active: #86efac;
+    --aluno-status-active-bg: #153c2c;
+    --aluno-status-danger: #d8b4fe;
+    --aluno-status-danger-bg: #3e2850;
+    --aluno-status-pending: #facc15;
+    --aluno-status-pending-bg: #4a3b11;
+}
+
+html[data-espacamento]:not([data-espacamento="normal"]) .main-content :is(
+    p,
+    li,
+    dd,
+    dt,
+    .loan-author,
+    .reserva-info,
+    .historico-info,
+    .config-card .desc
+) {
+    line-height: var(--aluno-line-height) !important;
+}
+
+html[data-espacamento="compacto"] .main-content :is(
+    .dashboard-main,
+    .catalog-main,
+    .loans-main,
+    .reservas-main,
+    .historico-main,
+    .config-container
+) {
+    padding: 24px 30px 42px !important;
+}
+
+html[data-espacamento="confortavel"] .main-content :is(
+    .dashboard-main,
+    .catalog-main,
+    .loans-main,
+    .reservas-main,
+    .historico-main,
+    .config-container
+) {
+    padding: 40px 48px 66px !important;
+}
+
+html[data-espacamento]:not([data-espacamento="normal"]) .main-content :is(
+    .catalog-filters,
+    .fav-toolbar,
+    .loan-card,
+    .reserva-card,
+    .historico-item,
+    .config-card,
+    .continue-card
+) {
+    padding: var(--aluno-card-padding) !important;
+}
+
+html[data-espacamento="compacto"] .main-content :is(
+    .catalogo-grid,
+    .favoritos-grid,
+    .loans-grid,
+    .reservas-list,
+    .historico-list,
+    .dashboard-row,
+    .opcoes-grid
+) {
+    gap: 12px !important;
+}
+
+html[data-espacamento="confortavel"] .main-content :is(
+    .catalogo-grid,
+    .favoritos-grid,
+    .loans-grid,
+    .reservas-list,
+    .historico-list,
+    .dashboard-row,
+    .opcoes-grid
+) {
+    gap: 24px !important;
+}
+
+@media (max-width: 768px) {
+    html[data-espacamento="compacto"] .main-content :is(
+        .dashboard-main,
+        .catalog-main,
+        .loans-main,
+        .reservas-main,
+        .historico-main,
+        .config-container
+    ) {
+        padding: 16px 12px 30px !important;
+    }
+
+    html[data-espacamento="confortavel"] .main-content :is(
+        .dashboard-main,
+        .catalog-main,
+        .loans-main,
+        .reservas-main,
+        .historico-main,
+        .config-container
+    ) {
+        padding: 26px 20px 46px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    html[data-espacamento="compacto"] .main-content :is(
+        .dashboard-main,
+        .catalog-main,
+        .loans-main,
+        .reservas-main,
+        .historico-main,
+        .config-container
+    ) {
+        padding: 12px 8px 22px !important;
+    }
+
+    html[data-espacamento="confortavel"] .main-content :is(
+        .dashboard-main,
+        .catalog-main,
+        .loans-main,
+        .reservas-main,
+        .historico-main,
+        .config-container
+    ) {
+        padding: 20px 16px 36px !important;
+    }
+}
+
+/* Correções compartilhadas do tema escuro em todas as páginas do aluno. */
+html[data-tema="escuro"] {
+    --primary-color: var(--aluno-primary);
+    --muted-color: var(--aluno-muted);
+    --student-primary: var(--aluno-primary);
+    --student-danger: var(--aluno-status-danger);
+    color-scheme: dark;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalogo-card,
+    .favorito-card,
+    .loan-card,
+    .reserva-card,
+    .historico-item,
+    .card-section,
+    .ranking-container,
+    .continue-card,
+    .catalog-filters,
+    .fav-toolbar,
+    .loans-tabs,
+    .loans-toolbar,
+    .reservas-toolbar,
+    .historico-filters,
+    .filter-summary,
+    .loan-detail-item,
+    .reserva-date,
+    .catalog-empty-inner,
+    .catalog-empty,
+    .fav-empty,
+    .loan-empty,
+    .loan-no-results,
+    .historico-empty,
+    .reservas-empty
+) {
+    background-color: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+    box-shadow: var(--aluno-shadow);
+}
+
+html[data-tema="escuro"] .main-content .tipo-badge,
+html[data-tema="escuro"] .main-content .fav-type-badge {
+    background: rgba(16, 40, 71, .94) !important;
+    border: 1px solid var(--aluno-border) !important;
+    color: #f7f9ff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .card-info h4,
+    .card-info .autor,
+    .loan-title,
+    .loan-author,
+    .loan-dates,
+    .loan-dates span,
+    .loan-days.neutral,
+    .reserva-body,
+    .reserva-body :is(.title, .author, .info, p, span, small),
+    .historico-info :is(.title, .author, .meta),
+    .filter-group label,
+    .historico-actions button,
+    .catalog-empty-inner :is(h3, p),
+    .loan-empty p,
+    .loan-no-results p,
+    .historico-empty p,
+    .reservas-empty :is(h2, p)
+) {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .card-info .autor,
+    .loan-author,
+    .loan-dates,
+    .loan-dates i,
+    .historico-info .author,
+    .historico-info .meta,
+    .catalog-empty-inner p,
+    .loan-empty,
+    .loan-no-results,
+    .historico-empty,
+    .reservas-empty
+) {
+    color: var(--aluno-muted) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-filters,
+    .fav-toolbar,
+    .loans-tabs,
+    .loans-toolbar,
+    .historico-filters,
+    .filter-summary,
+    .loan-detail-item,
+    .reserva-date,
+    .catalog-empty-inner,
+    .catalog-empty,
+    .fav-empty,
+    .loan-empty,
+    .loan-no-results
+) :is(input, select, textarea) {
+    background-color: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .catalog-filters,
+    .fav-toolbar,
+    .loans-tabs,
+    .loans-toolbar,
+    .historico-filters,
+    .filter-summary,
+    .loan-detail-item,
+    .reserva-date,
+    .catalog-empty-inner,
+    .catalog-empty,
+    .fav-empty,
+    .loan-empty,
+    .loan-no-results
+) button:not(.btn-primary):not(.btn-primary-action):not(.btn-salvar):not(.btn-explore):not(.btn-continue):not(.btn-success):not(.btn-danger):not(.btn-cancel):not(.btn-pickup):not(.btn-return):not(.btn-renew):not(.btn-remover-favorito):not(.filter-chip):not(.fav-chip):not(.loan-chip):not(.tab-btn):not(.view-btn):not(.active):not([aria-pressed="true"]):not([aria-selected="true"]) {
+    background-color: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(input, select, textarea) option {
+    background-color: var(--aluno-surface) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .filter-chip:not(.active),
+    .fav-chip:not(.active),
+    .loan-chip:not(.active),
+    .tab-btn:not(.active),
+    .view-btn:not([aria-pressed="true"]),
+    .loan-clear-btn,
+    #load-more-btn,
+    .historico-actions button
+) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .filter-chip:not(.active),
+    .fav-chip:not(.active),
+    .loan-chip:not(.active),
+    .tab-btn:not(.active),
+    .view-btn:not([aria-pressed="true"]),
+    .loan-clear-btn,
+    #load-more-btn,
+    .historico-actions button
+):is(:hover, :focus-visible) {
+    background: #24366f !important;
+    border-color: var(--aluno-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.tab-btn.active, .view-btn[aria-pressed="true"]) {
+    background: var(--aluno-accent-gold) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.view-toggle, .loans-view-toggle, .fav-view-toggle) {
+    background: var(--aluno-surface-raised) !important;
+    border: 1px solid var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .view-toggle .view-btn:not([aria-pressed="true"]),
+    .loans-view-toggle button:not(.active),
+    .fav-view-toggle button:not(.active)
+) {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .view-toggle .view-btn:not([aria-pressed="true"]),
+    .loans-view-toggle button:not(.active),
+    .fav-view-toggle button:not(.active)
+):is(:hover, :focus-visible) {
+    background: #24366f !important;
+    border-color: var(--aluno-primary) !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .view-toggle .view-btn,
+    .loans-view-toggle button,
+    .fav-view-toggle button
+):focus-visible {
+    outline: 2px solid var(--aluno-accent-gold) !important;
+    outline-offset: 2px;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .btn-primary,
+    .btn-primary-action,
+    .btn-salvar,
+    .btn-explore,
+    .btn-continue,
+    .empty-cta,
+    .filter-submit,
+    .paginacao a.active
+):not(:disabled) {
+    background: var(--aluno-accent-gold) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .btn-primary,
+    .btn-primary-action,
+    .btn-salvar,
+    .btn-explore,
+    .btn-continue,
+    .empty-cta,
+    .filter-submit,
+    .paginacao a.active
+):not(:disabled) :is(span, i, strong) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .btn-success,
+    .btn-pickup,
+    .btn-renew,
+    .btn-reserve.reserved
+):not(:disabled) {
+    background: #17634f !important;
+    border-color: #42b89a !important;
+    color: #f3fffb !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .btn-danger,
+    .btn-cancel,
+    .btn-return,
+    .btn-remover-favorito,
+    .btn-favorite.favorited,
+    .btn-reserve.reserved:hover
+):not(:disabled) {
+    background: #642f3b !important;
+    border-color: #d47a8d !important;
+    color: #fff5f6 !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .filter-chip.active,
+    .loan-chip.active,
+    .tab-btn.active,
+    .view-btn[aria-pressed="true"],
+    .loans-view-toggle button.active,
+    .fav-view-toggle button.active
+) {
+    background: var(--aluno-accent-gold) !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .filter-chip.active,
+    .loan-chip.active,
+    .tab-btn.active,
+    .view-btn[aria-pressed="true"],
+    .loans-view-toggle button.active,
+    .fav-view-toggle button.active
+) :is(span, i, strong) {
+    color: var(--aluno-action-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .loan-badge,
+    .reserva-status,
+    .historico-status,
+    .status-badge,
+    .item-type-badge,
+    .tipo-badge,
+    .fav-type-badge,
+    .badge-loan,
+    .badge-reservation,
+    .historico-badge
+) {
+    border-color: var(--aluno-border);
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .loan-badge.status-active,
+    .loan-badge.status-emprestado,
+    .loan-badge.status-returned,
+    .loan-badge.status-devolvido,
+    .status-returned,
+    .status-completed,
+    .status-approved,
+    .status-aprovada,
+    .status-emprestado,
+    .status-devolvido
+) {
+    background: var(--aluno-status-active-bg) !important;
+    color: var(--aluno-status-active) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .loan-badge.status-overdue,
+    .loan-badge.status-atrasado,
+    .loan-badge.status-refused,
+    .loan-badge.status-recusado,
+    .reserva-status.status-rejected,
+    .reserva-status.status-cancelled,
+    .status-overdue,
+    .status-atrasado,
+    .status-rejected,
+    .status-rejeitada,
+    .status-cancelled,
+    .status-cancelada,
+    .status-expirada,
+    .status-recusado
+) {
+    background: var(--aluno-status-danger-bg) !important;
+    color: var(--aluno-status-danger) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .loan-badge.status-pending,
+    .loan-badge.status-pendente,
+    .reserva-status.status-pending,
+    .status-pending,
+    .status-pendente
+) {
+    background: var(--aluno-status-pending-bg) !important;
+    color: var(--aluno-status-pending) !important;
+}
+
+html[data-tema="escuro"] .main-content .status-retirada {
+    background: #263b67 !important;
+    border-color: #7995d4 !important;
+    color: #dce7ff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.loan-card, .reserva-card, .historico-item):is(:hover, :focus-within) {
+    border-color: #6f94bc !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .4) !important;
+}
+
+html[data-tema="escuro"] .modal-overlay {
+    background: rgba(1, 8, 20, .78) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.modal-container, .modal-content, .modal-info, .modal) {
+    background-color: var(--aluno-surface) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.modal-content, .modal-info) :is(h1, h2, h3, h4, p, span, small, li, strong, .modal-meta, .modal-description) {
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.modal-close, .modal-actions button:not(.btn-primary):not(.btn-primary-action)) {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: var(--aluno-text) !important;
+}
+
+html[data-tema="escuro"] .main-content :is(.modal-close, .modal-actions button:not(.btn-primary):not(.btn-primary-action)):is(:hover, :focus-visible) {
+    background: #24366f !important;
+    color: #ffffff !important;
+}
+
+html[data-tema="escuro"] .main-content :is(
+    .loans-hero,
+    .reservas-hero,
+    .historico-hero,
+    .dashboard-hero,
+    .loan-detail-hero
+) {
+    border: 1px solid #426789;
+    box-shadow: var(--aluno-shadow);
+}
+
+html[data-tema="escuro"] .top-header .btn-logout {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+    color: #ffd0cc !important;
+}
+
+html[data-tema="escuro"] .top-header .btn-logout :is(i, span) {
+    color: inherit !important;
+}
+
+html[data-tema="escuro"] .top-header .btn-logout:hover {
+    background: #642f3b !important;
+    border-color: #d47a8d !important;
+    color: #fff5f6 !important;
+}
+
+.top-header .notification-btn {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px !important;
+    min-width: 42px;
+    max-width: 42px;
+    height: 42px !important;
+    min-height: 42px;
+    max-height: 42px;
+    aspect-ratio: 1;
+    padding: 0 !important;
+    border: 1px solid #dbe3ee !important;
+    border-radius: 50% !important;
+    line-height: 1;
+}
+
+.aluno-appearance-controls {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.aluno-appearance-button {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 1px solid #d3daf5;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #0035ff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.aluno-appearance-button:hover {
+    border-color: #ffad00;
+    transform: rotate(-12deg);
+}
+
+.aluno-appearance-button:focus-visible {
+    outline: 3px solid #ffad00 !important;
+    outline-offset: 3px !important;
+}
+
+.aluno-appearance-button .icon-sun { display: none; color: #ffad00; }
+html[data-tema="escuro"] .aluno-appearance-button .icon-moon,
+html[data-tema="alto_contraste"] .aluno-appearance-button .icon-moon,
+html[data-tema="alto_contraste"] .aluno-appearance-button .icon-sun { display: none; }
+html[data-tema="escuro"] .aluno-appearance-button .icon-sun { display: block; }
+.aluno-appearance-button .icon-contrast { display: none; }
+html[data-tema="alto_contraste"] .aluno-appearance-button .icon-contrast { display: block; }
+
+html[data-tema="escuro"] .aluno-appearance-button {
+    background: #111a42;
+    border-color: #28357f;
+    color: #8fa6ff;
+}
+
+html[data-tema="escuro"] .aluno-appearance-button:hover {
+    border-color: #ffad00;
+}
+
+html[data-tema="alto_contraste"] .aluno-appearance-button {
+    background: #000000;
+    border: 1px solid #ffffff;
+    color: #ffffff !important;
+}
+
+.top-header .notification-btn > i {
+    font-size: 1.375rem;
+    line-height: 1;
+}
+
+html[data-tema="escuro"] .top-header .notification-btn {
+    background: var(--aluno-surface-raised) !important;
+    border-color: var(--aluno-border) !important;
+}
+
+html[data-tema="escuro"] .top-header .notification-btn:hover,
+html[data-tema="escuro"] .top-header .notification-btn:focus-visible {
+    background: #24366f !important;
+    border-color: var(--aluno-accent-gold) !important;
+    color: var(--aluno-accent-gold) !important;
+}
+
+/* Indicador de foco visível para percorrer todas as páginas com Tab. */
+:is(
+    a[href],
+    button:not(:disabled),
+    input:not(:disabled),
+    select:not(:disabled),
+    textarea:not(:disabled),
+    summary,
+    [tabindex]:not([tabindex="-1"])
+):focus-visible,
+.opcao-card:focus-within {
+    outline: 3px solid #ffad00 !important;
+    outline-offset: 3px !important;
+}
+
+@media (max-width: 900px) {
+    .sidebar,
+    .sidebar.collapsed {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        padding: 8px 12px 0;
+        overflow: visible;
+        border-radius: 0;
+    }
+
+    .sidebar-header,
+    .sidebar.collapsed .sidebar-header {
+        min-height: 44px;
+        padding: 0;
+        margin: 0;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    .sidebar-logo,
+    .sidebar.collapsed .sidebar-logo {
+        position: static;
+        gap: 8px;
+        font-size: 1.25rem;
+    }
+
+    .sidebar-logo span,
+    .sidebar.collapsed .sidebar-logo span {
+        display: inline;
+        opacity: 1;
+        visibility: visible;
+        width: auto;
+    }
+
+    .sidebar .collapse-icon {
+        display: none;
+    }
+
+    .sidebar-nav,
+    .sidebar.collapsed .sidebar-nav {
+        display: flex;
+        gap: 4px;
+        width: 100%;
+        margin: 0;
+        padding: 6px 0 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scrollbar-width: thin;
+    }
+
+    .sidebar-nav .nav-item,
+    .sidebar.collapsed .sidebar-nav .nav-item {
+        flex: 0 0 auto;
+        width: auto;
+        margin: 0;
+        padding: 9px 11px;
+        gap: 8px;
+        font-size: 0.8125rem;
+    }
+
+    .sidebar.collapsed .nav-item span:not(.nav-badge) {
+        display: inline-block;
+        width: auto;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .main-content,
+    .sidebar.collapsed + .main-content {
+        min-width: 0;
+        margin-left: 0;
+    }
+
+    .top-header,
+    .sidebar.collapsed + .main-content .top-header {
+        position: sticky;
+        top: 0;
+        z-index: 90;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 10px;
+        padding: 10px 12px;
+        border-radius: 0 0 14px 14px;
+    }
+
+    .search-container {
+        order: 2;
+        flex: 1 1 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+    }
+
+    .header-right {
+        order: 1;
+        flex: 1 1 100%;
+        justify-content: flex-end;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .dashboard-main,
+    .catalog-main,
+    .loans-main,
+    .reservas-main,
+    .historico-main,
+    .config-container {
+        width: 100%;
+        min-width: 0;
+        padding: 20px 16px 36px;
+    }
+
+    .main-content :is(.catalogo-grid, .favoritos-grid, .loans-grid, .reservas-list, .historico-list) {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar,
+    .sidebar.collapsed {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+
+    .sidebar-nav .nav-item,
+    .sidebar.collapsed .sidebar-nav .nav-item {
+        padding: 8px 9px;
+        font-size: 0.75rem;
+    }
+
+    .top-header,
+    .sidebar.collapsed + .main-content .top-header {
+        margin-right: 6px;
+        margin-left: 6px;
+        padding: 8px 10px;
+    }
+
+    .header-right {
+        gap: 6px;
+    }
+
+    .dashboard-main,
+    .catalog-main,
+    .loans-main,
+    .reservas-main,
+    .historico-main,
+    .config-container {
+        padding: 16px 12px 28px;
+    }
+}

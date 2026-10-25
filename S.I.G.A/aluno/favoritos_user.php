@@ -1,0 +1,262 @@
+<?php
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/auth/verificar_login_user.php';
+
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: auth/login_user.php');
+    exit;
+}
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Busca nome do aluno
+$sql_nome = "SELECT nome_aluno FROM login_aluno WHERE id_aluno = ?";
+$stmt_nome = $conn->prepare($sql_nome);
+$stmt_nome->bind_param("i", $usuario_id);
+$stmt_nome->execute();
+$primeiroNome = 'Aluno';
+if ($row = $stmt_nome->get_result()->fetch_assoc()) {
+    $primeiroNome = explode(' ', trim($row['nome_aluno']))[0];
+}
+$stmt_nome->close();
+
+// ========== BUSCAR FAVORITOS ==========
+$sql_fav = "
+    SELECT f.item_id, f.tipo_item, f.data_favorito,
+           c.titulo,
+           c.autor AS subtitulo,
+           c.capa_url AS capa,
+           c.tipo
+    FROM favoritos f
+    INNER JOIN catalogo c ON f.item_id = c.id_catalogo AND f.tipo_item = c.tipo
+    WHERE f.usuario_id = ?
+    ORDER BY f.data_favorito DESC
+";
+$stmt_fav = $conn->prepare($sql_fav);
+$stmt_fav->bind_param("i", $usuario_id);
+$stmt_fav->execute();
+$result_fav = $stmt_fav->get_result();
+$favoritos = $result_fav->fetch_all(MYSQLI_ASSOC);
+$stmt_fav->close();
+
+$totalFavoritos = count($favoritos);
+$contagemTipos = ['livro' => 0, 'revista' => 0, 'tcc' => 0];
+foreach ($favoritos as $fav) {
+    if (isset($contagemTipos[$fav['tipo']])) {
+        $contagemTipos[$fav['tipo']]++;
+    }
+}
+
+// ========== BUSCAR NOTIFICAÇÕES ==========
+$notificacoes = array();
+$sql_notif = "
+    SELECT n.id_envio, n.titulo, n.mensagem, n.tipo, n.criado_em
+    FROM notificacoes n
+    WHERE n.id_aluno = ? AND COALESCE(n.lida, 0) = 0
+    ORDER BY n.criado_em DESC
+    LIMIT 5
+";
+$stmt_notif = $conn->prepare($sql_notif);
+if ($stmt_notif) {
+    $stmt_notif->bind_param("i", $usuario_id);
+    $stmt_notif->execute();
+    $notificacoes = $stmt_notif->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt_notif->close();
+}
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+  <title>Meus Favoritos - SiGA ITJ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/aluno/painel_user.css">
+  <link rel="stylesheet" href="../assets/css/aluno/catalogo_user.css">
+  <link rel="stylesheet" href="../assets/css/aluno/favoritos_user.css?v=<?= time() ?>">
+  <link rel="stylesheet" href="../assets/css/aluno/unificado_user.css">
+  <link rel="stylesheet" href="../assets/css/aluno/notificacoes_user.css">
+  <link rel="stylesheet" href="../assets/css/shared/alertas_ui.css">
+  <?php include __DIR__ . '/../includes/preferencias_head_user.php'; ?>
+  <link rel="stylesheet" href="../assets/css/aluno/controles_visualizacao_escuro_user.css?v=<?= time() ?>">
+
+  <script src="../assets/js/shared/alertas_ui.js"></script>
+  <script src="../assets/js/aluno/painel_user.js" defer></script>
+  <script src="../assets/js/aluno/notificacoes_user.js" defer></script>
+  <script src="../assets/js/aluno/favoritos_user.js?v=<?= time() ?>" defer></script>
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><i class="fas fa-book-reader"></i><span>SiGA ITJ</span></div>
+      <button class="collapse-icon" id="collapseBtn" title="Recolher menu" data-i18n-title="collapse_menu">
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="painel_user.php" class="nav-item"><i class="fas fa-home"></i><span>Visão Geral</span></a>
+      <a href="catalogo_user.php" class="nav-item"><i class="fas fa-search"></i><span>Catálogo</span></a>
+      <a href="favoritos_user.php" class="nav-item active"><i class="fas fa-heart"></i><span>Meus Favoritos</span></a>
+      <a href="emprestimos_user.php" class="nav-item"><i class="fas fa-book"></i><span>Meus Empréstimos</span></a>
+      <a href="reservas_user.php" class="nav-item"><i class="fas fa-clock"></i><span>Minhas Reservas</span></a>
+      <a href="configuracoes_user.php" class="nav-item"><i class="fas fa-sliders-h"></i><span>Configurações</span></a>
+    </nav>
+  </aside>
+
+  <div class="main-content">
+    <?php require __DIR__ . '/../includes/top_header_user.php'; ?>
+
+    <main class="container catalog-main">
+      <!-- HERO -->
+      <div class="fav-hero">
+        <div class="fav-hero-content">
+          <h1 id="favoritos-title" data-i18n="page_title">Meus Favoritos</h1>
+          <p id="favoritos-subtitle" data-i18n="page_subtitle">Seus itens salvos para leitura ou reserva futura.</p>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="fav-toolbar" id="fav-toolbar">
+        <div class="fav-search">
+          <i class="fas fa-search"></i>
+          <input type="text" id="fav-search-input" data-i18n-placeholder="favorites_search_placeholder" placeholder="Buscar nos seus favoritos..." autocomplete="off">
+        </div>
+
+        <div class="fav-chips" role="group" aria-label="Filtrar por tipo">
+          <button type="button" class="fav-chip active" data-filter="todos" aria-pressed="true" disabled>
+            <span class="chip-label" data-i18n="filter_all">Todos</span>
+            <span class="chip-count"><?= $totalFavoritos ?></span>
+          </button>
+          <button type="button" class="fav-chip" data-filter="livro" aria-pressed="false">
+            <span class="chip-label" data-i18n="filter_livro">Livros</span>
+            <span class="chip-count"><?= $contagemTipos['livro'] ?></span>
+          </button>
+          <button type="button" class="fav-chip" data-filter="revista" aria-pressed="false">
+            <span class="chip-label" data-i18n="filter_revista">Revistas</span>
+            <span class="chip-count"><?= $contagemTipos['revista'] ?></span>
+          </button>
+          <button type="button" class="fav-chip" data-filter="tcc" aria-pressed="false">
+            <span class="chip-label" data-i18n="filter_tcc">TCCs</span>
+            <span class="chip-count"><?= $contagemTipos['tcc'] ?></span>
+          </button>
+        </div>
+
+        <div class="fav-controls-right">
+          <div class="fav-sort">
+            <i class="fas fa-sort"></i>
+            <select id="fav-sort-select" aria-label="Ordenar favoritos">
+              <option value="recentes" data-i18n="sort_recentes">Mais recentes</option>
+              <option value="antigos" data-i18n="sort_antigos">Mais antigos</option>
+              <option value="titulo-asc" data-i18n="sort_titulo_asc">Título A-Z</option>
+              <option value="titulo-desc" data-i18n="sort_titulo_desc">Título Z-A</option>
+            </select>
+          </div>
+
+          <div class="fav-view-toggle" role="group" aria-label="Modo de visualização">
+            <button type="button" class="active" data-view="grid" data-i18n-title="view_grid" title="Ver em grade" aria-pressed="true">
+              <i class="fas fa-th-large"></i><span data-i18n="view_grid_label">Grade</span>
+            </button>
+            <button type="button" data-view="list" data-i18n-title="view_list" title="Ver em lista" aria-pressed="false">
+              <i class="fas fa-list"></i><span data-i18n="view_list_label">Lista</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID -->
+      <div class="catalog-grid" id="favoritos-grid">
+        <?php if ($totalFavoritos > 0): ?>
+            <?php foreach ($favoritos as $fav):
+                $tipoLabel = ['livro' => 'Livro', 'revista' => 'Revista', 'tcc' => 'TCC'][$fav['tipo']] ?? 'Item';
+                $tipoIcone = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'][$fav['tipo']] ?? 'fa-book';
+                $capa = $fav['capa'];
+                if (!empty($capa) && strpos($capa, 'http') !== 0 && strpos($capa, '/') !== 0) {
+                    $capa = '../' . $capa;
+                }
+            ?>
+            <article class="catalogo-card favorito-card"
+                 data-id="<?= $fav['item_id'] ?>"
+                 data-tipo="<?= htmlspecialchars($fav['tipo']) ?>"
+                 data-titulo="<?= htmlspecialchars($fav['titulo']) ?>"
+                 data-autor="<?= htmlspecialchars($fav['subtitulo'] ?? '') ?>"
+                 data-data="<?= !empty($fav['data_favorito']) ? strtotime($fav['data_favorito']) : 0 ?>">
+
+              <span class="fav-type-badge type-<?= $fav['tipo'] ?>">
+                <i class="fas <?= $tipoIcone ?>"></i> <?= $tipoLabel ?>
+              </span>
+
+              <div class="card-capa">
+                 <?php if(!empty($capa)): ?>
+                  <img src="<?= htmlspecialchars($capa) ?>" alt="Capa de <?= htmlspecialchars($fav['titulo']) ?>" loading="lazy">
+                 <?php else: ?>
+                  <div class="capa-placeholder">
+                        <i class="fas <?= $tipoIcone ?>"></i>
+                        <span><?= htmlspecialchars($fav['titulo']) ?></span>
+                    </div>
+                 <?php endif; ?>
+
+                  <form action="alternar_favorito_user.php" method="POST" class="form-remover-favorito">
+                      <input type="hidden" name="csrf" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                      <input type="hidden" name="item_id" value="<?= $fav['item_id'] ?>">
+                      <input type="hidden" name="tipo_item" value="<?= htmlspecialchars($fav['tipo_item']) ?>">
+                      <input type="hidden" name="redirect" value="favoritos_user.php">
+                      <button type="submit"
+                              class="btn-remover-favorito"
+                              data-i18n-title="remove_title"
+                              title="Remover dos favoritos"
+                              aria-label="Remover <?= htmlspecialchars($fav['titulo']) ?> dos favoritos">
+                        <i class="fas fa-heart"></i>
+                      </button>
+                  </form>
+              </div>
+
+              <div class="card-info">
+                <h4 title="<?= htmlspecialchars($fav['titulo']) ?>"><?= htmlspecialchars($fav['titulo']) ?></h4>
+                <p class="autor"><?= htmlspecialchars($fav['subtitulo'] ?? 'Autor não informado') ?></p>
+                <?php if (!empty($fav['data_favorito'])): ?>
+                <div class="card-added">
+                  <i class="far fa-clock"></i>
+                  <span><span data-i18n="added_on">Adicionado em</span> <?= date('d/m/Y', strtotime($fav['data_favorito'])) ?></span>
+                </div>
+                <?php endif; ?>
+              </div>
+            </article>
+            <?php endforeach; ?>
+
+            <div class="catalog-empty" id="favoritos-no-results" hidden>
+                <i class="fas fa-filter"></i>
+                <h3 data-i18n="no_results_title">Nenhum item encontrado</h3>
+                <p data-i18n="no_results_text">Nenhum favorito corresponde aos filtros atuais.</p>
+                <button type="button" id="fav-clear-filters" class="fav-clear-btn" data-i18n="clear_filters">
+                  <i class="fas fa-undo"></i> Limpar filtros
+                </button>
+            </div>
+        <?php else: ?>
+            <div class="catalog-empty fav-empty">
+                <div class="empty-illustration">
+                  <i class="far fa-heart"></i>
+                </div>
+                <h3 data-i18n="empty_favoritos">Você ainda não tem nenhum item nos favoritos</h3>
+                <p class="empty-hint">Explore o catálogo e salve livros, revistas e TCCs para encontrar depois.</p>
+                <a href="catalogo_user.php" class="fav-clear-btn empty-cta btn-explore" data-i18n="explore_catalog">
+                  <i class="fas fa-compass"></i> Explorar o Catálogo
+                </a>
+            </div>
+        <?php endif; ?>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  </script>
+</body>
+</html>
+
+
+
+
+

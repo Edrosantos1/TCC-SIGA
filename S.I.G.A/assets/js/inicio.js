@@ -229,23 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fecharMenu(true);
   }
 
-  // Navegação interna sem deixar #sobre ou #secretaria na URL.
-  // O link continua apontando para a seção para manter a navegação acessível,
-  // mas o hash é removido imediatamente após o clique.
-  document.querySelectorAll('a[href^="#"]').forEach(linkInterno => {
-    const destino = linkInterno.getAttribute("href");
-    if (!destino || destino === "#") return;
-
-    const secao = document.querySelector(destino);
-    if (!secao) return;
-
-    linkInterno.addEventListener("click", (evento) => {
-      evento.preventDefault();
-      secao.scrollIntoView({ behavior: "smooth", block: "start" });
-      window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    });
-  });
-
   const dialogo = document.getElementById("dialogo_informacoes");
   const tituloDialogo = document.getElementById("titulo_informacoes");
   const textoDialogo = document.getElementById("texto_informacoes");
@@ -283,6 +266,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("fechar_informacoes").addEventListener("click", fecharDialogo);
   dialogo.addEventListener("click", (evento) => { if (evento.target === dialogo) fecharDialogo(); });
+
+  // Navegação interna sem poluir a URL (sem #inicio, #titulo_sobre, #secretaria...)
+  function irParaSecao(alvo) {
+    if (!alvo) return;
+    if (alvo === document.body || alvo === document.documentElement) {
+      window.scrollTo({ top: 0 });
+    } else {
+      alvo.scrollIntoView({ block: "start" });
+      // Acessibilidade: leva o foco do teclado/leitor de tela para a seção
+      if (!alvo.hasAttribute("tabindex")) alvo.setAttribute("tabindex", "-1");
+      alvo.focus({ preventScroll: true });
+    }
+  }
+
+  function limparHashDaUrl() {
+    if (!window.location.hash) return;
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+
+  document.querySelectorAll('a[href^="#"]:not([href="#"]):not([data-dialogo])').forEach(link => {
+    link.addEventListener("click", (evento) => {
+      const alvo = document.getElementById(decodeURIComponent(link.getAttribute("href").slice(1)));
+      if (!alvo) return;
+      evento.preventDefault();
+      irParaSecao(alvo);
+      limparHashDaUrl();
+    });
+  });
+
+  // Se a página for aberta/atualizada já com um #hash, vai até a seção e limpa a URL
+  if (window.location.hash.length > 1) {
+    const alvoInicial = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+    limparHashDaUrl();
+    if (alvoInicial) window.addEventListener("load", () => irParaSecao(alvoInicial), { once: true });
+  }
 
   const idiomaSalvo = armazenamentoIdioma.ler();
   aplicarIdioma(traducoesPorIdioma[idiomaSalvo] ? idiomaSalvo : "pt");
