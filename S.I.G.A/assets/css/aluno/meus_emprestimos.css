@@ -218,70 +218,114 @@
 }
 
 /* ===================== GRID ===================== */
+/* Mesma grade dos favoritos (.catalog-grid) */
 .loans-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 18px;
-}
-.loans-grid.list-view {
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
 }
 
 /* ===================== CARD ===================== */
-.loan-card {
-  background: #fff;
-  border-radius: 16px;
-  border: 1px solid #e6eaf0;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-  overflow: hidden;
+/* Estrutura idêntica ao card de favoritos (catalogo-card + favorito-card).
+   Seletores com .loans-grid para vencer o aluno_unificado.css. */
+.loans-grid .loan-card {
+  position: relative;
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  height: auto;
+  padding: 0;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e6eaf0;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  position: relative;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s ease,
+              border-color 0.25s ease;
 }
-.loan-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(11, 75, 155, 0.12);
+.loans-grid .loan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(11, 75, 155, 0.14);
   border-color: #d5e5f5;
 }
-.loan-card:focus-within {
+.loans-grid .loan-card:focus-within {
   box-shadow: 0 0 0 3px rgba(11, 75, 155, 0.25);
 }
 
-/* Capa */
-.loan-cover-wrap {
+/* Capa (= .card-capa) */
+.loans-grid .loan-cover-wrap {
   position: relative;
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-  background: #e9edf3;
-  flex-shrink: 0;
-}
-.loan-cover,
-.loan-cover-placeholder {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #f0f4fd, #e2ebf7);
 }
-.loan-cover-placeholder {
+.loans-grid .loan-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.loans-grid .loan-card:hover .loan-cover { transform: scale(1.06); }
+
+/* Placeholder (= .capa-placeholder) */
+.loans-grid .loan-cover-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  border-radius: 0;
   color: #fff;
-  font-size: 2.75rem;
+  font-size: 2.625rem;
+  text-align: center;
   background: linear-gradient(135deg, #0b4b9b, #1565c0);
 }
-.loan-cover { transition: transform 0.4s ease; }
-.loan-card:hover .loan-cover { transform: scale(1.05); }
 
-/* Badge de status */
+/* Selo do tipo (= .fav-type-badge) */
+.loan-type-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.65625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0b4b9b;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.loan-type-badge i { font-size: 0.625rem; }
+.loan-type-badge.type-livro   { color: #0b4b9b; }
+.loan-type-badge.type-revista { color: #d35400; }
+.loan-type-badge.type-tcc     { color: #6a11cb; }
+
+/* Selo de status: ocupa o lugar do botão de coração dos favoritos */
 .loan-badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 5px 12px;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  padding: 4px 10px;
   border-radius: 999px;
   font-size: 0.65625rem;
   font-weight: 700;
@@ -289,8 +333,9 @@
   text-transform: uppercase;
   background: #fff;
   color: #0b4b9b;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18);
-  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .loan-badge.status-active,
 .loan-badge.status-emprestado { background: #dcfce7; color: #166534; }
@@ -304,51 +349,51 @@
 .loan-badge.status-refused,
 .loan-badge.status-recusado  { background: #fee2e2; color: #991b1b; }
 
-/* Corpo */
-.loan-body {
-  padding: 16px 18px 18px;
+/* Corpo (= .card-info) */
+.loans-grid .loan-body {
   display: flex;
   flex-direction: column;
-  gap: 5px;
   flex: 1;
+  gap: 4px;
+  padding: 14px 16px 16px;
 }
 .loan-title {
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: #0b1e33;
   margin: 0;
-  display: -webkit-box;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #0b1e33;
   line-height: 1.35;
-  min-height: 2.7em;
+  min-height: 40px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 .loan-author {
+  margin: 0;
   font-size: 0.8125rem;
   color: #64748b;
-  margin: 0 0 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Datas (= .card-added) */
 .loan-dates {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 0.78125rem;
-  color: #64748b;
-  margin-bottom: 6px;
-  padding-top: 8px;
-  border-top: 1px dashed #eef2f7;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: #94a3b8;
 }
 .loan-dates span {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
-.loan-dates i { color: #94a3b8; font-size: 0.75rem; width: 14px; text-align: center; }
+.loan-dates i { color: #cbd5e1; font-size: 0.6875rem; text-align: center; }
 
 /* Indicador de dias restantes (cards) */
 .loan-days {
@@ -368,55 +413,58 @@
 .loan-days.neutral  { background: #f1f5f9; color: #64748b; }
 
 /* ===================== LIST VIEW ===================== */
+/* Mesmo modo lista dos favoritos (.catalog-grid.list-view) */
+.loans-grid.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 .loans-grid.list-view .loan-card {
+  display: flex;
   flex-direction: row;
   align-items: stretch;
-  gap: 16px;
-  padding: 12px 18px;
+  border-radius: 14px;
 }
+.loans-grid.list-view .loan-card:hover { transform: translateX(4px); }
+
 .loans-grid.list-view .loan-cover-wrap {
+  position: static;
+  overflow: visible;
   width: 76px;
   min-width: 76px;
-  flex: 0 0 76px;
-  aspect-ratio: auto;
   height: 112px;
-  min-height: 112px;
+  flex: 0 0 76px;
   border-radius: 10px;
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
+  background: #e9edf3;
 }
-.loans-grid.list-view .loan-cover { object-position: center top; }
+.loans-grid.list-view .loan-cover {
+  border-radius: 10px;
+  object-position: center top;
+}
 .loans-grid.list-view .loan-cover-placeholder {
+  gap: 0;
+  padding: 6px;
   border-radius: 10px;
   font-size: 1.75rem;
-}
-.loans-grid.list-view .loan-badge {
-  top: 6px;
-  left: 6px;
-  max-width: calc(100% - 12px);
-  padding: 3px 6px;
-  overflow: hidden;
-  font-size: 0.5625rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .loans-grid.list-view .loan-body {
   flex: 1;
   min-width: 0;
-  padding: 0;
   justify-content: center;
+  padding: 14px 120px 14px 18px;
 }
-.loans-grid.list-view .loan-title {
-  min-height: 0;
-  line-clamp: 1;
+.loans-grid.list-view .loan-title { margin: 0 0 3px; }
+.loans-grid.list-view .loan-type-badge {
+  top: 8px;
+  left: 8px;
+  font-size: 0.5625rem;
+  padding: 3px 7px;
 }
-.loans-grid.list-view .loan-dates {
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 6px 18px;
-  border-top: none;
-  padding-top: 0;
+.loans-grid.list-view .loan-badge {
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
 }
-.loans-grid.list-view .loan-card:hover { transform: translateY(-1px); }
 
 /* ===================== EMPTY STATES ===================== */
 .loan-empty {
@@ -843,25 +891,28 @@
   .loans-chips { justify-content: flex-start; }
   .loans-controls-right { justify-content: space-between; }
 
-  .loans-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .loans-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  /* Mesmos ajustes do card do catálogo/favoritos */
+  .loans-grid .loan-cover-wrap { height: 200px; }
+  .loans-grid .loan-body { padding: 12px 13px 13px; }
+  .loans-grid .loan-title { font-size: 0.875rem; min-height: 38px; }
+  .loans-grid .loan-author { font-size: 0.75rem; }
 
   .loans-grid.list-view .loan-cover-wrap {
     width: 76px;
     min-width: 76px;
-    flex-basis: 76px;
     height: 112px;
-    min-height: 112px;
-    border-radius: 10px;
+    flex-basis: 76px;
   }
+  .loans-grid.list-view .loan-body { padding: 10px 104px 10px 14px; }
 }
 
 @media (max-width: 640px) {
   .loans-grid.list-view .loan-cover-wrap {
     width: 64px;
     min-width: 64px;
-    flex-basis: 64px;
     height: 94px;
-    min-height: 94px;
+    flex-basis: 64px;
   }
 }
 
@@ -886,27 +937,9 @@
   .loans-tabs { width: 100%; }
   .tab-btn { flex: 1; }
 
-  .loans-grid.list-view .loan-cover-wrap {
-    width: 64px;
-    min-width: 64px;
-    flex-basis: 64px;
-    height: 94px;
-    min-height: 94px;
-    border-radius: 10px;
-  }
-  .loans-grid.list-view .loan-card {
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-  }
-  .loans-grid.list-view .loan-body {
-    padding: 0;
-  }
-  .loans-grid.list-view .loan-dates {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    border-top: 0;
-    padding-top: 0;
-  }
+  .loans-grid .loan-cover-wrap { height: 170px; }
+  .loans-grid .loan-title { font-size: 0.8125rem; min-height: 34px; }
+  .loans-grid .loan-author { font-size: 0.71875rem; }
+  .loans-grid.list-view .loan-body { padding: 10px 92px 10px 14px; }
+  .loans-grid.list-view .loan-badge { right: 8px; }
 }

@@ -30,7 +30,7 @@ $notificacoes = array();
 $sql_notif = "
     SELECT n.id_envio, n.titulo, n.mensagem, n.tipo, n.criado_em
     FROM notificacoes n
-    WHERE n.id_aluno = ?
+    WHERE n.id_aluno = ? AND COALESCE(n.lida, 0) = 0
     ORDER BY n.criado_em DESC
     LIMIT 5
 ";
@@ -296,7 +296,6 @@ $reservasHistorico = array_filter($reservas, fn($r) => in_array($r['status'], ['
 
   <script>
     window.reservasData = <?= json_encode($reservas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-    window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
 </body>
 </html>

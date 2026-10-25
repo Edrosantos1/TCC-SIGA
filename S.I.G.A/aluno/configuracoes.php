@@ -24,7 +24,7 @@ $stmt->close();
 
 $notificacoes = [];
 $stmt_notificacoes = $conn->prepare(
-    'SELECT id_envio, titulo, mensagem, tipo, criado_em FROM notificacoes WHERE id_aluno = ? ORDER BY criado_em DESC LIMIT 5'
+    'SELECT id_envio, titulo, mensagem, tipo, criado_em FROM notificacoes WHERE id_aluno = ? AND COALESCE(lida, 0) = 0 ORDER BY criado_em DESC LIMIT 5'
 );
 if ($stmt_notificacoes) {
     $stmt_notificacoes->bind_param('i', $usuario_id);

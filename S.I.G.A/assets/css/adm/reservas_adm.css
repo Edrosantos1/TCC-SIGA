@@ -532,20 +532,6 @@ mark {
     border-color: #ddd6fe;
 }
 
-/* Pendente pede atenção: ponto pulsante */
-.status-pendente::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #e67e22;
-    animation: dotPulse 1.8s infinite;
-}
-
-@keyframes dotPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: 0.5; transform: scale(0.85); }
-}
-
 /* ========== AÇÕES ========== */
 .acoes-cell { text-align: center; white-space: nowrap !important; }
 
@@ -1032,7 +1018,7 @@ body.modal-aberto { overflow: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .reserva-row, .cfm-overlay, .cfm-box, .empty-state, .status-pendente::before { animation: none !important; }
+    .reserva-row, .cfm-overlay, .cfm-box, .empty-state { animation: none !important; }
     .btn-acao, .btn-acao-massa, .cfm-btn, .btn-primary { transition: none; }
 }
 

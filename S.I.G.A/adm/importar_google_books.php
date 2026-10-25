@@ -28,7 +28,11 @@ session_write_close();
 
 // A chave NÃO fica mais no código. Defina GOOGLE_BOOKS_API_KEY no ambiente do PHP.
 // Sem chave a API ainda responde, só que com limite de uso menor.
-$apiKey = getenv('GOOGLE_BOOKS_API_KEY') ?: 'AIzaSyAjKtOjQ23WZ4F2e8hpx5wkWXD5BBc79KQ';
+$apiKey = getenv('GOOGLE_BOOKS_API_KEY') ?: '';
+if ($apiKey === '' && is_file(__DIR__ . '/../includes/chaves.local.php')) {
+    $chaves = require __DIR__ . '/../includes/chaves.local.php';
+    $apiKey = is_array($chaves) ? (string) ($chaves['GOOGLE_BOOKS_API_KEY'] ?? '') : '';
+}
 
 $maxItens = 30;                 // quantos livros COM CAPA importar por execução
 $maxPaginasPorTermo = 5;

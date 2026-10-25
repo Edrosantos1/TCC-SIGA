@@ -28,7 +28,7 @@ $notificacoes = array();
 $sql_notif = "
     SELECT n.id_envio, n.titulo, n.mensagem, n.tipo, n.criado_em
     FROM notificacoes n
-    WHERE n.id_aluno = ?
+    WHERE n.id_aluno = ? AND COALESCE(n.lida, 0) = 0
     ORDER BY n.criado_em DESC
     LIMIT 5
 ";
@@ -58,6 +58,16 @@ $stmt_emprestimos->bind_param('i', $usuario_id);
 $stmt_emprestimos->execute();
 $emprestimos = $stmt_emprestimos->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt_emprestimos->close();
+
+// Capas salvas como 'assets/capas/...' são relativas à raiz do sistema; esta página fica em /aluno/.
+foreach ($emprestimos as &$emp) {
+    $capa = trim((string) ($emp['capa_url'] ?? ''));
+    if ($capa !== '' && !preg_match('#^(https?:)?//#i', $capa) && $capa[0] !== '/' && strpos($capa, 'data:') !== 0) {
+        $capa = '../' . $capa;
+    }
+    $emp['capa_url'] = $capa;
+}
+unset($emp);
 
 ?>
 <!DOCTYPE html>
@@ -184,6 +194,7 @@ $stmt_emprestimos->close();
             if (!$isActive && !$isHistory) continue;
             $tipo = $emprestimo['tipo'] ?: 'livro';
             $tipoIcon = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'][$tipo] ?? 'fa-book';
+            $tipoLabel = ['livro' => 'Livro', 'revista' => 'Revista', 'tcc' => 'TCC'][$tipo] ?? 'Livro';
             $statusLabel = match ($status) {
                 'emprestado' => 'Ativo', 'atrasado' => 'Atrasado', 'pendente' => 'Aguardando aprovação',
                 'devolvido' => 'Devolvido', default => 'Pendente'
@@ -202,13 +213,14 @@ $stmt_emprestimos->close();
             <?php else: ?>
               <div class="loan-cover-placeholder"><i class="fas <?= $tipoIcon ?>"></i></div>
             <?php endif; ?>
+            <span class="loan-type-badge tipo-badge type-<?= htmlspecialchars($tipo) ?>"><i class="fas <?= $tipoIcon ?>"></i> <?= htmlspecialchars($tipoLabel) ?></span>
             <span class="loan-badge status-<?= htmlspecialchars($statusClass) ?>"><?= htmlspecialchars($statusLabel) ?></span>
           </div>
           <div class="loan-body">
             <h4 class="loan-title"><?= htmlspecialchars($emprestimo['titulo_item']) ?></h4>
             <p class="loan-author"><?= htmlspecialchars($emprestimo['autor'] ?: 'Autor não informado') ?></p>
             <div class="loan-dates">
-              <span><i class="far fa-calendar-alt"></i> Empréstimo: <?= date('d/m/Y', strtotime($emprestimo['data_emprestimo'])) ?></span>
+              <span><i class="far fa-clock"></i> Empréstimo: <?= date('d/m/Y', strtotime($emprestimo['data_emprestimo'])) ?></span>
               <?php if (!empty($emprestimo['data_devolucao_prevista'])): ?>
                 <span><i class="far fa-calendar-check"></i> Vencimento: <?= date('d/m/Y', strtotime($emprestimo['data_devolucao_prevista'])) ?></span>
               <?php endif; ?>
@@ -221,9 +233,19 @@ $stmt_emprestimos->close();
         <?php foreach ($emprestimos as $emprestimo):
             if ($emprestimo['status'] !== 'devolvido') continue;
             $tipo = $emprestimo['tipo'] ?: 'livro';
+            $tipoIconH = ['livro' => 'fa-book', 'revista' => 'fa-newspaper', 'tcc' => 'fa-graduation-cap'][$tipo] ?? 'fa-book';
+            $tipoLabelH = ['livro' => 'Livro', 'revista' => 'Revista', 'tcc' => 'TCC'][$tipo] ?? 'Livro';
         ?>
         <article class="loan-card" data-status="<?= htmlspecialchars($emprestimo['status']) ?>">
-          <div class="loan-cover-wrap"><div class="loan-cover-placeholder"><i class="fas fa-book"></i></div><span class="loan-badge status-<?= htmlspecialchars($emprestimo['status']) ?>"><?= htmlspecialchars('Devolvido') ?></span></div>
+          <div class="loan-cover-wrap">
+            <?php if (!empty($emprestimo['capa_url'])): ?>
+              <img class="loan-cover" src="<?= htmlspecialchars($emprestimo['capa_url']) ?>" alt="<?= htmlspecialchars($emprestimo['titulo_item']) ?>">
+            <?php else: ?>
+              <div class="loan-cover-placeholder"><i class="fas <?= $tipoIconH ?>"></i></div>
+            <?php endif; ?>
+            <span class="loan-type-badge tipo-badge type-<?= htmlspecialchars($tipo) ?>"><i class="fas <?= $tipoIconH ?>"></i> <?= htmlspecialchars($tipoLabelH) ?></span>
+            <span class="loan-badge status-<?= htmlspecialchars($emprestimo['status']) ?>"><?= htmlspecialchars('Devolvido') ?></span>
+          </div>
           <div class="loan-body"><h4 class="loan-title"><?= htmlspecialchars($emprestimo['titulo_item']) ?></h4><p class="loan-author"><?= htmlspecialchars($emprestimo['autor'] ?: 'Autor não informado') ?></p></div>
         </article>
         <?php endforeach; ?>
@@ -257,7 +279,6 @@ $stmt_emprestimos->close();
 
   <script>
     window.emprestimosData = <?= json_encode($emprestimos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-    window.notificacoesData = <?= json_encode($notificacoes, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   </script>
 </body>
 </html>

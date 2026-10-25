@@ -413,10 +413,10 @@ unset($_SESSION['msg_sucesso'], $_SESSION['msg_erro']);
                     <div class="empty-illustration">
                         <i class="fas fa-inbox" id="empty-icon"></i>
                     </div>
-                    <h3 id="empty-title">Tudo em ordem! 🎉</h3>
+                    <h3 id="empty-title">Tudo em ordem!</h3>
                     <p id="empty-message">Nenhum empréstimo ativo no momento.</p>
                     <a href="catalogo_adm.php" class="empty-cta" id="empty-catalogo">
-                        <i class="fas fa-book"></i> Ir para o Catálogo
+                         Ir para o Catálogo
                     </a>
                     <button type="button" class="empty-cta" id="empty-limpar" style="display: none;">
                         <i class="fas fa-filter-circle-xmark"></i> Limpar filtros

@@ -348,6 +348,9 @@ function createLoanCard(loan, index, lang) {
       </div>`;
   }
 
+  const typeIcons = { livro: 'fa-book', revista: 'fa-newspaper', tcc: 'fa-graduation-cap' };
+  const typeIcon  = typeIcons[loan.type] || 'fa-book';
+  const typeLabel = getTranslation('type_' + (typeIcons[loan.type] ? loan.type : 'livro'), lang);
   const statusLabel = getStatusLabel(loan.status, lang);
   const loanDateStr = formatDate(loan.loanDate);
   const dueDateStr  = loan.dueDate ? formatDate(loan.dueDate) : getTranslation('status_pending', lang);
@@ -356,13 +359,14 @@ function createLoanCard(loan, index, lang) {
   card.innerHTML = `
     <div class="loan-cover-wrap">
       ${coverHTML}
+      <span class="loan-type-badge tipo-badge type-${loan.type || 'livro'}"><i class="fas ${typeIcon}"></i> ${typeLabel}</span>
       <span class="loan-badge status-${loan.status}">${statusLabel}</span>
     </div>
     <div class="loan-body">
       <h4 class="loan-title" title="${loan.title}">${loan.title}</h4>
       <p class="loan-author">${loan.author || getTranslation('author_unknown', lang)}</p>
       <div class="loan-dates">
-        <span><i class="far fa-calendar-alt"></i> ${getTranslation('loan_date', lang, { date: loanDateStr })}</span>
+        <span><i class="far fa-clock"></i> ${getTranslation('loan_date', lang, { date: loanDateStr })}</span>
         ${!isPending ? `<span><i class="far fa-calendar-check"></i> ${getTranslation('due_date', lang, { date: dueDateStr })}</span>` : ''}
       </div>
       ${daysInfo.text ? `<span class="loan-days ${daysInfo.cls}"><i class="fas fa-clock"></i> ${daysInfo.text}</span>` : ''}
